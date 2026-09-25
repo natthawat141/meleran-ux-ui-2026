@@ -1,0 +1,25 @@
+/* Full-width MeLearn artwork, no card chrome or gradients. */
+.home-newsletter { position: relative; isolation: isolate; overflow: hidden; display: grid; place-items: center; min-height: 420px; padding: 72px 24px; background: #fafbfc; border-block: 1px solid #edf0f2; }
+.home-newsletter-background { position: absolute; inset: -28% 0; z-index: -2; pointer-events: none; }
+.home-newsletter-background img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 55%; }
+.home-newsletter-content { width: min(590px, 100%); text-align: center; }
+.home-v3 .home-newsletter-content h2 { font-size: clamp(26px, 3vw, 36px); line-height: 1.4; margin-bottom: 25px; }
+.home-newsletter-input-row { display: flex; align-items: flex-start; gap: 10px; }
+.home-newsletter-input-row .ant-form-item { flex: 1; min-width: 0; margin-bottom: 0; text-align: left; }
+.home-newsletter-form .ant-input { height: 52px; padding-inline: 18px; border-radius: 10px; font-family: inherit; background: #fff; }
+.home-newsletter-form .ant-input::placeholder { color: #6e8495; }
+.home-newsletter-form .ant-btn { flex: 0 0 auto; height: 52px; padding-inline: 24px; box-shadow: none; }
+.home-v3 .home-newsletter-note { margin-top: 14px; font-size: 12px; line-height: 1.8; color: var(--home-muted); }
+.home-newsletter-success h3 { font-size: 21px; }
+.home-newsletter-success h3:focus { outline: none; }
+.home-v3 .home-newsletter-success p { margin-block: 12px 20px; color: var(--home-muted); font-size: 14px; }
+@media (max-width: 600px) {
+  .home-newsletter { min-height: 360px; padding: 56px 20px; }
+  .home-v3 .home-newsletter-content h2 { margin-bottom: 22px; }
+  .home-newsletter-input-row { gap: 8px; }
+  .home-newsletter-form .ant-btn { padding-inline: 15px; font-size: 14px; }
+  .home-newsletter-form .ant-input { padding-inline: 12px; font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-newsletter-background { transform: none !important; }
+}
