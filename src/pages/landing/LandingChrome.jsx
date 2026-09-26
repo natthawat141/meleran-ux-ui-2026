@@ -13,6 +13,7 @@ function MelearnLogo() {
 
 function MainNavigation({ onNavigate }) {
   return <>
+    <Link to="/chat" onClick={onNavigate}>คุยกับครู</Link>
     <Link to="/courses" onClick={onNavigate}>คอร์สเรียน</Link>
     <a href="/#how-it-works" onClick={onNavigate}>วิธีเรียน</a>
     <Link to="/articles" onClick={onNavigate}>บทความ</Link>

@@ -4,6 +4,7 @@ import { PublicShell, WorkspaceShell } from './components/Shell.jsx';
 import { useLms } from './store.jsx';
 import { CatalogPage, CourseDetailPage, InstructorProfilePage } from './pages/PublicPages.jsx';
 import { LandingPage } from './pages/landing/LandingPage.jsx';
+import { ChatApp } from './chat/ChatApp.jsx';
 import { BlogIndexPage, BlogArticlePage } from './pages/blog/BlogPages.jsx';
 import { AdminBlogPage, AdminBlogEditorPage } from './pages/admin/BlogAdminPages.jsx';
 import { LoginPage, RegisterPage, BecomeInstructorPage, DemoAccountPage, VerifyEmailPage } from './pages/AuthPages.jsx';
@@ -45,6 +46,7 @@ const admin = (element) => <RolePage roles={['admin']}>{element}</RolePage>;
 export function AppRoutes() {
   return <Routes>
     <Route path="/" element={<LandingPage/>}/>
+    <Route path="/chat/*" element={<ChatApp/>}/>
     <Route path="/courses" element={<Public><CatalogPage/></Public>}/>
     <Route path="/courses/:slug" element={<Public><CourseDetailPage/></Public>}/>
     <Route path="/articles" element={<BlogIndexPage/>}/>
