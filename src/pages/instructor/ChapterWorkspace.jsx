@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Breadcrumb, Button, Dropdown, Empty, Input, Modal, Space, Tag, message } from 'antd';
 import { ArrowDownOutlined, ArrowLeftOutlined, ArrowUpOutlined, CheckCircleOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined, HolderOutlined, MoreOutlined, PlayCircleOutlined, PlusOutlined, QuestionCircleOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store.jsx';
 import { createId } from '../../data.js';
 import { RichTextEditor } from '../../components/chapter/RichTextEditor.jsx';
@@ -14,23 +14,24 @@ const kinds = { video: { label: 'วิดีโอ', icon: <PlayCircleOutlined/
 
 export function ChapterWorkspace() {
   const { courseId, chapterId } = useParams();
+  const [search] = useSearchParams();
   const { data } = useLms();
   const course = data.courses.find((entry) => entry.id === courseId);
   const chapter = course?.chapters.find((entry) => entry.id === chapterId);
   if (!chapter) return <Empty description="ไม่พบบทนี้"/>;
-  return <Workspace key={`${courseId}:${chapterId}`} course={course} initial={chapter}/>;
+  return <Workspace key={`${courseId}:${chapterId}:${search}`} course={course} initial={chapter} initialItem={search.get('item')} initialAdd={search.get('add')} initialView={search.get('view')}/>;
 }
 
-function Workspace({ course, initial }) {
+function Workspace({ course, initial, initialItem, initialAdd, initialView }) {
   const { data, saveChapterWorkspace, removeChapter } = useLms();
   const navigate = useNavigate();
   const initialQuizzes = () => initial.items.filter((item) => item.quizId).map((item) => data.quizzes.find((quiz) => quiz.id === item.quizId)).filter(Boolean);
   const [draft, setDraft] = useState(() => structuredClone(initial));
   const [quizzes, setQuizzes] = useState(() => structuredClone(initialQuizzes()));
   const [baseline, setBaseline] = useState(() => JSON.stringify({ chapter: initial, quizzes: initialQuizzes() }));
-  const [selected, setSelected] = useState(initial.items[0]?.id || 'settings');
+  const [selected, setSelected] = useState(() => initialView === 'settings' ? 'settings' : initial.items.find((entry) => entry.id === initialItem)?.id || initial.items[0]?.id || 'settings');
   const [preview, setPreview] = useState(false);
-  const [adding, setAdding] = useState(null);
+  const [adding, setAdding] = useState(() => Object.hasOwn(kinds, initialAdd) ? initialAdd : null);
   const [newTitle, setNewTitle] = useState('');
   const [undo, setUndo] = useState(null);
   const [error, setError] = useState('');
@@ -50,7 +51,9 @@ function Workspace({ course, initial }) {
     const beforeUnload = (event) => { if (dirtyRef.current) { event.preventDefault(); event.returnValue = ''; } };
     const click = (event) => {
       const anchor = event.target.closest?.('a[href]');
-      if (!dirtyRef.current || !anchor || anchor.target === '_blank' || new URL(anchor.href).pathname === location.pathname) return;
+      if (!dirtyRef.current || !anchor || anchor.target === '_blank') return;
+      const target = new URL(anchor.href);
+      if (target.pathname === location.pathname && target.search === location.search) return;
       if (!window.confirm('มีการแก้ไขที่ยังไม่บันทึก ต้องการออกและทิ้งการเปลี่ยนแปลงหรือไม่?')) { event.preventDefault(); event.stopPropagation(); }
     };
     // Browser Back needs its own guard because this prototype uses BrowserRouter.

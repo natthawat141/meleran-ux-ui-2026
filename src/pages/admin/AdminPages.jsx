@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Alert, Button, Descriptions, Empty, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag, Typography, message } from 'antd';
-import { ArrowRightOutlined, MailOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
+import { Alert, Avatar, Button, Descriptions, Empty, Form, Input, Modal, Pagination, Popconfirm, Segmented, Select, Space, Table, Tag, Typography, message } from 'antd';
+import { AppstoreOutlined, ArrowRightOutlined, MailOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store.jsx';
 import { PageTitle, StatusTag } from '../../components/common.jsx';
 import { formatPrice, flattenItems, instructorFor } from '../../data.js';
+import './admin-courses.css';
 
 const { Text, Title } = Typography;
 
@@ -74,6 +75,8 @@ export function AdminInstructorRequestDetailPage() {
 export function AdminCoursesPage() {
   const { data } = useLms();
   const navigate = useNavigate();
+  const [view, setView] = useState('table');
+  const [cardPage, setCardPage] = useState(1);
   const columns = [
     { title: 'คอร์ส', render: (_, course) => <div className="table-course-name"><strong>{course.title}</strong><Text type="secondary">{course.category} · {flattenItems(course).length} รายการ</Text></div> },
     { title: 'ผู้สอน', render: (_, course) => instructorFor(data, course)?.name ?? '—' },
@@ -81,7 +84,32 @@ export function AdminCoursesPage() {
     { title: 'สถานะ', dataIndex: 'status', render: (status) => <StatusTag status={status}/> },
     { title: 'จัดการ', render: (_, course) => <Space wrap><Button onClick={() => navigate(`/teach/courses/${course.id}/settings`)}>แก้ไขคอร์ส</Button><Button onClick={() => navigate(`/teach/courses/${course.id}/curriculum`)}>จัดบทเรียน</Button><Button type="text" onClick={() => navigate(`/admin/courses/${course.id}`)}>รายละเอียด</Button></Space> },
   ];
-  return <><PageTitle eyebrow="ผู้ดูแลระบบ" title="คอร์สทั้งหมด" subtitle="สร้างคอร์สและจัดการเนื้อหาของผู้สอนทุกคน" actions={<Link to="/teach/courses/new"><Button type="primary" icon={<PlusOutlined/>}>สร้างคอร์ส</Button></Link>}/><Table rowKey="id" dataSource={data.courses} columns={columns} pagination={{ pageSize: 10 }} scroll={{ x: 850 }}/></>;
+  const pageSize = 9;
+  const cardCourses = data.courses.slice((cardPage - 1) * pageSize, cardPage * pageSize);
+  const switchView = (value) => { setView(value); setCardPage(1); };
+  return <>
+    <PageTitle eyebrow="ผู้ดูแลระบบ" title="คอร์สทั้งหมด" subtitle="สร้างคอร์สและจัดการเนื้อหาของผู้สอนทุกคน" actions={<Link to="/teach/courses/new"><Button type="primary" icon={<PlusOutlined/>}>สร้างคอร์ส</Button></Link>}/>
+    <div className="admin-courses-toolbar"><span>{data.courses.length} คอร์ส</span><Segmented aria-label="รูปแบบการแสดงคอร์ส" value={view} onChange={switchView} options={[{ value: 'table', label: 'ตาราง', icon: <UnorderedListOutlined/> }, { value: 'card', label: 'การ์ด', icon: <AppstoreOutlined/> }]}/></div>
+    {view === 'table' ? <Table rowKey="id" dataSource={data.courses} columns={columns} pagination={{ pageSize: 10 }} scroll={{ x: 850 }}/> : <>
+      {data.courses.length ? <div className="admin-course-card-grid">{cardCourses.map((course) => {
+        const teacher = instructorFor(data, course);
+        const lessonCount = flattenItems(course).length;
+        const learnerCount = data.enrollments.filter((enrollment) => enrollment.courseId === course.id).length;
+        return <article className="admin-course-card" key={course.id}>
+          <div className="admin-course-card-cover"><img src={course.cover} alt={`ภาพปก ${course.title}`} loading="lazy"/><StatusTag status={course.status}/></div>
+          <div className="admin-course-card-body">
+            <div className="admin-course-card-category">{course.category} <span>·</span> {course.level}</div>
+            <h2>{course.title}</h2>
+            {course.subtitle && <p className="admin-course-card-summary">{course.subtitle}</p>}
+            <div className="admin-course-card-teacher"><Avatar size={30}>{teacher?.name?.slice(0, 1) ?? 'ผ'}</Avatar><span>{teacher?.name ?? 'ยังไม่ระบุผู้สอน'}</span><strong>{formatPrice(course.price)}</strong></div>
+            <div className="admin-course-card-stats"><span>{course.chapters.length} บท</span><span>{lessonCount} รายการเรียน</span><span>{learnerCount} ผู้เรียน</span></div>
+            <div className="admin-course-card-actions"><Button onClick={() => navigate(`/teach/courses/${course.id}/settings`)}>แก้ไขคอร์ส</Button><Button onClick={() => navigate(`/teach/courses/${course.id}/curriculum`)}>จัดบทเรียน</Button><Button type="link" onClick={() => navigate(`/admin/courses/${course.id}`)}>รายละเอียด</Button></div>
+          </div>
+        </article>;
+      })}</div> : <Empty description="ยังไม่มีคอร์ส"/>}
+      {data.courses.length > pageSize && <Pagination className="admin-course-card-pagination" current={cardPage} pageSize={pageSize} total={data.courses.length} onChange={setCardPage} showSizeChanger={false} showTotal={(total, range) => `${range[0]}–${range[1]} จาก ${total} คอร์ส`}/>}
+    </>}
+  </>;
 }
 
 export function AdminCourseDetailPage() {

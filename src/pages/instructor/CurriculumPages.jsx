@@ -1,31 +1,11 @@
 import React from 'react';
-import { Alert, Button, Collapse, Empty, Form, Input, Modal, Popconfirm, Space, Typography, message } from 'antd';
-import { EditOutlined, FileAddOutlined, PlayCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Alert, Button, Empty, Form, Input, Popconfirm, Typography, message } from 'antd';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store.jsx';
-import { ContentTypeIcon, PageTitle, StatusTag } from '../../components/common.jsx';
-import { formatPrice } from '../../data.js';
+import { PageTitle } from '../../components/common.jsx';
+export { CurriculumPage } from './CurriculumWorkspace.jsx';
 
-const { Text, Title } = Typography;
-
-export function CurriculumPage() {
-  const { courseId } = useParams();
-  const { data, saveChapter, removeChapter, removeItem } = useLms();
-  const navigate = useNavigate();
-  const course = data.courses.find((item) => item.id === courseId);
-  const [chapterForm] = Form.useForm();
-  if (!course) return <Empty description="ไม่พบคอร์สนี้"/>;
-  const createChapter = () => Modal.confirm({ title: 'เพิ่มบทเรียน', icon: null, content: <Form form={chapterForm} layout="vertical" className="modal-form"><Form.Item name="title" label="ชื่อบท" rules={[{ required: true, message: 'กรอกชื่อบท' }]}><Input autoFocus placeholder="เช่น เริ่มจากพื้นฐาน"/></Form.Item><Form.Item name="description" label="คำอธิบาย"><Input.TextArea rows={2}/></Form.Item></Form>, okText: 'เพิ่มบท', cancelText: 'ยกเลิก', onOk: async () => { try { const values = await chapterForm.validateFields(); saveChapter(course.id, values); chapterForm.resetFields(); message.success('เพิ่มบทแล้ว'); } catch { return Promise.reject(); } } });
-  const makeItemPath = (type, chapterId) => type === 'quiz' ? `/teach/quizzes/new?course=${course.id}&chapter=${chapterId}` : `/teach/courses/${course.id}/${type === 'video' ? 'videos' : 'articles'}/new?chapter=${chapterId}`;
-  return <><PageTitle eyebrow="จัดการคอร์ส" title="โครงสร้างบทเรียน" subtitle={`${course.title} · ราคา ${formatPrice(course.price)}`} actions={<Space><Link to={`/teach/courses/${course.id}`}><Button>ภาพรวม</Button></Link><Button type="primary" icon={<PlusOutlined/>} onClick={createChapter}>เพิ่มบท</Button></Space>}/><div className="curriculum-help">จัดบทเรียนจากบนลงล่าง เพิ่มวิดีโอ บทความ หรือแบบทดสอบไว้ภายในบท แล้วเปิดดูตัวอย่างก่อนเผยแพร่</div>
-    {course.chapters.length ? <div className="curriculum-chapters">{course.chapters.map((chapter, index) => <section className="curriculum-chapter" key={chapter.id}><div className="curriculum-chapter-head"><div><Text type="secondary">บทที่ {index + 1}</Text><Title level={4}>{chapter.title}</Title><Text type="secondary">{chapter.description}</Text></div><Space wrap><Button icon={<EditOutlined/>} onClick={() => navigate(`/teach/courses/${course.id}/chapters/${chapter.id}`)}>แก้บท</Button><Popconfirm title="ลบบทนี้หรือไม่" description="รายการเรียนรู้ภายในบทจะถูกนำออกจากคอร์ส" okText="ลบบท" cancelText="ยกเลิก" onConfirm={() => { removeChapter(course.id, chapter.id); message.success('ลบบทแล้ว'); }}><Button danger>ลบ</Button></Popconfirm></Space></div>
-        <div className="curriculum-items">{chapter.items.map((item) => <div className="curriculum-item" key={item.id}><ContentTypeIcon type={item.type}/><div><strong>{item.title}</strong><Text type="secondary">{item.type === 'video' ? `วิดีโอ · ${item.duration || 'ไม่ระบุเวลา'}` : item.type === 'article' ? `บทความ · ${item.readingMinutes || 0} นาที` : `แบบทดสอบ · ${data.quizzes.find((quiz) => quiz.id === item.quizId)?.questions.length ?? 0} ข้อ`}</Text></div><Button onClick={() => navigate(item.type === 'quiz' ? `/teach/quizzes/${item.quizId}` : `/teach/courses/${course.id}/${item.type === 'video' ? 'videos' : 'articles'}/${item.id}?chapter=${chapter.id}`)}>แก้ไข</Button><Popconfirm title="ลบรายการนี้หรือไม่" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => { removeItem(course.id, chapter.id, item.id); message.success('ลบรายการแล้ว'); }}><Button danger>ลบ</Button></Popconfirm></div>)}</div>
-        <div className="chapter-content-count"><span>{chapter.items.filter((item) => item.type === 'video').length} วิดีโอ</span><span>{chapter.items.filter((item) => item.type === 'quiz').length} แบบฝึกหัด</span><span>{chapter.items.filter((item) => item.type === 'article').length} บทความ</span></div>
-        <div className="add-learning-content"><div><Text strong>เพิ่มเนื้อหาในบทนี้</Text><p>เพิ่มวิดีโอและแบบฝึกหัดได้หลายรายการในบทเดียว</p></div><Space wrap><Button icon={<PlusOutlined/>} onClick={() => navigate(makeItemPath('video', chapter.id))}>เพิ่มวิดีโอ</Button><Button icon={<PlusOutlined/>} onClick={() => navigate(makeItemPath('article', chapter.id))}>เพิ่มบทความ</Button><Button icon={<PlusOutlined/>} onClick={() => navigate(makeItemPath('quiz', chapter.id))}>เพิ่มแบบฝึกหัด</Button></Space></div>
-      </section>)}</div> : <div className="learning-empty"><Empty description="เริ่มต้นด้วยการเพิ่มบทแรก"><Button type="primary" onClick={createChapter}>เพิ่มบท</Button></Empty></div>}
-    <div className="curriculum-footer"><Link to={`/teach/courses/${course.id}/preview`}><Button type="primary">ดูตัวอย่างคอร์ส</Button></Link><Link to={`/teach/courses/${course.id}/settings`}><Button>ตั้งค่าคอร์ส</Button></Link></div>
-  </>;
-}
+const { Text } = Typography;
 
 export function ChapterEditorPage() {
   const { courseId, chapterId } = useParams();

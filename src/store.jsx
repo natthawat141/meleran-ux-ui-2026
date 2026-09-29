@@ -129,6 +129,25 @@ export function LmsProvider({ children }) {
     return next;
   }), [update]);
 
+  // Reordering changes IDs' positions only, preserving content and learning history.
+  const reorderCurriculum = useCallback((courseId, chapterId, orderedIds) => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    if (!course || !currentUser || (currentUser.role !== 'admin' && !(currentUser.role === 'instructor' && course.instructorId === currentUser.id))) return { ok: false, message: 'ไม่มีสิทธิ์เรียงเนื้อหาในคอร์สนี้' };
+    const entries = chapterId ? course.chapters.find((entry) => entry.id === chapterId)?.items : course.chapters;
+    if (!entries || orderedIds.length !== entries.length || new Set(orderedIds).size !== entries.length || orderedIds.some((id) => !entries.some((entry) => entry.id === id))) return { ok: false, message: 'รายการถูกเปลี่ยนแล้ว กรุณาโหลดหน้าใหม่' };
+    const next = structuredClone(data);
+    const target = next.courses.find((entry) => entry.id === courseId);
+    if (chapterId) {
+      const chapter = target.chapters.find((entry) => entry.id === chapterId);
+      chapter.items = orderedIds.map((id) => chapter.items.find((entry) => entry.id === id));
+    } else target.chapters = orderedIds.map((id) => target.chapters.find((entry) => entry.id === id));
+    target.updatedAt = new Date().toISOString();
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกลำดับไม่ได้ พื้นที่เก็บในเบราว์เซอร์ไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, [currentUser, data]);
+
   // Commit the chapter workspace as one unit; a failed browser write keeps the draft open.
   const saveChapterWorkspace = useCallback((courseId, chapter, quizzes, baseline) => {
     const course = data.courses.find((entry) => entry.id === courseId);
@@ -369,11 +388,11 @@ export function LmsProvider({ children }) {
 
   const value = useMemo(() => ({
     data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse,
-    saveChapter, saveChapterWorkspace, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment,
+    saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment,
     markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest,
     createInstructorInvite, acceptInstructorInvite,
     changeUserRole, updateProfile, resetPassword,
-  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
+  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
 
   return <LmsContext.Provider value={value}>{children}</LmsContext.Provider>;
 }
