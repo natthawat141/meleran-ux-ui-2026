@@ -3,10 +3,11 @@ import { ConfigProvider } from 'antd';
 import { useLms } from '../../store.jsx';
 import { LandingHeader, LandingFooter } from './LandingChrome.jsx';
 import { CourseCollection } from './CourseCollection.jsx';
+import { LearningInvitation } from './LearningInvitation.jsx';
 import { LandingFaq } from './LearningSections.jsx';
 import { LearningGuide } from './LearningGuide.jsx';
 import { ReadingCollection } from './ReadingCollection.jsx';
-import { PartnerPreview } from './PartnerPreview.jsx';
+import { BrandIntroduction, FounderPreview } from './BrandStory.jsx';
 import { LandingHero } from './LandingHero.jsx';
 import { NewsletterBanner } from './NewsletterBanner.jsx';
 import './landing.css';
@@ -44,10 +45,12 @@ export function LandingPage() {
       <LandingHeader />
       <main id="home-main" tabIndex={-1}>
         <LandingHero />
-        <CourseCollection courses={courses} data={data} />
-        <LearningGuide />
-        <PartnerPreview />
+        <BrandIntroduction />
+        <FounderPreview />
+        <LearningInvitation />
         <ReadingCollection posts={data.blogPosts.filter((post) => post.status === 'published')} />
+        <LearningGuide />
+        <CourseCollection courses={courses} data={data} />
         <LandingFaq />
         <NewsletterBanner />
       </main>

@@ -16,6 +16,7 @@ function MainNavigation({ onNavigate }) {
     <Link to="/courses" onClick={onNavigate}>คอร์สเรียน</Link>
     <a href="/#how-it-works" onClick={onNavigate}>วิธีเรียน</a>
     <Link to="/articles" onClick={onNavigate}>บทความ</Link>
+    <Link to="/about" onClick={onNavigate}>รู้จักเรา</Link>
     <Link to="/become-instructor" onClick={onNavigate}>สำหรับผู้สอน</Link>
   </>;
 }
@@ -63,6 +64,7 @@ export function LandingFooter() {
           <Link to="/courses">คอร์สทั้งหมด</Link>
           <a href="/#how-it-works">วิธีเรียนกับเรา</a>
           <Link to="/articles">บทความทั้งหมด</Link>
+          <Link to="/about">เรื่องราวของ melearn</Link>
           <a href="/#newsletter">รับข่าวสารจาก melearn</a>
         </nav>
         <nav aria-label="ช่วยเหลือผู้เรียน">
