@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppShell, Avatar, Burger, Button, Group, Menu, NavLink, Select, Stack, Text } from '@mantine/core';
-import { IconAdjustments, IconArticle, IconBook2, IconCertificate, IconChevronDown, IconCirclePlus, IconClipboardCheck, IconLayoutDashboard, IconLogout, IconReceipt, IconSchool, IconSettings, IconShoppingBag, IconUsers } from '@tabler/icons-react';
+import { IconAdjustments, IconArticle, IconChartBar, IconBook2, IconCertificate, IconChevronDown, IconCirclePlus, IconClipboardCheck, IconLayoutDashboard, IconLogout, IconReceipt, IconSchool, IconSettings, IconShoppingBag, IconUsers } from '@tabler/icons-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLms } from '../store.jsx';
 import { LandingHeader, LandingFooter } from '../pages/landing/LandingChrome.jsx';
@@ -26,6 +26,8 @@ const roleMenus = {
   ],
   admin: [
     { key: '/admin', icon: <IconLayoutDashboard />, label: 'ภาพรวมระบบ' },
+    { key: '/admin/business-analytics', icon: <IconChartBar />, label: 'ภาพรวมธุรกิจ' },
+    { key: '/admin/finance', icon: <IconReceipt />, label: 'รายงานการเงิน' },
     { key: '/admin/articles', icon: <IconArticle />, label: 'บทความ' },
     { key: '/admin/instructors', icon: <IconSchool />, label: 'ผู้สอนและคำขอ' },
     { key: '/admin/courses', icon: <IconBook2 />, label: 'คอร์สทั้งหมด' },

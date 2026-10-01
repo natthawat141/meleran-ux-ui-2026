@@ -18,7 +18,7 @@ import { CurriculumPage, ContentEditorPage } from './pages/instructor/Curriculum
 import { ChapterWorkspace as ChapterEditorPage } from './pages/instructor/ChapterWorkspace.jsx';
 import { QuizManagerPage, QuizEditorPage, QuizAttemptsPage, GradeEssayPage } from './pages/instructor/QuizPages.jsx';
 import { CoursePreviewPage, InstructorLearnersPage } from './pages/instructor/InsightPages.jsx';
-import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorRequestsPage, AdminInstructorRequestDetailPage, AdminCoursesPage, AdminCourseDetailPage } from './pages/admin/AdminPages.jsx';
+import { AdminBusinessAnalyticsPage, AdminFinanceReportPage, AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorRequestsPage, AdminInstructorRequestDetailPage, AdminCoursesPage, AdminCourseDetailPage } from './pages/admin/AdminPages.jsx';
 import { NoAccessPage, NotFoundPage } from './pages/SystemPages.jsx';
 
 function Public({ children }) { return <PublicShell>{children}</PublicShell>; }
@@ -96,6 +96,8 @@ export function AppRoutes() {
     <Route path="/teach/learners" element={instructor(<InstructorLearnersPage/>)}/>
 
     <Route path="/admin" element={admin(<AdminDashboardPage/>)}/>
+    <Route path="/admin/business-analytics" element={admin(<AdminBusinessAnalyticsPage/>)}/>
+    <Route path="/admin/finance" element={admin(<AdminFinanceReportPage/>)}/>
     <Route path="/admin/articles" element={admin(<AdminBlogPage/>)}/>
     <Route path="/admin/articles/new" element={admin(<AdminBlogEditorPage/>)}/>
     <Route path="/admin/articles/:id/edit" element={admin(<AdminBlogEditorPage/>)}/>

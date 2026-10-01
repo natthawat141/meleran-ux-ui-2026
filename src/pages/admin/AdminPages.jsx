@@ -6,15 +6,86 @@ import { useLms } from '../../store.jsx';
 import { PageTitle, StatusTag } from '../../components/common.jsx';
 import { formatPrice, flattenItems, instructorFor } from '../../data.js';
 import './admin-courses.css';
+import { BusinessAnalyticsPage } from './BusinessAnalyticsPage';
+import { FinanceReportPage } from './FinanceReportPage';
 
 const { Text, Title } = Typography;
+
+export function AdminBusinessAnalyticsPage() {
+  const { data } = useLms();
+  return <BusinessAnalyticsPage courses={data.courses} />;
+}
+
+export function AdminFinanceReportPage() {
+  const { data } = useLms();
+  return <FinanceReportPage courses={data.courses} />;
+}
 
 export function AdminDashboardPage() {
   const { data } = useLms();
   const pendingRequests = data.instructorRequests.filter((request) => request.status === 'pending').length;
   const pendingEssays = data.attempts.filter((attempt) => attempt.essayStatus === 'pending').length;
   const sales = data.orders.filter((order) => order.status === 'paid').reduce((sum, order) => sum + order.amount, 0);
-  return <><PageTitle eyebrow="ผู้ดูแลระบบ" title="ภาพรวมระบบ" subtitle="ตรวจงานที่ต้องดำเนินการและดูสถานะข้อมูลตัวอย่าง"/><div className="admin-work-summary"><Link to="/admin/instructors"><span>คำขอผู้สอน</span><strong>{pendingRequests}</strong><small>รอพิจารณา <ArrowRightOutlined/></small></Link><Link to="/teach/quizzes"><span>คำตอบข้อเขียน</span><strong>{pendingEssays}</strong><small>รอตรวจจากผู้สอน <ArrowRightOutlined/></small></Link><Link to="/admin/courses"><span>คอร์สเผยแพร่</span><strong>{data.courses.filter((course) => course.status === 'published').length}</strong><small>จาก {data.courses.length} คอร์ส <ArrowRightOutlined/></small></Link><Link to="/admin/orders"><span>ยอดซื้อสำเร็จ</span><strong>฿{sales.toLocaleString('th-TH')}</strong><small>ข้อมูลการชำระจำลอง <ArrowRightOutlined/></small></Link></div><section className="admin-recent"><div className="admin-recent-heading"><Title level={4}>คอร์สล่าสุด</Title><Link to="/admin/courses">ดูคอร์สทั้งหมด</Link></div>{data.courses.slice(0, 5).map((course) => <Link to={`/admin/courses/${course.id}`} className="admin-course-row" key={course.id}><div><strong>{course.title}</strong><Text type="secondary">{instructorFor(data, course)?.name} · {flattenItems(course).length} เนื้อหา</Text></div><StatusTag status={course.status}/><ArrowRightOutlined/></Link>)}</section></>;
+
+  return (
+    <>
+      <PageTitle eyebrow="ผู้ดูแลระบบ" title="ภาพรวมระบบ" subtitle="ตรวจงานที่ต้องดำเนินการและดูสถานะข้อมูลตัวอย่าง" actions={<Space wrap><Link to="/admin/business-analytics"><Button>ภาพรวมธุรกิจ</Button></Link><Link to="/admin/finance"><Button>รายงานการเงิน</Button></Link></Space>} />
+      <div className="admin-work-summary">
+        <Link to="/admin/users"><span>ผู้เรียนในระบบ</span><strong>{data.users.filter(user => user.role === 'learner').length}</strong><small>จากผู้ใช้ทั้งหมด {data.users.length} คน</small></Link>
+        <Link to="/admin/instructors"><span>ผู้สอน</span><strong>{data.users.filter(user => user.role === 'instructor').length}</strong><small>ตรวจผู้สอนและคำขอ</small></Link>
+        <Link to="/admin/courses"><span>การลงทะเบียน</span><strong>{data.enrollments.length}</strong><small>จำนวนรายการ ไม่ใช่ผู้เรียนไม่ซ้ำ</small></Link>
+        <Link to="/admin/orders"><span>คำสั่งซื้อรอดำเนินการ</span><strong>{data.orders.filter(order => order.status === 'pending').length}</strong><small>ล้มเหลว {data.orders.filter(order => order.status === 'failed').length} รายการ</small></Link>
+      </div>
+      <div className="admin-work-summary">
+        <Link to="/admin/instructors">
+          <span>คำขอผู้สอน</span>
+          <strong>{pendingRequests}</strong>
+          <small>
+            รอพิจารณา <ArrowRightOutlined />
+          </small>
+        </Link>
+        <Link to="/teach/quizzes">
+          <span>คำตอบข้อเขียน</span>
+          <strong>{pendingEssays}</strong>
+          <small>
+            รอตรวจจากผู้สอน <ArrowRightOutlined />
+          </small>
+        </Link>
+        <Link to="/admin/courses">
+          <span>คอร์สเผยแพร่</span>
+          <strong>{data.courses.filter((course) => course.status === 'published').length}</strong>
+          <small>
+            จาก {data.courses.length} คอร์ส <ArrowRightOutlined />
+          </small>
+        </Link>
+        <Link to="/admin/orders">
+          <span>ยอดซื้อสำเร็จ</span>
+          <strong>฿{sales.toLocaleString('th-TH')}</strong>
+          <small>
+            ข้อมูลการชำระจำลอง <ArrowRightOutlined />
+          </small>
+        </Link>
+      </div>
+      <section className="admin-recent">
+        <div className="admin-recent-heading">
+          <Title level={4}>คอร์สล่าสุด</Title>
+          <Link to="/admin/courses">ดูคอร์สทั้งหมด</Link>
+        </div>
+        {data.courses.slice(0, 5).map((course) => (
+          <Link to={`/admin/courses/${course.id}`} className="admin-course-row" key={course.id}>
+            <div>
+              <strong>{course.title}</strong>
+              <Text type="secondary">
+                {instructorFor(data, course)?.name} · {flattenItems(course).length} เนื้อหา
+              </Text>
+            </div>
+            <StatusTag status={course.status} />
+            <ArrowRightOutlined />
+          </Link>
+        ))}
+      </section>
+    </>
+  );
 }
 
 export function AdminUsersPage() {

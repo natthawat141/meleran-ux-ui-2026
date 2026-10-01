@@ -13,3 +13,14 @@ Demo sign-in:
 | Admin | `admin@learn.demo` | `Admin123!` |
 
 Reset the browser demo data from Account → Reset demo data. The instructor role switch in the header is a walkthrough shortcut; use Admin → Instructors to review the invite and approval flows.
+
+
+## Admin business and finance reporting prototype
+
+- `/admin/business-analytics`: synthetic daily activity, learning/purchase-hour heatmaps, funnel and course breakdown.
+- `/admin/finance`: synthetic confirmed payments, completed refunds, fees, signed ledger and CSV. No real payment or refund action.
+- [UX/UI specification](docs/BUSINESS_ANALYTICS_UI_SPEC.md)
+- [Metrics, raw events and draft API contract](docs/BUSINESS_ANALYTICS_DATA_SPEC.md)
+- [Admin management gaps and quick work list](docs/ADMIN_MANAGEMENT_GAP_AUDIT_TH.md)
+
+Verify with `npm run build`; domain tests: `node --test tests/business-reports.test.mjs` on Node 24. This feature uses isolated TS/TSX modules supported by Vite; it does not migrate the existing JavaScript application.
