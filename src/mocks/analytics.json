@@ -1,0 +1,240 @@
+{
+  "users": [
+    {
+      "id": "u-somchai",
+      "name": "สมชาย หมายมั่น",
+      "email": "somchai@learn.demo",
+      "password": "Learn123!",
+      "role": "learner",
+      "bio": "สนใจพัฒนาทักษะการสื่อสารในองค์กร",
+      "status": "active"
+    },
+    {
+      "id": "u-aree",
+      "name": "อารี รักเรียน",
+      "email": "aree@learn.demo",
+      "password": "Learn123!",
+      "role": "learner",
+      "bio": "ผู้เรียนที่ชอบเรียนรู้ทักษะใหม่ด้วยตนเอง",
+      "status": "active"
+    },
+    {
+      "id": "u-wichai",
+      "name": "วิชัย มุ่งมั่น",
+      "email": "wichai@learn.demo",
+      "password": "Learn123!",
+      "role": "learner",
+      "bio": "พนักงานฝ่ายการตลาด",
+      "status": "active"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz-writing-pre",
+      "courseId": "course-writing",
+      "title": "แบบทดสอบวัดระดับก่อนเรียน: พื้นฐานการเขียน",
+      "passPercent": 60,
+      "assessmentStage": "pre_test",
+      "comparisonSetId": "comp-writing-2026",
+      "questions": [
+        {
+          "id": "q-pre-1",
+          "type": "choice",
+          "prompt": "องค์ประกอบสำคัญอันดับแรกในการเขียนสื่อสารคือข้อใด",
+          "options": ["คำศัพท์ที่สละสลวย", "การเข้าใจผู้อ่านและวัตถุประสงค์", "ความยาวของเนื้อหา"],
+          "answer": 1,
+          "points": 5
+        },
+        {
+          "id": "q-pre-2",
+          "type": "choice",
+          "prompt": "เมื่อต้องการให้ผู้อ่านปฏิบัติตาม ควรวาง Call to Action ไว้ส่วนใด",
+          "options": ["ท้ายข้อความอย่างชัดเจน", "ซ่อนไว้ในย่อหน้ากลาง", "ไม่ต้องใส่ ปล่อยให้เดาเอง"],
+          "answer": 0,
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "quiz-writing-post",
+      "courseId": "course-writing",
+      "title": "แบบทดสอบประเมินผลหลังเรียน: การเขียนเชิงประยุกต์",
+      "passPercent": 60,
+      "assessmentStage": "post_test",
+      "comparisonSetId": "comp-writing-2026",
+      "questions": [
+        {
+          "id": "q-post-1",
+          "type": "choice",
+          "prompt": "ประโยคที่ดีตามหลักการตัดคำฟุ่มเฟือยควรมีลักษณะอย่างไร",
+          "options": ["กระชับ สื่อความตรงไปตรงมา และรักษาใจความครบ", "ใช้คำเชื่อมให้มากที่สุดเพื่อความเชื่อมโยง", "ใช้ภาษาทางการระดับสูงสุดเสมอ"],
+          "answer": 0,
+          "points": 5
+        },
+        {
+          "id": "q-post-2",
+          "type": "essay",
+          "responseMode": "either",
+          "prompt": "จงเรียบเรียงข้อความอีเมลแจ้งการประชุมให้กระชับ ไม่เกิน 3 บรรทัด หรือแนบภาพตัวอย่างงานเขียนของคุณ",
+          "rubric": "ประเมินความชัดเจนของประเด็น (2 คะแนน) และความกระชับ (3 คะแนน)",
+          "points": 5
+        }
+      ]
+    }
+  ],
+  "comparisonSets": [
+    {
+      "id": "comp-writing-2026",
+      "title": "ชุดประเมินทักษะการเขียน ก.ย. 2026",
+      "courseId": "course-writing",
+      "preQuizId": "quiz-writing-pre",
+      "postQuizId": "quiz-writing-post",
+      "description": "เปรียบเทียบคะแนนก่อนและหลังเรียนของผู้เรียนในคอร์สเขียนให้ชัด สื่อสารให้ตรง",
+      "createdAt": "2026-09-18T00:00:00.000Z"
+    }
+  ],
+  "enrollments": [
+    { "id": "enroll-w-somchai", "courseId": "course-writing", "userId": "u-somchai", "createdAt": "2026-09-12T10:00:00.000Z" },
+    { "id": "enroll-w-aree", "courseId": "course-writing", "userId": "u-aree", "createdAt": "2026-09-14T11:00:00.000Z" },
+    { "id": "enroll-w-wichai", "courseId": "course-writing", "userId": "u-wichai", "createdAt": "2026-09-20T14:00:00.000Z" },
+    { "id": "enroll-d-somchai", "courseId": "course-data", "userId": "u-somchai", "createdAt": "2026-09-15T09:00:00.000Z" },
+    { "id": "enroll-d-aree", "courseId": "course-data", "userId": "u-aree", "createdAt": "2026-09-16T15:00:00.000Z" }
+  ],
+  "attempts": [
+    {
+      "id": "att-pre-natee",
+      "quizId": "quiz-writing-pre",
+      "courseId": "course-writing",
+      "userId": "u-natee",
+      "answers": { "q-pre-1": 1, "q-pre-2": 1 },
+      "score": 5,
+      "maxChoice": 10,
+      "percent": 50,
+      "essayStatus": "none",
+      "passed": false,
+      "status": "submitted",
+      "submittedAt": "2026-09-21T09:30:00.000Z"
+    },
+    {
+      "id": "att-post-natee",
+      "quizId": "quiz-writing-post",
+      "courseId": "course-writing",
+      "userId": "u-natee",
+      "answers": {
+        "q-post-1": 0,
+        "q-post-2": { "text": "เรียนทีมงาน ขอแจ้งประชุมสรุปโครงการวันพรุ่งนี้ 10:00 น. ห้อง A ขอบคุณครับ" }
+      },
+      "score": 5,
+      "maxChoice": 5,
+      "essayStatus": "graded",
+      "essayScore": 4,
+      "essayFeedback": "กระชับและสื่อสารตรงจุดมาก เยี่ยมครับ",
+      "totalScore": 9,
+      "maxScore": 10,
+      "finalPercent": 90,
+      "percent": 90,
+      "passed": true,
+      "status": "submitted",
+      "submittedAt": "2026-09-26T14:10:00.000Z",
+      "gradedAt": "2026-09-27T10:00:00.000Z"
+    },
+    {
+      "id": "att-writing-mid-natee",
+      "quizId": "quiz-writing",
+      "courseId": "course-writing",
+      "userId": "u-natee",
+      "answers": {
+        "qw-1": 1,
+        "qw-2": { "text": "ปรับจาก: 'เนื่องจากมีข้อจำกัดด้านเวลา จึงไม่สามารถกระทำได้' เป็น: 'ทำไม่ทันเพราะเวลาจำกัด'" }
+      },
+      "score": 1,
+      "maxChoice": 1,
+      "percent": 100,
+      "essayStatus": "pending",
+      "passed": null,
+      "status": "submitted",
+      "submittedAt": "2026-09-28T10:15:00.000Z"
+    },
+    {
+      "id": "att-pre-somchai",
+      "quizId": "quiz-writing-pre",
+      "courseId": "course-writing",
+      "userId": "u-somchai",
+      "answers": { "q-pre-1": 1, "q-pre-2": 0 },
+      "score": 10,
+      "maxChoice": 10,
+      "percent": 100,
+      "essayStatus": "none",
+      "passed": true,
+      "status": "submitted",
+      "submittedAt": "2026-09-22T13:40:00.000Z"
+    },
+    {
+      "id": "att-writing-mid-aree",
+      "quizId": "quiz-writing",
+      "courseId": "course-writing",
+      "userId": "u-aree",
+      "answers": {
+        "qw-1": 1,
+        "qw-2": {
+          "text": "ข้อความต้นฉบับยาวเกินไป ปรับให้สั้นลงโดยเน้นใจความหลักว่าใครต้องทำอะไร",
+          "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600&q=80"
+        }
+      },
+      "score": 1,
+      "maxChoice": 1,
+      "percent": 100,
+      "essayStatus": "pending",
+      "passed": null,
+      "status": "submitted",
+      "submittedAt": "2026-09-29T09:20:00.000Z"
+    },
+    {
+      "id": "att-pre-aree",
+      "quizId": "quiz-writing-pre",
+      "courseId": "course-writing",
+      "userId": "u-aree",
+      "answers": { "q-pre-1": 0, "q-pre-2": 0 },
+      "score": 5,
+      "maxChoice": 10,
+      "percent": 50,
+      "essayStatus": "none",
+      "passed": false,
+      "status": "submitted",
+      "submittedAt": "2026-09-23T11:00:00.000Z"
+    },
+    {
+      "id": "att-post-aree",
+      "quizId": "quiz-writing-post",
+      "courseId": "course-writing",
+      "userId": "u-aree",
+      "answers": {
+        "q-post-1": 0,
+        "q-post-2": { "text": "เรียนทุกท่าน นัดประชุมวางแผนไตรมาส 4 วันศุกร์นี้ เวลา 14:00 น. ผ่าน Zoom" }
+      },
+      "score": 5,
+      "maxChoice": 5,
+      "essayStatus": "pending",
+      "passed": null,
+      "status": "submitted",
+      "submittedAt": "2026-09-30T08:30:00.000Z"
+    },
+    {
+      "id": "att-data-somchai",
+      "quizId": "quiz-data",
+      "courseId": "course-data",
+      "userId": "u-somchai",
+      "answers": {
+        "qd-1": 0,
+        "qd-2": { "text": "ยอดขายเพิ่มขึ้น 20% แต่ข้อจำกัดคือเป็นข้อมูลเฉพาะสาขาในกรุงเทพฯ" }
+      },
+      "score": 1,
+      "maxChoice": 1,
+      "percent": 100,
+      "essayStatus": "pending",
+      "passed": null,
+      "status": "submitted",
+      "submittedAt": "2026-09-29T16:45:00.000Z"
+    }
+  ]
+}

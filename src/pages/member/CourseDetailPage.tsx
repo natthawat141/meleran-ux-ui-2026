@@ -1,0 +1,104 @@
+import React from 'react';
+import { Alert, Button, Empty, Space, Tag, Typography } from 'antd';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useLms } from '../../store';
+import { CourseProgress, PageTitle } from '../../components/common';
+import { CourseOutline } from '../../components/CourseOutline';
+import { AskInstructorButton } from '../../components/AskInstructorButton';
+import { UserAvatar } from '../../components/UserAvatar';
+import { formatPrice, instructorFor } from '../../data';
+import './catalog.css';
+
+export function MemberCourseDetailPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const { data, currentUser, enrollFree } = useLms();
+  const course = data.courses.find(
+    (entry) => (entry.slug === slug || entry.id === slug) && entry.status === 'published'
+  );
+
+  if (!course) {
+    return (
+      <Empty description="ไม่พบคอร์สที่เผยแพร่นี้">
+        <Link to="/explore/courses">กลับสำรวจคอร์ส</Link>
+      </Empty>
+    );
+  }
+
+  const currentUserId = currentUser?.id ?? '';
+  const teacher = instructorFor(data, course);
+  const enrolled = data.enrollments.some(
+    (entry) => entry.courseId === course.id && entry.userId === currentUserId
+  );
+  const canLearn = currentUser?.role === 'learner' || currentUser?.role === 'admin';
+
+  const start = () => {
+    if (enrolled) {
+      navigate(`/learn/courses/${course.id}`);
+    } else if (course.price === 0) {
+      enrollFree(course.id);
+      navigate(`/learn/courses/${course.id}`);
+    } else {
+      navigate(`/checkout/${course.id}`);
+    }
+  };
+
+  return (
+    <div className="member-course-detail">
+      <Link to="/explore/courses">กลับสำรวจคอร์ส</Link>
+      <PageTitle
+        eyebrow="รายละเอียดคอร์สสำหรับสมาชิก"
+        title={course.title}
+        subtitle={course.subtitle}
+      />
+      <div className="member-course-summary">
+        <img src={course.cover} alt={`ภาพประกอบ ${course.title}`} />
+        <div>
+          <Space wrap>
+            <Tag>{course.category}</Tag>
+            <Typography.Text type="secondary">ระดับ {course.level}</Typography.Text>
+          </Space>
+          <div className="member-course-teacher">
+            <UserAvatar user={teacher} size={36} />
+            <span>ผู้สอน {teacher?.name}</span>
+          </div>
+          <Typography.Paragraph>{course.description}</Typography.Paragraph>
+          {enrolled ? (
+            <>
+              <Typography.Text strong>คุณลงเรียนคอร์สนี้แล้ว</Typography.Text>
+              <CourseProgress course={course} data={data} userId={currentUserId} />
+            </>
+          ) : (
+            <Typography.Text strong>{formatPrice(course.price)}</Typography.Text>
+          )}
+          <Space wrap>
+            {canLearn && (
+              <Button type="primary" onClick={start}>
+                {enrolled ? 'เรียนต่อ' : course.price === 0 ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'}
+              </Button>
+            )}
+            {enrolled && <AskInstructorButton course={course} />}
+            {currentUser?.role === 'admin' && (
+              <Link to={`/admin/courses/${course.id}`}>
+                <Button>จัดการคอร์ส</Button>
+              </Link>
+            )}
+            {currentUser?.role === 'instructor' && course.instructorId === currentUserId && (
+              <Link to={`/teach/courses/${course.id}`}>
+                <Button>จัดการคอร์สของฉัน</Button>
+              </Link>
+            )}
+          </Space>
+          {!canLearn && (
+            <Alert
+              type="info"
+              message="คุณกำลังดูคอร์สในบทบาทผู้สอน"
+              description="การลงเรียนในต้นแบบใช้บัญชีผู้เรียน ผ่านเมนูสลับบทบาทด้านบน"
+            />
+          )}
+        </div>
+      </div>
+      <CourseOutline course={course} />
+    </div>
+  );
+}
