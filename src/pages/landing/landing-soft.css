@@ -1,0 +1,252 @@
+/* Landing-only visual trial. The hero identifies this page, keeping About and
+   other consumers of landing.css unchanged, including shared team portraits. */
+.home-v3:has(.home-hero) {
+  --home-soft-sky: #e5f4ff;
+  --home-bright-sky: #b9e5ff;
+  --home-shape-blue: #74c8f5;
+  overflow: clip;
+}
+
+.home-v3:has(.home-hero) .ant-btn {
+  border-radius: 999px;
+}
+
+.home-v3:has(.home-hero) .home-hero {
+  background: #fff;
+}
+
+.home-v3:has(.home-hero) .home-hero::before,
+.home-v3:has(.home-hero) .home-hero::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.home-v3:has(.home-hero) .home-hero::before {
+  width: 49%;
+  height: 83%;
+  right: 3%;
+  top: 8%;
+  border-radius: 48% 52% 44% 56% / 54% 44% 56% 46%;
+  background: var(--home-bright-sky);
+  transform: rotate(-9deg);
+}
+
+.home-v3:has(.home-hero) .home-hero::after {
+  width: 82px;
+  height: 82px;
+  right: 46%;
+  bottom: 12%;
+  border: 15px solid var(--home-shape-blue);
+  border-radius: 50%;
+}
+
+.home-v3:has(.home-hero) .home-hero-background {
+  inset: 11% 5% 10% auto;
+  width: 43%;
+  overflow: hidden;
+  border-radius: 49% 49% 44% 44% / 46% 46% 54% 54%;
+  z-index: -1;
+  background: var(--home-soft-sky);
+}
+
+.home-v3:has(.home-hero) .home-hero-background img {
+  object-position: 89% center;
+}
+
+.home-v3:has(.home-hero) .home-hero-scrim {
+  inset: 11% 8% auto auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--home-blue);
+  z-index: 0;
+}
+
+.home-v3:has(.home-hero) .home-hero-layout {
+  min-height: 640px;
+  padding-block: 70px;
+}
+
+.home-v3:has(.home-hero) .home-hero-copy {
+  width: 46%;
+}
+
+.home-v3:has(.home-hero) .home-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--home-soft-sky);
+  color: #1764a1;
+  font-size: 14px;
+}
+
+.home-v3:has(.home-hero) .home-eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--home-blue);
+}
+
+.home-v3:has(.home-hero) .home-hero h1 {
+  font-size: clamp(38px, 4vw, 57px);
+  line-height: 1.4;
+}
+
+.home-v3:has(.home-hero) .home-hero-actions {
+  gap: 18px;
+}
+
+.home-v3:has(.home-hero) .brand-introduction {
+  border-bottom: 0;
+}
+
+.home-v3:has(.home-hero) .brand-team-section {
+  width: min(1320px, calc(100% - 40px));
+  margin-inline: auto;
+  padding-block: 68px;
+  background: var(--home-soft-sky);
+  border-radius: 48px;
+}
+
+.home-v3:has(.home-hero) .brand-team-layout {
+  width: calc(100% - 96px);
+  max-width: 1180px;
+  gap: 50px;
+}
+
+.home-v3:has(.home-hero) .founder-portrait {
+  border-radius: 100px 100px 28px 28px;
+}
+
+.home-v3:has(.home-hero) .home-invitation {
+  border-bottom: 0;
+  align-items: center;
+  gap: 60px;
+}
+
+.home-v3:has(.home-hero) .home-invitation-prompts {
+  padding: 30px;
+  background: #f1f9ff;
+  border-radius: 32px;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-nav::before,
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-ink-bar {
+  display: none;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab {
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab + .ant-tabs-tab {
+  margin-left: 8px;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab-active {
+  background: var(--home-blue);
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #fff;
+}
+
+.home-v3:has(.home-hero) .home-invitation-note {
+  border-left: 0;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.home-v3:has(.home-hero) .home-guide {
+  background: var(--home-soft-sky);
+  border-radius: 64px 64px 0 0;
+}
+
+.home-v3:has(.home-hero) .home-guide-photo img {
+  border-radius: 45% 45% 26px 26px;
+}
+
+.home-v3:has(.home-hero) .home-step-icon {
+  border: 0;
+  border-radius: 50%;
+}
+
+.home-v3:has(.home-hero) .home-course {
+  border-radius: 26px;
+}
+
+.home-v3:has(.home-hero) .home-course-meta > span:first-child {
+  padding: 3px 10px;
+  background: var(--home-soft-sky);
+  color: #1764a1;
+  border-radius: 999px;
+}
+
+.home-v3:has(.home-hero) .home-course-meta {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.home-v3:has(.home-hero) .home-newsletter {
+  width: min(1320px, calc(100% - 40px));
+  margin: 0 auto 48px;
+  border: 0;
+  border-radius: 48px;
+}
+
+.home-v3:has(.home-hero) .home-newsletter-form .ant-input {
+  border-radius: 999px;
+}
+
+@media (max-width: 1100px) {
+  .home-v3:has(.home-hero) .home-hero-layout { min-height: 580px; }
+  .home-v3:has(.home-hero) .home-hero h1 { font-size: 40px; }
+  .home-v3:has(.home-hero) .brand-team-layout { width: calc(100% - 64px); }
+  .home-v3:has(.home-hero) .home-invitation { gap: 32px; }
+}
+
+@media (max-width: 700px) {
+  .home-v3:has(.home-hero) .home-hero-layout {
+    min-height: auto;
+    padding-block: 36px 380px;
+    align-items: flex-start;
+  }
+  .home-v3:has(.home-hero) .home-hero-copy { width: 100%; padding: 0; }
+  .home-v3:has(.home-hero) .home-hero h1 { font-size: clamp(33px, 8.5vw, 45px); }
+  .home-v3:has(.home-hero) .home-hero-background {
+    inset: auto 8% 36px auto;
+    width: 80%;
+    height: 310px;
+  }
+  .home-v3:has(.home-hero) .home-hero::before {
+    inset: auto 5% 22px auto;
+    width: 86%;
+    height: 326px;
+  }
+  .home-v3:has(.home-hero) .home-hero::after {
+    right: auto;
+    left: 5%;
+    bottom: 48px;
+    width: 54px;
+    height: 54px;
+    border-width: 10px;
+  }
+  .home-v3:has(.home-hero) .home-hero-scrim { inset: auto 9% 326px auto; width: 19px; height: 19px; }
+  .home-v3:has(.home-hero) .home-intro { max-width: 48ch; font-size: 16px; margin-top: 17px; }
+  .home-v3:has(.home-hero) .home-hero-actions { margin-top: 22px; }
+  .home-v3:has(.home-hero) .brand-team-section { width: calc(100% - 24px); padding-block: 40px; border-radius: 32px; }
+  .home-v3:has(.home-hero) .brand-team-layout { width: calc(100% - 40px); gap: 28px; }
+  .home-v3:has(.home-hero) .founder-portrait { border-radius: 60px 60px 20px 20px; }
+  .home-v3:has(.home-hero) .home-invitation { gap: 26px; }
+  .home-v3:has(.home-hero) .home-invitation-prompts { padding: 22px 18px; border-radius: 26px; }
+  .home-v3:has(.home-hero) .home-invitation .ant-tabs-tab { padding: 9px 12px; font-size: 14px; }
+  .home-v3:has(.home-hero) .home-guide { border-radius: 36px 36px 0 0; }
+  .home-v3:has(.home-hero) .home-newsletter { width: calc(100% - 24px); margin-bottom: 28px; border-radius: 32px; }
+}
