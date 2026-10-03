@@ -1,41 +1,81 @@
 .home-teachers { padding-block: 68px 82px; }
-.home-teachers-heading { margin-bottom: 28px; }
+.home-teachers-heading { margin-bottom: 24px; }
 .home-v3 .home-teachers-heading h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.5; font-weight: 450; }
-.home-v3 .home-teachers-heading > p { margin-top: 14px; color: var(--home-muted); }
-.home-teacher-tabs .ant-tabs-nav { margin-bottom: 28px; }
-.home-teacher-tabs .ant-tabs-nav::before, .home-teacher-tabs .ant-tabs-ink-bar { display: none; }
-.home-teacher-tabs .ant-tabs-tab { padding: 12px 18px; background: var(--home-sky); border-radius: 24px; border: 1px solid transparent; }
-.home-teacher-tabs .ant-tabs-tab + .ant-tabs-tab { margin-left: 12px; }
-.home-teacher-tabs .ant-tabs-tab-active { background: #e5f4ff; border-color: #85c8f5; }
-.home-teacher-tabs .ant-tabs-tab-active .ant-tabs-tab-btn { text-shadow: none; }
-.home-teacher-tabs .ant-tabs-tab-btn:focus-visible { outline-offset: 3px; }
-.home-teacher-choice { display: flex; align-items: center; gap: 12px; text-align: left; color: var(--home-ink); font-size: 17px; }
-.home-teacher-choice small { display: block; color: var(--home-muted); font-size: 13px; margin-top: 3px; }
-.home-teacher-choice-photo { display: block; position: relative; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex: 0 0 auto; background: #b9e5ff; }
-.home-teacher-photo img, .home-teacher-choice-photo img { position: absolute; top: 0; width: 300%; max-width: none; height: 100%; object-fit: cover; object-position: center 25%; }
-.home-teacher-profile { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(30px, 5vw, 72px); align-items: center; }
-.home-teacher-photo { position: relative; min-width: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 46% 46% 28px 28px; background: #b9e5ff; }
-.home-teacher-photo-ton { border-radius: 28px 46% 46% 28px; }
-.home-teacher-photo-praew { border-radius: 46% 28px 28px 46%; }
-.home-teacher-story { padding-block: 16px; min-width: 0; }
-.home-v3 .home-teacher-demo { color: var(--home-muted); font-size: 12px; margin-bottom: 16px; }
-.home-v3 .home-teacher-name { color: var(--home-blue); font-size: 19px; margin-bottom: 14px; }
-.home-teacher-name span { display: block; margin-top: 4px; font-size: 14px; color: var(--home-muted); }
-.home-v3 .home-teacher-story h3 { font-size: clamp(24px, 2.5vw, 32px); line-height: 1.6; font-weight: 450; }
-.home-v3 .home-teacher-description { margin-top: 17px; color: var(--home-muted); font-size: 16px; line-height: 1.9; max-width: 48ch; }
-.home-teacher-activities { display: flex; flex-wrap: wrap; gap: 9px; list-style: none; margin: 24px 0 28px; padding: 0; }
-.home-teacher-activities li { padding: 6px 13px; border-radius: 999px; background: var(--home-sky); font-size: 13px; color: #1764a1; }
+.home-v3 .home-teachers-heading > div > p { max-width: 62ch; margin-top: 8px; color: var(--home-muted); line-height: 1.8; }
+.home-teacher-disclosure { margin: 16px 0 0; color: var(--home-muted); font-size: 13px; line-height: 1.7; text-align: center; }
+.home-teacher-carousel-wrap { position: relative; }
+.home-teacher-carousel .slick-list { padding-block: 2px 6px; }
+.home-teacher-carousel .slick-slide { height: auto; }
+.home-teacher-carousel .slick-slide > div { height: 100%; }
+.home-teacher-slide { height: 100%; padding-inline: 16px; background: #fff; }
+.home-teacher-portrait { position: relative; width: 100%; height: 260px; overflow: hidden; background: transparent; }
+.home-teacher-portrait-circle { position: absolute; z-index: 0; left: 50%; bottom: 0; width: 58%; aspect-ratio: 1; border-radius: 50%; background: #35b8f4; transform: translateX(-50%); }
+.home-teacher-portrait-ton .home-teacher-portrait-circle { background: #22aef0; }
+.home-teacher-portrait-praew .home-teacher-portrait-circle { background: #48c1f4; }
+.home-teacher-portrait-nont .home-teacher-portrait-circle { background: #29b3ef; }
+.home-teacher-portrait-window { position: absolute; z-index: 1; inset: 0 auto 0 50%; width: 65%; overflow: hidden; transform: translateX(-50%); }
+.home-teacher-portrait-mind .home-teacher-portrait-window { width: 60%; }
+.home-teacher-portrait-nont .home-teacher-portrait-window { width: 80%; }
+.home-teacher-portrait-image { position: absolute; top: 0; width: 300%; max-width: none; height: auto; }
+.home-teacher-portrait-window-single .home-teacher-portrait-image { width: 100%; }
+.home-teacher-portrait-image-mind { top: -12px; }
+.home-teacher-portrait-image-nont { top: -10px; }
+.home-teacher-portrait-image-ton { transform: scale(1.02); transform-origin: top center; }
+.home-teacher-portrait-image-praew { transform: scale(1.03); transform-origin: top center; }
+.home-teacher-portrait-image-nont { width: 100%; max-width: 100%; height: auto; }
+.home-teacher-decoration { position: absolute; z-index: 0; pointer-events: none; }
+.home-teacher-decoration-ring { top: 30px; left: 14%; width: 23px; height: 23px; border: 5px solid #ffd84d; border-radius: 50%; }
+.home-teacher-decoration-dots { top: 82px; right: 12%; width: 34px; height: 65px; background-image: radial-gradient(circle, #ffd84d 2px, transparent 2.5px); background-position: 0 0; background-size: 12px 12px; }
+.home-teacher-nameband { display: flex; align-items: baseline; gap: 7px 12px; min-height: 54px; padding: 7px 17px; border-radius: 10px 10px 0 0; background: #ffd84d; color: #24272d; }
+.home-teacher-nameband strong { font-size: 19px; font-weight: 600; line-height: 1.6; }
+.home-teacher-nameband span { font-size: 12px; font-weight: 400; line-height: 1.6; }
+.home-teacher-subject-band { padding: 8px 10px 9px; border-radius: 0 0 11px 11px; background: #ffd84d; }
+.home-teacher-subject-box { display: flex; min-height: 58px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 5px 9px; border-radius: 8px; background: #fff; color: #24272d; text-align: center; }
+.home-teacher-subject-box strong { font-size: 15px; font-weight: 550; line-height: 1.55; }
+.home-teacher-subject-box span { color: #50545a; font-size: 12px; line-height: 1.5; }
+.home-teacher-slide-content { padding: 13px 14px 0; }
+.home-teacher-slide-content > p { min-height: 3.4em; margin: 0 0 8px; color: #4f555d; font-size: 14px; line-height: 1.75; }
+.home-teacher-details-button.ant-btn { padding: 0; color: #0074e8; font-size: 14px; font-weight: 500; }
+.home-teacher-details-button.ant-btn:hover { color: #006bd5; background: transparent; }
+.home-teacher-details-button.ant-btn:focus-visible, .home-teacher-carousel-control.ant-btn:focus-visible { outline: 3px solid #309cdb; outline-offset: 3px; }
+.home-teacher-carousel-control.ant-btn { position: absolute; z-index: 4; top: 110px; display: grid; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid #dce3e8; border-radius: 50%; background: #fff; color: #3f454d; box-shadow: none; }
+.home-teacher-carousel-control.ant-btn:hover { border-color: #0074e8; background: #fff; color: #0074e8; }
+.home-teacher-carousel-control-prev { left: -16px; }
+.home-teacher-carousel-control-next { right: -16px; }
+
+.home-teacher-modal { --home-ink: #24272d; --home-muted: #636971; --home-blue: #0074e8; font-family: 'Anuphan Variable', sans-serif; }
+.home-teacher-modal .ant-modal-title, .home-teacher-modal .ant-modal-body { font-family: 'Anuphan Variable', sans-serif; }
+.home-teacher-modal-content { padding-top: 4px; color: #24272d; }
+.home-teacher-modal-content .ant-tag { margin-bottom: 13px; border-radius: 999px; }
+.home-teacher-modal-name { margin: 0 0 8px; color: var(--home-blue); font-size: 18px; font-weight: 550; }
+.home-teacher-modal-name span { margin-left: 7px; color: var(--home-muted); font-size: 14px; font-weight: 400; }
+.home-teacher-modal-content h3 { margin: 0 0 4px; color: #24272d; font-size: 21px; line-height: 1.5; font-weight: 550; }
+.home-teacher-modal-content > p:not(.home-teacher-modal-name) { margin: 0; color: #636971; line-height: 1.85; }
+.home-teacher-modal-content > .home-teacher-modal-level { margin-bottom: 10px; color: #50545a; font-size: 13px; }
+.home-teacher-modal-content h4 { margin: 20px 0 8px; color: #24272d; font-size: 15px; font-weight: 550; }
+.home-teacher-modal-content ul { display: grid; gap: 7px; margin: 0 0 20px; padding-left: 22px; color: var(--home-muted); line-height: 1.75; }
+.home-teacher-modal-course-link { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 0 15px; border-radius: 10px; background: var(--home-blue); color: #fff !important; font-weight: 500; text-decoration: none; }
+.home-teacher-modal-course-link:hover { background: #006bd5; }
+.home-teacher-modal-course-link:focus-visible { outline: 3px solid #309cdb; outline-offset: 3px; }
+
 @media (max-width: 700px) {
   .home-teachers { padding-block: 42px 52px; }
-  .home-teacher-tabs .ant-tabs-tab { padding: 9px 12px; border-radius: 18px; }
-  .home-teacher-tabs .ant-tabs-tab + .ant-tabs-tab { margin-left: 8px; }
-  .home-teacher-tabs .ant-tabs-nav-list { width: 100%; }
-  .home-teacher-tabs .ant-tabs-tab { flex: 1; justify-content: center; }
-  .home-teacher-choice { flex-direction: column; gap: 6px; font-size: 15px; text-align: center; }
-  .home-teacher-choice small { display: none; }
-  .home-teacher-choice-photo { width: 40px; height: 40px; }
-  .home-teacher-profile { grid-template-columns: 1fr; gap: 20px; }
-  .home-teacher-photo { width: min(100%, 340px); margin-inline: auto; aspect-ratio: 1; }
-  .home-teacher-story { padding: 0; }
-  .home-teacher-activities { margin-block: 19px 23px; }
+  .home-teachers-heading { margin-bottom: 22px; }
+  .home-v3 .home-teacher-disclosure { margin-top: 14px; text-align: left; }
+  .home-teacher-portrait { height: 230px; }
+  .home-teacher-portrait-window { width: 100%; }
+  .home-teacher-portrait-mind .home-teacher-portrait-window { width: 92%; }
+  .home-teacher-portrait-nont .home-teacher-portrait-window { width: 123%; }
+  .home-teacher-portrait-circle { width: 88%; }
+  .home-teacher-nameband { flex-wrap: wrap; min-height: 52px; padding-inline: 14px; }
+  .home-teacher-nameband strong { font-size: 18px; }
+  .home-teacher-slide-content { padding-inline: 10px; }
+  .home-teacher-slide-content > p { min-height: 0; }
+  .home-teacher-carousel-control.ant-btn { top: 108px; width: 38px; height: 38px; }
+  .home-teacher-carousel-control-prev { left: 4px; }
+  .home-teacher-carousel-control-next { right: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-teacher-carousel .slick-track { transition-duration: 0ms !important; }
 }
