@@ -1,0 +1,41 @@
+.home-teachers { padding-block: 68px 82px; }
+.home-teachers-heading { margin-bottom: 28px; }
+.home-v3 .home-teachers-heading h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.5; font-weight: 450; }
+.home-v3 .home-teachers-heading > p { margin-top: 14px; color: var(--home-muted); }
+.home-teacher-tabs .ant-tabs-nav { margin-bottom: 28px; }
+.home-teacher-tabs .ant-tabs-nav::before, .home-teacher-tabs .ant-tabs-ink-bar { display: none; }
+.home-teacher-tabs .ant-tabs-tab { padding: 12px 18px; background: var(--home-sky); border-radius: 24px; border: 1px solid transparent; }
+.home-teacher-tabs .ant-tabs-tab + .ant-tabs-tab { margin-left: 12px; }
+.home-teacher-tabs .ant-tabs-tab-active { background: #e5f4ff; border-color: #85c8f5; }
+.home-teacher-tabs .ant-tabs-tab-active .ant-tabs-tab-btn { text-shadow: none; }
+.home-teacher-tabs .ant-tabs-tab-btn:focus-visible { outline-offset: 3px; }
+.home-teacher-choice { display: flex; align-items: center; gap: 12px; text-align: left; color: var(--home-ink); font-size: 17px; }
+.home-teacher-choice small { display: block; color: var(--home-muted); font-size: 13px; margin-top: 3px; }
+.home-teacher-choice-photo { display: block; position: relative; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex: 0 0 auto; background: #b9e5ff; }
+.home-teacher-photo img, .home-teacher-choice-photo img { position: absolute; top: 0; width: 300%; max-width: none; height: 100%; object-fit: cover; object-position: center 25%; }
+.home-teacher-profile { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(30px, 5vw, 72px); align-items: center; }
+.home-teacher-photo { position: relative; min-width: 0; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 46% 46% 28px 28px; background: #b9e5ff; }
+.home-teacher-photo-ton { border-radius: 28px 46% 46% 28px; }
+.home-teacher-photo-praew { border-radius: 46% 28px 28px 46%; }
+.home-teacher-story { padding-block: 16px; min-width: 0; }
+.home-v3 .home-teacher-demo { color: var(--home-muted); font-size: 12px; margin-bottom: 16px; }
+.home-v3 .home-teacher-name { color: var(--home-blue); font-size: 19px; margin-bottom: 14px; }
+.home-teacher-name span { display: block; margin-top: 4px; font-size: 14px; color: var(--home-muted); }
+.home-v3 .home-teacher-story h3 { font-size: clamp(24px, 2.5vw, 32px); line-height: 1.6; font-weight: 450; }
+.home-v3 .home-teacher-description { margin-top: 17px; color: var(--home-muted); font-size: 16px; line-height: 1.9; max-width: 48ch; }
+.home-teacher-activities { display: flex; flex-wrap: wrap; gap: 9px; list-style: none; margin: 24px 0 28px; padding: 0; }
+.home-teacher-activities li { padding: 6px 13px; border-radius: 999px; background: var(--home-sky); font-size: 13px; color: #1764a1; }
+@media (max-width: 700px) {
+  .home-teachers { padding-block: 42px 52px; }
+  .home-teacher-tabs .ant-tabs-tab { padding: 9px 12px; border-radius: 18px; }
+  .home-teacher-tabs .ant-tabs-tab + .ant-tabs-tab { margin-left: 8px; }
+  .home-teacher-tabs .ant-tabs-nav-list { width: 100%; }
+  .home-teacher-tabs .ant-tabs-tab { flex: 1; justify-content: center; }
+  .home-teacher-choice { flex-direction: column; gap: 6px; font-size: 15px; text-align: center; }
+  .home-teacher-choice small { display: none; }
+  .home-teacher-choice-photo { width: 40px; height: 40px; }
+  .home-teacher-profile { grid-template-columns: 1fr; gap: 20px; }
+  .home-teacher-photo { width: min(100%, 340px); margin-inline: auto; aspect-ratio: 1; }
+  .home-teacher-story { padding: 0; }
+  .home-teacher-activities { margin-block: 19px 23px; }
+}

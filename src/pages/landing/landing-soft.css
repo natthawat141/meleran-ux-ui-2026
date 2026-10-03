@@ -73,25 +73,6 @@
   width: 46%;
 }
 
-.home-v3:has(.home-hero) .home-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 7px 16px;
-  border-radius: 999px;
-  background: var(--home-soft-sky);
-  color: #1764a1;
-  font-size: 14px;
-}
-
-.home-v3:has(.home-hero) .home-eyebrow::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--home-blue);
-}
-
 .home-v3:has(.home-hero) .home-hero h1 {
   font-size: clamp(38px, 4vw, 57px);
   line-height: 1.4;
