@@ -18,6 +18,7 @@ const roleMenus = {
   ],
   instructor: [
     { key: '/teach', icon: <IconLayoutDashboard />, label: 'ภาพรวมผู้สอน' },
+    { key: '/teach/analytics', icon: <IconChartBar />, label: 'วิเคราะห์การเรียนรู้' },
     { key: '/teach/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
     { key: '/teach/courses/new', icon: <IconCirclePlus />, label: 'สร้างคอร์ส' },
     { key: '/teach/quizzes', icon: <IconClipboardCheck />, label: 'งานตรวจคำตอบ' },

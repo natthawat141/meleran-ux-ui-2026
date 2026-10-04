@@ -18,6 +18,7 @@ import { CurriculumPage, ContentEditorPage } from './pages/instructor/Curriculum
 import { ChapterWorkspace as ChapterEditorPage } from './pages/instructor/ChapterWorkspace.jsx';
 import { QuizManagerPage, QuizEditorPage, QuizAttemptsPage, GradeEssayPage } from './pages/instructor/QuizPages.jsx';
 import { CoursePreviewPage, InstructorLearnersPage } from './pages/instructor/InsightPages.jsx';
+import { InstructorAnalyticsRoute } from './pages/instructor/InstructorAnalyticsRoute.jsx';
 import { AdminBusinessAnalyticsPage, AdminFinanceReportPage, AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorRequestsPage, AdminInstructorRequestDetailPage, AdminCoursesPage, AdminCourseDetailPage } from './pages/admin/AdminPages.jsx';
 import { NoAccessPage, NotFoundPage } from './pages/SystemPages.jsx';
 
@@ -78,6 +79,7 @@ export function AppRoutes() {
     <Route path="/account/profile" element={<RolePage roles={['learner','instructor','admin']}><ProfilePage/></RolePage>}/>
 
     <Route path="/teach" element={instructor(<InstructorDashboardPage/>)}/>
+    <Route path="/teach/analytics" element={instructor(<InstructorAnalyticsRoute/>)} />
     <Route path="/teach/courses" element={instructor(<InstructorCoursesPage/>)}/>
     <Route path="/teach/courses/new" element={instructor(<CourseEditorPage/>)}/>
     <Route path="/teach/courses/:courseId" element={instructor(<InstructorCourseOverviewPage/>)}/>
