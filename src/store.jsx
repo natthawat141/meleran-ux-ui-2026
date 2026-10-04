@@ -244,7 +244,8 @@ export function LmsProvider({ children }) {
   }), [update]);
 
   const enrollFree = useCallback((courseId, userId = currentUser?.id) => update((next) => {
-    if (!userId || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) return next;
+    const course = next.courses.find((entry) => entry.id === courseId);
+    if (!userId || !course || course.price > 0 || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) return next;
     next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString() });
     return next;
   }), [currentUser?.id, update]);
@@ -253,7 +254,7 @@ export function LmsProvider({ children }) {
     const orderId = createId('order');
     update((next) => {
       const course = next.courses.find((item) => item.id === courseId);
-      if (!course || !currentUser) return next;
+      if (!course || course.price <= 0 || !currentUser) return next;
       const order = { id: orderId, courseId, userId: currentUser.id, amount: Number(course.price), status: outcome, method: 'บัตรจำลอง', createdAt: new Date().toISOString() };
       next.orders.unshift(order);
       if (outcome === 'paid' && !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString() });

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Alert, Button, Col, Empty, Form, Input, InputNumber, Modal, Popconfirm, Row, Select, Space, Table, Tag, Typography, message } from 'antd';
+import { Alert, Button, Col, Empty, Form, Input, InputNumber, Modal, Popconfirm, Radio, Row, Select, Space, Table, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, BookOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store.jsx';
@@ -40,10 +40,13 @@ export function CourseEditorPage() {
   const course = data.courses.find((item) => item.id === courseId);
   const isNew = !courseId || courseId === 'new';
   const [form] = Form.useForm();
-  const initialValues = course ? { ...course, outcomesText: course.outcomes?.join('\n') } : { category: 'การสื่อสาร', level: 'เริ่มต้น', price: 0, status: 'draft', instructorId: currentUser.id };
+  const initialValues = course ? { ...course, outcomesText: course.outcomes?.join('\n'), pricingType: course.price === 0 ? 'free' : 'paid' } : { category: 'การสื่อสาร', level: 'เริ่มต้น', price: 0, pricingType: 'free', status: 'draft', instructorId: currentUser.id };
   const selectedStatus = Form.useWatch('status', form) ?? course?.status ?? 'draft';
+  const selectedPricingType = Form.useWatch('pricingType', form) ?? (course?.price ? 'paid' : 'free');
   const submit = (values) => {
-    const { outcomesText, ...rest } = values;
+    if (values.pricingType === 'paid' && Number(values.price) <= 0) { message.error('กรอกราคามากกว่า 0 บาทสำหรับคอร์สที่มีค่าใช้จ่าย'); return; }
+    const { outcomesText, pricingType, ...rest } = values;
+    rest.price = pricingType === 'free' ? 0 : Number(values.price);
     const savedId = saveCourse({ ...rest, outcomes: (outcomesText ?? '').split('\n').map((line) => line.trim()).filter(Boolean), instructorId: currentUser.role === 'admin' ? values.instructorId : course?.instructorId ?? currentUser.id }, course?.id);
     if (!savedId) { message.error('ไม่สามารถบันทึกคอร์สนี้ได้'); return; }
     message.success(isNew ? 'สร้างคอร์สแล้ว' : 'บันทึกข้อมูลคอร์สแล้ว');
@@ -66,7 +69,7 @@ export function CourseEditorPage() {
           </section>
           <section className="editor-section"><div className="course-editor-section-heading"><span>03</span><div><Title level={4}>รายละเอียดเพิ่มเติม</Title><p>ช่วยให้ผู้เรียนค้นพบคอร์สที่เหมาะกับตัวเอง</p></div></div>
             {currentUser.role === 'admin' && <Form.Item name="instructorId" label="ผู้สอนประจำคอร์ส" rules={[{ required: true, message: 'เลือกผู้สอน' }]}><Select options={data.users.filter((user) => ['instructor','admin'].includes(user.role)).map((user) => ({ value: user.id, label: user.name }))}/></Form.Item>}
-            <div className="course-editor-details"><Form.Item name="category" label="หมวดหมู่"><Select options={['การสื่อสาร','ข้อมูลและดิจิทัล','การทำงาน','การออกแบบ'].map((value) => ({ value }))}/></Form.Item><Form.Item name="level" label="ระดับ"><Select options={['เริ่มต้น','กลาง','ขั้นสูง'].map((value) => ({ value }))}/></Form.Item><Form.Item name="price" label="ราคาคอร์ส" extra="ใส่ 0 สำหรับคอร์สฟรี"><InputNumber min={0} step={50} addonAfter="บาท" style={{ width: '100%' }}/></Form.Item></div>
+            <div className="course-editor-details"><Form.Item name="category" label="หมวดหมู่"><Select options={['การสื่อสาร','ข้อมูลและดิจิทัล','การทำงาน','การออกแบบ'].map((value) => ({ value }))}/></Form.Item><Form.Item name="level" label="ระดับ"><Select options={['เริ่มต้น','กลาง','ขั้นสูง'].map((value) => ({ value }))}/></Form.Item><Form.Item name="pricingType" label="ค่าเรียน"><Radio.Group optionType="button" buttonStyle="solid"><Radio.Button value="free">เรียนฟรี</Radio.Button><Radio.Button value="paid">มีค่าใช้จ่าย</Radio.Button></Radio.Group></Form.Item>{selectedPricingType === 'paid' && <Form.Item name="price" label="ราคาคอร์ส" rules={[{ required: true, message: 'กรอกราคาคอร์ส' }]}><InputNumber min={1} precision={0} step={50} addonAfter="บาท" style={{ width: '100%' }}/></Form.Item>}</div>
           </section>
         </div>
         <aside className="editor-aside course-editor-publish"><Title level={5}>การเผยแพร่</Title><p>บันทึกเป็นฉบับร่างก่อน แล้วกลับมาแก้ไขได้ทุกเมื่อ</p><Form.Item name="status" label="สถานะ"><Select options={[{ value: 'draft', label: 'ฉบับร่าง' }, { value: 'published', label: 'เผยแพร่แล้ว' }]}/></Form.Item><div className="course-publish-note">{selectedStatus === 'published' ? 'คอร์สจะปรากฏในหน้าคอร์สสาธารณะหลังบันทึก' : 'ฉบับร่างยังไม่แสดงให้ผู้เรียนทั่วไปเห็น'}</div><Button block type="primary" htmlType="submit">{isNew ? 'สร้างคอร์ส' : 'บันทึกการเปลี่ยนแปลง'}</Button>{!isNew && <Link to={`/teach/courses/${course.id}/preview`}><Button block className="top-space">ดูตัวอย่างคอร์ส</Button></Link>}{!isNew && <Popconfirm title="ลบคอร์สนี้หรือไม่" okText="ลบคอร์ส" cancelText="ยกเลิก" onConfirm={() => { removeCourse(course.id); navigate('/teach/courses'); }}><Button block danger className="top-space">ลบคอร์ส</Button></Popconfirm>}</aside>

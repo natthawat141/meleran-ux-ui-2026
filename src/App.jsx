@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-do
 import { PublicShell, WorkspaceShell } from './components/Shell.jsx';
 import { useLms } from './store.jsx';
 import { CatalogPage, CourseDetailPage, InstructorProfilePage } from './pages/PublicPages.jsx';
+import { CourseLessonPreviewPage } from './pages/public/CourseLessonPreviewPage.tsx';
 import { LandingPage } from './pages/landing/LandingPage.jsx';
 import { AboutPage } from './pages/landing/AboutPage.jsx';
 import { BlogIndexPage, BlogArticlePage } from './pages/blog/BlogPages.jsx';
@@ -49,6 +50,7 @@ export function AppRoutes() {
     <Route path="/about" element={<AboutPage/>}/>
     <Route path="/courses" element={<Public><CatalogPage/></Public>}/>
     <Route path="/courses/:slug" element={<Public><CourseDetailPage/></Public>}/>
+    <Route path="/courses/:slug/preview" element={<Public><CourseLessonPreviewPage/></Public>}/>
     <Route path="/articles" element={<BlogIndexPage/>}/>
     <Route path="/articles/:id" element={<BlogArticlePage/>}/>
     <Route path="/instructors/:id" element={<Public><InstructorProfilePage/></Public>}/>

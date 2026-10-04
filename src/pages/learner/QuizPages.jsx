@@ -16,6 +16,10 @@ export function QuizIntroPage() {
   const quiz = data.quizzes.find((item) => item.id === quizId);
   if (!quiz) return <Empty description="ไม่พบแบบทดสอบ"/>;
   const course = data.courses.find((item) => item.id === quiz.courseId);
+  const enrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === data.currentUserId);
+  if (course && !enrolled && data.users.find((user) => user.id === data.currentUserId)?.role !== 'admin') {
+    return <Alert type="warning" showIcon message="แบบทดสอบเปิดหลังสมัครคอร์ส" action={<Link to={`/explore/courses/${course.slug}`}><Button size="small">ดูรายละเอียดและสมัคร</Button></Link>}/>;
+  }
   const latest = data.attempts.find((attempt) => attempt.quizId === quiz.id && attempt.userId === data.currentUserId && attempt.status === 'submitted');
   const start = () => {
     const draft = data.attempts.find((attempt) => attempt.quizId === quiz.id && attempt.userId === data.currentUserId && attempt.status === 'in_progress');
