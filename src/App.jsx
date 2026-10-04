@@ -13,6 +13,7 @@ import { LearnerDashboardPage, MyCoursesPage } from './pages/learner/DashboardPa
 import { LearnerCoursePage, VideoLessonPage, ArticleLessonPage } from './pages/learner/LessonPages.jsx';
 import { QuizIntroPage, QuizAttemptPage, QuizResultPage } from './pages/learner/QuizPages.jsx';
 import { CheckoutPage, CheckoutResultPage, OrdersPage, OrderDetailPage } from './pages/learner/CommercePages.jsx';
+import { CartPage } from './pages/learner/CartPage.jsx';
 import { CertificatesPage, CertificateDetailPage, ProfilePage, VerifyCertificatePage } from './pages/learner/AccountPages.jsx';
 import { InstructorDashboardPage, InstructorCoursesPage, CourseEditorPage, InstructorCourseOverviewPage } from './pages/instructor/CoursePages.jsx';
 import { CurriculumPage, ContentEditorPage } from './pages/instructor/CurriculumPages.jsx';
@@ -75,6 +76,7 @@ export function AppRoutes() {
     <Route path="/learn/attempts/:attemptId/result" element={learner(<QuizResultPage/>)}/>
     <Route path="/checkout/:courseId" element={learner(<CheckoutPage/>)}/>
     <Route path="/checkout/:orderId/result" element={learner(<CheckoutResultPage/>)}/>
+    <Route path="/account/cart" element={learner(<CartPage/>)}/>
     <Route path="/account/orders" element={learner(<OrdersPage/>)}/>
     <Route path="/account/orders/:orderId" element={learner(<OrderDetailPage/>)}/>
     <Route path="/account/certificates" element={learner(<CertificatesPage/>)}/>

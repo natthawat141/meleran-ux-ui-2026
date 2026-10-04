@@ -17,7 +17,7 @@ export function SectionHeading({ title, description, action }) {
   return <div className="section-heading"><div><Title order={3}>{title}</Title>{description && <Text c="dimmed">{description}</Text>}</div>{action}</div>;
 }
 
-export function CourseCard({ course, data, href, compact = false }) {
+export function CourseCard({ course, data, href, compact = false, action }) {
   const teacher = instructorFor(data, course);
   const chapterCount = course.chapters?.length ?? 0;
   const lessonCount = course.chapters?.reduce((sum, chapter) => sum + (chapter.items?.length ?? 0), 0) ?? 0;
@@ -33,6 +33,7 @@ export function CourseCard({ course, data, href, compact = false }) {
       <Text c="dimmed" className="course-summary" lineClamp={2}>{course.subtitle}</Text>
       <div className="course-card-meta"><Avatar size={27} color="gray" radius="xl">{teacher?.name?.slice(0, 1) ?? 'ผ'}</Avatar><Text size="sm">{teacher?.name ?? 'ผู้สอน'}</Text><span className="meta-spacer"/><Text c="dimmed" size="xs">{chapterCount} บท · {lessonCount} รายการ</Text>
       </div>
+      {action && <div className="course-card-actions">{action}</div>}
     </div>
   </article>;
 }

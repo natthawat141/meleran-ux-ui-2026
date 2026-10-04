@@ -31,6 +31,8 @@ function loadData() {
       const certificates = snapshotLegacyCertificateNames(Array.isArray(parsed.certificates) ? parsed.certificates : initialData.certificates, users);
       const orders = Array.isArray(parsed.orders) ? parsed.orders : structuredClone(initialData.orders);
       const enrollments = Array.isArray(parsed.enrollments) ? parsed.enrollments : structuredClone(initialData.enrollments);
+      const cartItems = Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
+      const mockPriceEmails = Array.isArray(parsed.mockPriceEmails) ? parsed.mockPriceEmails : [];
       const referralLinks = Array.isArray(parsed.referralLinks) ? parsed.referralLinks : structuredClone(initialData.referralLinks);
       const instructorPayouts = Array.isArray(parsed.instructorPayouts) ? parsed.instructorPayouts : [];
       if (!parsed.financeDemoSeedVersion && !orders.some((order) => order.status === 'paid')) {
@@ -40,7 +42,7 @@ function loadData() {
         });
         initialData.referralLinks.forEach((link) => { if (!referralLinks.some((item) => item.code === link.code)) referralLinks.push(structuredClone(link)); });
       }
-      return { ...initialData, ...parsed, users, certificates, courses, orders, enrollments, referralLinks, instructorPayouts, financeDemoSeedVersion: initialData.financeDemoSeedVersion, blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : structuredClone(initialData.blogPosts) };
+      return { ...initialData, ...parsed, users, certificates, courses, orders, enrollments, cartItems, mockPriceEmails, referralLinks, instructorPayouts, financeDemoSeedVersion: initialData.financeDemoSeedVersion, blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : structuredClone(initialData.blogPosts) };
     }
   } catch { /* Start with the sample data if storage is unavailable or invalid. */ }
   return structuredClone(initialData);
@@ -125,6 +127,19 @@ export function LmsProvider({ children }) {
       const existing = next.courses.find((course) => course.id === id);
       const record = { ...existing, ...values, id: savedId, slug: values.slug || values.title?.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-'), cover: values.cover ?? existing?.cover ?? defaultCourseCover, instructorId: currentUser.role === 'admin' ? values.instructorId || existing?.instructorId || currentUser.id : existing?.instructorId || currentUser.id, chapters: existing?.chapters ?? [], status: values.status ?? existing?.status ?? 'draft', updatedAt: new Date().toISOString() };
       if (!record.cover) record.cover = defaultCourseCover;
+      const previousPrice = Number(existing?.price);
+      const nextPrice = Number(record.price);
+      if (existing?.status === 'published' && record.status === 'published' && Number.isFinite(previousPrice) && Number.isFinite(nextPrice) && previousPrice > nextPrice) {
+        next.cartItems ??= [];
+        next.mockPriceEmails ??= [];
+        const now = new Date().toISOString();
+        const watchers = next.cartItems.filter((entry) => entry.courseId === id && entry.priceAlertEnabled && !next.enrollments.some((enrollment) => enrollment.courseId === id && enrollment.userId === entry.userId) && !next.orders.some((order) => order.courseId === id && order.userId === entry.userId && order.status === 'paid'));
+        watchers.forEach((entry) => {
+          const recipient = next.users.find((user) => user.id === entry.userId);
+          if (!recipient?.email) return;
+          next.mockPriceEmails.unshift({ id: createId('price-email'), userId: entry.userId, courseId: id, courseTitle: record.title, to: recipient.email, previousPrice, newPrice: nextPrice, createdAt: now, status: 'mock-sent' });
+        });
+      }
       if (existing) next.courses = next.courses.map((course) => course.id === id ? record : course);
       else next.courses.unshift(record);
       return next;
@@ -138,6 +153,7 @@ export function LmsProvider({ children }) {
     next.attempts = next.attempts.filter((attempt) => attempt.courseId !== courseId);
     next.enrollments = next.enrollments.filter((item) => item.courseId !== courseId);
     next.certificates = next.certificates.filter((item) => item.courseId !== courseId);
+    next.cartItems = (next.cartItems ?? []).filter((item) => item.courseId !== courseId);
     Object.keys(next.progress).filter((key) => key.startsWith(`${courseId}:`)).forEach((key) => delete next.progress[key]);
     return next;
   }), [update]);
@@ -270,6 +286,38 @@ export function LmsProvider({ children }) {
     return next;
   }), [currentUser?.id, update]);
 
+  const addCourseToCart = useCallback((courseId, referralCode = null) => {
+    const course = data.courses.find((item) => item.id === courseId && item.status === 'published');
+    if (!currentUser || !['learner', 'admin'].includes(currentUser.role)) return { ok: false, message: 'เข้าสู่ระบบในฐานะผู้เรียนก่อนเพิ่มคอร์ส' };
+    if (!course || course.price <= 0) return { ok: false, message: 'คอร์สนี้ไม่ต้องใช้ตะกร้า' };
+    if (data.enrollments.some((item) => item.courseId === courseId && item.userId === currentUser.id) || data.orders.some((item) => item.courseId === courseId && item.userId === currentUser.id && item.status === 'paid')) return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
+    if (data.cartItems.some((item) => item.courseId === courseId && item.userId === currentUser.id)) return { ok: true, alreadyAdded: true };
+    const referral = data.referralLinks.find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === course.id && item.instructorId === course.instructorId);
+    update((next) => { next.cartItems.push({ id: createId('cart'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), priceAlertEnabled: false, ...(referral ? { referralCode: referral.code } : {}) }); return next; });
+    return { ok: true };
+  }, [currentUser, data.courses, data.enrollments, data.orders, data.cartItems, data.referralLinks, update]);
+
+  const removeCourseFromCart = useCallback((cartItemId) => {
+    if (!currentUser || !data.cartItems.some((entry) => entry.id === cartItemId && entry.userId === currentUser.id)) return false;
+    update((next) => {
+      next.cartItems = next.cartItems.filter((entry) => entry.id !== cartItemId);
+      return next;
+    });
+    return true;
+  }, [currentUser, data.cartItems, update]);
+
+  const setCoursePriceAlert = useCallback((courseId, enabled) => {
+    if (!currentUser || !data.cartItems.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) return false;
+    update((next) => {
+      next.cartItems = next.cartItems.map((entry) => {
+        if (entry.courseId !== courseId || entry.userId !== currentUser.id) return entry;
+        return { ...entry, priceAlertEnabled: Boolean(enabled) };
+      });
+      return next;
+    });
+    return true;
+  }, [currentUser, data.cartItems, update]);
+
   const simulatePayment = useCallback((courseId, outcome, referralCode = null) => {
     const orderId = createId('order');
     update((next) => {
@@ -282,7 +330,10 @@ export function LmsProvider({ children }) {
       const instructorShareAmount = Math.round((amount * sharePercent + Number.EPSILON) * 100) / 100;
       const order = { id: orderId, courseId, userId: currentUser.id, amount, status: outcome, method: 'บัตรจำลอง', createdAt: new Date().toISOString(), instructorId: course.instructorId, ...(outcome === 'paid' ? { instructorSharePercent: sharePercent, instructorShareAmount, platformShareAmount: Math.round((amount - instructorShareAmount + Number.EPSILON) * 100) / 100, payoutStatus: 'pending' } : {}), ...(link ? { referralCode: link.code, referralLinkId: link.id } : {}) };
       next.orders.unshift(order);
-      if (outcome === 'paid' && !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
+      if (outcome === 'paid') {
+        next.cartItems = (next.cartItems ?? []).filter((entry) => entry.courseId !== courseId || entry.userId !== currentUser.id);
+        if (!next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
+      }
       return next;
     });
     return orderId;
@@ -466,11 +517,12 @@ export function LmsProvider({ children }) {
   const value = useMemo(() => ({
     data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse,
     saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment,
+    addCourseToCart, removeCourseFromCart, setCoursePriceAlert,
     createReferralLink, saveInstructorCommission, markInstructorPayout,
     markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest,
     createInstructorInvite, acceptInstructorInvite,
     changeUserRole, updateProfile, resetPassword,
-  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, createReferralLink, saveInstructorCommission, markInstructorPayout, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
+  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, addCourseToCart, removeCourseFromCart, setCoursePriceAlert, createReferralLink, saveInstructorCommission, markInstructorPayout, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
 
   return <LmsContext.Provider value={value}>{children}</LmsContext.Provider>;
 }

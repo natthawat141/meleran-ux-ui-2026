@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AppShell, Avatar, Burger, Button, Group, Menu, NavLink, Select, Stack, Text } from '@mantine/core';
-import { IconAdjustments, IconArticle, IconBook2, IconCertificate, IconChartBar, IconChevronDown, IconCirclePlus, IconClipboardCheck, IconLayoutDashboard, IconLogout, IconReceipt, IconSchool, IconSettings, IconShoppingBag, IconUsers } from '@tabler/icons-react';
+import { AppShell, Avatar, Badge, Burger, Button, Group, Menu, NavLink, Select, Stack, Text } from '@mantine/core';
+import { IconAdjustments, IconArticle, IconBook2, IconCertificate, IconChartBar, IconChevronDown, IconCirclePlus, IconClipboardCheck, IconLayoutDashboard, IconLogout, IconReceipt, IconSchool, IconSettings, IconShoppingBag, IconShoppingCart, IconUsers } from '@tabler/icons-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLms } from '../store.jsx';
 import { LandingHeader, LandingFooter } from '../pages/landing/LandingChrome.jsx';
@@ -12,6 +12,7 @@ const roleMenus = {
     { key: '/learn', icon: <IconLayoutDashboard />, label: 'ภาพรวมการเรียน' },
     { key: '/learn/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
     { key: '/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
+    { key: '/account/cart', icon: <IconShoppingCart />, label: 'ตะกร้าคอร์ส' },
     { key: '/account/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
     { key: '/account/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
     { key: '/account/profile', icon: <IconSettings />, label: 'บัญชีของฉัน' },
@@ -62,7 +63,7 @@ export function PublicShell({ children }) {
 }
 
 export function WorkspaceShell({ children }) {
-  const { currentUser, signInDemo, signOut } = useLms();
+  const { data, currentUser, signInDemo, signOut } = useLms();
   const location = useLocation();
   const navigate = useNavigate();
   const [opened, setOpened] = useState(false);
@@ -78,7 +79,8 @@ export function WorkspaceShell({ children }) {
     const result = signInDemo(nextRole);
     if (result.ok) navigate(roleMeta[nextRole].home);
   };
-  const navLinks = items.map((item) => <NavLink key={item.key} component={Link} to={item.key} label={item.label} leftSection={item.icon} active={selected === item.key} onClick={() => setOpened(false)} />);
+  const cartCount = (data.cartItems ?? []).filter((item) => item.userId === currentUser?.id).length;
+  const navLinks = items.map((item) => <NavLink key={item.key} component={Link} to={item.key} label={item.label} leftSection={item.icon} rightSection={item.key === '/account/cart' && cartCount > 0 ? <Badge size="sm" variant="light" color="blue">{cartCount}</Badge> : null} active={selected === item.key} onClick={() => setOpened(false)} />);
   const profileInitial = currentUser?.name?.trim()?.slice(0, 1) || meta.label.slice(0, 1);
 
   return <AppShell className="workspace-shell" header={{ height: 72 }} navbar={{ width: 258, breakpoint: 'md', collapsed: { mobile: !opened } }} padding="xl">
