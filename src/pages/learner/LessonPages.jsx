@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store.jsx';
 import { ContentTypeIcon, PageTitle, StoryParagraphs } from '../../components/common.jsx';
 import { flattenItems, instructorFor } from '../../data.js';
+import { getCoursePreviewLesson } from '../../lib/course-preview.ts';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -15,6 +16,12 @@ function getCourseItem(data, courseId, itemId) {
   const sequence = flattenItems(course);
   const index = sequence.findIndex((entry) => entry.id === itemId);
   return { course, chapter, item, sequence, index };
+}
+
+function canOpenCourseItem(data, course, item, userId) {
+  return data.users.find((user) => user.id === userId)?.role === 'admin'
+    || data.enrollments.some((entry) => entry.courseId === course.id && entry.userId === userId)
+    || getCoursePreviewLesson(course)?.item.id === item.id;
 }
 
 function LessonSidebar({ course, currentItem, data }) {
@@ -40,7 +47,7 @@ export function LearnerCoursePage() {
   const course = data.courses.find((item) => item.id === courseId);
   const enrolled = data.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id);
   if (!course) return <Empty description="ไม่พบคอร์สนี้"/>;
-  if (!enrolled) return <Alert type="warning" showIcon message="ต้องลงเรียนก่อนจึงจะเปิดเนื้อหาได้" action={<Link to={`/courses/${course.slug}`}>ไปหน้ารายละเอียด</Link>}/>;
+  if (!enrolled) return <Alert type="warning" showIcon message="ต้องลงเรียนก่อนจึงจะเปิดเนื้อหาได้" action={<Space><Link to={`/courses/${course.slug}/preview`}>ทดลองดูบทแรก</Link><Link to={`/courses/${course.slug}`}>รายละเอียดและสมัคร</Link></Space>}/>;
   const first = flattenItems(course)[0];
   const teacher = instructorFor(data, course);
   return <>
@@ -56,6 +63,7 @@ export function VideoLessonPage() {
   const { data, currentUser, markContentDone } = useLms();
   const { course, chapter, item, sequence, index } = getCourseItem(data, courseId, itemId);
   if (!course || !item || item.type !== 'video') return <Empty description="ไม่พบวิดีโอนี้"/>;
+  if (!canOpenCourseItem(data, course, item, currentUser.id)) return <Alert type="warning" showIcon message="บทนี้เปิดหลังสมัครคอร์ส" action={<Link to={`/explore/courses/${course.slug}`}>ดูรายละเอียดและสมัครเรียน</Link>}/>;
   const done = Boolean(data.progress[`${courseId}:${itemId}`]?.[currentUser.id]);
   const teacher = instructorFor(data, course);
   const next = sequence[index + 1];
@@ -72,6 +80,7 @@ export function ArticleLessonPage() {
   const { data, currentUser, markContentDone } = useLms();
   const { course, chapter, item, sequence, index } = getCourseItem(data, courseId, itemId);
   if (!course || !item || item.type !== 'article') return <Empty description="ไม่พบบทความนี้"/>;
+  if (!canOpenCourseItem(data, course, item, currentUser.id)) return <Alert type="warning" showIcon message="บทนี้เปิดหลังสมัครคอร์ส" action={<Link to={`/explore/courses/${course.slug}`}>ดูรายละเอียดและสมัครเรียน</Link>}/>;
   const teacher = instructorFor(data, course);
   const next = sequence[index + 1];
   const nextPath = next && `/learn/courses/${course.id}/${next.type === 'video' ? 'videos' : next.type === 'article' ? 'articles' : 'quizzes'}/${next.id}`;
