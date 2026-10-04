@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { createId, DEMO_ACCOUNTS, flattenItems, initialData, seedCourseCoverReplacements } from './data.js';
 import defaultCourseCover from './assets/generated/course-default-v2.png';
+import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model.ts';
 
 const STORAGE_KEY = 'stay-elearn-ux-v2';
 const LEGACY_DEFAULT_COVER = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85';
@@ -18,7 +19,9 @@ function loadData() {
           ? { ...course, cover: replacement.to } : course;
       }) : structuredClone(initialData.courses);
       courses.forEach((course) => course.chapters.forEach((chapter) => chapter.items.forEach((item) => { if (!item.id) item.id = createId('item'); })));
-      return { ...initialData, ...parsed, courses, blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : structuredClone(initialData.blogPosts) };
+      const users = Array.isArray(parsed.users) ? parsed.users : initialData.users;
+      const certificates = snapshotLegacyCertificateNames(Array.isArray(parsed.certificates) ? parsed.certificates : initialData.certificates, users);
+      return { ...initialData, ...parsed, users, certificates, courses, blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : structuredClone(initialData.blogPosts) };
     }
   } catch { /* Start with the sample data if storage is unavailable or invalid. */ }
   return structuredClone(initialData);
@@ -35,6 +38,7 @@ function awardCertificate(data, courseId, userId) {
   return { ...data, certificates: [...data.certificates, {
     id: createId('cert'), code: `STAY-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
     courseId, userId, issuedAt: new Date().toISOString(),
+    recipientName: certificateRecipient(data.users.find((item) => item.id === userId) || { id: userId, name: 'ผู้เรียน' }),
   }] };
 }
 
@@ -371,10 +375,14 @@ export function LmsProvider({ children }) {
     return next;
   }), [update]);
 
-  const updateProfile = useCallback((values) => update((next) => {
-    next.users = next.users.map((item) => item.id === currentUser?.id ? { ...item, ...values } : item);
-    return next;
-  }), [currentUser?.id, update]);
+  const updateProfile = useCallback((values) => {
+    if (!currentUser) return { ok: false, message: 'ไม่พบบัญชีผู้ใช้' };
+    const validation = validateProfile(values, data.users, currentUser.id);
+    if (validation) return { ok: false, message: validation };
+    const editable = { name: values.name.trim(), username: values.username?.trim(), firstName: values.firstName?.trim(), lastName: values.lastName?.trim(), firstNameEnglish: values.firstNameEnglish?.trim(), lastNameEnglish: values.lastNameEnglish?.trim(), certificateName: values.certificateName?.trim(), birthDate: values.birthDate?.trim(), phone: values.phone?.trim(), school: values.school?.trim(), educationLevel: values.educationLevel, interests: values.interests ?? [], learningGoals: values.learningGoals ?? [], googleLinkedEmail: values.googleLinkedEmail, bio: values.bio, avatar: values.avatar };
+    update((next) => { next.users = next.users.map((item) => item.id === currentUser.id ? { ...item, ...editable } : item); return next; });
+    return { ok: true };
+  }, [currentUser, data.users, update]);
 
   const resetPassword = useCallback((email, password) => {
     const user = data.users.find((item) => item.email.toLowerCase() === email?.trim().toLowerCase());

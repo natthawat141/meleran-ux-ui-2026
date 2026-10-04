@@ -10,6 +10,7 @@ import { ReadingCollection } from './ReadingCollection.jsx';
 import { BrandIntroduction, FounderPreview } from './BrandStory.jsx';
 import { LandingHero } from './LandingHero.jsx';
 import { NewsletterBanner } from './NewsletterBanner.jsx';
+import { InstructorSpotlight } from './InstructorSpotlight';
 import './landing.css';
 
 export const landingTheme = {
@@ -45,13 +46,14 @@ export function LandingPage() {
       <LandingHeader />
       <main id="home-main" tabIndex={-1}>
         <LandingHero />
+        <InstructorSpotlight />
         <BrandIntroduction />
-        <FounderPreview />
         <LearningInvitation />
         <ReadingCollection posts={data.blogPosts.filter((post) => post.status === 'published')} />
         <LearningGuide />
         <CourseCollection courses={courses} data={data} />
         <LandingFaq />
+        <FounderPreview />
         <NewsletterBanner />
       </main>
       <LandingFooter />

@@ -25,7 +25,7 @@ export function LandingHero() {
         initial={reducedMotion ? false : 'hidden'}
         whileInView="visible" viewport={{ once: true, amount: 0.2 }}
         variants={{ visible: { transition: { staggerChildren: 0.09 } } }}>
-        <motion.p variants={reducedMotion ? undefined : reveal} className="home-eyebrow">พื้นที่เรียนรู้ ที่เป็นของคุณ</motion.p>
+
         <motion.h1 variants={reducedMotion ? undefined : reveal} id="home-title">เรียนรู้สิ่งใหม่<br/><span>ในจังหวะของคุณ</span></motion.h1>
         <motion.p variants={reducedMotion ? undefined : reveal} className="home-intro">ค่อย ๆ เพิ่มทักษะที่อยากมี ผ่านคอร์สออนไลน์ที่เลือกเวลาเรียนได้เอง พร้อมผู้สอนที่ช่วยให้คุณไปต่อ</motion.p>
         <motion.div variants={reducedMotion ? undefined : reveal} className="home-hero-actions">

@@ -5,9 +5,9 @@ import { motion, useReducedMotion } from 'motion/react';
 import './brand-story.css';
 
 export const founders = [
+  { id: 3, image: '/images/founders/kiattisak-sing-ngam-ceo.jpg', name: 'Kiattisak Sing-ngam', role: 'ประธานเจ้าหน้าที่บริหาร · CEO', width: 960, height: 955 },
   { id: 1, image: '/images/founders/nichanun-kaitom-thongprasert-coo.jpg', name: 'Nichanun Kaitom Thongprasert', role: 'ประธานเจ้าหน้าที่ฝ่ายปฏิบัติการ · COO', width: 1030, height: 1030 },
   { id: 2, image: '/images/founders/natthawat-sawatdee-cto.jpg', name: 'Natthawat Sawatdee', role: 'ประธานเจ้าหน้าที่ฝ่ายเทคโนโลยี · CTO', width: 1086, height: 1448 },
-  { id: 3, image: '/images/founders/kiattisak-sing-ngam-ceo.jpg', name: 'Kiattisak Sing-ngam', role: 'ประธานเจ้าหน้าที่บริหาร · CEO', width: 960, height: 955 },
 ];
 
 export function StoryReveal({ children, className = '' }) {
