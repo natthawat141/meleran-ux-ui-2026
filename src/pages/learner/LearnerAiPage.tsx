@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { Button, Drawer, Input, Modal, Select, Typography, type GetRef } from 'antd';
+import { Button, Drawer, Input, Modal, Typography, type GetRef } from 'antd';
 import { ActionIcon, Menu, NavLink, Stack, Text as MantineText, Tooltip } from '@mantine/core';
 import {
   IconArrowLeft, IconArrowUp, IconArrowUpRight, IconBook2, IconBulb,
   IconDots, IconHome2, IconInfoCircle, IconMathFunction, IconLayoutSidebar,
-  IconMessageChatbot, IconNotes, IconPencil, IconSearch, IconTrash,
+  IconMessageChatbot, IconNotes, IconPencil, IconSearch, IconTrash, IconX,
 } from '@tabler/icons-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import logo from '../../assets/melearn-ui/logo.PNG';
 import { useLms } from '../../store';
 import { AiResponse } from './AiResponse';
+import { findCourseCommand, removeCourseCommand } from './ai-course-command';
 import {
   AI_MATH_DEMO_PROMPT, createAiThread, getDemoResponse, loadAiThreads, saveAiThreads,
   type AiContext, type AiMessage, type AiThread,
@@ -105,6 +106,10 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   const [renameThreadId, setRenameThreadId] = useState<string | null>(null);
   const [renameTitle, setRenameTitle] = useState('');
   const [deleteThreadId, setDeleteThreadId] = useState<string | null>(null);
+  const [composerFocused, setComposerFocused] = useState(false);
+  const [composerCaret, setComposerCaret] = useState(0);
+  const [courseOptionIndex, setCourseOptionIndex] = useState(0);
+  const [dismissedCommand, setDismissedCommand] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<GetRef<typeof Input.TextArea>>(null);
   const active = threads.find((thread) => thread.id === activeId);
@@ -113,6 +118,14 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
     ? data.attempts.find((item) => item.id === activeContext.attemptId && item.userId === userId && item.status === 'in_progress')
     : undefined;
   const activeCourse = courses.find((item) => item.id === activeContext.courseId);
+  const commandKey = `${activeId}:${active?.draft}:${composerCaret}`;
+  const courseCommand = composerFocused && !composing && dismissedCommand !== commandKey
+    ? findCourseCommand(active?.draft ?? '', composerCaret)
+    : null;
+  const matchingCourses = courseCommand
+    ? courses.filter((course) => course.title.toLocaleLowerCase().includes(courseCommand.query))
+    : [];
+  const highlightedCourseIndex = Math.min(courseOptionIndex, Math.max(0, matchingCourses.length - 1));
   const returnToAttempt = activeAttempt
     ? `/learn/attempts/${activeAttempt.id}${activeContext.questionId ? `#question-${activeContext.questionId}` : ''}`
     : '';
@@ -175,6 +188,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   };
 
   const sendMessage = (raw?: string) => {
+    if (!raw && courseCommand) return;
     const text = (raw ?? active?.draft ?? '').trim();
     if (!active || !text) return;
     const now = new Date().toISOString();
@@ -192,8 +206,52 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
     }));
   };
 
+  const chooseCourse = (courseId: string) => {
+    if (!active || !courseCommand || !courses.some((course) => course.id === courseId)) return;
+    const draft = removeCourseCommand(active.draft, courseCommand);
+    const caret = courseCommand.start;
+    const context = activeContext.courseId === courseId ? activeContext : { courseId };
+    updateActive((thread) => ({ ...thread, draft, context }));
+    setDismissedCommand('');
+    setComposerCaret(caret);
+    setCourseOptionIndex(0);
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.resizableTextArea?.textArea.setSelectionRange(caret, caret);
+    });
+  };
+
+  const updateComposerCaret = (element: HTMLTextAreaElement) => {
+    setComposerCaret(element.selectionStart);
+    setCourseOptionIndex(0);
+  };
+
+  useEffect(() => {
+    if (courseCommand) document.getElementById(`learn-ai-course-option-${highlightedCourseIndex}`)?.scrollIntoView({ block: 'nearest' });
+  }, [commandKey, highlightedCourseIndex, Boolean(courseCommand)]);
+
   const onComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey && !composing && !event.nativeEvent.isComposing) {
+    if (composing || event.nativeEvent.isComposing) return;
+    if (courseCommand) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setDismissedCommand(commandKey);
+        return;
+      }
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        setCourseOptionIndex((highlightedCourseIndex + step + matchingCourses.length) % (matchingCourses.length || 1));
+        return;
+      }
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        const course = matchingCourses[highlightedCourseIndex];
+        if (course) chooseCourse(course.id);
+        return;
+      }
+    }
+    if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       sendMessage();
     }
@@ -302,27 +360,63 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
           )}
         </div>
         <div className="learn-ai-composer-dock">
-          <div className="learn-ai-composer-wrap">
-            {courses.length > 0 && <Select aria-label="คอร์สที่กำลังเรียน" className="learn-ai-course-select" variant="borderless" placeholder="เลือกคอร์ส" value={activeCourse?.id} options={courses.map((item) => ({ value: item.id, label: item.title }))} onChange={(courseId) => {
-              const nextContext = activeAttempt?.courseId === courseId
-                ? { ...activeContext, courseId }
-                : { courseId };
-              updateActive((thread) => ({ ...thread, context: nextContext }));
-            }} />}
+          <div className="learn-ai-composer-wrap" onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setComposerFocused(false);
+          }}>
+            {courseCommand && <div className="learn-ai-course-menu">
+              <MantineText size="xs" c="dimmed" className="learn-ai-course-menu-label">เลือกคอร์สที่เรียน</MantineText>
+              <div id="learn-ai-course-options" role="listbox" aria-label="คอร์สที่ลงเรียน" className="learn-ai-course-options">
+                {matchingCourses.map((course, index) => <Button
+                  key={course.id}
+                  id={`learn-ai-course-option-${index}`}
+                  type="text"
+                  role="option"
+                  aria-selected={index === highlightedCourseIndex}
+                  className="learn-ai-course-option"
+                  icon={<IconBook2 size={16} aria-hidden="true" />}
+                  onPointerDown={(event) => event.preventDefault()}
+                  onClick={() => chooseCourse(course.id)}
+                >{course.title}</Button>)}
+              </div>
+              {!matchingCourses.length && <div className="learn-ai-course-menu-empty" role="status">{courses.length ? 'ไม่พบคอร์สที่ตรงกัน' : 'ยังไม่มีคอร์สที่ลงเรียน'}</div>}
+            </div>}
+            {activeCourse && <div className="learn-ai-selected-course">
+              <IconBook2 size={14} aria-hidden="true" />
+              <span title={activeCourse.title}>{activeCourse.title}</span>
+              <Button type="text" size="small" aria-label="นำคอร์สออกจากคำถาม" icon={<IconX size={13} aria-hidden="true" />} onClick={() => {
+                updateActive((thread) => ({ ...thread, context: {} }));
+                inputRef.current?.focus();
+              }} />
+            </div>}
             <label htmlFor="learn-ai-composer" className="learn-ai-sr-only">พิมพ์คำถามถึง Melearn AI</label>
             <Input.TextArea
               id="learn-ai-composer"
               className="learn-ai-composer-input"
               ref={inputRef}
               value={active?.draft ?? ''}
-              onChange={(event) => updateActive((thread) => ({ ...thread, draft: event.target.value }))}
+              onChange={(event) => {
+                updateActive((thread) => ({ ...thread, draft: event.target.value }));
+                updateComposerCaret(event.target);
+              }}
+              onSelect={(event) => updateComposerCaret(event.currentTarget)}
+              onFocus={(event) => {
+                setComposerFocused(true);
+                updateComposerCaret(event.currentTarget);
+              }}
+              role="combobox"
+              aria-autocomplete="list"
+              aria-haspopup="listbox"
+              aria-expanded={Boolean(courseCommand)}
+              aria-controls={courseCommand ? 'learn-ai-course-options' : undefined}
+              aria-activedescendant={courseCommand && matchingCourses.length ? `learn-ai-course-option-${highlightedCourseIndex}` : undefined}
+              aria-describedby="learn-ai-composer-hint"
               onCompositionStart={() => setComposing(true)}
               onCompositionEnd={() => setComposing(false)}
               onKeyDown={onComposerKeyDown}
-              placeholder={activeContext.questionLabel ? 'ถามเกี่ยวกับข้อนี้ หรือขอคำใบ้เพิ่ม…' : 'พิมพ์คำถามเกี่ยวกับบทเรียน…'}
+              placeholder={activeContext.questionLabel ? 'ถามเกี่ยวกับข้อนี้ หรือพิมพ์ / เลือกคอร์ส…' : 'ถามเกี่ยวกับบทเรียน หรือพิมพ์ / เลือกคอร์ส…'}
               autoSize={{ minRows: 2, maxRows: 5 }}
             />
-            <div className="learn-ai-composer-actions"><Text>Enter ส่ง · Shift + Enter ขึ้นบรรทัดใหม่</Text><Button type="primary" aria-label="ส่งคำถาม" icon={<IconArrowUp size={17} />} onClick={() => sendMessage()} disabled={!active?.draft.trim()} /></div>
+            <div className="learn-ai-composer-actions"><Text id="learn-ai-composer-hint"><span className="learn-ai-keyboard-hint">Enter ส่ง · </span>/ เลือกคอร์ส</Text><Button type="primary" aria-label="ส่งคำถาม" icon={<IconArrowUp size={17} />} onClick={() => sendMessage()} disabled={!active?.draft.trim() || Boolean(courseCommand)} /></div>
           </div>
           <div className="learn-ai-demo-note"><IconInfoCircle size={14} aria-hidden="true" /><span>โหมดตัวอย่าง · ยังไม่เชื่อมต่อ AI จริง</span></div>
           {storageWarning && <div className="learn-ai-storage-warning" role="status">บันทึกประวัติแชตในอุปกรณ์นี้ไม่สำเร็จ</div>}

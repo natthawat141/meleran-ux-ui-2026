@@ -31,7 +31,7 @@ Use Node.js 24 or later for the native TypeScript test entry. On Windows:
 ```powershell
 npm.cmd run typecheck
 npm.cmd run build
-node --test tests/business-reports.test.mjs tests/profile-model.test.mjs tests/instructorAnalytics.test.ts tests/instructor-finance.test.mjs
+node --test tests/business-reports.test.mjs tests/profile-model.test.mjs tests/instructorAnalytics.test.ts tests/instructor-finance.test.mjs tests/ai-course-command.test.ts
 ```
 
 Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
