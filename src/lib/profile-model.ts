@@ -2,6 +2,8 @@ export interface ProfileDetails {
   username?: string;
   firstName?: string;
   lastName?: string;
+  firstNameEnglish?: string;
+  lastNameEnglish?: string;
   certificateName?: string;
   birthDate?: string;
   phone?: string;

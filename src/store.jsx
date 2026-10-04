@@ -379,7 +379,7 @@ export function LmsProvider({ children }) {
     if (!currentUser) return { ok: false, message: 'ไม่พบบัญชีผู้ใช้' };
     const validation = validateProfile(values, data.users, currentUser.id);
     if (validation) return { ok: false, message: validation };
-    const editable = { name: values.name.trim(), username: values.username?.trim(), firstName: values.firstName?.trim(), lastName: values.lastName?.trim(), certificateName: values.certificateName?.trim(), birthDate: values.birthDate?.trim(), phone: values.phone?.trim(), school: values.school?.trim(), educationLevel: values.educationLevel, interests: values.interests ?? [], learningGoals: values.learningGoals ?? [], googleLinkedEmail: values.googleLinkedEmail, bio: values.bio, avatar: values.avatar };
+    const editable = { name: values.name.trim(), username: values.username?.trim(), firstName: values.firstName?.trim(), lastName: values.lastName?.trim(), firstNameEnglish: values.firstNameEnglish?.trim(), lastNameEnglish: values.lastNameEnglish?.trim(), certificateName: values.certificateName?.trim(), birthDate: values.birthDate?.trim(), phone: values.phone?.trim(), school: values.school?.trim(), educationLevel: values.educationLevel, interests: values.interests ?? [], learningGoals: values.learningGoals ?? [], googleLinkedEmail: values.googleLinkedEmail, bio: values.bio, avatar: values.avatar };
     update((next) => { next.users = next.users.map((item) => item.id === currentUser.id ? { ...item, ...editable } : item); return next; });
     return { ok: true };
   }, [currentUser, data.users, update]);

@@ -59,8 +59,10 @@ export function ProfileSettings({ user, users, updateProfile }: Props) {
         <section className="profile-v2-section">
           <div className="profile-v2-section-title"><div><h2>ข้อมูลส่วนตัว</h2><Text type="secondary">ข้อมูลเพิ่มเติมเป็นตัวเลือก</Text></div></div>
           <div className="profile-v2-fields">
-            <Form.Item name="firstName" label="ชื่อจริง"><Input autoComplete="given-name" /></Form.Item>
-            <Form.Item name="lastName" label="นามสกุล"><Input autoComplete="family-name" /></Form.Item>
+            <Form.Item name="firstName" label="ชื่อจริง (ไทย)"><Input autoComplete="given-name" /></Form.Item>
+            <Form.Item name="lastName" label="นามสกุล (ไทย)"><Input autoComplete="family-name" /></Form.Item>
+            <Form.Item name="firstNameEnglish" label="First name (English)"><Input autoComplete="given-name" /></Form.Item>
+            <Form.Item name="lastNameEnglish" label="Last name (English)"><Input autoComplete="family-name" /></Form.Item>
             <Form.Item name="birthDate" label="วันเกิด"><Input type="date" max={localToday} /></Form.Item>
             <Form.Item name="phone" label="เบอร์โทรศัพท์"><Input autoComplete="tel" /></Form.Item>
             <Form.Item name="bio" label="แนะนำตัว" className="profile-v2-wide"><Input.TextArea rows={3} maxLength={600} placeholder="เล่าเกี่ยวกับตัวคุณสั้น ๆ" /></Form.Item>
