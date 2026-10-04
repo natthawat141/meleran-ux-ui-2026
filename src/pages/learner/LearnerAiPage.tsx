@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { Button, Drawer, Input, Modal, Select, Tag, Typography, type GetRef } from 'antd';
-import { ActionIcon, Button as MantineButton, Menu, NavLink, Stack, Text as MantineText } from '@mantine/core';
+import { Button, Drawer, Input, Modal, Select, Typography, type GetRef } from 'antd';
+import { ActionIcon, Menu, NavLink, Stack, Text as MantineText, Tooltip } from '@mantine/core';
 import {
-  IconArrowLeft, IconArrowUp, IconArrowUpRight, IconBook2, IconBrain, IconBulb,
-  IconDots, IconHome2, IconInfoCircle, IconMathFunction, IconMenu2,
-  IconMessageChatbot, IconMessagePlus, IconNotes, IconPencil, IconSearch, IconTrash, IconX,
+  IconArrowLeft, IconArrowUp, IconArrowUpRight, IconBook2, IconBulb,
+  IconDots, IconHome2, IconInfoCircle, IconMathFunction, IconLayoutSidebar,
+  IconMessageChatbot, IconNotes, IconPencil, IconSearch, IconTrash,
 } from '@tabler/icons-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import logo from '../../assets/melearn-ui/logo.PNG';
@@ -98,6 +98,8 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   const [activeId, setActiveId] = useState(initial.activeId);
   const [search, setSearch] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [composing, setComposing] = useState(false);
   const [storageWarning, setStorageWarning] = useState(false);
   const [renameThreadId, setRenameThreadId] = useState<string | null>(null);
@@ -197,23 +199,36 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
     }
   };
 
-  const sidebar = (
+  const sidebar = (mobile = false) => (
     <div className="learn-ai-sidebar-inner">
-      <Link to="/learn" className="learn-ai-brand" aria-label="Melearn AI หน้าหลัก">
-        <BrandLogo className="learn-ai-brand-logo-img" />
-        <span>Melearn <b>AI</b></span>
-      </Link>
-      <MantineButton className="learn-ai-new-chat" fullWidth leftSection={<IconMessagePlus size={17} aria-hidden="true" />} onClick={newChat}>แชตใหม่</MantineButton>
-      <Input
+      <div className="learn-ai-sidebar-heading">
+        <Link to="/learn" className="learn-ai-brand" aria-label="Melearn หน้าหลัก">
+          <BrandLogo className="learn-ai-brand-logo-img" />
+        </Link>
+        <Tooltip label="ค้นหาแชต">
+          <ActionIcon variant="subtle" color="gray" size={36} aria-label="ค้นหาแชต" aria-expanded={searchOpen} onClick={() => {
+            setSearchOpen((open) => !open);
+            setSearch('');
+          }}><IconSearch size={20} aria-hidden="true" /></ActionIcon>
+        </Tooltip>
+        <Tooltip label="หด sidebar">
+          <ActionIcon variant="subtle" color="gray" size={36} aria-label="หด sidebar" aria-expanded={mobile ? drawerOpen : !sidebarCollapsed} onClick={() => mobile ? setDrawerOpen(false) : setSidebarCollapsed(true)}>
+            <IconLayoutSidebar size={20} aria-hidden="true" />
+          </ActionIcon>
+        </Tooltip>
+      </div>
+      <NavLink component="button" type="button" className="learn-ai-new-chat" label="แชตใหม่" leftSection={<IconPencil size={19} aria-hidden="true" />} onClick={newChat} />
+      {searchOpen && <Input
         className="learn-ai-search"
         allowClear
         prefix={<IconSearch size={17} />}
         placeholder="ค้นหาแชต"
         aria-label="ค้นหาประวัติแชต"
         value={search}
+        autoFocus
         onChange={(event) => setSearch(event.target.value)}
-      />
-      <MantineText className="learn-ai-history-label" size="xs" fw={700} tt="uppercase" c="dimmed" lts={1.2}>ประวัติการสนทนา</MantineText>
+      />}
+      <MantineText className="learn-ai-history-label" size="xs" c="dimmed">แชตล่าสุด</MantineText>
       <Stack component="nav" className="learn-ai-history" gap={5} aria-label="ประวัติการสนทนา">
         {visibleThreads.length ? visibleThreads.map((thread) => (
           <div className="learn-ai-history-row" key={thread.id}>
@@ -225,7 +240,6 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
               aria-current={thread.id === activeId ? 'page' : undefined}
               aria-label={thread.title}
               label={thread.title}
-              leftSection={<IconMessagePlus size={17} aria-hidden="true" />}
               onClick={() => selectThread(thread)}
             />
             <Menu position="bottom-end" shadow="md" width={164} withinPortal zIndex={1100}>
@@ -250,23 +264,18 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   );
 
   return (
-    <main className="learn-ai-app">
-      <aside className="learn-ai-sidebar">{sidebar}</aside>
-      <Drawer className="learn-ai-mobile-drawer" placement="left" width={292} open={drawerOpen} onClose={() => setDrawerOpen(false)} closable={false}>
-        <Button className="learn-ai-drawer-close" type="text" aria-label="ปิดเมนู" icon={<IconX size={20} />} onClick={() => setDrawerOpen(false)} />
-        {sidebar}
+    <main className={`learn-ai-app${sidebarCollapsed ? ' learn-ai-sidebar-collapsed' : ''}`}>
+      <aside className="learn-ai-sidebar">{sidebar()}</aside>
+      <Drawer className="learn-ai-mobile-drawer" placement="left" width={292} open={drawerOpen} onClose={() => setDrawerOpen(false)} closable={false} destroyOnHidden>
+        {sidebar(true)}
       </Drawer>
       <section className="learn-ai-main" aria-label="Melearn AI">
-        <header className="learn-ai-topbar">
-          <Button className="learn-ai-menu-toggle" type="text" aria-label="เปิดเมนูแชต" icon={<IconMenu2 size={21} />} onClick={() => setDrawerOpen(true)} />
-          <div className="learn-ai-topbar-title"><IconBrain size={18} aria-hidden="true" /><span>ผู้ช่วยการเรียน</span><Tag>เดโม</Tag></div>
-          {courses.length > 0 && <Select aria-label="คอร์สที่กำลังเรียน" className="learn-ai-course-select" placeholder="เลือกคอร์ส" value={activeCourse?.id} options={courses.map((item) => ({ value: item.id, label: item.title }))} onChange={(courseId) => {
-            const nextContext = activeAttempt?.courseId === courseId
-              ? { ...activeContext, courseId }
-              : { courseId };
-            updateActive((thread) => ({ ...thread, context: nextContext }));
-          }} />}
-        </header>
+        <div className="learn-ai-floating-controls">
+          <Tooltip label="เปิด sidebar">
+            <ActionIcon className="learn-ai-desktop-expand" variant="subtle" color="gray" size={40} aria-label="เปิด sidebar" aria-expanded={!sidebarCollapsed} onClick={() => setSidebarCollapsed(false)}><IconLayoutSidebar size={21} aria-hidden="true" /></ActionIcon>
+          </Tooltip>
+          <ActionIcon className="learn-ai-mobile-expand" variant="subtle" color="gray" size={40} aria-label="เปิดเมนูแชต" aria-expanded={drawerOpen} onClick={() => setDrawerOpen(true)}><IconLayoutSidebar size={21} aria-hidden="true" /></ActionIcon>
+        </div>
         {activeAttempt && activeContext.questionLabel && <div className="learn-ai-context-strip"><IconBook2 size={15} /><span>แบบฝึกหัดที่กำลังทำ</span><b>{activeContext.questionLabel}</b><Link to={returnToAttempt}>กลับไปข้อสอบ</Link></div>}
         <div className="learn-ai-thread" ref={scrollRef}>
           {active?.messages.length ? (
@@ -275,7 +284,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
                 <article className={`learn-ai-message ${message.role}`} key={message.id}>
                   {message.role === 'assistant' && <span className="learn-ai-message-mark"><IconMessageChatbot size={17} aria-hidden="true" /></span>}
                   <div className="learn-ai-message-body">
-                    <Text className="learn-ai-message-author">{message.role === 'user' ? 'คุณ' : 'Melearn AI'}</Text>
+                    <Text className="learn-ai-message-author">{message.role === 'user' ? 'คุณ' : 'ผู้ช่วยการเรียน'}</Text>
                     <AiResponse blocks={message.blocks} />
                   </div>
                 </article>
@@ -285,7 +294,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
             <div className="learn-ai-welcome">
               <BrandLogo className="learn-ai-welcome-logo" />
               <h1>สวัสดี วันนี้อยากเรียนรู้อะไร?</h1>
-              <p>เลือกตัวอย่างเพื่อดูรูปแบบคำตอบของ Melearn AI</p>
+              <p>เริ่มถาม หรือเลือกคำถามด้านล่างได้เลย</p>
               <div className="learn-ai-starters">
                 {prompts.map((prompt) => <button type="button" key={prompt.text} onClick={() => sendMessage(prompt.text)}><span className="learn-ai-starter-icon">{prompt.icon}</span><span>{prompt.text}</span><IconArrowUpRight className="learn-ai-starter-arrow" size={16} aria-hidden="true" /></button>)}
               </div>
@@ -294,6 +303,12 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
         </div>
         <div className="learn-ai-composer-dock">
           <div className="learn-ai-composer-wrap">
+            {courses.length > 0 && <Select aria-label="คอร์สที่กำลังเรียน" className="learn-ai-course-select" variant="borderless" placeholder="เลือกคอร์ส" value={activeCourse?.id} options={courses.map((item) => ({ value: item.id, label: item.title }))} onChange={(courseId) => {
+              const nextContext = activeAttempt?.courseId === courseId
+                ? { ...activeContext, courseId }
+                : { courseId };
+              updateActive((thread) => ({ ...thread, context: nextContext }));
+            }} />}
             <label htmlFor="learn-ai-composer" className="learn-ai-sr-only">พิมพ์คำถามถึง Melearn AI</label>
             <Input.TextArea
               id="learn-ai-composer"
