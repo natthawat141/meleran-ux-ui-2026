@@ -1,6 +1,7 @@
 import writingCover from './assets/generated/course-writing-v2.png';
 import dataCover from './assets/generated/course-data-v2.png';
 import focusCover from './assets/generated/course-focus-v2.png';
+import assignmentFixture from './mocks/assignments.json';
 import writingArticleCover from './assets/generated/article-writing-v2.png';
 import dataArticleCover from './assets/generated/article-data-v2.png';
 
@@ -114,6 +115,7 @@ export const initialData = {
   enrollments: [{ id: 'enroll-writing', courseId: 'course-writing', userId: learner.id, createdAt: '2026-09-10' }],
   progress: {},
   attempts: [],
+  assignments: assignmentFixture,
   orders: [],
   certificates: [],
   instructorRequests: [{ id: 'req-demo', userName: 'ศศิ ธรรมดี', email: 'sasi@example.test', intro: 'อยากแบ่งปันความรู้ด้านการทำงาน', status: 'pending', createdAt: '2026-09-18' }],

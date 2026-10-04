@@ -45,7 +45,7 @@ export function ContentTypeIcon({ type, className = '' }) {
 export function StatusTag({ status }) {
   const values = {
     published: ['cobalt', 'เผยแพร่แล้ว'], draft: ['gray', 'ฉบับร่าง'], pending: ['gray', 'รอตรวจ'],
-    paid: ['cobalt', 'ชำระแล้ว'], failed: ['red', 'ไม่สำเร็จ'], approved: ['cobalt', 'อนุมัติแล้ว'],
+    paid: ['cobalt', 'สำเร็จ (จำลอง)'], failed: ['red', 'ไม่สำเร็จ (จำลอง)'], approved: ['cobalt', 'อนุมัติแล้ว'],
     rejected: ['red', 'ส่งกลับ'], graded: ['cobalt', 'ตรวจแล้ว'],
   };
   const [color, label] = values[status] ?? ['gray', status ?? '—'];

@@ -85,7 +85,8 @@ export function CurriculumPage() {
       content: item ? 'รายการนี้จะถูกนำออกจากคอร์ส การลบไม่สามารถเลิกทำได้' : `เนื้อหา ${chapter.items.length} รายการในบทนี้จะถูกลบด้วย การลบไม่สามารถเลิกทำได้`,
       okText: item ? 'นำออกจากบท' : 'ลบบท', cancelText: 'ยกเลิก', okButtonProps: { danger: true },
       onOk: () => {
-        if (item) removeItem(course.id, chapter.id, item.id); else removeChapter(course.id, chapter.id);
+        const result = item ? removeItem(course.id, chapter.id, item.id) : removeChapter(course.id, chapter.id);
+        if (!result.ok) { message.error(result.message); return Promise.reject(); }
         message.success(item ? 'นำเนื้อหาออกแล้ว' : 'ลบบทแล้ว');
       },
     });

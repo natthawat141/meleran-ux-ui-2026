@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppShell, Avatar, Burger, Button, Group, Menu, NavLink, Select, Stack, Text } from '@mantine/core';
-import { IconAdjustments, IconArticle, IconBook2, IconCertificate, IconChevronDown, IconCirclePlus, IconClipboardCheck, IconLayoutDashboard, IconLogout, IconReceipt, IconSchool, IconSettings, IconShoppingBag, IconUsers } from '@tabler/icons-react';
+import { IconAdjustments, IconArticle, IconBook2, IconCertificate, IconChartBar, IconChevronDown, IconCirclePlus, IconClipboardCheck, IconLayoutDashboard, IconLogout, IconReceipt, IconSchool, IconSettings, IconShoppingBag, IconUsers } from '@tabler/icons-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLms } from '../store.jsx';
 import { LandingHeader, LandingFooter } from '../pages/landing/LandingChrome.jsx';
@@ -10,6 +10,7 @@ import loginArtwork from '../assets/generated/guide-learning-path-v2.png';
 const roleMenus = {
   learner: [
     { key: '/learn', icon: <IconLayoutDashboard />, label: 'ภาพรวมการเรียน' },
+    { key: '/learn/assignments', icon: <IconClipboardCheck />, label: 'งานแบบฝึกหัด' },
     { key: '/learn/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
     { key: '/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
     { key: '/account/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
@@ -21,6 +22,8 @@ const roleMenus = {
     { key: '/teach/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
     { key: '/teach/courses/new', icon: <IconCirclePlus />, label: 'สร้างคอร์ส' },
     { key: '/teach/quizzes', icon: <IconClipboardCheck />, label: 'งานตรวจคำตอบ' },
+    { key: '/teach/assignments', icon: <IconClipboardCheck />, label: 'มอบหมายแบบฝึกหัด' },
+    { key: '/teach/analytics', icon: <IconChartBar />, label: 'Analytics' },
     { key: '/teach/learners', icon: <IconUsers />, label: 'ผู้เรียน' },
     { key: '/account/profile', icon: <IconSettings />, label: 'บัญชีของฉัน' },
   ],
@@ -32,6 +35,8 @@ const roleMenus = {
     { key: '/admin/users', icon: <IconUsers />, label: 'ผู้ใช้งาน' },
     { key: '/admin/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
     { key: '/admin/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
+    { key: '/admin/assignments', icon: <IconClipboardCheck />, label: 'งานมอบหมาย' },
+    { key: '/admin/analytics', icon: <IconChartBar />, label: 'Analytics' },
   ],
 };
 

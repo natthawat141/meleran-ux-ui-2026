@@ -1,0 +1,15 @@
+[
+  {
+    "id": "assignment-writing-practice",
+    "courseId": "course-writing",
+    "chapterId": "ch-write-2",
+    "quizId": "quiz-writing",
+    "title": "ฝึกเขียนให้เข้าใจ",
+    "instructions": "ทำแบบทดสอบหลังเรียนบทนี้ คำตอบข้อเขียนส่งให้ผู้สอนตรวจ",
+    "learnerIds": ["u-natee"],
+    "status": "active",
+    "createdBy": "u-nalin",
+    "createdAt": "2026-09-21T09:00:00.000Z",
+    "updatedAt": "2026-09-21T09:00:00.000Z"
+  }
+]

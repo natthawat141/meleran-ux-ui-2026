@@ -159,7 +159,8 @@ export function LmsProvider({ children }) {
       const replacement = chapter.items.find((item) => item.id === old.id);
       const hasProgress = Object.values(data.progress[`${courseId}:${old.id}`] || {}).some(Boolean);
       const hasAttempts = old.quizId && data.attempts.some((attempt) => attempt.quizId === old.quizId);
-      if (!replacement && (hasProgress || hasAttempts)) return { ok: false, message: 'นำรายการที่มีประวัติเรียนหรือคำตอบออกไม่ได้' };
+      const hasAssignments = old.quizId && data.assignments.some((assignment) => assignment.quizId === old.quizId);
+      if (!replacement && (hasProgress || hasAttempts || hasAssignments)) return { ok: false, message: 'นำรายการที่มีประวัติเรียน คำตอบ หรือรายการมอบหมายออกไม่ได้' };
       if (hasAttempts && JSON.stringify(oldQuizzes.find((quiz) => quiz.id === old.quizId)) !== JSON.stringify(quizzes.find((quiz) => quiz.id === old.quizId))) return { ok: false, message: 'แบบฝึกหัดมีประวัติแล้ว ให้สร้างชุดใหม่แทน' };
     }
     const next = structuredClone(data);
@@ -175,15 +176,24 @@ export function LmsProvider({ children }) {
     return { ok: true };
   }, [currentUser, data]);
 
-  const removeChapter = useCallback((courseId, chapterId) => update((next) => {
-    const chapter = next.courses.find((course) => course.id === courseId)?.chapters.find((item) => item.id === chapterId);
-    const quizIds = chapter?.items.filter((item) => item.quizId).map((item) => item.quizId) ?? [];
+  const removeChapter = useCallback((courseId, chapterId) => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    const chapter = course?.chapters.find((entry) => entry.id === chapterId);
+    const canManage = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && course?.instructorId === currentUser.id);
+    if (!chapter || !canManage) return { ok: false, message: 'ไม่มีสิทธิ์ลบบทนี้' };
+    const quizIds = chapter.items.filter((item) => item.quizId).map((item) => item.quizId);
+    const hasProgress = chapter.items.some((item) => Object.values(data.progress[`${courseId}:${item.id}`] || {}).some(Boolean));
+    const hasAttempts = data.attempts.some((attempt) => quizIds.includes(attempt.quizId));
+    const hasAssignments = data.assignments.some((assignment) => quizIds.includes(assignment.quizId));
+    if (hasProgress || hasAttempts || hasAssignments) return { ok: false, message: 'บทนี้มีประวัติเรียน แบบฝึกหัด หรือรายการมอบหมาย กรุณาเก็บประวัติหรือจัดการงานมอบหมายก่อนลบ' };
+    const next = structuredClone(data);
     next.quizzes = next.quizzes.filter((quiz) => !quizIds.includes(quiz.id));
-    next.attempts = next.attempts.filter((attempt) => !quizIds.includes(attempt.quizId));
-    chapter?.items.forEach((item) => { delete next.progress[`${courseId}:${item.id}`]; });
-    next.courses = next.courses.map((course) => course.id === courseId ? { ...course, chapters: course.chapters.filter((chapter) => chapter.id !== chapterId) } : course);
-    return next;
-  }), [update]);
+    next.courses = next.courses.map((entry) => entry.id === courseId ? { ...entry, chapters: entry.chapters.filter((item) => item.id !== chapterId) } : entry);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'ลบบทไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, [currentUser, data]);
 
   const saveItem = useCallback((courseId, chapterId, values) => update((next) => {
     next.courses = next.courses.map((course) => course.id !== courseId ? course : {
@@ -196,20 +206,30 @@ export function LmsProvider({ children }) {
     return next;
   }), [update]);
 
-  const removeItem = useCallback((courseId, chapterId, itemId) => update((next) => {
-    const course = next.courses.find((item) => item.id === courseId);
-    const chapter = course?.chapters.find((item) => item.id === chapterId);
+  const removeItem = useCallback((courseId, chapterId, itemId) => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    const chapter = course?.chapters.find((entry) => entry.id === chapterId);
     const item = chapter?.items.find((entry) => entry.id === itemId);
-    if (item?.quizId) {
-      next.quizzes = next.quizzes.filter((quiz) => quiz.id !== item.quizId);
-      next.attempts = next.attempts.filter((attempt) => attempt.quizId !== item.quizId);
-    }
-    delete next.progress[`${courseId}:${itemId}`];
-    next.courses = next.courses.map((item) => item.id !== courseId ? item : { ...item, chapters: item.chapters.map((entry) => entry.id === chapterId ? { ...entry, items: entry.items.filter((content) => content.id !== itemId) } : entry) });
-    return next;
-  }), [update]);
+    const canManage = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && course?.instructorId === currentUser.id);
+    if (!item || !canManage) return { ok: false, message: 'ไม่มีสิทธิ์นำรายการนี้ออก' };
+    if (Object.values(data.progress[`${courseId}:${itemId}`] || {}).some(Boolean)) return { ok: false, message: 'รายการนี้มีประวัติเรียนแล้ว จึงนำออกไม่ได้' };
+    if (item.quizId && (data.attempts.some((attempt) => attempt.quizId === item.quizId) || data.assignments.some((assignment) => assignment.quizId === item.quizId))) return { ok: false, message: 'แบบฝึกหัดนี้มีประวัติคำตอบหรือรายการมอบหมาย จึงนำออกไม่ได้' };
+    const next = structuredClone(data);
+    if (item.quizId) next.quizzes = next.quizzes.filter((quiz) => quiz.id !== item.quizId);
+    next.courses = next.courses.map((entry) => entry.id !== courseId ? entry : { ...entry, chapters: entry.chapters.map((chapterEntry) => chapterEntry.id === chapterId ? { ...chapterEntry, items: chapterEntry.items.filter((content) => content.id !== itemId) } : chapterEntry) });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'นำรายการออกไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, [currentUser, data]);
 
   const saveQuiz = useCallback((values, quizId) => {
+    const existingQuiz = data.quizzes.find((quiz) => quiz.id === quizId);
+    const existingCourse = data.courses.find((course) => course.id === existingQuiz?.courseId);
+    const targetCourse = data.courses.find((course) => course.id === values.courseId);
+    const canManageExisting = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && existingCourse?.instructorId === currentUser.id);
+    const canManageTarget = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && targetCourse?.instructorId === currentUser.id);
+    if (!canManageTarget || (existingQuiz && (!canManageExisting || data.attempts.some((attempt) => attempt.quizId === quizId)))) return null;
     const resultId = quizId ?? createId('quiz');
     update((next) => {
       const existing = next.quizzes.find((quiz) => quiz.id === quizId);
@@ -231,13 +251,90 @@ export function LmsProvider({ children }) {
       return next;
     });
     return resultId;
-  }, [update]);
+  }, [currentUser, data.attempts, data.courses, data.quizzes, update]);
 
-  const removeQuiz = useCallback((quizId) => update((next) => {
-    next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
-    next.courses = next.courses.map((course) => ({ ...course, chapters: course.chapters.map((chapter) => ({ ...chapter, items: chapter.items.filter((item) => item.quizId !== quizId) })) }));
-    return next;
-  }), [update]);
+  const removeQuiz = useCallback((quizId) => {
+    const quiz = data.quizzes.find((entry) => entry.id === quizId);
+    const course = data.courses.find((entry) => entry.id === quiz?.courseId);
+    const canManage = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && course?.instructorId === currentUser.id);
+    if (!quiz || !canManage) return { ok: false, message: 'ไม่มีสิทธิ์ลบแบบฝึกหัดนี้' };
+    if (data.attempts.some((attempt) => attempt.quizId === quizId)) return { ok: false, message: 'แบบฝึกหัดนี้มีประวัติคำตอบแล้ว จึงลบไม่ได้เพื่อรักษาผลงานผู้เรียน' };
+    if (data.assignments.some((assignment) => assignment.quizId === quizId)) return { ok: false, message: 'แบบฝึกหัดนี้ถูกมอบหมายแล้ว กรุณาจัดการรายการมอบหมายก่อนลบ' };
+    const next = structuredClone(data);
+    next.quizzes = next.quizzes.filter((entry) => entry.id !== quizId);
+    next.courses = next.courses.map((entry) => ({ ...entry, chapters: entry.chapters.map((chapter) => ({ ...chapter, items: chapter.items.filter((item) => item.quizId !== quizId) })) }));
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกการลบไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, [currentUser, data]);
+
+  const saveAssignment = useCallback((values, assignmentId) => {
+    if (!currentUser || !['admin', 'instructor'].includes(currentUser.role)) return { ok: false, message: 'ไม่มีสิทธิ์มอบหมายแบบฝึกหัด' };
+    const course = data.courses.find((entry) => entry.id === values.courseId);
+    const quiz = data.quizzes.find((entry) => entry.id === values.quizId && entry.courseId === values.courseId);
+    const linkedChapter = course?.chapters.find((chapter) => chapter.items.some((item) => item.quizId === values.quizId));
+    const canManage = currentUser.role === 'admin' || course?.instructorId === currentUser.id;
+    if (!course || !quiz || !linkedChapter || !canManage) return { ok: false, message: 'เลือกแบบฝึกหัดในคอร์สที่คุณมีสิทธิ์จัดการ' };
+    if (!values.title?.trim()) return { ok: false, message: 'กรอกชื่อรายการมอบหมาย' };
+    const learnerIds = [...new Set(values.learnerIds ?? [])];
+    const enrolledIds = new Set(data.enrollments.filter((entry) => entry.courseId === course.id).map((entry) => entry.userId));
+    if (!learnerIds.length || learnerIds.some((id) => !enrolledIds.has(id) || !data.users.some((user) => user.id === id && user.role === 'learner'))) return { ok: false, message: 'ผู้รับทุกคนต้องเป็นผู้เรียนที่ลงทะเบียนในคอร์สนี้' };
+    const existing = data.assignments.find((entry) => entry.id === assignmentId);
+    if (assignmentId && (!existing || existing.courseId !== course.id)) return { ok: false, message: 'ไม่พบรายการมอบหมายนี้ในคอร์ส' };
+    if (existing && existing.status !== 'active') return { ok: false, message: 'รายการนี้ถูกยกเลิกแล้ว จึงแก้ไขไม่ได้' };
+    if (existing && data.attempts.some((attempt) => attempt.assignmentId === assignmentId)) return { ok: false, message: 'งานนี้มีประวัติคำตอบแล้ว จึงแก้โจทย์หรือรายชื่อผู้รับไม่ได้' };
+    const now = new Date().toISOString();
+    const record = {
+      ...existing,
+      id: assignmentId ?? createId('assignment'),
+      courseId: course.id,
+      chapterId: linkedChapter.id,
+      quizId: quiz.id,
+      title: values.title.trim(),
+      instructions: values.instructions?.trim() ?? '',
+      learnerIds,
+      status: existing?.status ?? 'active',
+      createdBy: existing?.createdBy ?? currentUser.id,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+    };
+    const next = structuredClone(data);
+    next.assignments = existing
+      ? next.assignments.map((entry) => entry.id === assignmentId ? record : entry)
+      : [record, ...next.assignments];
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true, assignment: record };
+  }, [currentUser, data]);
+
+  const removeAssignment = useCallback((assignmentId) => {
+    const assignment = data.assignments.find((entry) => entry.id === assignmentId);
+    const course = data.courses.find((entry) => entry.id === assignment?.courseId);
+    const canManage = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && course?.instructorId === currentUser.id);
+    if (!assignment || !canManage) return { ok: false, message: 'ไม่มีสิทธิ์ลบรายการนี้' };
+    if (data.attempts.some((attempt) => attempt.assignmentId === assignmentId)) return { ok: false, message: 'รายการนี้มีประวัติคำตอบแล้ว ให้ยกเลิกแทนการลบ' };
+    const next = structuredClone(data);
+    next.assignments = next.assignments.filter((entry) => entry.id !== assignmentId);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกการลบไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, [currentUser, data]);
+
+  const cancelAssignment = useCallback((assignmentId) => {
+    const assignment = data.assignments.find((entry) => entry.id === assignmentId);
+    const course = data.courses.find((entry) => entry.id === assignment?.courseId);
+    const canManage = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && course?.instructorId === currentUser.id);
+    if (!assignment || !canManage) return { ok: false, message: 'ไม่มีสิทธิ์ยกเลิกรายการนี้' };
+    const next = structuredClone(data);
+    next.assignments = next.assignments.map((entry) => entry.id === assignmentId ? { ...entry, status: 'cancelled', updatedAt: new Date().toISOString() } : entry);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกสถานะไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, [currentUser, data]);
 
   const enrollFree = useCallback((courseId, userId = currentUser?.id) => update((next) => {
     if (!userId || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) return next;
@@ -250,7 +347,7 @@ export function LmsProvider({ children }) {
     update((next) => {
       const course = next.courses.find((item) => item.id === courseId);
       if (!course || !currentUser) return next;
-      const order = { id: orderId, courseId, userId: currentUser.id, amount: Number(course.price), status: outcome, method: 'บัตรจำลอง', createdAt: new Date().toISOString() };
+      const order = { id: orderId, courseId, userId: currentUser.id, amount: Number(course.price), status: outcome, method: 'การชำระเงินจำลอง (ผู้ให้บริการยังไม่เลือก)', createdAt: new Date().toISOString() };
       next.orders.unshift(order);
       if (outcome === 'paid' && !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString() });
       return next;
@@ -264,22 +361,30 @@ export function LmsProvider({ children }) {
     return awardCertificate(next, courseId, currentUser.id);
   }), [currentUser?.id, update]);
 
-  const startAttempt = useCallback((quiz) => {
+  const startAttempt = useCallback((quiz, assignmentId = null) => {
+    if (!currentUser || !quiz) return null;
+    if (assignmentId) {
+      const assignment = data.assignments.find((entry) => entry.id === assignmentId);
+      const isEnrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === currentUser.id);
+      if (currentUser.role !== 'learner' || !assignment || assignment.status !== 'active' || assignment.quizId !== quiz.id || !assignment.learnerIds.includes(currentUser.id) || !isEnrolled) return null;
+    }
     const attemptId = createId('attempt');
     update((next) => {
-      next.attempts.unshift({ id: attemptId, quizId: quiz.id, courseId: quiz.courseId, userId: currentUser.id, answers: {}, status: 'in_progress', submittedAt: null });
+      next.attempts.unshift({ id: attemptId, quizId: quiz.id, courseId: quiz.courseId, assignmentId, quizSnapshot: structuredClone(quiz), userId: currentUser.id, answers: {}, status: 'in_progress', startedAt: new Date().toISOString(), submittedAt: null });
       return next;
     });
     return attemptId;
-  }, [currentUser?.id, update]);
+  }, [currentUser, data.assignments, data.enrollments, update]);
 
   const saveAttemptDraft = useCallback((attemptId, answers) => update((next) => {
-    next.attempts = next.attempts.map((attempt) => attempt.id === attemptId && attempt.status === 'in_progress' ? { ...attempt, answers } : attempt);
+    next.attempts = next.attempts.map((attempt) => attempt.id === attemptId && attempt.userId === currentUser?.id && attempt.status === 'in_progress' ? { ...attempt, answers } : attempt);
     return next;
-  }), [update]);
+  }), [currentUser?.id, update]);
 
   const submitAttempt = useCallback((quiz, answers, existingAttemptId) => {
     let attemptId = existingAttemptId;
+    const existingAttempt = data.attempts.find((entry) => entry.id === existingAttemptId);
+    if (!currentUser || (existingAttemptId && (existingAttempt?.userId !== currentUser.id || existingAttempt?.status !== 'in_progress'))) return null;
     update((next) => {
       const choiceQuestions = quiz.questions.filter((question) => question.type === 'choice');
       const essayQuestions = quiz.questions.filter((question) => question.type === 'essay');
@@ -287,7 +392,7 @@ export function LmsProvider({ children }) {
       const score = choiceQuestions.reduce((sum, question) => sum + (Number(answers[question.id]) === Number(question.answer) ? Number(question.points || 1) : 0), 0);
       const percent = maxChoice ? Math.round(score / maxChoice * 100) : 0;
       const passed = essayQuestions.length ? null : percent >= Number(quiz.passPercent || 60);
-      const attempt = { ...(next.attempts.find((entry) => entry.id === existingAttemptId) ?? {}), id: existingAttemptId ?? createId('attempt'), quizId: quiz.id, courseId: quiz.courseId, userId: currentUser.id, answers, score, maxChoice, percent, essayStatus: essayQuestions.length ? 'pending' : 'none', passed, status: 'submitted', submittedAt: new Date().toISOString() };
+      const attempt = { ...(next.attempts.find((entry) => entry.id === existingAttemptId) ?? {}), id: existingAttemptId ?? createId('attempt'), quizId: quiz.id, courseId: quiz.courseId, userId: currentUser.id, answers: structuredClone(answers), quizSnapshot: structuredClone(existingAttempt?.quizSnapshot ?? quiz), score, maxChoice, percent, essayStatus: essayQuestions.length ? 'pending' : 'none', passed, status: 'submitted', submittedAt: new Date().toISOString() };
       attemptId = attempt.id;
       if (existingAttemptId) next.attempts = next.attempts.map((entry) => entry.id === existingAttemptId ? attempt : entry);
       else next.attempts.unshift(attempt);
@@ -299,17 +404,28 @@ export function LmsProvider({ children }) {
       return passed ? awardCertificate(next, quiz.courseId, currentUser.id) : next;
     });
     return attemptId;
-  }, [currentUser?.id, update]);
+  }, [currentUser, data.attempts, update]);
 
-  const gradeAttempt = useCallback((attemptId, { score, feedback }) => update((next) => {
+  const gradeAttempt = useCallback((attemptId, { scores = {}, feedbacks = {}, feedback = '' }) => {
+    const sourceAttempt = data.attempts.find((item) => item.id === attemptId);
+    const sourceQuiz = sourceAttempt?.quizSnapshot ?? data.quizzes.find((item) => item.id === sourceAttempt?.quizId);
+    const sourceCourse = data.courses.find((item) => item.id === sourceAttempt?.courseId);
+    const canGrade = currentUser?.role === 'admin' || (currentUser?.role === 'instructor' && sourceCourse?.instructorId === currentUser.id);
+    const essayQuestions = sourceQuiz?.questions.filter((question) => question.type === 'essay') ?? [];
+    if (!sourceAttempt || !sourceQuiz || !essayQuestions.length || !canGrade || sourceAttempt.essayStatus !== 'pending') return { ok: false, message: 'ไม่มีสิทธิ์ตรวจคำตอบนี้ หรือรายการถูกตรวจไปแล้ว' };
+    if (essayQuestions.some((question) => !Number.isFinite(Number(scores[question.id])) || Number(scores[question.id]) < 0 || Number(scores[question.id]) > Number(question.points || 1))) return { ok: false, message: 'ตรวจคะแนนแต่ละข้อให้ครบและอยู่ในช่วงคะแนนที่กำหนด' };
+    const grades = essayQuestions.map((question) => ({ questionId: question.id, score: Number(scores[question.id]), maxScore: Number(question.points || 1), feedback: String(feedbacks[question.id] ?? '').trim() }));
+    const score = grades.reduce((sum, grade) => sum + grade.score, 0);
+    const gradeFeedback = String(feedback).trim();
+    update((next) => {
     const attempt = next.attempts.find((item) => item.id === attemptId);
-    const quiz = next.quizzes.find((item) => item.id === attempt?.quizId);
+    const quiz = attempt?.quizSnapshot ?? next.quizzes.find((item) => item.id === attempt?.quizId);
     if (!attempt || !quiz) return next;
     const essayMax = quiz.questions.filter((question) => question.type === 'essay').reduce((sum, question) => sum + Number(question.points || 1), 0);
     const max = attempt.maxChoice + essayMax;
-    const total = attempt.score + Number(score || 0);
+    const total = attempt.score + score;
     const passed = max > 0 && total / max * 100 >= Number(quiz.passPercent || 60);
-    next.attempts = next.attempts.map((item) => item.id === attemptId ? { ...item, essayStatus: 'graded', essayScore: Number(score || 0), essayFeedback: feedback, totalScore: total, maxScore: max, finalPercent: Math.round(total / max * 100), passed, gradedAt: new Date().toISOString() } : item);
+    next.attempts = next.attempts.map((item) => item.id === attemptId ? { ...item, essayStatus: 'graded', essayScore: score, questionGrades: grades, essayFeedback: gradeFeedback, totalScore: total, maxScore: max, finalPercent: Math.round(total / max * 100), passed, gradedAt: new Date().toISOString() } : item);
     if (passed) {
       const course = next.courses.find((entry) => entry.id === quiz.courseId);
       const quizItem = flattenItems(course).find((entry) => entry.quizId === quiz.id);
@@ -317,7 +433,9 @@ export function LmsProvider({ children }) {
       return awardCertificate(next, quiz.courseId, attempt.userId);
     }
     return next;
-  }), [update]);
+    });
+    return { ok: true };
+  }, [currentUser, data.attempts, data.courses, data.quizzes, update]);
 
   const requestInstructor = useCallback((values) => update((next) => {
     next.instructorRequests.unshift({ id: createId('req'), userId: currentUser?.id, userName: currentUser?.name ?? values.name, email: currentUser?.email ?? values.email, intro: values.intro, status: 'pending', createdAt: new Date().toISOString() });
@@ -388,11 +506,11 @@ export function LmsProvider({ children }) {
 
   const value = useMemo(() => ({
     data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse,
-    saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment,
+    saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, saveAssignment, removeAssignment, cancelAssignment, enrollFree, simulatePayment,
     markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest,
     createInstructorInvite, acceptInstructorInvite,
     changeUserRole, updateProfile, resetPassword,
-  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
+  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, saveAssignment, removeAssignment, cancelAssignment, enrollFree, simulatePayment, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
 
   return <LmsContext.Provider value={value}>{children}</LmsContext.Provider>;
 }

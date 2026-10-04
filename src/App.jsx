@@ -20,6 +20,8 @@ import { QuizManagerPage, QuizEditorPage, QuizAttemptsPage, GradeEssayPage } fro
 import { CoursePreviewPage, InstructorLearnersPage } from './pages/instructor/InsightPages.jsx';
 import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorRequestsPage, AdminInstructorRequestDetailPage, AdminCoursesPage, AdminCourseDetailPage } from './pages/admin/AdminPages.jsx';
 import { NoAccessPage, NotFoundPage } from './pages/SystemPages.jsx';
+import { AssignmentsPage } from './pages/AssignmentsPage.jsx';
+import { AnalyticsPage } from './pages/AnalyticsPage.jsx';
 
 function Public({ children }) { return <PublicShell>{children}</PublicShell>; }
 
@@ -66,6 +68,7 @@ export function AppRoutes() {
     <Route path="/learn/courses/:courseId/videos/:itemId" element={learner(<VideoLessonPage/>)}/>
     <Route path="/learn/courses/:courseId/articles/:itemId" element={learner(<ArticleLessonPage/>)}/>
     <Route path="/learn/courses/:courseId/quizzes/:itemId" element={learner(<RedirectCourseQuiz/>)}/>
+    <Route path="/learn/assignments" element={learner(<AssignmentsPage/>)}/>
     <Route path="/learn/quizzes/:quizId" element={learner(<QuizIntroPage/>)}/>
     <Route path="/learn/attempts/:attemptId" element={learner(<QuizAttemptPage/>)}/>
     <Route path="/learn/attempts/:attemptId/result" element={learner(<QuizResultPage/>)}/>
@@ -88,6 +91,8 @@ export function AppRoutes() {
     <Route path="/teach/courses/:courseId/articles/:itemId" element={instructor(<ContentEditorPage type="article"/>)}/>
     <Route path="/teach/courses/:courseId/quizzes" element={instructor(<QuizManagerPage/>)}/>
     <Route path="/teach/quizzes" element={instructor(<QuizManagerPage/>)}/>
+    <Route path="/teach/assignments" element={instructor(<AssignmentsPage/>)}/>
+    <Route path="/teach/analytics" element={instructor(<AnalyticsPage/>)}/>
     <Route path="/teach/quizzes/:quizId" element={instructor(<QuizEditorPage/>)}/>
     <Route path="/teach/quizzes/:quizId/attempts" element={instructor(<QuizAttemptsPage/>)}/>
     <Route path="/teach/attempts/:attemptId/grade" element={instructor(<GradeEssayPage/>)}/>
@@ -105,6 +110,8 @@ export function AppRoutes() {
     <Route path="/admin/instructors/:id" element={admin(<AdminInstructorRequestDetailPage/>)}/>
     <Route path="/admin/courses" element={admin(<AdminCoursesPage/>)}/>
     <Route path="/admin/courses/:courseId" element={admin(<AdminCourseDetailPage/>)}/>
+    <Route path="/admin/assignments" element={admin(<AssignmentsPage/>)}/>
+    <Route path="/admin/analytics" element={admin(<AnalyticsPage/>)}/>
     <Route path="/admin/orders" element={admin(<OrdersPage/>)}/>
     <Route path="/admin/orders/:orderId" element={admin(<OrderDetailPage/>)}/>
     <Route path="/admin/certificates" element={admin(<CertificatesPage/>)}/>
