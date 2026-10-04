@@ -217,6 +217,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
           </ActionIcon>
         </Tooltip>
       </div>
+      <NavLink component={Link} to="/learn" className="learn-ai-back-learning" label="กลับไปหน้าหลัก" leftSection={<IconHome2 size={17} aria-hidden="true" />} />
       <NavLink component="button" type="button" className="learn-ai-new-chat" label="แชตใหม่" leftSection={<IconPencil size={19} aria-hidden="true" />} onClick={newChat} />
       {searchOpen && <Input
         className="learn-ai-search"
@@ -256,10 +257,9 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
           </div>
         )) : <div className="learn-ai-history-empty">{search ? 'ไม่พบแชตที่ตรงกัน' : 'ยังไม่มีประวัติ'}</div>}
       </Stack>
-      <div className="learn-ai-sidebar-bottom">
-        {activeAttempt && <NavLink component={Link} to={returnToAttempt} className="learn-ai-return-attempt" label="กลับไปทำแบบฝึกหัด" leftSection={<IconArrowLeft size={17} aria-hidden="true" />} />}
-        <NavLink component={Link} to="/learn" className="learn-ai-back-learning" label="กลับไปหน้าหลัก" leftSection={<IconHome2 size={17} aria-hidden="true" />} />
-      </div>
+      {activeAttempt && <div className="learn-ai-sidebar-bottom">
+        <NavLink component={Link} to={returnToAttempt} className="learn-ai-return-attempt" label="กลับไปทำแบบฝึกหัด" leftSection={<IconArrowLeft size={17} aria-hidden="true" />} />
+      </div>}
     </div>
   );
 

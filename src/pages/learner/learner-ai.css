@@ -54,7 +54,7 @@
 .learn-ai-sidebar-bottom { display: grid; gap: 4px; margin-top: auto; padding-top: 12px; }
 .learn-ai-back-learning.mantine-NavLink-root, .learn-ai-return-attempt.mantine-NavLink-root { min-height: 43px; padding: 0 10px; border-radius: 9px; color: #636971; font-size: 13px; font-weight: 550; }
 .learn-ai-back-learning:hover, .learn-ai-return-attempt:hover { background: #f3f5f7; color: #24272d; }
-.learn-ai-back-learning.mantine-NavLink-root { background: #edf1f5; }
+.learn-ai-back-learning.mantine-NavLink-root { margin-bottom: 4px; background: #edf1f5; }
 .learn-ai-return-attempt.mantine-NavLink-root { background: #edf7ff; color: #0074e8; }
 
 .learn-ai-main { position: relative; display: flex; min-width: 0; height: 100%; flex: 1; flex-direction: column; background: #fff; }
