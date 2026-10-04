@@ -111,7 +111,7 @@
   width: min(1320px, calc(100% - 40px));
   margin-inline: auto;
   padding-block: 68px;
-  background-color: var(--home-yellow-soft);
+  background-color: #fff;
   background-image:
     radial-gradient(circle, rgb(0 116 232 / 24%) 2px, transparent 2.5px),
     radial-gradient(circle, transparent 0 22px, var(--home-yellow-accent) 23px 26px, transparent 27px);
@@ -177,14 +177,59 @@
 }
 
 .home-v3:has(.home-hero) .brand-team-layout {
+  display: block;
   width: calc(100% - 96px);
   max-width: 1180px;
-  gap: 50px;
 }
 
-.home-v3:has(.home-hero) .founder-portrait {
-  border-radius: 100px 100px 28px 28px;
+.home-v3:has(.home-hero) .brand-team-copy {
+  margin: 0 0 34px;
+  text-align: left;
 }
+
+.home-v3:has(.home-hero) .brand-team-copy > p:not(.brand-kicker) {
+  max-width: none;
+  margin: 14px 0 20px;
+}
+
+.home-v3:has(.home-hero) .brand-team-copy .home-text-link {
+  justify-content: flex-start;
+}
+
+.home-v3:has(.home-hero) .brand-team-portraits {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 20px;
+}
+
+.home-v3:has(.home-hero) .brand-team-person {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.home-v3:has(.home-hero) .brand-team-person > a {
+  display: block;
+}
+
+.home-v3:has(.home-hero) .brand-team-person .founder-portrait {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px 14px 0 0;
+}
+
+.home-v3:has(.home-hero) .brand-team-identity {
+  flex: 1;
+  padding: 13px 15px 15px;
+  border-radius: 0 0 14px 14px;
+  background: var(--home-yellow-soft);
+}
+
+.home-v3:has(.home-hero) .brand-team-identity h3 { min-height: 3.2em; }
+.home-v3:has(.home-hero) .brand-team-identity p { color: #4f4b38; }
 
 .home-v3:has(.home-hero) .home-invitation {
   border-bottom: 0;
@@ -324,8 +369,13 @@
   .home-v3:has(.home-hero) .home-intro { max-width: 48ch; font-size: 16px; margin-top: 17px; }
   .home-v3:has(.home-hero) .home-hero-actions { margin-top: 22px; }
   .home-v3:has(.home-hero) .brand-team-section { width: calc(100% - 24px); padding-block: 40px; border-radius: 32px; }
-  .home-v3:has(.home-hero) .brand-team-layout { width: calc(100% - 40px); gap: 28px; }
-  .home-v3:has(.home-hero) .founder-portrait { border-radius: 60px 60px 20px 20px; }
+  .home-v3:has(.home-hero) .brand-team-layout { width: calc(100% - 40px); }
+  .home-v3:has(.home-hero) .brand-team-copy { margin-bottom: 26px; }
+  .home-v3:has(.home-hero) .brand-team-portraits { grid-template-columns: 1fr; gap: 18px; }
+  .home-v3:has(.home-hero) .brand-team-person { display: flex; }
+  .home-v3:has(.home-hero) .brand-team-person .founder-portrait { border-radius: 12px 12px 0 0; }
+  .home-v3:has(.home-hero) .brand-team-identity { padding: 12px 14px; border-radius: 0 0 12px 12px; }
+  .home-v3:has(.home-hero) .brand-team-identity h3 { min-height: 0; }
   .home-v3:has(.home-hero) .home-invitation { gap: 26px; }
   .home-v3:has(.home-hero) .home-invitation-prompts { padding: 22px 18px; border-radius: 26px; }
   .home-v3:has(.home-hero) .home-invitation .ant-tabs-tab { padding: 9px 12px; font-size: 14px; }

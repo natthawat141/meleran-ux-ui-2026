@@ -48,12 +48,12 @@ export function LandingPage() {
         <LandingHero />
         <InstructorSpotlight />
         <BrandIntroduction />
-        <FounderPreview />
         <LearningInvitation />
         <ReadingCollection posts={data.blogPosts.filter((post) => post.status === 'published')} />
         <LearningGuide />
         <CourseCollection courses={courses} data={data} />
         <LandingFaq />
+        <FounderPreview />
         <NewsletterBanner />
       </main>
       <LandingFooter />
