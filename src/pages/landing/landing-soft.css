@@ -4,6 +4,8 @@
   --home-soft-sky: #e5f4ff;
   --home-bright-sky: #b9e5ff;
   --home-shape-blue: #74c8f5;
+  --home-yellow-soft: #FFF4BF;
+  --home-yellow-accent: #FFEEA3;
   overflow: clip;
 }
 
@@ -38,7 +40,7 @@
   height: 82px;
   right: 46%;
   bottom: 12%;
-  border: 15px solid var(--home-shape-blue);
+  border: 15px solid var(--home-yellow-accent);
   border-radius: 50%;
 }
 
@@ -60,7 +62,7 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--home-blue);
+  background: var(--home-yellow-accent);
   z-index: 0;
 }
 
@@ -142,7 +144,7 @@
 .home-v3:has(.home-hero) .home-invitation-note {
   border-left: 0;
   border-radius: 18px;
-  background: #fff;
+  background: var(--home-yellow-soft);
 }
 
 .home-v3:has(.home-hero) .home-guide {
@@ -157,6 +159,12 @@
 .home-v3:has(.home-hero) .home-step-icon {
   border: 0;
   border-radius: 50%;
+  background: var(--home-yellow-soft);
+}
+
+.home-v3:has(.home-hero) .home-guide-photo img,
+.home-v3:has(.home-hero) .home-guide-photo .home-photo-fallback {
+  border-bottom: 10px solid var(--home-yellow-accent);
 }
 
 .home-v3:has(.home-hero) .home-course {
@@ -165,8 +173,8 @@
 
 .home-v3:has(.home-hero) .home-course-meta > span:first-child {
   padding: 3px 10px;
-  background: var(--home-soft-sky);
-  color: #1764a1;
+  background: var(--home-yellow-soft);
+  color: #4b431d;
   border-radius: 999px;
 }
 
@@ -180,6 +188,19 @@
   margin: 0 auto 48px;
   border: 0;
   border-radius: 48px;
+}
+
+.home-v3:has(.home-hero) .home-newsletter::after {
+  content: '';
+  position: absolute;
+  top: 24px;
+  right: clamp(14px, 4vw, 52px);
+  width: clamp(42px, 6vw, 68px);
+  aspect-ratio: 1;
+  border: 9px solid var(--home-yellow-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .home-v3:has(.home-hero) .home-newsletter-form .ant-input {

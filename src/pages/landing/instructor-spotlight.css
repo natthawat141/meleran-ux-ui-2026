@@ -43,6 +43,11 @@
 .home-teacher-carousel-control-prev { left: -16px; }
 .home-teacher-carousel-control-next { right: -16px; }
 
+.home-v3:has(.home-hero) .home-teacher-decoration-ring { border-color: var(--home-yellow-accent); }
+.home-v3:has(.home-hero) .home-teacher-decoration-dots { background-image: radial-gradient(circle, var(--home-yellow-accent) 2px, transparent 2.5px); }
+.home-v3:has(.home-hero) .home-teacher-nameband { background: var(--home-yellow-soft); }
+.home-v3:has(.home-hero) .home-teacher-subject-band { background: var(--home-yellow-accent); }
+
 .home-teacher-modal { --home-ink: #24272d; --home-muted: #636971; --home-blue: #0074e8; font-family: 'Anuphan Variable', sans-serif; }
 .home-teacher-modal .ant-modal-title, .home-teacher-modal .ant-modal-body { font-family: 'Anuphan Variable', sans-serif; }
 .home-teacher-modal-content { padding-top: 4px; color: #24272d; }
