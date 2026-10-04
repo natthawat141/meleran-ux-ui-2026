@@ -146,8 +146,8 @@ export function CurriculumPage() {
       cancelText: 'ยกเลิก',
       okButtonProps: { danger: true },
       onOk: () => {
-        if (item) removeItem(course.id, chapter.id, item.id);
-        else removeChapter(course.id, chapter.id);
+        const result = item ? removeItem(course.id, chapter.id, item.id) : removeChapter(course.id, chapter.id);
+        if (!result.ok) { message.error(result.message); return; }
         message.success(item ? 'นำเนื้อหาออกแล้ว' : 'ลบบทแล้ว');
       },
     });

@@ -56,8 +56,8 @@ export function QuizManagerPage() {
             okText="ลบ"
             cancelText="ยกเลิก"
             onConfirm={() => {
-              removeQuiz(quiz.id);
-              message.success('ลบแบบทดสอบแล้ว');
+              const result = removeQuiz(quiz.id);
+              result.ok ? message.success('ลบแบบทดสอบแล้ว') : message.error(result.message);
             }}
           >
             <Button danger>ลบ</Button>
@@ -146,12 +146,12 @@ export function QuizAttemptsPage() {
 export function GradeEssayPage() {
   const { attemptId } = useParams<{ attemptId?: string }>();
   const [search] = useSearchParams();
-  const { data } = useLms();
+  const { data, currentUser } = useLms();
   const navigate = useNavigate();
   const attempt = data.attempts.find((item) => item.id === attemptId);
-  const quiz = data.quizzes.find((item) => item.id === attempt?.quizId);
+  const quiz = attempt?.quizSnapshot ?? data.quizzes.find((item) => item.id === attempt?.quizId);
   const returnTo = search.get('returnTo') || `/teach/quizzes/${quiz?.id}/attempts`;
-  if (!attempt || !quiz) return <Empty description="ไม่พบคำตอบนี้" />;
+  if (!attempt || !quiz || (currentUser?.role !== 'admin' && data.courses.find((entry) => entry.id === attempt.courseId)?.instructorId !== currentUser?.id)) return <Empty description="ไม่พบคำตอบนี้" />;
   if (attempt.essayStatus !== 'pending')
     return (
       <Alert
@@ -231,7 +231,8 @@ function GradingWorkspace({ attempt, quiz, returnTo }: GradingWorkspaceProps) {
   };
   const submit = (values: GradingFormValues) => {
     if (values.score === undefined) return;
-    gradeAttempt(attempt.id, { score: values.score, feedback: values.feedback });
+    const result = gradeAttempt(attempt.id, { score: values.score, feedback: values.feedback });
+    if (!result.ok) { message.error(result.message); return; }
     dirtyRef.current = false;
     try {
       sessionStorage.removeItem(draftKey);

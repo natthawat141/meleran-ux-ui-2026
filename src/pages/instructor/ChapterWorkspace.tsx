@@ -413,8 +413,9 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                   okButtonProps: { danger: true },
                   cancelText: 'ยกเลิก',
                   onOk: () => {
+                    const result = removeChapter(course.id, draft.id);
+                    if (!result.ok) { message.error(result.message); return; }
                     dirtyRef.current = false;
-                    removeChapter(course.id, draft.id);
                     navigate(`/teach/courses/${course.id}/curriculum`);
                   },
                 });

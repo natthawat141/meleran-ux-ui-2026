@@ -8,6 +8,7 @@ import { useLms } from '../store';
 import { PageTitle } from '../components/common';
 import { UserAvatar } from '../components/UserAvatar';
 import { DirectorySearch, useDirectorySearch, matchesDirectorySearch } from '../components/DirectorySearch';
+import { assignmentHasHistory, attemptMatchesAssignment } from '../lib/learning-history';
 import type { Assignment } from '../types';
 import './analytics/analytics.css';
 
@@ -22,6 +23,7 @@ interface AssignmentFormValues {
   courseId: string;
   quizId: string;
   title?: string;
+  instructions?: string;
   stage: 'pre_test' | 'practice' | 'post_test';
   assigneeType: 'all_enrolled' | 'specific';
   assigneeIds?: string[];
@@ -29,7 +31,7 @@ interface AssignmentFormValues {
 }
 
 export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assignments' }: AssignmentsPageProps) {
-  const { data, currentUser, saveAssignment, removeAssignment } = useLms();
+  const { data, currentUser, saveAssignment, removeAssignment, cancelAssignment } = useLms();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null);
   const [form] = Form.useForm<AssignmentFormValues>();
@@ -82,6 +84,7 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
       courseId: assignment.courseId,
       quizId: assignment.quizId,
       title: assignment.title,
+      instructions: assignment.instructions,
       stage: assignment.stage,
       assigneeType: assignment.assigneeType,
       assigneeIds: assignment.assigneeIds || [],
@@ -106,13 +109,15 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
       quizId: values.quizId,
       title: values.title || quiz?.title || 'แบบฝึกหัดมอบหมาย',
       stage: values.stage,
+      instructions: values.instructions?.trim() || '',
       assigneeType: values.assigneeType,
       assigneeIds: values.assigneeType === 'all_enrolled' ? enrolledUsers : values.assigneeIds || [],
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
       createdBy: editingAssignment?.createdBy || currentUser?.id,
     };
 
-    saveAssignment(payload, editingAssignment?.id);
+    const result = saveAssignment(payload, editingAssignment?.id);
+    if (!result.ok) { message.error(result.message); return; }
     message.success(editingAssignment ? 'แก้ไขงานมอบหมายแล้ว' : 'สร้างงานมอบหมายแล้ว');
     setModalOpen(false);
   };
@@ -167,8 +172,9 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
       key: 'status',
       render: (_, row) => {
         const attempt = (data.attempts || []).find(
-          (att) => att.quizId === row.quizId && att.userId === currentUser?.id
+          (att) => attemptMatchesAssignment(att, row) && att.userId === currentUser?.id
         );
+        if (row.status === 'cancelled') return <Tag>ยกเลิกแล้ว</Tag>;
         if (!attempt) return <Tag>ยังไม่ทำ</Tag>;
         if (attempt.essayStatus === 'pending') return <Tag color="warning">ส่งแล้ว (รอตรวจ)</Tag>;
         if (attempt.passed) return <Tag color="success">ผ่าน ({attempt.finalPercent ?? attempt.percent}%)</Tag>;
@@ -180,7 +186,7 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
       key: 'action',
       render: (_, row) => {
         const attempt = (data.attempts || []).find(
-          (att) => att.quizId === row.quizId && att.userId === currentUser?.id
+          (att) => attemptMatchesAssignment(att, row) && att.userId === currentUser?.id
         );
         if (attempt && attempt.status === 'submitted') {
           return (
@@ -190,8 +196,8 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
           );
         }
         return (
-          <Link to={`/learn/quizzes/${row.quizId}`}>
-            <Button type="primary" size="small">
+          <Link to={`/learn/quizzes/${row.quizId}?assignmentId=${encodeURIComponent(row.id)}`}>
+            <Button type="primary" size="small" disabled={row.status === 'cancelled'}>
               {attempt ? 'ทำต่อ' : 'เริ่มทำ'}
             </Button>
           </Link>
@@ -278,17 +284,18 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
           <Link to={`/teach/quizzes/${row.quizId}/attempts`}>
             <Button size="small">ดูคำตอบ</Button>
           </Link>
-          <Button size="small" onClick={() => handleOpenEdit(row)}>
+          <Button size="small" disabled={assignmentHasHistory(data, row) || row.status === 'cancelled'} onClick={() => handleOpenEdit(row)}>
             แก้ไข
           </Button>
+          {row.status !== 'cancelled' && <Popconfirm title="ยกเลิกงานนี้โดยเก็บประวัติคำตอบไว้?" onConfirm={() => { const result = cancelAssignment(row.id); result.ok ? message.success('ยกเลิกงานแล้ว') : message.error(result.message); }}><Button size="small">ยกเลิกงาน</Button></Popconfirm>}
           <Popconfirm
             title="ลบงานมอบหมายนี้หรือไม่?"
             onConfirm={() => {
-              removeAssignment(row.id);
-              message.success('ลบงานมอบหมายแล้ว');
+              const result = removeAssignment(row.id);
+              result.ok ? message.success('ลบงานมอบหมายแล้ว') : message.error(result.message);
             }}
           >
-            <Button size="small" danger>
+            <Button size="small" danger disabled={assignmentHasHistory(data, row)}>
               ลบ
             </Button>
           </Popconfirm>
@@ -401,6 +408,7 @@ export function AssignmentsPage({ instructorId, directoryBackTo = '/admin/assign
             <Input placeholder="เช่น แบบทดสอบวัดระดับก่อนเรียน หรือการบ้านสัปดาห์ที่ 1" />
           </Form.Item>
 
+          <Form.Item name="instructions" label="คำแนะนำสำหรับงาน"><Input.TextArea rows={3} /></Form.Item>
           <Form.Item name="stage" label="ระยะการวัดผล" rules={[{ required: true }]}>
             <Radio.Group>
               <Radio value="pre_test">ก่อนเรียน (Pre-test)</Radio>

@@ -151,6 +151,9 @@ export type QuizAnswerValue = number | string | AttemptAnswerEssay | unknown;
 
 export interface QuizAttempt {
   id: string;
+  assignmentId?: string | null;
+  quizSnapshot?: Quiz;
+  startedAt?: string;
   quizId: string;
   courseId: string;
   userId: string;
@@ -313,6 +316,9 @@ export interface InstructorInvite {
 
 export interface Assignment {
   id: string;
+  status?: 'active' | 'cancelled';
+  instructions?: string;
+  chapterId?: string;
   courseId: string;
   quizId: string;
   title: string;
@@ -468,11 +474,11 @@ export interface LmsContextType {
   saveChapter: (courseId: string, chapter: Partial<Chapter>, chapterId?: string) => void;
   saveChapterWorkspace: (courseId: string, chapter: Chapter, quizzes: Quiz[], baseline: string) => WorkspaceSaveResult;
   reorderCurriculum: (courseId: string, chapterId: string | null | undefined, orderedIds: string[]) => ReorderResult;
-  removeChapter: (courseId: string, chapterId: string) => void;
+  removeChapter: (courseId: string, chapterId: string) => ActionResult;
   saveItem: (courseId: string, chapterId: string, values: Partial<CourseItem>) => void;
-  removeItem: (courseId: string, chapterId: string, itemId: string) => void;
-  saveQuiz: (values: Partial<Quiz>, quizId?: string) => string;
-  removeQuiz: (quizId: string) => void;
+  removeItem: (courseId: string, chapterId: string, itemId: string) => ActionResult;
+  saveQuiz: (values: Partial<Quiz>, quizId?: string) => string | null;
+  removeQuiz: (quizId: string) => ActionResult;
   enrollFree: (courseId: string, userId?: string, referralCode?: string | null) => void;
   simulatePayment: (courseId: string, outcome: 'paid' | 'failed', referralCode?: string | null, accessCode?: string) => string | null;
   createAccessCode: (values: CreateAccessCodeInput) => CreateAccessCodeResult;
@@ -484,10 +490,10 @@ export interface LmsContextType {
   saveInstructorCommission: (userId: string, base: number, referral: number) => ActionResult;
   markInstructorPayout: (instructorId: string) => InstructorPayoutResult;
   markContentDone: (courseId: string, itemId: string) => void;
-  startAttempt: (quiz: Quiz) => string;
+  startAttempt: (quiz: Quiz, assignmentId?: string | null) => string | null;
   saveAttemptDraft: (attemptId: string, answers: Record<string, QuizAnswerValue>) => void;
-  submitAttempt: (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string) => string;
-  gradeAttempt: (attemptId: string, grading: { score: number; feedback?: string }) => void;
+  submitAttempt: (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string) => string | null;
+  gradeAttempt: (attemptId: string, grading: { score: number; feedback?: string }) => ActionResult;
   requestInstructor: (values: { name?: string; email?: string; intro: string }) => void;
   reviewInstructorRequest: (requestId: string, decision: 'approved' | 'rejected', note?: string) => void;
   createInstructorInvite: (invite: { name: string; email: string }) => string;
@@ -495,8 +501,9 @@ export interface LmsContextType {
   changeUserRole: (userId: string, role: Role) => void;
   updateProfile: (values: ProfileValues) => ActionResult;
   resetPassword: (email: string, password?: string) => ActionResult;
-  saveAssignment: (values: Partial<Assignment>, assignmentId?: string) => string;
-  removeAssignment: (assignmentId: string) => void;
+  saveAssignment: (values: Partial<Assignment>, assignmentId?: string) => ActionResult & { assignment?: Assignment };
+  removeAssignment: (assignmentId: string) => ActionResult;
+  cancelAssignment: (assignmentId: string) => ActionResult;
   saveComparisonSet: (values: Partial<ComparisonSet>, comparisonSetId?: string) => string;
   markNotificationRead: (notificationId: string) => void;
   sendInboxMessage: (args: SendInboxMessageArgs) => SendInboxMessageResult;

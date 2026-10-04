@@ -212,6 +212,7 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
     setSaving(true);
     try {
       const id = saveQuiz({ title: draft.title, courseId: draft.courseId, chapterId: draft.chapterId, passPercent: draft.passPercent, questions: nextQuestions }, quiz?.id);
+      if (!id) { setSaving(false); message.error('บันทึกไม่ได้: ไม่มีสิทธิ์หรือแบบฝึกหัดมีประวัติคำตอบแล้ว'); return; }
       // The prototype store persists in an effect. Confirm persistence before clearing the draft.
       window.setTimeout(() => {
         try {
@@ -261,7 +262,7 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
               { key: 'delete', label: 'ลบแบบทดสอบ', danger: true, icon: <DeleteOutlined />, onClick: () => Modal.confirm({
                 title: 'ลบแบบทดสอบนี้หรือไม่', content: `“${quiz.title}” จะถูกนำออกจากบทเรียน และคำตอบจะไม่ปรากฏในรายการแบบทดสอบนี้`,
                 okText: 'ลบแบบทดสอบ', cancelText: 'ยกเลิก', okButtonProps: { danger: true },
-                onOk: () => { removeQuiz(quiz.id); sessionStorage.removeItem(draftKey); navigate('/teach/quizzes'); },
+                onOk: () => { const result = removeQuiz(quiz.id); if (!result.ok) { message.error(result.message); return; } sessionStorage.removeItem(draftKey); navigate('/teach/quizzes'); },
               }) },
             ] }}><Button type="text" icon={<EllipsisOutlined />} aria-label="จัดการแบบทดสอบ" /></Dropdown>}
           </div>

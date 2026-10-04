@@ -2,12 +2,13 @@ import React, { useEffect } from 'react';
 import { Alert, Button, Empty, Form, Radio, Result, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, ClockCircleOutlined, SendOutlined } from '@ant-design/icons';
 import { IconSparkles } from '@tabler/icons-react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { RichDocument } from '../../components/chapter/RichTextEditor';
 import { AskInstructorButton } from '../../components/AskInstructorButton';
 import { PageTitle } from '../../components/common';
 import { answerIsComplete, WrittenAnswerInput, WrittenAnswerView } from '../../components/WrittenAnswer';
+import { assignmentIncludesLearner } from '../../lib/learning-history';
 import type { QuizAnswerValue } from '../../types';
 import './quiz-ai-entry.css';
 
@@ -17,10 +18,14 @@ export function QuizIntroPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
   const { data, currentUser, startAttempt } = useLms();
+  const [search] = useSearchParams();
+  const assignmentId = search.get('assignmentId');
+  const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
   const quiz = data.quizzes.find((item) => item.id === quizId);
 
   if (!quiz) return <Empty description="ไม่พบแบบทดสอบ" />;
 
+  if (assignmentId && (!assignment || assignment.status === 'cancelled' || assignment.quizId !== quiz.id || !assignmentIncludesLearner(assignment, currentUser?.id ?? ''))) return <Alert type="error" showIcon message="งานนี้ไม่ได้มอบหมายให้คุณหรือถูกยกเลิกแล้ว" />;
   const course = data.courses.find((item) => item.id === quiz.courseId);
   const enrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === currentUser?.id);
   if (course && !enrolled && currentUser?.role !== 'admin') {
@@ -33,6 +38,7 @@ export function QuizIntroPage() {
     (attempt) =>
       attempt.quizId === quiz.id &&
       attempt.userId === data.currentUserId &&
+      (attempt.assignmentId ?? null) === assignmentId &&
       attempt.status === 'submitted'
   );
 
@@ -41,10 +47,11 @@ export function QuizIntroPage() {
       (attempt) =>
         attempt.quizId === quiz.id &&
         attempt.userId === data.currentUserId &&
+        (attempt.assignmentId ?? null) === assignmentId &&
         attempt.status === 'in_progress'
     );
-    const id = draft?.id ?? startAttempt(quiz);
-    navigate(`/learn/attempts/${id}`);
+    const id = draft?.id ?? startAttempt(quiz, assignmentId);
+    if (id) navigate(`/learn/attempts/${id}`);
   };
 
   return (
@@ -55,7 +62,8 @@ export function QuizIntroPage() {
       <div className="quiz-intro-panel">
         <AskInstructorButton course={course} item={courseItem} />
         <Tag color="processing">แบบทดสอบ</Tag>
-        <Title>{quiz.title}</Title>
+        <Title>{assignment?.title ?? quiz.title}</Title>
+        {assignment?.instructions && <Paragraph>{assignment.instructions}</Paragraph>}
         <Paragraph>
           ทบทวนสิ่งที่ได้เรียนรู้ในบทนี้ ส่งคำตอบเมื่อพร้อม
           ผู้สอนจะตรวจคำตอบข้อเขียนและแจ้งผลในระบบ
@@ -99,7 +107,7 @@ export function QuizIntroPage() {
             }
           />
         )}
-        <Button className="top-space" type="primary" size="large" onClick={start}>
+        <Button className="top-space" type="primary" size="large" onClick={start} disabled={Boolean(assignmentId && latest?.essayStatus === 'pending')}>
           {latest ? 'ทำแบบทดสอบอีกครั้ง' : 'เริ่มทำแบบทดสอบ'}
         </Button>
       </div>
@@ -110,9 +118,9 @@ export function QuizIntroPage() {
 export function QuizAttemptPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
-  const { data, saveAttemptDraft, submitAttempt } = useLms();
+  const { data, currentUser, saveAttemptDraft, submitAttempt } = useLms();
   const attempt = data.attempts.find((item) => item.id === attemptId);
-  const quiz = data.quizzes.find((item) => item.id === attempt?.quizId);
+  const quiz = attempt?.quizSnapshot ?? data.quizzes.find((item) => item.id === attempt?.quizId);
   const [form] = Form.useForm<Record<string, QuizAnswerValue>>();
 
   useEffect(() => {
@@ -121,7 +129,7 @@ export function QuizAttemptPage() {
     }
   }, [attempt?.id, attempt?.answers, form]);
 
-  if (!attempt || !quiz || attempt.status !== 'in_progress') {
+  if (!attempt || !quiz || attempt.userId !== currentUser?.id || attempt.status !== 'in_progress') {
     return (
       <Result
         status="404"
@@ -145,8 +153,8 @@ export function QuizAttemptPage() {
       (question) => question.type === 'essay' && !answerIsComplete(question, values[question.id])
     );
     if (missingEssay) return;
-    submitAttempt(quiz, values, attempt.id);
-    navigate(`/learn/attempts/${attempt.id}/result`);
+    const id = submitAttempt(quiz, values, attempt.id);
+    if (id) navigate(`/learn/attempts/${id}/result`);
   };
 
   return (
@@ -251,11 +259,11 @@ export function QuizAttemptPage() {
 
 export function QuizResultPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
-  const { data } = useLms();
+  const { data, currentUser } = useLms();
   const attempt = data.attempts.find((item) => item.id === attemptId);
-  const quiz = data.quizzes.find((item) => item.id === attempt?.quizId);
+  const quiz = attempt?.quizSnapshot ?? data.quizzes.find((item) => item.id === attempt?.quizId);
 
-  if (!attempt || !quiz) return <Empty description="ไม่พบผลแบบทดสอบ" />;
+  if (!attempt || !quiz || attempt.userId !== currentUser?.id) return <Empty description="ไม่พบผลแบบทดสอบ" />;
 
   const pending = attempt.essayStatus === 'pending';
   const percent = attempt.finalPercent ?? attempt.percent ?? 0;

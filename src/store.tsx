@@ -7,6 +7,7 @@ import { MAX_INBOX_ATTACHMENT_BYTES, MAX_INBOX_ATTACHMENTS, MAX_INBOX_TOTAL_ATTA
 import { mergeInboxDemo } from './mocks/inbox';
 import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model';
 import { normalizeAccessCode, quoteAccessCode } from './lib/access-code-utils';
+import { assignmentHasHistory, assignmentIncludesLearner, assignmentSaveIssue, canManageCourse, contentRemovalIssue } from './lib/learning-history';
 import type {
   ActionResult,
   AccessCode,
@@ -115,7 +116,7 @@ function loadData(): LmsData & { notifications?: AppNotification[] } {
       );
       const assignments: Assignment[] =
         Array.isArray(parsed.assignments) && parsed.assignments.length
-          ? parsed.assignments
+          ? parsed.assignments.map((assignment: Assignment & { learnerIds?: unknown }) => 'learnerIds' in assignment && Array.isArray(assignment.learnerIds) ? { ...assignment, stage: assignment.stage ?? 'practice', assigneeType: 'specific', assigneeIds: assignment.learnerIds.filter((id: unknown): id is string => typeof id === 'string') } : assignment)
           : structuredClone(initialData.assignments || []);
       const comparisonSets: ComparisonSet[] =
         Array.isArray(parsed.comparisonSets) && parsed.comparisonSets.length
@@ -240,6 +241,13 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     () => data.users.find((user) => user.id === data.currentUserId) ?? null,
     [data.users, data.currentUserId]
   );
+
+  const commitLearningChange = useCallback((next: LmsData): ActionResult => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
+    setData(next);
+    return { ok: true };
+  }, []);
 
   const signIn = useCallback(
     (email: string, password?: string): ActionResult => {
@@ -523,7 +531,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         const hasProgress = Object.values(data.progress[`${courseId}:${old.id}`] || {}).some(Boolean);
         const oldQuizId = 'quizId' in old ? old.quizId : undefined;
         const hasAttempts = oldQuizId && data.attempts.some((attempt) => attempt.quizId === oldQuizId);
-        if (!replacement && (hasProgress || hasAttempts)) {
+        const hasAssignments = oldQuizId && (data.assignments || []).some((assignment) => assignment.quizId === oldQuizId);
+        if (!replacement && (hasProgress || hasAttempts || hasAssignments)) {
           return { ok: false, message: 'นำรายการที่มีประวัติเรียนหรือคำตอบออกไม่ได้' };
         }
         if (
@@ -555,29 +564,18 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     [currentUser, data]
   );
 
-  const removeChapter = useCallback(
-    (courseId: string, chapterId: string) => {
-      update((next) => {
-        const chapter = next.courses.find((course) => course.id === courseId)?.chapters.find((item) => item.id === chapterId);
-        const quizIds =
-          chapter?.items
-            .filter((item): item is CourseItem & { quizId: string } => 'quizId' in item && Boolean(item.quizId))
-            .map((item) => item.quizId) ?? [];
-        next.quizzes = next.quizzes.filter((quiz) => !quizIds.includes(quiz.id));
-        next.attempts = next.attempts.filter((attempt) => !quizIds.includes(attempt.quizId));
-        chapter?.items.forEach((item) => {
-          delete next.progress[`${courseId}:${item.id}`];
-        });
-        next.courses = next.courses.map((course) =>
-          course.id === courseId
-            ? { ...course, chapters: course.chapters.filter((ch) => ch.id !== chapterId) }
-            : course
-        );
-        return next;
-      });
-    },
-    [update]
-  );
+  const removeChapter = useCallback((courseId: string, chapterId: string): ActionResult => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    const chapter = course?.chapters.find((entry) => entry.id === chapterId);
+    if (!chapter) return { ok: false, message: 'ไม่พบบทเรียนนี้' };
+    const issue = contentRemovalIssue(data, currentUser, courseId, chapter.items);
+    if (issue) return { ok: false, message: issue };
+    const quizIds = chapter.items.flatMap((item) => 'quizId' in item && item.quizId ? [item.quizId] : []);
+    const next = structuredClone(data);
+    next.quizzes = next.quizzes.filter((quiz) => !quizIds.includes(quiz.id));
+    next.courses = next.courses.map((entry) => entry.id === courseId ? { ...entry, chapters: entry.chapters.filter((item) => item.id !== chapterId) } : entry);
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
 
   const saveItem = useCallback(
     (courseId: string, chapterId: string, values: Partial<CourseItem>) => {
@@ -605,36 +603,23 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     [update]
   );
 
-  const removeItem = useCallback(
-    (courseId: string, chapterId: string, itemId: string) => {
-      update((next) => {
-        const course = next.courses.find((item) => item.id === courseId);
-        const chapter = course?.chapters.find((item) => item.id === chapterId);
-        const item = chapter?.items.find((entry) => entry.id === itemId);
-        const quizId = item && 'quizId' in item ? item.quizId : undefined;
-        if (quizId) {
-          next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
-          next.attempts = next.attempts.filter((attempt) => attempt.quizId !== quizId);
-        }
-        delete next.progress[`${courseId}:${itemId}`];
-        next.courses = next.courses.map((c) =>
-          c.id !== courseId
-            ? c
-            : {
-                ...c,
-                chapters: c.chapters.map((ch) =>
-                  ch.id === chapterId ? { ...ch, items: ch.items.filter((content) => content.id !== itemId) } : ch
-                ),
-              }
-        );
-        return next;
-      });
-    },
-    [update]
-  );
+  const removeItem = useCallback((courseId: string, chapterId: string, itemId: string): ActionResult => {
+    const item = data.courses.find((entry) => entry.id === courseId)?.chapters.find((entry) => entry.id === chapterId)?.items.find((entry) => entry.id === itemId);
+    if (!item) return { ok: false, message: 'ไม่พบเนื้อหานี้' };
+    const issue = contentRemovalIssue(data, currentUser, courseId, [item]);
+    if (issue) return { ok: false, message: issue };
+    const next = structuredClone(data);
+    const quizId = 'quizId' in item ? item.quizId : undefined;
+    if (quizId) next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
+    next.courses = next.courses.map((entry) => entry.id !== courseId ? entry : { ...entry, chapters: entry.chapters.map((chapter) => chapter.id !== chapterId ? chapter : { ...chapter, items: chapter.items.filter((content) => content.id !== itemId) }) });
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
 
   const saveQuiz = useCallback(
-    (values: Partial<Quiz>, quizId?: string): string => {
+    (values: Partial<Quiz>, quizId?: string): string | null => {
+      const existingQuiz = data.quizzes.find((entry) => entry.id === quizId);
+      const targetCourse = data.courses.find((entry) => entry.id === (values.courseId ?? existingQuiz?.courseId));
+      if (!canManageCourse(currentUser, targetCourse) || (quizId && (!existingQuiz || !canManageCourse(currentUser, data.courses.find((entry) => entry.id === existingQuiz.courseId)) || data.attempts.some((attempt) => attempt.quizId === quizId)))) return null;
       const resultId = quizId ?? createId('quiz');
       update((next) => {
         const existing = next.quizzes.find((quiz) => quiz.id === quizId);
@@ -691,25 +676,23 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       });
       return resultId;
     },
-    [update]
+    [currentUser, data, update]
   );
 
-  const removeQuiz = useCallback(
-    (quizId: string) => {
-      update((next) => {
-        next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
-        next.courses = next.courses.map((course) => ({
-          ...course,
-          chapters: course.chapters.map((chapter) => ({
-            ...chapter,
-            items: chapter.items.filter((item) => !('quizId' in item) || item.quizId !== quizId),
-          })),
-        }));
-        return next;
-      });
-    },
-    [update]
-  );
+  const removeQuiz = useCallback((quizId: string): ActionResult => {
+    const quiz = data.quizzes.find((entry) => entry.id === quizId);
+    const course = data.courses.find((entry) => entry.id === quiz?.courseId);
+    if (!quiz || !course || !canManageCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ลบแบบฝึกหัดนี้' };
+    if (data.attempts.some((attempt) => attempt.quizId === quizId)) return { ok: false, message: 'แบบฝึกหัดนี้มีประวัติคำตอบแล้ว จึงลบไม่ได้' };
+    if ((data.assignments || []).some((assignment) => assignment.quizId === quizId)) return { ok: false, message: 'แบบฝึกหัดนี้ถูกมอบหมายแล้ว กรุณาจัดการงานมอบหมายก่อนลบ' };
+    const items = course.chapters.flatMap((chapter) => chapter.items).filter((item) => 'quizId' in item && item.quizId === quizId);
+    const issue = contentRemovalIssue(data, currentUser, course.id, items);
+    if (issue) return { ok: false, message: issue };
+    const next = structuredClone(data);
+    next.quizzes = next.quizzes.filter((entry) => entry.id !== quizId);
+    next.courses = next.courses.map((entry) => ({ ...entry, chapters: entry.chapters.map((chapter) => ({ ...chapter, items: chapter.items.filter((item) => !('quizId' in item) || item.quizId !== quizId) })) }));
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
 
   const enrollFree = useCallback(
     (courseId: string, userId = currentUser?.id, referralCode: string | null = null) => {
@@ -905,45 +888,37 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     [currentUser?.id, update]
   );
 
-  const startAttempt = useCallback(
-    (quiz: Quiz): string => {
-      const attemptId = createId('attempt');
-      if (!currentUser?.id) return attemptId;
-      update((next) => {
-        next.attempts.unshift({
-          id: attemptId,
-          quizId: quiz.id,
-          courseId: quiz.courseId,
-          userId: currentUser.id,
-          answers: {},
-          essayStatus: 'none',
-          passed: null,
-          status: 'in_progress',
-          submittedAt: undefined,
-        });
-        return next;
-      });
-      return attemptId;
-    },
-    [currentUser?.id, update]
-  );
+  const startAttempt = useCallback((quiz: Quiz, assignmentId: string | null = null): string | null => {
+    if (!currentUser || !data.quizzes.some((entry) => entry.id === quiz.id && entry.courseId === quiz.courseId)) return null;
+    const enrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === currentUser.id);
+    if (currentUser.role !== 'admin' && (currentUser.role !== 'learner' || !enrolled)) return null;
+    if (assignmentId) {
+      const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
+      if (currentUser.role !== 'learner' || !assignment || assignment.status === 'cancelled' || assignment.quizId !== quiz.id || !assignmentIncludesLearner(assignment, currentUser.id) || !enrolled) return null;
+      if (data.attempts.some((attempt) => attempt.assignmentId === assignmentId && attempt.userId === currentUser.id && attempt.essayStatus === 'pending')) return null;
+    }
+    const draft = data.attempts.find((entry) => entry.quizId === quiz.id && entry.userId === currentUser.id && (entry.assignmentId ?? null) === assignmentId && entry.status === 'in_progress');
+    if (draft) return draft.id;
+    const id = createId('attempt');
+    const next = structuredClone(data);
+    next.attempts.unshift({ id, quizId: quiz.id, courseId: quiz.courseId, assignmentId, quizSnapshot: structuredClone(quiz), userId: currentUser.id, answers: {}, essayStatus: 'none', passed: null, status: 'in_progress', startedAt: new Date().toISOString() });
+    return commitLearningChange(next).ok ? id : null;
+  }, [currentUser, data, commitLearningChange]);
 
-  const saveAttemptDraft = useCallback(
-    (attemptId: string, answers: Record<string, QuizAnswerValue>) => {
-      update((next) => {
-        next.attempts = next.attempts.map((attempt) =>
-          attempt.id === attemptId && attempt.status === 'in_progress' ? { ...attempt, answers } : attempt
-        );
-        return next;
-      });
-    },
-    [update]
-  );
+  const saveAttemptDraft = useCallback((attemptId: string, answers: Record<string, QuizAnswerValue>) => {
+    update((next) => {
+      next.attempts = next.attempts.map((attempt) => attempt.id === attemptId && attempt.userId === currentUser?.id && attempt.status === 'in_progress' ? { ...attempt, answers: structuredClone(answers) } : attempt);
+      return next;
+    });
+  }, [currentUser?.id, update]);
 
   const submitAttempt = useCallback(
-    (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string): string => {
+    (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string): string | null => {
       let attemptId = existingAttemptId ?? createId('attempt');
-      if (!currentUser?.id) return attemptId;
+      if (!currentUser?.id) return null;
+      const existingAttempt = data.attempts.find((entry) => entry.id === existingAttemptId);
+      if (existingAttemptId && (!existingAttempt || existingAttempt.userId !== currentUser.id || existingAttempt.status !== 'in_progress' || existingAttempt.quizId !== quiz.id)) return null;
+      quiz = existingAttempt?.quizSnapshot ?? quiz;
       update((next) => {
         const choiceQuestions = quiz.questions.filter((question) => question.type === 'choice');
         const essayQuestions = quiz.questions.filter((question) => question.type === 'essay');
@@ -973,7 +948,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
           quizId: quiz.id,
           courseId: quiz.courseId,
           userId: currentUser.id,
-          answers,
+          answers: structuredClone(answers),
+          quizSnapshot: structuredClone(quiz),
           score,
           maxChoice,
           percent,
@@ -1013,63 +989,31 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       });
       return attemptId;
     },
-    [currentUser?.id, update]
+    [currentUser, data.attempts, update]
   );
 
-  const gradeAttempt = useCallback(
-    (attemptId: string, { score, feedback }: { score: number; feedback?: string }) => {
-      update((next) => {
-        const attempt = next.attempts.find((item) => item.id === attemptId);
-        const quiz = next.quizzes.find((item) => item.id === attempt?.quizId);
-        if (!attempt || !quiz) return next;
-        const essayMax = quiz.questions
-          .filter((question) => question.type === 'essay')
-          .reduce((sum, question) => sum + Number(question.points || 1), 0);
-        const max = Number(attempt.maxChoice || 0) + essayMax;
-        const total = Number(attempt.score || 0) + Number(score || 0);
-        const finalPercent = max > 0 ? Math.round((total / max) * 100) : 0;
-        const passed = max > 0 && finalPercent >= Number(quiz.passPercent || 60);
-        next.attempts = next.attempts.map((item) =>
-          item.id === attemptId
-            ? {
-                ...item,
-                essayStatus: 'graded',
-                essayScore: Number(score || 0),
-                essayFeedback: feedback,
-                totalScore: total,
-                maxScore: max,
-                finalPercent,
-                percent: finalPercent,
-                passed,
-                gradedAt: new Date().toISOString(),
-              }
-            : item
-        );
-        addNotification(next, {
-          id: `grade-completed:${attemptId}`,
-          userId: attempt.userId,
-          type: 'grade_completed',
-          title: 'ผู้สอนตรวจงานของคุณแล้ว',
-          description: `${quiz.title} · คะแนนรวม ${total} / ${max}`,
-          href: `/learn/attempts/${attemptId}/result`,
-        });
-        if (passed) {
-          const targetCourseId = attempt.courseId || quiz.courseId;
-          const course = next.courses.find((entry) => entry.id === targetCourseId);
-          const quizItem = flattenItems(course).find((entry) => 'quizId' in entry && entry.quizId === quiz.id);
-          if (quizItem) {
-            next.progress[`${targetCourseId}:${quizItem.id}`] = {
-              ...(next.progress[`${targetCourseId}:${quizItem.id}`] ?? {}),
-              [attempt.userId]: true,
-            };
-          }
-          return awardCertificate(next, targetCourseId, attempt.userId);
-        }
-        return next;
-      });
-    },
-    [update]
-  );
+  const gradeAttempt = useCallback((attemptId: string, { score, feedback }: { score: number; feedback?: string }): ActionResult => {
+    const source = data.attempts.find((entry) => entry.id === attemptId);
+    const quiz = source?.quizSnapshot ?? data.quizzes.find((entry) => entry.id === source?.quizId);
+    const course = data.courses.find((entry) => entry.id === source?.courseId);
+    if (!source || !quiz || !canManageCourse(currentUser, course) || source.status !== 'submitted' || source.essayStatus !== 'pending') return { ok: false, message: 'ไม่มีสิทธิ์ตรวจคำตอบนี้ หรือรายการถูกตรวจไปแล้ว' };
+    const questions = quiz.questions.filter((question) => question.type === 'essay');
+    const essayMax = questions.reduce((sum, question) => sum + Number(question.points || 1), 0);
+    if (!questions.length || !Number.isFinite(score) || score < 0 || score > essayMax) return { ok: false, message: 'กรอกคะแนนในช่วงที่กำหนด' };
+    const max = Number(source.maxChoice || 0) + essayMax;
+    const total = Number(source.score || 0) + score;
+    const finalPercent = max > 0 ? Math.round(total / max * 100) : 0;
+    const passed = max > 0 && finalPercent >= Number(quiz.passPercent || 60);
+    const next = structuredClone(data);
+    next.attempts = next.attempts.map((entry) => entry.id === attemptId ? { ...entry, essayStatus: 'graded', essayScore: score, essayFeedback: feedback, totalScore: total, maxScore: max, finalPercent, percent: finalPercent, passed, gradedAt: new Date().toISOString() } : entry);
+    addNotification(next, { id: 'grade-completed:' + attemptId, userId: source.userId, type: 'grade_completed', title: 'ผู้สอนตรวจงานของคุณแล้ว', description: quiz.title + ' · คะแนนรวม ' + total + ' / ' + max, href: '/learn/attempts/' + attemptId + '/result' });
+    if (passed) {
+      const item = flattenItems(course).find((entry) => 'quizId' in entry && entry.quizId === quiz.id);
+      if (item) next.progress[quiz.courseId + ':' + item.id] = { ...(next.progress[quiz.courseId + ':' + item.id] ?? {}), [source.userId]: true };
+      return commitLearningChange(awardCertificate(next, quiz.courseId, source.userId));
+    }
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
 
   const requestInstructor = useCallback(
     (values: { name?: string; email?: string; intro: string }) => {
@@ -1226,73 +1170,48 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     [data.users, update]
   );
 
-  const saveAssignment = useCallback(
-    (values: Partial<Assignment>, assignmentId?: string): string => {
-      const resultId = assignmentId ?? createId('assign');
-      update((next) => {
-        const existing = (next.assignments || []).find((item) => item.id === assignmentId);
-        const assignment: Assignment = {
-          id: resultId,
-          courseId: values.courseId ?? existing?.courseId ?? '',
-          quizId: values.quizId ?? existing?.quizId ?? '',
-          title: values.title ?? existing?.title ?? '',
-          stage: values.stage ?? existing?.stage ?? 'practice',
-          assigneeType: values.assigneeType ?? existing?.assigneeType ?? 'all_enrolled',
-          assigneeIds: values.assigneeIds ?? existing?.assigneeIds,
-          dueDate: values.dueDate !== undefined ? values.dueDate : existing?.dueDate,
-          createdBy: existing?.createdBy || values.createdBy,
-          createdAt: existing?.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          ...existing,
-          ...values,
-        };
-        if (!next.assignments) next.assignments = [];
-        if (existing) {
-          next.assignments = next.assignments.map((item) => (item.id === assignmentId ? assignment : item));
-        } else {
-          next.assignments.unshift(assignment);
-        }
-        const changed =
-          !existing ||
-          existing.title !== assignment.title ||
-          existing.quizId !== assignment.quizId ||
-          existing.dueDate !== assignment.dueDate ||
-          existing.stage !== assignment.stage ||
-          existing.assigneeType !== assignment.assigneeType ||
-          JSON.stringify([...(existing.assigneeIds || [])].sort()) !==
-            JSON.stringify([...(assignment.assigneeIds || [])].sort());
-        if (changed) {
-          const recipients =
-            assignment.assigneeType === 'all_enrolled'
-              ? (next.enrollments || []).filter((entry) => entry.courseId === assignment.courseId).map((entry) => entry.userId)
-              : assignment.assigneeIds || [];
-          [...new Set(recipients)].forEach((userId) =>
-            addNotification(next, {
-              id: createId('notification'),
-              userId,
-              type: existing ? 'assignment_updated' : 'assignment_created',
-              title: existing ? 'งานมอบหมายมีการเปลี่ยนแปลง' : 'คุณได้รับงานมอบหมายใหม่',
-              description: assignment.title,
-              href: '/learn/assignments',
-            })
-          );
-        }
-        return next;
-      });
-      return resultId;
-    },
-    [update]
-  );
+  const saveAssignment = useCallback((values: Partial<Assignment>, assignmentId?: string): ActionResult & { assignment?: Assignment } => {
+    const issue = assignmentSaveIssue(data, currentUser, values, assignmentId);
+    if (issue) return { ok: false, message: issue };
+    const existing = (data.assignments || []).find((entry) => entry.id === assignmentId);
+    const course = data.courses.find((entry) => entry.id === values.courseId)!;
+    const now = new Date().toISOString();
+    const assignment: Assignment = {
+      ...existing, ...values, id: existing?.id ?? createId('assign'),
+      courseId: course.id, quizId: values.quizId!, title: values.title!.trim(),
+      stage: values.stage ?? existing?.stage ?? 'practice',
+      assigneeType: values.assigneeType!,
+      assigneeIds: [...new Set(values.assigneeIds ?? [])],
+      status: existing?.status ?? 'active',
+      createdBy: existing?.createdBy ?? currentUser!.id,
+      createdAt: existing?.createdAt ?? now, updatedAt: now,
+    };
+    const next = structuredClone(data);
+    next.assignments = existing ? (next.assignments || []).map((entry) => entry.id === assignment.id ? assignment : entry) : [assignment, ...(next.assignments || [])];
+    const recipients = assignment.assigneeType === 'all_enrolled' ? next.enrollments.filter((entry) => entry.courseId === course.id).map((entry) => entry.userId) : assignment.assigneeIds || [];
+    [...new Set(recipients)].forEach((userId) => addNotification(next, { id: createId('notification'), userId, type: existing ? 'assignment_updated' : 'assignment_created', title: existing ? 'งานมอบหมายมีการเปลี่ยนแปลง' : 'คุณได้รับงานมอบหมายใหม่', description: assignment.title, href: '/learn/assignments' }));
+    const result = commitLearningChange(next);
+    return result.ok ? { ok: true, assignment } : result;
+  }, [currentUser, data, commitLearningChange]);
 
-  const removeAssignment = useCallback(
-    (assignmentId: string) => {
-      update((next) => {
-        next.assignments = (next.assignments || []).filter((item) => item.id !== assignmentId);
-        return next;
-      });
-    },
-    [update]
-  );
+  const removeAssignment = useCallback((assignmentId: string): ActionResult => {
+    const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
+    const course = data.courses.find((entry) => entry.id === assignment?.courseId);
+    if (!assignment || !canManageCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ลบงานนี้' };
+    if (assignmentHasHistory(data, assignment)) return { ok: false, message: 'งานนี้มีประวัติคำตอบแล้ว กรุณายกเลิกแทนการลบ' };
+    const next = structuredClone(data);
+    next.assignments = (next.assignments || []).filter((entry) => entry.id !== assignmentId);
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
+
+  const cancelAssignment = useCallback((assignmentId: string): ActionResult => {
+    const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
+    const course = data.courses.find((entry) => entry.id === assignment?.courseId);
+    if (!assignment || !canManageCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ยกเลิกงานนี้' };
+    const next = structuredClone(data);
+    next.assignments = (next.assignments || []).map((entry) => entry.id === assignmentId ? { ...entry, status: 'cancelled', updatedAt: new Date().toISOString() } : entry);
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
 
   const markNotificationRead = useCallback(
     (notificationId: string) => {
@@ -1512,6 +1431,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       resetPassword,
       saveAssignment,
       removeAssignment,
+      cancelAssignment,
       saveComparisonSet,
       markNotificationRead,
       sendInboxMessage,
@@ -1561,6 +1481,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       resetPassword,
       saveAssignment,
       removeAssignment,
+      cancelAssignment,
       saveComparisonSet,
       markNotificationRead,
       sendInboxMessage,

@@ -57,7 +57,8 @@ export function ChapterEditorPage() {
             okText="ลบ"
             cancelText="ยกเลิก"
             onConfirm={() => {
-              removeChapter(course.id, chapter.id);
+              const result = removeChapter(course.id, chapter.id);
+              if (!result.ok) { message.error(result.message); return; }
               navigate(`/teach/courses/${course.id}/curriculum`);
             }}
           >

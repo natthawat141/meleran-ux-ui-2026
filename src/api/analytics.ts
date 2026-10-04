@@ -1,6 +1,6 @@
 /**
  * Central Read-Model and Selectors for Learner Analytics, Reviews Queue, and Pre/Post Assessment
- * Follows LEARNER-ANALYTICS-UI-SPEC.md strictly:
+ * Derived from the historical LEARNER-ANALYTICS-UI-SPEC.md (archive references in docs/GIT_CONSOLIDATION_20261004.md):
  * - Single source of truth for formulas and metrics
  * - Paired difference calculated on matched n only
  * - Pending essay excluded from final score calculations
