@@ -1,0 +1,9 @@
+.directory-search { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.directory-search > .ant-input-affix-wrapper { flex: 1 1 280px; max-width: 560px; }
+.directory-search > .ant-select { width: 200px; }
+.directory-search > span:last-child { color: var(--ink-secondary); font-size: 13px; }
+@media (max-width: 600px) { .directory-search > .ant-select { flex: 1 1 180px; } }
+@media (max-width: 760px) {
+  .workspace-content-inner:has(.directory-search) > .page-title > div:first-child,
+  .catalog-page .page-title > div:first-child { flex: 0 1 auto; }
+}

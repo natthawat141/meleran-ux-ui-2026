@@ -1,0 +1,1370 @@
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { message } from 'antd';
+import { createId, DEMO_ACCOUNTS, flattenItems, initialData, seedCourseCoverReplacements } from './data';
+import defaultCourseCover from './assets/generated/course-default-v2.png';
+import { canAccessInboxConversation, getInboxContacts, getInboxLessonContext, inboxPathForRole } from './api/inbox';
+import { MAX_INBOX_ATTACHMENT_BYTES, MAX_INBOX_ATTACHMENTS, MAX_INBOX_TOTAL_ATTACHMENT_BYTES } from './api/inboxAttachments';
+import { mergeInboxDemo } from './mocks/inbox';
+import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model';
+import type {
+  ActionResult,
+  Assignment,
+  BlogPost,
+  Certificate,
+  Chapter,
+  ComparisonSet,
+  Course,
+  CourseItem,
+  Enrollment,
+  InboxConversation,
+  InboxMessage,
+  LmsContextType,
+  LmsData,
+  Order,
+  Quiz,
+  QuizAnswerValue,
+  QuizAttempt,
+  ReorderResult,
+  Role,
+  SendInboxMessageArgs,
+  SendInboxMessageResult,
+  User,
+  WorkspaceSaveResult,
+} from './types';
+
+const STORAGE_KEY = 'stay-elearn-ux-v2';
+const LEGACY_DEFAULT_COVER = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85';
+const LmsContext = createContext<LmsContextType | null>(null);
+
+interface AppNotification {
+  id: string;
+  userId?: string;
+  type: string;
+  title: string;
+  description: string;
+  href?: string;
+  conversationId?: string;
+  createdAt?: string;
+  readAt?: string | null;
+}
+
+interface StoredLmsData extends Partial<LmsData> {
+  notifications?: AppNotification[];
+}
+
+function addNotification(data: StoredLmsData, notification: AppNotification) {
+  if (!notification.userId) return;
+  if (!Array.isArray(data.notifications)) data.notifications = [];
+  if (data.notifications.some((entry) => entry.id === notification.id)) return;
+  data.notifications.unshift({ ...notification, createdAt: new Date().toISOString(), readAt: null });
+}
+
+function normalizeBlogCover(cover?: string): string | undefined {
+  if (typeof cover !== 'string') return undefined;
+  const trimmed = cover.trim();
+  if (!trimmed) return undefined;
+  if (/^data:image\//i.test(trimmed) && trimmed.length < 80) return undefined;
+  if (/^https?:\/\/127\.0\.0\.1:\d+\//i.test(trimmed)) return undefined;
+  return trimmed;
+}
+
+function normalizeBlogPosts(posts?: unknown): BlogPost[] {
+  if (!Array.isArray(posts)) return structuredClone(initialData.blogPosts);
+  return posts.map((post) => {
+    const cover = normalizeBlogCover(post.cover);
+    const next: BlogPost = { ...post, coverKey: post.coverKey || 'writing' };
+    if (cover) next.cover = cover;
+    else delete next.cover;
+    return next;
+  });
+}
+
+function loadData(): LmsData & { notifications?: AppNotification[] } {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const courses: Course[] = Array.isArray(parsed.courses)
+        ? parsed.courses.map((course: Course) => {
+            if (course.cover === LEGACY_DEFAULT_COVER || course.cover?.includes('course-default-v1')) {
+              return { ...course, cover: defaultCourseCover };
+            }
+            const replacement = seedCourseCoverReplacements[course.id];
+            return replacement && (course.cover === replacement.from || course.cover?.includes(replacement.previousGenerated))
+              ? { ...course, cover: replacement.to }
+              : course;
+          })
+        : structuredClone(initialData.courses);
+      courses.forEach((course) =>
+        course.chapters.forEach((chapter) =>
+          chapter.items.forEach((item) => {
+            if (!item.id) item.id = createId('item');
+          })
+        )
+      );
+      const assignments: Assignment[] =
+        Array.isArray(parsed.assignments) && parsed.assignments.length
+          ? parsed.assignments
+          : structuredClone(initialData.assignments || []);
+      const comparisonSets: ComparisonSet[] =
+        Array.isArray(parsed.comparisonSets) && parsed.comparisonSets.length
+          ? parsed.comparisonSets
+          : structuredClone(initialData.comparisonSets || []);
+      const attempts: QuizAttempt[] = Array.isArray(parsed.attempts) ? parsed.attempts : [];
+      (initialData.attempts || []).forEach((a) => {
+        if (!attempts.some((item) => item.id === a.id)) attempts.push(a);
+      });
+      const quizzes: Quiz[] = Array.isArray(parsed.quizzes) ? parsed.quizzes : structuredClone(initialData.quizzes || []);
+      (initialData.quizzes || []).forEach((q) => {
+        if (!quizzes.some((item) => item.id === q.id)) quizzes.push(q);
+      });
+      const users: User[] = Array.isArray(parsed.users) ? parsed.users : structuredClone(initialData.users || []);
+      (initialData.users || []).forEach((u) => {
+        if (!users.some((item) => item.id === u.id)) users.push(u);
+      });
+      const enrollments: Enrollment[] = Array.isArray(parsed.enrollments)
+        ? parsed.enrollments
+        : structuredClone(initialData.enrollments || []);
+      (initialData.enrollments || []).forEach((e) => {
+        if (!enrollments.some((item) => item.id === e.id)) enrollments.push(e);
+      });
+      return mergeInboxDemo({
+        ...initialData,
+        ...parsed,
+        courses,
+        blogPosts: normalizeBlogPosts(parsed.blogPosts),
+        assignments,
+        comparisonSets,
+        attempts,
+        quizzes,
+        users,
+        certificates: snapshotLegacyCertificateNames(Array.isArray(parsed.certificates) ? parsed.certificates : initialData.certificates, users),
+        enrollments,
+        inboxDemoVersion: parsed.inboxDemoVersion || 0,
+        inboxConversations: Array.isArray(parsed.inboxConversations) ? parsed.inboxConversations : [],
+        inboxMessages: Array.isArray(parsed.inboxMessages) ? parsed.inboxMessages : [],
+      }) as LmsData & { notifications?: AppNotification[] };
+    }
+  } catch {
+    /* Start with the sample data if storage is unavailable or invalid. */
+  }
+  return structuredClone(initialData) as LmsData & { notifications?: AppNotification[] };
+}
+
+function awardCertificate(data: LmsData, courseId: string, userId: string): LmsData {
+  const course = data.courses.find((item) => item.id === courseId);
+  if (!course || data.certificates.some((item) => item.courseId === courseId && item.userId === userId)) return data;
+  const items = flattenItems(course);
+  const complete = items.every((item) =>
+    item.type === 'quiz'
+      ? data.attempts.some((attempt) => attempt.quizId === item.quizId && attempt.userId === userId && attempt.passed === true)
+      : Boolean(data.progress[`${courseId}:${item.id}`]?.[userId])
+  );
+  if (!complete || items.length === 0) return data;
+  const newCert: Certificate = {
+    id: createId('cert'),
+    code: `STAY-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+    courseId,
+    userId,
+    issuedAt: new Date().toISOString(),
+    recipientName: certificateRecipient(data.users.find((item) => item.id === userId) || { id: userId, name: 'ผู้เรียน' }),
+  };
+  return {
+    ...data,
+    certificates: [...data.certificates, newCert],
+  };
+}
+
+export function LmsProvider({ children }: { children: React.ReactNode }) {
+  const [data, setData] = useState<LmsData & { notifications?: AppNotification[] }>(loadData);
+  const persistWarnedRef = useRef(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      persistWarnedRef.current = false;
+    } catch {
+      if (!persistWarnedRef.current) {
+        persistWarnedRef.current = true;
+        message.warning('บันทึกลงเบราว์เซอร์ไม่สำเร็จ รูปหรือเนื้อหาอาจหายหลังรีเฟรช ลองลดจำนวนรูปในบทความ');
+      }
+    }
+  }, [data]);
+
+  const update = useCallback(
+    (recipe: (current: LmsData & { notifications?: AppNotification[] }) => LmsData & { notifications?: AppNotification[] }) => {
+      setData((current) => recipe(structuredClone(current)));
+    },
+    []
+  );
+
+  const currentUser = useMemo(
+    () => data.users.find((user) => user.id === data.currentUserId) ?? null,
+    [data.users, data.currentUserId]
+  );
+
+  const signIn = useCallback(
+    (email: string, password?: string): ActionResult => {
+      const user = data.users.find(
+        (item) => item.email.toLowerCase() === email.trim().toLowerCase() && item.password === password
+      );
+      if (!user) return { ok: false, message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' };
+      if (user.status === 'pending') return { ok: false, message: 'บัญชีผู้สอนยังรอแอดมินอนุมัติ' };
+      update((next) => {
+        next.currentUserId = user.id;
+        return next;
+      });
+      return { ok: true, user };
+    },
+    [data.users, update]
+  );
+
+  const register = useCallback(
+    ({ name, email, password }: { name: string; email: string; password?: string }): ActionResult => {
+      if (data.users.some((item) => item.email.toLowerCase() === email.trim().toLowerCase())) {
+        return { ok: false, message: 'อีเมลนี้มีบัญชีแล้ว' };
+      }
+      const user: User = {
+        id: createId('u'),
+        name: name.trim(),
+        email: email.trim(),
+        password: password || '',
+        role: 'learner',
+        bio: '',
+        status: 'active',
+      };
+      update((next) => {
+        next.users.push(user);
+        next.currentUserId = user.id;
+        return next;
+      });
+      return { ok: true, user };
+    },
+    [data.users, update]
+  );
+
+  const signOut = useCallback(() => {
+    update((next) => {
+      next.currentUserId = null;
+      return next;
+    });
+  }, [update]);
+
+  const signInDemo = useCallback(
+    (role: Role): ActionResult => {
+      const account = DEMO_ACCOUNTS.find((item) => item.role === role);
+      return account ? signIn(account.email, account.password) : { ok: false, message: 'ไม่พบบัญชีตัวอย่าง' };
+    },
+    [signIn]
+  );
+
+  const resetDemo = useCallback(() => {
+    setData(structuredClone(initialData) as LmsData & { notifications?: AppNotification[] });
+  }, []);
+
+  const saveBlogPost = useCallback(
+    (values: Partial<BlogPost>, postId?: string): string | null => {
+      if (currentUser?.role !== 'admin') return null;
+      const savedId = postId ?? createId('post');
+      update((next) => {
+        const existing = next.blogPosts.find((post) => post.id === postId);
+        const now = new Date().toISOString();
+        const cover = normalizeBlogCover(values.cover);
+        const record: BlogPost = {
+          id: savedId,
+          title: values.title ?? existing?.title ?? '',
+          category: values.category ?? existing?.category ?? '',
+          excerpt: values.excerpt ?? existing?.excerpt ?? '',
+          body: values.body ?? existing?.body ?? '',
+          status: values.status ?? existing?.status ?? 'draft',
+          authorId: existing?.authorId ?? currentUser.id,
+          coverKey: values.coverKey || existing?.coverKey || 'writing',
+          readingMinutes: Math.max(2, Math.ceil((values.body || existing?.body || '').length / 500)),
+          createdAt: existing?.createdAt ?? now,
+          updatedAt: now,
+          publishedAt: values.status === 'published' ? existing?.publishedAt ?? now : null,
+          ...existing,
+          ...values,
+        };
+        if (cover) record.cover = cover;
+        else delete record.cover;
+        if (existing) {
+          next.blogPosts = next.blogPosts.map((post) => (post.id === postId ? record : post));
+        } else {
+          next.blogPosts.unshift(record);
+        }
+        return next;
+      });
+      return savedId;
+    },
+    [currentUser, update]
+  );
+
+  const removeBlogPost = useCallback(
+    (postId: string): boolean => {
+      if (currentUser?.role !== 'admin') return false;
+      update((next) => {
+        next.blogPosts = next.blogPosts.filter((post) => post.id !== postId);
+        return next;
+      });
+      return true;
+    },
+    [currentUser?.role, update]
+  );
+
+  const saveCourse = useCallback(
+    (values: Partial<Course>, id?: string): string | null => {
+      const target = data.courses.find((course) => course.id === id);
+      if (
+        !currentUser ||
+        !['admin', 'instructor'].includes(currentUser.role) ||
+        (target && currentUser.role !== 'admin' && target.instructorId !== currentUser.id)
+      ) {
+        return null;
+      }
+      const savedId = id ?? createId('course');
+      update((next) => {
+        const existing = next.courses.find((course) => course.id === id);
+        const record: Course = {
+          id: savedId,
+          slug: values.slug || values.title?.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-') || savedId,
+          title: values.title ?? existing?.title ?? '',
+          subtitle: values.subtitle ?? existing?.subtitle,
+          description: values.description ?? existing?.description,
+          category: values.category ?? existing?.category ?? 'ทั่วไป',
+          level: values.level ?? existing?.level ?? 'เริ่มต้น',
+          price: values.price ?? existing?.price ?? 0,
+          instructorId:
+            currentUser.role === 'admin'
+              ? values.instructorId || existing?.instructorId || currentUser.id
+              : existing?.instructorId || currentUser.id,
+          chapters: existing?.chapters ?? [],
+          status: values.status ?? existing?.status ?? 'draft',
+          cover: values.cover ?? existing?.cover ?? defaultCourseCover,
+          updatedAt: new Date().toISOString(),
+          ...existing,
+          ...values,
+        };
+        if (!record.cover) record.cover = defaultCourseCover;
+        if (existing) {
+          next.courses = next.courses.map((course) => (course.id === id ? record : course));
+        } else {
+          next.courses.unshift(record);
+        }
+        return next;
+      });
+      return savedId;
+    },
+    [currentUser, data.courses, update]
+  );
+
+  const removeCourse = useCallback(
+    (courseId: string) => {
+      update((next) => {
+        next.courses = next.courses.filter((course) => course.id !== courseId);
+        next.quizzes = next.quizzes.filter((quiz) => quiz.courseId !== courseId);
+        next.attempts = next.attempts.filter((attempt) => attempt.courseId !== courseId);
+        next.enrollments = next.enrollments.filter((item) => item.courseId !== courseId);
+        next.certificates = next.certificates.filter((item) => item.courseId !== courseId);
+        Object.keys(next.progress)
+          .filter((key) => key.startsWith(`${courseId}:`))
+          .forEach((key) => delete next.progress[key]);
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const saveChapter = useCallback(
+    (courseId: string, values: Partial<Chapter>, chapterId?: string) => {
+      update((next) => {
+        next.courses = next.courses.map((course) => {
+          if (course.id !== courseId) return course;
+          const targetId = chapterId ?? values.id ?? createId('ch');
+          const chapter: Chapter = {
+            id: targetId,
+            title: values.title ?? '',
+            description: values.description ?? '',
+            items: values.items ?? course.chapters.find((item) => item.id === targetId)?.items ?? [],
+          };
+          const chapters = (chapterId || values.id)
+            ? course.chapters.map((item) => (item.id === targetId ? chapter : item))
+            : [...course.chapters, chapter];
+          return { ...course, chapters, updatedAt: new Date().toISOString() };
+        });
+        return next;
+      });
+    },
+    [update]
+  );
+
+  // Reordering changes IDs' positions only, preserving content and learning history.
+  const reorderCurriculum = useCallback(
+    (courseId: string, chapterId: string | null | undefined, orderedIds: string[]): ReorderResult => {
+      const course = data.courses.find((entry) => entry.id === courseId);
+      if (
+        !course ||
+        !currentUser ||
+        (currentUser.role !== 'admin' && !(currentUser.role === 'instructor' && course.instructorId === currentUser.id))
+      ) {
+        return { ok: false, message: 'ไม่มีสิทธิ์เรียงเนื้อหาในคอร์สนี้' };
+      }
+      const entries = chapterId ? course.chapters.find((entry) => entry.id === chapterId)?.items : course.chapters;
+      if (
+        !entries ||
+        orderedIds.length !== entries.length ||
+        new Set(orderedIds).size !== entries.length ||
+        orderedIds.some((id) => !entries.some((entry) => entry.id === id))
+      ) {
+        return { ok: false, message: 'รายการถูกเปลี่ยนแล้ว กรุณาโหลดหน้าใหม่' };
+      }
+      const next = structuredClone(data);
+      const target = next.courses.find((entry) => entry.id === courseId);
+      if (!target) return { ok: false, message: 'ไม่พบคอร์ส' };
+
+      if (chapterId) {
+        const chapter = target.chapters.find((entry) => entry.id === chapterId);
+        if (chapter) {
+          chapter.items = orderedIds
+            .map((id) => chapter.items.find((entry) => entry.id === id))
+            .filter((item): item is CourseItem => Boolean(item));
+        }
+      } else {
+        target.chapters = orderedIds
+          .map((id) => target.chapters.find((entry) => entry.id === id))
+          .filter((ch): ch is Chapter => Boolean(ch));
+      }
+      target.updatedAt = new Date().toISOString();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        return { ok: false, message: 'บันทึกลำดับไม่ได้ พื้นที่เก็บในเบราว์เซอร์ไม่พอ' };
+      }
+      setData(next);
+      return { ok: true };
+    },
+    [currentUser, data]
+  );
+
+  // Commit the chapter workspace as one unit; a failed browser write keeps the draft open.
+  const saveChapterWorkspace = useCallback(
+    (courseId: string, chapter: Chapter, quizzes: Quiz[], baseline: string): WorkspaceSaveResult => {
+      const course = data.courses.find((entry) => entry.id === courseId);
+      const existing = course?.chapters.find((entry) => entry.id === chapter.id);
+      if (
+        !existing ||
+        !currentUser ||
+        (currentUser.role !== 'admin' && !(currentUser.role === 'instructor' && course?.instructorId === currentUser.id))
+      ) {
+        return { ok: false, message: 'ไม่มีสิทธิ์แก้บทนี้' };
+      }
+      const oldQuizzes = existing.items
+        .filter((item): item is CourseItem & { quizId: string } => 'quizId' in item && Boolean(item.quizId))
+        .map((item) => data.quizzes.find((quiz) => quiz.id === item.quizId))
+        .filter((q): q is Quiz => Boolean(q));
+      if (baseline !== JSON.stringify({ chapter: existing, quizzes: oldQuizzes })) {
+        return { ok: false, message: 'ข้อมูลบทถูกเปลี่ยนแล้ว กรุณาโหลดหน้าใหม่ก่อนแก้ต่อ' };
+      }
+      for (const old of existing.items) {
+        const replacement = chapter.items.find((item) => item.id === old.id);
+        const hasProgress = Object.values(data.progress[`${courseId}:${old.id}`] || {}).some(Boolean);
+        const oldQuizId = 'quizId' in old ? old.quizId : undefined;
+        const hasAttempts = oldQuizId && data.attempts.some((attempt) => attempt.quizId === oldQuizId);
+        if (!replacement && (hasProgress || hasAttempts)) {
+          return { ok: false, message: 'นำรายการที่มีประวัติเรียนหรือคำตอบออกไม่ได้' };
+        }
+        if (
+          hasAttempts &&
+          JSON.stringify(oldQuizzes.find((quiz) => quiz.id === oldQuizId)) !==
+            JSON.stringify(quizzes.find((quiz) => quiz.id === oldQuizId))
+        ) {
+          return { ok: false, message: 'แบบฝึกหัดมีประวัติแล้ว ให้สร้างชุดใหม่แทน' };
+        }
+      }
+      const next = structuredClone(data);
+      const target = next.courses.find((entry) => entry.id === courseId);
+      if (!target) return { ok: false, message: 'ไม่พบคอร์ส' };
+      target.chapters = target.chapters.map((entry) => (entry.id === chapter.id ? structuredClone(chapter) : entry));
+      target.updatedAt = new Date().toISOString();
+      const retained = new Set(quizzes.map((quiz) => quiz.id));
+      const removed = new Set(oldQuizzes.filter((quiz) => !retained.has(quiz.id)).map((quiz) => quiz.id));
+      next.quizzes = next.quizzes
+        .filter((quiz) => !retained.has(quiz.id) && !removed.has(quiz.id))
+        .concat(structuredClone(quizzes));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        return { ok: false, message: 'พื้นที่เก็บในเบราว์เซอร์ไม่พอ ลองลดขนาดรูปหรือใช้ลิงก์วิดีโอ งานที่แก้ยังอยู่ในหน้านี้' };
+      }
+      setData(next);
+      return { ok: true };
+    },
+    [currentUser, data]
+  );
+
+  const removeChapter = useCallback(
+    (courseId: string, chapterId: string) => {
+      update((next) => {
+        const chapter = next.courses.find((course) => course.id === courseId)?.chapters.find((item) => item.id === chapterId);
+        const quizIds =
+          chapter?.items
+            .filter((item): item is CourseItem & { quizId: string } => 'quizId' in item && Boolean(item.quizId))
+            .map((item) => item.quizId) ?? [];
+        next.quizzes = next.quizzes.filter((quiz) => !quizIds.includes(quiz.id));
+        next.attempts = next.attempts.filter((attempt) => !quizIds.includes(attempt.quizId));
+        chapter?.items.forEach((item) => {
+          delete next.progress[`${courseId}:${item.id}`];
+        });
+        next.courses = next.courses.map((course) =>
+          course.id === courseId
+            ? { ...course, chapters: course.chapters.filter((ch) => ch.id !== chapterId) }
+            : course
+        );
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const saveItem = useCallback(
+    (courseId: string, chapterId: string, values: Partial<CourseItem>) => {
+      update((next) => {
+        next.courses = next.courses.map((course) =>
+          course.id !== courseId
+            ? course
+            : {
+                ...course,
+                chapters: course.chapters.map((chapter) =>
+                  chapter.id !== chapterId
+                    ? chapter
+                    : {
+                        ...chapter,
+                        items: values.id
+                          ? chapter.items.map((item) => (item.id === values.id ? ({ ...item, ...values } as CourseItem) : item))
+                          : [...chapter.items, { ...values, id: createId('item') } as CourseItem],
+                      }
+                ),
+              }
+        );
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const removeItem = useCallback(
+    (courseId: string, chapterId: string, itemId: string) => {
+      update((next) => {
+        const course = next.courses.find((item) => item.id === courseId);
+        const chapter = course?.chapters.find((item) => item.id === chapterId);
+        const item = chapter?.items.find((entry) => entry.id === itemId);
+        const quizId = item && 'quizId' in item ? item.quizId : undefined;
+        if (quizId) {
+          next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
+          next.attempts = next.attempts.filter((attempt) => attempt.quizId !== quizId);
+        }
+        delete next.progress[`${courseId}:${itemId}`];
+        next.courses = next.courses.map((c) =>
+          c.id !== courseId
+            ? c
+            : {
+                ...c,
+                chapters: c.chapters.map((ch) =>
+                  ch.id === chapterId ? { ...ch, items: ch.items.filter((content) => content.id !== itemId) } : ch
+                ),
+              }
+        );
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const saveQuiz = useCallback(
+    (values: Partial<Quiz>, quizId?: string): string => {
+      const resultId = quizId ?? createId('quiz');
+      update((next) => {
+        const existing = next.quizzes.find((quiz) => quiz.id === quizId);
+        const quiz: Quiz = {
+          id: resultId,
+          courseId: values.courseId ?? existing?.courseId ?? '',
+          title: values.title ?? existing?.title ?? '',
+          passPercent: values.passPercent ?? existing?.passPercent ?? 60,
+          questions: values.questions ?? existing?.questions ?? [],
+          ...existing,
+          ...values,
+        };
+        if (existing) {
+          next.quizzes = next.quizzes.map((item) => (item.id === quizId ? quiz : item));
+        } else {
+          next.quizzes.push(quiz);
+        }
+        const previousItem = next.courses
+          .flatMap((course) => course.chapters.flatMap((chapter) => chapter.items))
+          .find((item) => 'quizId' in item && item.quizId === resultId);
+
+        if (existing) {
+          next.courses = next.courses.map((course) => ({
+            ...course,
+            chapters: course.chapters.map((chapter) => ({
+              ...chapter,
+              items:
+                course.id === values.courseId && chapter.id === values.chapterId
+                  ? chapter.items.map((item) =>
+                      'quizId' in item && item.quizId === resultId ? { ...item, title: quiz.title } : item
+                    )
+                  : chapter.items.filter((item) => !('quizId' in item) || item.quizId !== resultId),
+            })),
+          }));
+        }
+        if (values.courseId && values.chapterId) {
+          const course = next.courses.find((item) => item.id === values.courseId);
+          const chapter = course?.chapters.find((item) => item.id === values.chapterId);
+          if (course && chapter && !chapter.items.some((item) => 'quizId' in item && item.quizId === resultId)) {
+            const courseCopy = structuredClone(course);
+            const chapterCopy = courseCopy.chapters.find((item) => item.id === values.chapterId);
+            if (chapterCopy) {
+              chapterCopy.items.push({
+                id: previousItem?.id ?? createId('item'),
+                type: 'quiz',
+                title: quiz.title,
+                quizId: resultId,
+              });
+              next.courses = next.courses.map((item) => (item.id === courseCopy.id ? courseCopy : item));
+            }
+          }
+        }
+        return next;
+      });
+      return resultId;
+    },
+    [update]
+  );
+
+  const removeQuiz = useCallback(
+    (quizId: string) => {
+      update((next) => {
+        next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
+        next.courses = next.courses.map((course) => ({
+          ...course,
+          chapters: course.chapters.map((chapter) => ({
+            ...chapter,
+            items: chapter.items.filter((item) => !('quizId' in item) || item.quizId !== quizId),
+          })),
+        }));
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const enrollFree = useCallback(
+    (courseId: string, userId = currentUser?.id) => {
+      update((next) => {
+        const course = next.courses.find((entry) => entry.id === courseId);
+        if (!userId || !course || course.price > 0 || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) {
+          return next;
+        }
+        next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString() });
+        return next;
+      });
+    },
+    [currentUser?.id, update]
+  );
+
+  const simulatePayment = useCallback(
+    (courseId: string, outcome: 'paid' | 'failed'): string => {
+      const orderId = createId('order');
+      update((next) => {
+        const course = next.courses.find((item) => item.id === courseId);
+        if (!course || course.price <= 0 || !currentUser) return next;
+        const order: Order = {
+          id: orderId,
+          courseId,
+          userId: currentUser.id,
+          amount: Number(course.price),
+          status: outcome,
+          method: 'บัตรจำลอง',
+          createdAt: new Date().toISOString(),
+        };
+        next.orders.unshift(order);
+        if (
+          outcome === 'paid' &&
+          !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)
+        ) {
+          next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString() });
+        }
+        return next;
+      });
+      return orderId;
+    },
+    [currentUser, update]
+  );
+
+  const markContentDone = useCallback(
+    (courseId: string, itemId: string) => {
+      if (!currentUser?.id) return;
+      update((next) => {
+        const key = `${courseId}:${itemId}`;
+        next.progress[key] = { ...(next.progress[key] ?? {}), [currentUser.id]: true };
+        return awardCertificate(next, courseId, currentUser.id);
+      });
+    },
+    [currentUser?.id, update]
+  );
+
+  const startAttempt = useCallback(
+    (quiz: Quiz): string => {
+      const attemptId = createId('attempt');
+      if (!currentUser?.id) return attemptId;
+      update((next) => {
+        next.attempts.unshift({
+          id: attemptId,
+          quizId: quiz.id,
+          courseId: quiz.courseId,
+          userId: currentUser.id,
+          answers: {},
+          essayStatus: 'none',
+          passed: null,
+          status: 'in_progress',
+          submittedAt: undefined,
+        });
+        return next;
+      });
+      return attemptId;
+    },
+    [currentUser?.id, update]
+  );
+
+  const saveAttemptDraft = useCallback(
+    (attemptId: string, answers: Record<string, QuizAnswerValue>) => {
+      update((next) => {
+        next.attempts = next.attempts.map((attempt) =>
+          attempt.id === attemptId && attempt.status === 'in_progress' ? { ...attempt, answers } : attempt
+        );
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const submitAttempt = useCallback(
+    (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string): string => {
+      let attemptId = existingAttemptId ?? createId('attempt');
+      if (!currentUser?.id) return attemptId;
+      update((next) => {
+        const choiceQuestions = quiz.questions.filter((question) => question.type === 'choice');
+        const essayQuestions = quiz.questions.filter((question) => question.type === 'essay');
+        const maxChoice = choiceQuestions.reduce((sum, question) => sum + Number(question.points || 1), 0);
+        const score = choiceQuestions.reduce(
+          (sum, question) =>
+            sum +
+            ('answer' in question && Number(answers[question.id]) === Number(question.answer)
+              ? Number(question.points || 1)
+              : 0),
+          0
+        );
+        const percent = maxChoice ? Math.round((score / maxChoice) * 100) : 0;
+        const passed = essayQuestions.length ? null : percent >= Number(quiz.passPercent || 60);
+        const attempt: QuizAttempt = {
+          ...(next.attempts.find((entry) => entry.id === existingAttemptId) ?? {
+            id: attemptId,
+            quizId: quiz.id,
+            courseId: quiz.courseId,
+            userId: currentUser.id,
+            answers: {},
+            essayStatus: 'none',
+            passed: null,
+            status: 'draft',
+          }),
+          id: existingAttemptId ?? attemptId,
+          quizId: quiz.id,
+          courseId: quiz.courseId,
+          userId: currentUser.id,
+          answers,
+          score,
+          maxChoice,
+          percent,
+          essayStatus: essayQuestions.length ? 'pending' : 'none',
+          passed,
+          status: 'submitted',
+          submittedAt: new Date().toISOString(),
+        };
+        attemptId = attempt.id;
+        if (existingAttemptId) {
+          next.attempts = next.attempts.map((entry) => (entry.id === existingAttemptId ? attempt : entry));
+        } else {
+          next.attempts.unshift(attempt);
+        }
+        if (essayQuestions.length) {
+          const course = next.courses.find((entry) => entry.id === quiz.courseId);
+          addNotification(next, {
+            id: `review-submitted:${attempt.id}`,
+            userId: course?.instructorId,
+            type: 'review_submitted',
+            title: 'มีงานส่งใหม่รอตรวจ',
+            description: `${next.users.find((entry) => entry.id === currentUser.id)?.name || 'ผู้เรียน'} · ${quiz.title}`,
+            href: `/teach/attempts/${attempt.id}/grade?returnTo=${encodeURIComponent(`/teach/reviews?course=${quiz.courseId}`)}`,
+          });
+        }
+        if (passed) {
+          const course = next.courses.find((entry) => entry.id === quiz.courseId);
+          const item = flattenItems(course).find((entry) => 'quizId' in entry && entry.quizId === quiz.id);
+          if (item) {
+            next.progress[`${quiz.courseId}:${item.id}`] = {
+              ...(next.progress[`${quiz.courseId}:${item.id}`] ?? {}),
+              [currentUser.id]: true,
+            };
+          }
+        }
+        return passed ? awardCertificate(next, quiz.courseId, currentUser.id) : next;
+      });
+      return attemptId;
+    },
+    [currentUser?.id, update]
+  );
+
+  const gradeAttempt = useCallback(
+    (attemptId: string, { score, feedback }: { score: number; feedback?: string }) => {
+      update((next) => {
+        const attempt = next.attempts.find((item) => item.id === attemptId);
+        const quiz = next.quizzes.find((item) => item.id === attempt?.quizId);
+        if (!attempt || !quiz) return next;
+        const essayMax = quiz.questions
+          .filter((question) => question.type === 'essay')
+          .reduce((sum, question) => sum + Number(question.points || 1), 0);
+        const max = Number(attempt.maxChoice || 0) + essayMax;
+        const total = Number(attempt.score || 0) + Number(score || 0);
+        const finalPercent = max > 0 ? Math.round((total / max) * 100) : 0;
+        const passed = max > 0 && finalPercent >= Number(quiz.passPercent || 60);
+        next.attempts = next.attempts.map((item) =>
+          item.id === attemptId
+            ? {
+                ...item,
+                essayStatus: 'graded',
+                essayScore: Number(score || 0),
+                essayFeedback: feedback,
+                totalScore: total,
+                maxScore: max,
+                finalPercent,
+                percent: finalPercent,
+                passed,
+                gradedAt: new Date().toISOString(),
+              }
+            : item
+        );
+        addNotification(next, {
+          id: `grade-completed:${attemptId}`,
+          userId: attempt.userId,
+          type: 'grade_completed',
+          title: 'ผู้สอนตรวจงานของคุณแล้ว',
+          description: `${quiz.title} · คะแนนรวม ${total} / ${max}`,
+          href: `/learn/attempts/${attemptId}/result`,
+        });
+        if (passed) {
+          const targetCourseId = attempt.courseId || quiz.courseId;
+          const course = next.courses.find((entry) => entry.id === targetCourseId);
+          const quizItem = flattenItems(course).find((entry) => 'quizId' in entry && entry.quizId === quiz.id);
+          if (quizItem) {
+            next.progress[`${targetCourseId}:${quizItem.id}`] = {
+              ...(next.progress[`${targetCourseId}:${quizItem.id}`] ?? {}),
+              [attempt.userId]: true,
+            };
+          }
+          return awardCertificate(next, targetCourseId, attempt.userId);
+        }
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const requestInstructor = useCallback(
+    (values: { name?: string; email?: string; intro: string }) => {
+      update((next) => {
+        next.instructorRequests.unshift({
+          id: createId('req'),
+          userId: currentUser?.id,
+          userName: currentUser?.name ?? values.name ?? '',
+          email: currentUser?.email ?? values.email ?? '',
+          intro: values.intro,
+          status: 'pending',
+          createdAt: new Date().toISOString(),
+        });
+        return next;
+      });
+    },
+    [currentUser, update]
+  );
+
+  const reviewInstructorRequest = useCallback(
+    (requestId: string, decision: 'approved' | 'rejected', note = '') => {
+      update((next) => {
+        const request = next.instructorRequests.find((item) => item.id === requestId);
+        if (!request) return next;
+        next.instructorRequests = next.instructorRequests.map((item) =>
+          item.id === requestId ? { ...item, status: decision, reviewNote: note } : item
+        );
+        if (decision === 'approved') {
+          const existing = next.users.find((item) => item.id === request.userId || item.email === request.email);
+          if (existing) {
+            next.users = next.users.map((item) => (item.id === existing.id ? { ...item, role: 'instructor', status: 'active' } : item));
+          } else {
+            next.users.push({
+              id: createId('u'),
+              name: request.userName,
+              email: request.email,
+              password: 'Teach123!',
+              role: 'instructor',
+              bio: request.intro,
+              status: 'active',
+            });
+          }
+        }
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const createInstructorInvite = useCallback(
+    ({ name, email }: { name: string; email: string }): string => {
+      const token = createId('invite');
+      update((next) => {
+        const user = next.users.find((item) => item.email.toLowerCase() === email.trim().toLowerCase());
+        if (user) {
+          next.invitations.unshift({
+            id: createId('inv'),
+            token,
+            userId: user.id,
+            name: user.name,
+            email: user.email,
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          const newUser: User = {
+            id: createId('u'),
+            name: name.trim(),
+            email: email.trim(),
+            password: '',
+            role: 'instructor',
+            bio: '',
+            status: 'invited',
+          };
+          next.users.push(newUser);
+          next.invitations.unshift({
+            id: createId('inv'),
+            token,
+            userId: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+          });
+        }
+        return next;
+      });
+      return token;
+    },
+    [update]
+  );
+
+  const acceptInstructorInvite = useCallback(
+    (token: string, password?: string): ActionResult => {
+      let result: ActionResult = { ok: false, message: 'ไม่พบคำเชิญนี้' };
+      update((next) => {
+        const invite = next.invitations.find((item) => item.token === token && item.status === 'pending');
+        if (!invite) return next;
+        next.invitations = next.invitations.map((item) => (item.id === invite.id ? { ...item, status: 'accepted' } : item));
+        next.users = next.users.map((item) =>
+          item.id === invite.userId ? { ...item, role: 'instructor', status: 'active', password: password || item.password } : item
+        );
+        next.currentUserId = invite.userId ?? null;
+        result = { ok: true, user: next.users.find((item) => item.id === invite.userId) };
+        return next;
+      });
+      return result;
+    },
+    [update]
+  );
+
+  const changeUserRole = useCallback(
+    (userId: string, role: Role) => {
+      update((next) => {
+        next.users = next.users.map((item) => (item.id === userId ? { ...item, role } : item));
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const updateProfile = useCallback(
+    (values: import('./lib/profile-model').ProfileValues): ActionResult => {
+      if (!currentUser) return { ok: false, message: 'ไม่พบบัญชีผู้ใช้' };
+      const validation = validateProfile(values, data.users, currentUser.id);
+      if (validation) return { ok: false, message: validation };
+      const editable = {
+        name: values.name.trim(), username: values.username?.trim(), firstName: values.firstName?.trim(),
+        lastName: values.lastName?.trim(), firstNameEnglish: values.firstNameEnglish?.trim(),
+        lastNameEnglish: values.lastNameEnglish?.trim(), certificateName: values.certificateName?.trim(),
+        birthDate: values.birthDate?.trim(), phone: values.phone?.trim(), school: values.school?.trim(),
+        educationLevel: values.educationLevel, interests: values.interests ?? [], learningGoals: values.learningGoals ?? [],
+        googleLinkedEmail: values.googleLinkedEmail, bio: values.bio, avatar: values.avatar,
+      };
+      update((next) => {
+        next.users = next.users.map((item) => (item.id === currentUser.id ? { ...item, ...editable } : item));
+        return next;
+      });
+      return { ok: true };
+    },
+    [currentUser, data.users, update]
+  );
+
+  const resetPassword = useCallback(
+    (email: string, password?: string): ActionResult => {
+      const user = data.users.find((item) => item.email.toLowerCase() === email?.trim().toLowerCase());
+      if (!user) return { ok: false, message: 'ไม่พบอีเมลนี้ในข้อมูลตัวอย่าง' };
+      update((next) => {
+        next.users = next.users.map((item) => (item.id === user.id ? { ...item, password: password || item.password } : item));
+        return next;
+      });
+      return { ok: true };
+    },
+    [data.users, update]
+  );
+
+  const saveAssignment = useCallback(
+    (values: Partial<Assignment>, assignmentId?: string): string => {
+      const resultId = assignmentId ?? createId('assign');
+      update((next) => {
+        const existing = (next.assignments || []).find((item) => item.id === assignmentId);
+        const assignment: Assignment = {
+          id: resultId,
+          courseId: values.courseId ?? existing?.courseId ?? '',
+          quizId: values.quizId ?? existing?.quizId ?? '',
+          title: values.title ?? existing?.title ?? '',
+          stage: values.stage ?? existing?.stage ?? 'practice',
+          assigneeType: values.assigneeType ?? existing?.assigneeType ?? 'all_enrolled',
+          assigneeIds: values.assigneeIds ?? existing?.assigneeIds,
+          dueDate: values.dueDate !== undefined ? values.dueDate : existing?.dueDate,
+          createdBy: existing?.createdBy || values.createdBy,
+          createdAt: existing?.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          ...existing,
+          ...values,
+        };
+        if (!next.assignments) next.assignments = [];
+        if (existing) {
+          next.assignments = next.assignments.map((item) => (item.id === assignmentId ? assignment : item));
+        } else {
+          next.assignments.unshift(assignment);
+        }
+        const changed =
+          !existing ||
+          existing.title !== assignment.title ||
+          existing.quizId !== assignment.quizId ||
+          existing.dueDate !== assignment.dueDate ||
+          existing.stage !== assignment.stage ||
+          existing.assigneeType !== assignment.assigneeType ||
+          JSON.stringify([...(existing.assigneeIds || [])].sort()) !==
+            JSON.stringify([...(assignment.assigneeIds || [])].sort());
+        if (changed) {
+          const recipients =
+            assignment.assigneeType === 'all_enrolled'
+              ? (next.enrollments || []).filter((entry) => entry.courseId === assignment.courseId).map((entry) => entry.userId)
+              : assignment.assigneeIds || [];
+          [...new Set(recipients)].forEach((userId) =>
+            addNotification(next, {
+              id: createId('notification'),
+              userId,
+              type: existing ? 'assignment_updated' : 'assignment_created',
+              title: existing ? 'งานมอบหมายมีการเปลี่ยนแปลง' : 'คุณได้รับงานมอบหมายใหม่',
+              description: assignment.title,
+              href: '/learn/assignments',
+            })
+          );
+        }
+        return next;
+      });
+      return resultId;
+    },
+    [update]
+  );
+
+  const removeAssignment = useCallback(
+    (assignmentId: string) => {
+      update((next) => {
+        next.assignments = (next.assignments || []).filter((item) => item.id !== assignmentId);
+        return next;
+      });
+    },
+    [update]
+  );
+
+  const markNotificationRead = useCallback(
+    (notificationId: string) => {
+      update((next) => {
+        next.notifications = (next.notifications || []).map((entry) =>
+          entry.id === notificationId && entry.userId === currentUser?.id && !entry.readAt
+            ? { ...entry, readAt: new Date().toISOString() }
+            : entry
+        );
+        return next;
+      });
+    },
+    [currentUser?.id, update]
+  );
+
+  const sendInboxMessage = useCallback(
+    ({
+      conversationId,
+      recipientId,
+      courseId,
+      itemId,
+      chapterId,
+      text,
+      attachments = [],
+    }: SendInboxMessageArgs): SendInboxMessageResult => {
+      const body = typeof text === 'string' ? text.trim() : '';
+      if (body.length > 3000) return { ok: false, message: 'ข้อความยาวได้ไม่เกิน 3,000 ตัวอักษร' };
+      if (!Array.isArray(attachments)) return { ok: false, message: 'ไฟล์แนบไม่ถูกต้อง กรุณาเลือกไฟล์ใหม่' };
+      if (!body && !attachments.length) return { ok: false, message: 'พิมพ์ข้อความหรือแนบไฟล์ก่อนส่ง' };
+      if (attachments.some((attachment) => !attachment || typeof attachment !== 'object')) {
+        return { ok: false, message: 'ไฟล์แนบไม่ถูกต้อง กรุณาเลือกไฟล์ใหม่' };
+      }
+      const allowedAttachmentTypes = new Set(['image/webp', 'video/mp4', 'video/webm']);
+      const attachmentBytes = attachments.reduce((sum, attachment) => sum + attachment.size, 0);
+      if (attachments.length > MAX_INBOX_ATTACHMENTS || attachmentBytes > MAX_INBOX_TOTAL_ATTACHMENT_BYTES) {
+        return { ok: false, message: 'แนบไฟล์ได้ไม่เกิน 3 ไฟล์ และขนาดรวมไม่เกิน 8 MB' };
+      }
+      if (attachments.some((attachment) =>
+        !attachment || typeof attachment.name !== 'string' ||
+        !allowedAttachmentTypes.has(attachment.contentType) ||
+        !Number.isFinite(attachment.size) || attachment.size <= 0 || attachment.size > MAX_INBOX_ATTACHMENT_BYTES ||
+        typeof attachment.url !== 'string' ||
+        attachment.url.length > Math.ceil(MAX_INBOX_ATTACHMENT_BYTES / 3) * 4 + 128 ||
+        !new RegExp(`^data:${attachment.contentType};base64,[A-Za-z0-9+/]*={0,2}$`).test(attachment.url)
+      )) return { ok: false, message: 'ชนิดหรือขนาดไฟล์แนบไม่ถูกต้อง กรุณาเลือกไฟล์ใหม่' };
+      if (!currentUser) return { ok: false, message: 'กรุณาเข้าสู่ระบบก่อนส่งข้อความ' };
+      let conversation = (data.inboxConversations || []).find((entry) => entry.id === conversationId);
+      if (conversationId && !canAccessInboxConversation(data, conversation!, currentUser)) {
+        return { ok: false, message: 'คุณไม่มีสิทธิ์ส่งข้อความในการสนทนานี้' };
+      }
+      if (!conversation) {
+        const contact = getInboxContacts(data, currentUser).find(
+          (entry) => entry.user.id === recipientId && (entry.course?.id || null) === (courseId || null)
+        );
+        if (!contact) return { ok: false, message: 'เลือกผู้สอนในคอร์สที่คุณเรียนหรือแอดมินที่ติดต่อได้' };
+        conversation = (data.inboxConversations || []).find((entry) => entry.id === contact.key) || {
+          id: contact.key,
+          participantIds: [currentUser.id, contact.user.id],
+          courseId: contact.course?.id || null,
+          createdAt: new Date().toISOString(),
+        };
+      }
+      if (!canAccessInboxConversation(data, conversation, currentUser)) {
+        return { ok: false, message: 'คุณไม่มีสิทธิ์ส่งข้อความในการสนทนานี้' };
+      }
+      const context =
+        itemId || chapterId
+          ? getInboxLessonContext(data, currentUser, conversation.courseId || undefined, itemId, chapterId)
+          : undefined;
+      if ((itemId || chapterId) && !context) {
+        return { ok: false, message: 'ไม่พบบทเรียนที่ต้องการถาม กรุณาเปิดจากหน้าเรียนอีกครั้ง' };
+      }
+      const recipient = data.users.find(
+        (entry) => conversation!.participantIds.includes(entry.id) && entry.id !== currentUser.id
+      );
+      if (!recipient || recipient.status !== 'active') {
+        return { ok: false, message: 'บัญชีผู้รับยังไม่พร้อมรับข้อความ' };
+      }
+      const inboxMessage: InboxMessage = {
+        id: createId('message'),
+        conversationId: conversation.id,
+        senderId: currentUser.id,
+        body,
+        ...(attachments.length && {
+          attachments: attachments.map((attachment) => ({ ...attachment, id: createId('attachment') })),
+        }),
+        ...(context && { context }),
+        createdAt: new Date().toISOString(),
+        readBy: [currentUser.id],
+      };
+      const append = (next: StoredLmsData) => {
+        const existing = (next.inboxConversations || []).find((entry) => entry.id === conversation!.id);
+        if (existing && !canAccessInboxConversation(next as LmsData, existing, currentUser)) return next;
+        if (!Array.isArray(next.inboxConversations)) next.inboxConversations = [];
+        if (!existing) next.inboxConversations.push(conversation!);
+        if (!Array.isArray(next.inboxMessages)) next.inboxMessages = [];
+        next.inboxMessages.push(inboxMessage);
+        addNotification(next, {
+          id: `inbox-message:${inboxMessage.id}`,
+          userId: recipient.id,
+          type: 'inbox_message',
+          conversationId: conversation!.id,
+          title: `ข้อความใหม่จาก ${currentUser.name}`,
+          description: body
+            ? body.length > 100 ? `${body.slice(0, 100)}…` : body
+            : attachments.length === 1
+              ? attachments[0].contentType.startsWith('image/') ? 'แนบรูปภาพ' : 'แนบวิดีโอ'
+              : `แนบไฟล์ ${attachments.length} รายการ`,
+          href: `${inboxPathForRole(recipient.role)}?thread=${encodeURIComponent(conversation!.id)}`,
+        });
+        return next;
+      };
+      // Check browser persistence before clearing the composer's draft.
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(append(structuredClone(data))));
+      } catch {
+        return { ok: false, message: 'บันทึกข้อความหรือไฟล์แนบไม่ได้ ข้อความและไฟล์ยังอยู่ กรุณาลองลดขนาดไฟล์' };
+      }
+      update((next) => append(next) as LmsData & { notifications?: AppNotification[] });
+      return { ok: true, conversationId: conversation.id };
+    },
+    [data, currentUser, update]
+  );
+
+  const markInboxConversationRead = useCallback(
+    (conversationId: string) => {
+      update((next) => {
+        const conversation = (next.inboxConversations || []).find((entry) => entry.id === conversationId);
+        if (!conversation || !canAccessInboxConversation(next, conversation, currentUser)) return next;
+        next.inboxMessages = (next.inboxMessages || []).map((entry) =>
+          entry.conversationId === conversationId && (!currentUser || !entry.readBy?.includes(currentUser.id))
+            ? { ...entry, readBy: [...(entry.readBy || []), ...(currentUser ? [currentUser.id] : [])] }
+            : entry
+        );
+        next.notifications = (next.notifications || []).map((entry) =>
+          entry.conversationId === conversationId && entry.userId === currentUser?.id && !entry.readAt
+            ? { ...entry, readAt: new Date().toISOString() }
+            : entry
+        );
+        return next;
+      });
+    },
+    [currentUser, update]
+  );
+
+  const saveComparisonSet = useCallback(
+    (values: Partial<ComparisonSet>, comparisonSetId?: string): string => {
+      const resultId = comparisonSetId ?? createId('comp');
+      update((next) => {
+        const existing = (next.comparisonSets || []).find((item) => item.id === comparisonSetId);
+        const set: ComparisonSet = {
+          id: resultId,
+          title: values.title ?? existing?.title ?? '',
+          courseId: values.courseId ?? existing?.courseId ?? '',
+          preQuizId: values.preQuizId ?? existing?.preQuizId ?? '',
+          postQuizId: values.postQuizId ?? existing?.postQuizId ?? '',
+          description: values.description ?? existing?.description,
+          createdAt: existing?.createdAt || new Date().toISOString(),
+          ...existing,
+          ...values,
+        };
+        if (!next.comparisonSets) next.comparisonSets = [];
+        if (existing) {
+          next.comparisonSets = next.comparisonSets.map((item) => (item.id === comparisonSetId ? set : item));
+        } else {
+          next.comparisonSets.push(set);
+        }
+        return next;
+      });
+      return resultId;
+    },
+    [update]
+  );
+
+  const value = useMemo<LmsContextType>(
+    () => ({
+      data,
+      currentUser,
+      signIn,
+      signInDemo,
+      signOut,
+      register,
+      resetDemo,
+      saveBlogPost,
+      removeBlogPost,
+      saveCourse,
+      removeCourse,
+      saveChapter,
+      saveChapterWorkspace,
+      reorderCurriculum,
+      removeChapter,
+      saveItem,
+      removeItem,
+      saveQuiz,
+      removeQuiz,
+      enrollFree,
+      simulatePayment,
+      markContentDone,
+      startAttempt,
+      saveAttemptDraft,
+      submitAttempt,
+      gradeAttempt,
+      requestInstructor,
+      reviewInstructorRequest,
+      createInstructorInvite,
+      acceptInstructorInvite,
+      changeUserRole,
+      updateProfile,
+      resetPassword,
+      saveAssignment,
+      removeAssignment,
+      saveComparisonSet,
+      markNotificationRead,
+      sendInboxMessage,
+      markInboxConversationRead,
+    }),
+    [
+      data,
+      currentUser,
+      signIn,
+      signInDemo,
+      signOut,
+      register,
+      resetDemo,
+      saveBlogPost,
+      removeBlogPost,
+      saveCourse,
+      removeCourse,
+      saveChapter,
+      saveChapterWorkspace,
+      reorderCurriculum,
+      removeChapter,
+      saveItem,
+      removeItem,
+      saveQuiz,
+      removeQuiz,
+      enrollFree,
+      simulatePayment,
+      markContentDone,
+      startAttempt,
+      saveAttemptDraft,
+      submitAttempt,
+      gradeAttempt,
+      requestInstructor,
+      reviewInstructorRequest,
+      createInstructorInvite,
+      acceptInstructorInvite,
+      changeUserRole,
+      updateProfile,
+      resetPassword,
+      saveAssignment,
+      removeAssignment,
+      saveComparisonSet,
+      markNotificationRead,
+      sendInboxMessage,
+      markInboxConversationRead,
+    ]
+  );
+
+  return <LmsContext.Provider value={value}>{children}</LmsContext.Provider>;
+}
+
+export const useLms = (): LmsContextType => {
+  const value = useContext(LmsContext);
+  if (!value) throw new Error('useLms must be used within LmsProvider');
+  return value;
+};

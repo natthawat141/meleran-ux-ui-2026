@@ -791,9 +791,11 @@
 .image-upload-preview { display: grid; place-items: center; width: min(100%, 320px); aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; border: 1px solid #e5e7eb; background: #f5f7f9; color: #697581; font-size: 13px; }
 .image-upload-preview .ant-image { width: 100%; height: 100%; }
 .image-upload-preview .ant-image-img { width: 100%; height: 100%; object-fit: cover; }
+.image-upload-preview-img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .image-upload-controls { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
 .image-upload-hint { margin: 6px 0 0; color: #737b84; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
 .image-upload-avatar .image-upload-preview { width: 96px; height: 96px; aspect-ratio: 1; border-radius: 50%; }
+.image-upload-wide .image-upload-preview { width: 100%; max-width: none; }
 .content-edit-layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; align-items: start; gap: 24px; max-width: 1180px; }
 .content-edit-main, .content-edit-side { min-width: 0; padding: 24px; border: 1px solid #e5e7eb; border-radius: 13px; background: #fff; }
 .content-edit-side { position: sticky; top: 96px; }

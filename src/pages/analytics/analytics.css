@@ -1,0 +1,192 @@
+/* Analytics, Reviews Queue, and Assignments feature styling */
+/* Uses the shared Melearn theme tokens for surfaces, text, actions, and status. */
+
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.analytics-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.analytics-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.analytics-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.analytics-stat-card:hover {
+  border-color: var(--line);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.analytics-stat-card.is-clickable {
+  cursor: pointer;
+}
+
+.analytics-stat-card.is-clickable:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.analytics-stat-label {
+  font-size: 13px;
+  color: var(--ink-secondary);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.analytics-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.analytics-stat-sub {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  margin-top: 6px;
+}
+
+.analytics-attention-box {
+  background: var(--primary-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 22px;
+}
+
+.attention-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.attention-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.prepost-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.prepost-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.prepost-stat-pill {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.prepost-stat-pill .diff-positive {
+  color: var(--success);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.prepost-stat-pill .diff-neutral {
+  color: var(--ink-secondary);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.prepost-stat-pill .diff-negative {
+  color: var(--danger);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.prepost-formula-callout {
+  background: var(--surface-muted);
+  border-left: 4px solid var(--primary);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  margin-top: 18px;
+}
+
+.learner-profile-header {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.learner-profile-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.timeline-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.review-queue-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.review-age-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface-muted);
+  color: var(--ink-secondary);
+}
+
+.assignments-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
