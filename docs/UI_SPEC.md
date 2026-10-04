@@ -17,7 +17,7 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 | การใช้งาน | ค่าอ้างอิงปัจจุบัน | ตำแหน่งหลัก |
 | --- | --- | --- |
 | พื้นหลัก | `#ffffff` | หน้า public และ surface |
-| Primary/action | `#0074e8` | `src/theme.js`, `LandingPage.jsx`, `landing.css` |
+| Primary/action | `#0074e8` | `src/theme.ts`, `LandingPage.tsx`, `landing.css` |
 | Primary hover | `#006bd5` | theme และ Landing |
 | ฟ้าอ่อนสำหรับพื้นที่พักสายตา | `#f1f9ff` และเฉดเย็นใกล้เคียง | `--home-sky`, cobalt palette |
 | ข้อความหลัก | `#24272d` | `colorModeTokens.light`, `--home-ink` |
@@ -34,7 +34,7 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 
 ## 3. ฟอนต์และจังหวะการอ่าน
 
-- ใช้ `Anuphan Variable` ที่โหลดใน `src/main.jsx` ไม่เปลี่ยนเป็นฟอนต์ใหม่โดยไม่มีเหตุผลจากผู้ใช้
+- ใช้ `Anuphan Variable` ที่โหลดใน `src/main.tsx` ไม่เปลี่ยนเป็นฟอนต์ใหม่โดยไม่มีเหตุผลจากผู้ใช้
 - Public body ประมาณ 15–17px, editorial paragraph ใหญ่ขึ้นตามบริบท หัวข้อ public น้ำหนักประมาณ 450–550; ป้ายงานใน workspace เพิ่มน้ำหนักเมื่อช่วยแยกลำดับได้
 - ภาษาไทยต้องมี line-height พอ: เนื้อหาประมาณ 1.7–1.95, หัวข้อประมาณ 1.35–1.5 ตรวจสระ/วรรณยุกต์ไม่ถูกตัด
 - ใช้ขนาด/น้ำหนัก/ระยะเพื่อบอก hierarchy ไม่ทำทุกหัวข้อหนาใหญ่เท่ากัน ไม่เพิ่ม letter spacing กว้างกับภาษาไทยเพื่อให้ดูพรีเมียม
@@ -69,10 +69,10 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 
 | พื้นที่ | ใช้ฐานปัจจุบัน |
 | --- | --- |
-| Workspace shell/sidebar/profile menu | Mantine + Tabler icons ใน `src/components/Shell.jsx` |
+| Workspace shell/sidebar/profile menu | Mantine + Tabler icons ใน `src/components/Shell.tsx` |
 | CRUD, form, table, upload, modal, dropdown | Ant Design + `@ant-design/icons` |
 | Login/register inputs, fields, buttons | shadcn/Base UI ใน `src/components/ui/` |
-| Rich content | Tiptap ใน `src/components/chapter/RichTextEditor.jsx` |
+| Rich content | Tiptap ใน `src/components/chapter/RichTextEditor.tsx` |
 | Motion/parallax | `motion/react` และ component เดิมใน Landing |
 
 - ห้ามใช้อีโมจิแทนไอคอนหรือใช้เป็นของตกแต่ง UI ใช้ชุดไอคอนตามบริบทเดิมของหน้า ไม่ผสมหลายสไตล์ใน toolbar เดียว
@@ -86,14 +86,14 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 
 - Logo: `src/assets/melearn-ui/logo.PNG`; เป็นสำเนา asset แบรนด์เดิมใน workspace ให้รักษาสัดส่วน พื้นที่หายใจ และไม่ขยายจนทับ header
 - ภาพกราฟิก Melearn: `src/assets/generated/`; อ่านบันทึก asset ในโฟลเดอร์เมื่อจะเปลี่ยน ใช้ภาพที่มี neutral/white balance ไม่สร้างภาพฟ้าล้วนทุกหัวข้อ
-- ภาพทีม: `public/images/founders/`; mapping ชื่อ/ตำแหน่งอยู่ใน `BrandStory.jsx` เป็นข้อมูลร่วมของ Landing และ About ห้ามเดาชื่อ ประวัติ ความเชี่ยวชาญ หรือเปลี่ยน mapping รูปเอง
+- ภาพทีม: `public/images/founders/`; mapping ชื่อ/ตำแหน่งอยู่ใน `BrandStory.tsx` เป็นข้อมูลร่วมของ Landing และ About ห้ามเดาชื่อ ประวัติ ความเชี่ยวชาญ หรือเปลี่ยน mapping รูปเอง
 - ถ้าต้องสร้างกราฟิกใหม่ ให้ทำเป็นงานเฉพาะแบรนด์ตามคำขอ ใช้ image generation เมื่อมีเครื่องมือ ไม่แทนด้วยภาพ stock จาก URL สุ่ม
 - ไม่มี fake partner logos, รีวิว ยอดผู้เรียน หรือรางวัลที่ยืนยันไม่ได้ ถ้าใช้ข้อความร่าง ต้องไม่เขียนเป็นผลงานจริง
 - Crop ภาพตามพื้นที่โดยรักษาจุดสำคัญ ใช้ aspect ratio และ lazy loading ตามบริบท ใส่ alt ที่อธิบายภาพเมื่อมีความหมาย
 
 ## 7. Pattern หน้า public
 
-- Landing: มีเรื่องราวแบรนด์ ทีม บทความ กิจกรรม/วิธีเรียน และคอร์ส โดยลำดับล่าสุดดูใน `LandingPage.jsx` ไม่ย้อนกลับไปใช้หน้าเก่าที่ถูกปฏิเสธ
+- Landing: มีเรื่องราวแบรนด์ ทีม บทความ กิจกรรม/วิธีเรียน และคอร์ส โดยลำดับล่าสุดดูใน `LandingPage.tsx` ไม่ย้อนกลับไปใช้หน้าเก่าที่ถูกปฏิเสธ
 - Hero: พื้นหลังครอบคลุม section; parallax เบา ๆ มี overlay ที่ช่วยอ่านข้อความและยังเห็นภาพ ไม่ฟอกภาพจนจางหมด
 - Newsletter: ลักษณะ hero พื้นหลังภาพเฉพาะแบรนด์พร้อม parallax และฟอร์มอีเมลตรงกลาง หลีกเลี่ยงไอคอนซองจดหมาย กล่องตกแต่งจำนวนมาก และ gradient รก
 - Blog: คนทั่วไปอ่านได้ หน้ารวมมี card/table view ตามที่ผู้ใช้ขอ หน้ารายละเอียดมี hierarchy แบบเว็บอ่านบทความ ไม่ใช้ layout dashboard สำหรับอ่าน

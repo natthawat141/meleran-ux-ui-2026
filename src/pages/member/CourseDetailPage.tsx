@@ -1,8 +1,9 @@
 import React from 'react';
 import { Alert, Button, Empty, Space, Tag, Typography } from 'antd';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { CourseProgress, PageTitle } from '../../components/common';
+import { CourseCartButton } from '../../components/CourseCartButton';
 import { CourseOutline } from '../../components/CourseOutline';
 import { AskInstructorButton } from '../../components/AskInstructorButton';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -12,6 +13,7 @@ import { getCoursePreviewLesson } from '../../lib/course-preview';
 
 export function MemberCourseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const { data, currentUser, enrollFree } = useLms();
   const course = data.courses.find(
@@ -33,15 +35,17 @@ export function MemberCourseDetailPage() {
   );
   const canLearn = currentUser?.role === 'learner' || currentUser?.role === 'admin';
   const hasPreview = Boolean(getCoursePreviewLesson(course));
+  const referralCode = new URLSearchParams(location.search).get('ref')?.trim();
+  const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
 
   const start = () => {
     if (enrolled) {
       navigate(`/learn/courses/${course.id}`);
     } else if (course.price === 0) {
-      enrollFree(course.id);
+      enrollFree(course.id, undefined, referralCode);
       navigate(`/learn/courses/${course.id}`);
     } else {
-      navigate(`/checkout/${course.id}`);
+      navigate(`/checkout/${course.id}${referralQuery}`);
     }
   };
 
@@ -78,6 +82,9 @@ export function MemberCourseDetailPage() {
               <Button type="primary" onClick={start}>
                 {enrolled ? 'เรียนต่อ' : course.price === 0 ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'}
               </Button>
+            )}
+            {canLearn && !enrolled && course.price > 0 && (
+              <CourseCartButton course={course} referralCode={referralCode} />
             )}
             {hasPreview && <Link to={`/courses/${course.slug}/preview`}><Button>ทดลองเรียนบทแรก</Button></Link>}
             {enrolled && <AskInstructorButton course={course} />}

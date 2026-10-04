@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { Button, Drawer, Input, Select, Tag, Typography, type GetRef } from 'antd';
+import { Button, Drawer, Input, Modal, Select, Tag, Typography, type GetRef } from 'antd';
+import { ActionIcon, Button as MantineButton, Menu, NavLink, Stack, Text as MantineText } from '@mantine/core';
 import {
-  IconArrowLeft, IconArrowUp, IconBook2, IconMenu2, IconMessagePlus,
-  IconSearch, IconSparkles, IconX,
+  IconArrowLeft, IconArrowUp, IconArrowUpRight, IconBook2, IconBrain, IconBulb,
+  IconDots, IconHome2, IconInfoCircle, IconMathFunction, IconMenu2,
+  IconMessageChatbot, IconMessagePlus, IconNotes, IconPencil, IconSearch, IconTrash, IconX,
 } from '@tabler/icons-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import logo from '../../assets/melearn-ui/logo.PNG';
 import { useLms } from '../../store';
 import { AiResponse } from './AiResponse';
 import {
@@ -15,10 +18,14 @@ import './learner-ai.css';
 
 const { Text } = Typography;
 const prompts = [
-  { text: AI_MATH_DEMO_PROMPT, icon: '∑' },
-  { text: 'ช่วยสรุปบทเรียนที่กำลังเรียน', icon: '▤' },
-  { text: 'ขอคำใบ้แบบฝึกหัดข้อนี้', icon: '✳' },
+  { text: AI_MATH_DEMO_PROMPT, icon: <IconMathFunction size={17} aria-hidden="true" /> },
+  { text: 'ช่วยสรุปบทเรียนที่กำลังเรียน', icon: <IconNotes size={17} aria-hidden="true" /> },
+  { text: 'ขอคำใบ้แบบฝึกหัดข้อนี้', icon: <IconBulb size={17} aria-hidden="true" /> },
 ];
+
+function BrandLogo({ className = '' }: { className?: string }) {
+  return <span className={`brand-logo-crop learn-ai-logo-crop ${className}`} aria-hidden="true"><img src={logo} alt="" width="1920" height="1080" /></span>;
+}
 
 function makeTitle(value: string) {
   return value.trim().replace(/\s+/g, ' ').slice(0, 42) || 'แชตใหม่';
@@ -93,6 +100,9 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [composing, setComposing] = useState(false);
   const [storageWarning, setStorageWarning] = useState(false);
+  const [renameThreadId, setRenameThreadId] = useState<string | null>(null);
+  const [renameTitle, setRenameTitle] = useState('');
+  const [deleteThreadId, setDeleteThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<GetRef<typeof Input.TextArea>>(null);
   const active = threads.find((thread) => thread.id === activeId);
@@ -117,7 +127,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   const visibleThreads = useMemo(() => {
     const term = search.trim().toLocaleLowerCase();
     return [...threads]
-      .filter((thread) => thread.messages.length > 0 || Boolean(thread.draft.trim()))
+      .filter((thread) => thread.messages.length > 0 || Boolean(thread.draft.trim()) || thread.titleEdited === true)
       .filter((thread) => !term || thread.title.toLocaleLowerCase().includes(term) || thread.messages.some((message) => message.blocks.some((block) => block.type === 'text' && block.text.toLocaleLowerCase().includes(term))))
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }, [threads, search]);
@@ -139,6 +149,29 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
     setDrawerOpen(false);
   };
 
+  const beginRename = (thread: AiThread) => {
+    setRenameThreadId(thread.id);
+    setRenameTitle(thread.title);
+  };
+
+  const saveThreadTitle = () => {
+    const title = renameTitle.trim();
+    if (!renameThreadId || !title) return;
+    const updatedAt = new Date().toISOString();
+    setThreads((current) => current.map((thread) => thread.id === renameThreadId
+      ? { ...thread, title, titleEdited: true, updatedAt }
+      : thread));
+    setRenameThreadId(null);
+  };
+
+  const deleteThread = (threadId: string) => {
+    let remaining = threads.filter((thread) => thread.id !== threadId);
+    if (!remaining.length) remaining = [createAiThread(incomingContext)];
+    const latest = [...remaining].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+    setThreads(remaining);
+    if (activeId === threadId && latest) setActiveId(latest.id);
+  };
+
   const sendMessage = (raw?: string) => {
     const text = (raw ?? active?.draft ?? '').trim();
     if (!active || !text) return;
@@ -149,7 +182,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
     };
     updateActive((thread) => ({
       ...thread,
-      title: thread.messages.length ? thread.title : makeTitle(text),
+      title: thread.titleEdited || thread.messages.length ? thread.title : makeTitle(text),
       updatedAt: now,
       draft: '',
       context: validateContext(thread.context),
@@ -166,11 +199,11 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
 
   const sidebar = (
     <div className="learn-ai-sidebar-inner">
-      <Link to="/learn" className="learn-ai-brand" aria-label="Melearn AI กลับหน้าการเรียน">
-        <img src={new URL('../../assets/melearn-ui/logo.PNG', import.meta.url).href} alt="" />
+      <Link to="/learn" className="learn-ai-brand" aria-label="Melearn AI หน้าหลัก">
+        <BrandLogo className="learn-ai-brand-logo-img" />
         <span>Melearn <b>AI</b></span>
       </Link>
-      <Button className="learn-ai-new-chat" type="primary" block icon={<IconMessagePlus size={17} />} onClick={newChat}>แชตใหม่</Button>
+      <MantineButton className="learn-ai-new-chat" fullWidth leftSection={<IconMessagePlus size={17} aria-hidden="true" />} onClick={newChat}>แชตใหม่</MantineButton>
       <Input
         className="learn-ai-search"
         allowClear
@@ -180,18 +213,38 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
         value={search}
         onChange={(event) => setSearch(event.target.value)}
       />
-      <div className="learn-ai-history-label">ประวัติการสนทนา</div>
-      <nav className="learn-ai-history" aria-label="ประวัติการสนทนา">
+      <MantineText className="learn-ai-history-label" size="xs" fw={700} tt="uppercase" c="dimmed" lts={1.2}>ประวัติการสนทนา</MantineText>
+      <Stack component="nav" className="learn-ai-history" gap={5} aria-label="ประวัติการสนทนา">
         {visibleThreads.length ? visibleThreads.map((thread) => (
-          <button type="button" key={thread.id} className={`learn-ai-history-item ${thread.id === activeId ? 'active' : ''}`} onClick={() => selectThread(thread)}>
-            <IconMessagePlus size={16} />
-            <span>{thread.title}</span>
-          </button>
+          <div className="learn-ai-history-row" key={thread.id}>
+            <NavLink
+              component="button"
+              type="button"
+              className="learn-ai-history-item"
+              active={thread.id === activeId}
+              aria-current={thread.id === activeId ? 'page' : undefined}
+              aria-label={thread.title}
+              label={thread.title}
+              leftSection={<IconMessagePlus size={17} aria-hidden="true" />}
+              onClick={() => selectThread(thread)}
+            />
+            <Menu position="bottom-end" shadow="md" width={164} withinPortal zIndex={1100}>
+              <Menu.Target>
+                <ActionIcon className="learn-ai-thread-menu-trigger" variant="subtle" color="gray" size={32} aria-label={`ตัวเลือกแชต ${thread.title}`}>
+                  <IconDots size={18} aria-hidden="true" />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item leftSection={<IconPencil size={16} aria-hidden="true" />} onClick={() => beginRename(thread)}>เปลี่ยนชื่อ</Menu.Item>
+                <Menu.Item color="red" leftSection={<IconTrash size={16} aria-hidden="true" />} onClick={() => setDeleteThreadId(thread.id)}>ลบแชต</Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </div>
         )) : <div className="learn-ai-history-empty">{search ? 'ไม่พบแชตที่ตรงกัน' : 'ยังไม่มีประวัติ'}</div>}
-      </nav>
+      </Stack>
       <div className="learn-ai-sidebar-bottom">
-        {activeAttempt && <Link className="learn-ai-return-attempt" to={returnToAttempt}><IconArrowLeft size={17} /> กลับไปทำแบบฝึกหัด</Link>}
-        <Link className="learn-ai-back-learning" to="/learn"><IconBook2 size={17} /> กลับไปหน้าการเรียน</Link>
+        {activeAttempt && <NavLink component={Link} to={returnToAttempt} className="learn-ai-return-attempt" label="กลับไปทำแบบฝึกหัด" leftSection={<IconArrowLeft size={17} aria-hidden="true" />} />}
+        <NavLink component={Link} to="/learn" className="learn-ai-back-learning" label="กลับไปหน้าหลัก" leftSection={<IconHome2 size={17} aria-hidden="true" />} />
       </div>
     </div>
   );
@@ -206,7 +259,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
       <section className="learn-ai-main" aria-label="Melearn AI">
         <header className="learn-ai-topbar">
           <Button className="learn-ai-menu-toggle" type="text" aria-label="เปิดเมนูแชต" icon={<IconMenu2 size={21} />} onClick={() => setDrawerOpen(true)} />
-          <div className="learn-ai-topbar-title"><IconSparkles size={18} /><span>ผู้ช่วยการเรียน</span><Tag>เดโม</Tag></div>
+          <div className="learn-ai-topbar-title"><IconBrain size={18} aria-hidden="true" /><span>ผู้ช่วยการเรียน</span><Tag>เดโม</Tag></div>
           {courses.length > 0 && <Select aria-label="คอร์สที่กำลังเรียน" className="learn-ai-course-select" placeholder="เลือกคอร์ส" value={activeCourse?.id} options={courses.map((item) => ({ value: item.id, label: item.title }))} onChange={(courseId) => {
             const nextContext = activeAttempt?.courseId === courseId
               ? { ...activeContext, courseId }
@@ -220,7 +273,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
             <div className="learn-ai-messages" aria-live="polite">
               {active.messages.map((message) => (
                 <article className={`learn-ai-message ${message.role}`} key={message.id}>
-                  {message.role === 'assistant' && <span className="learn-ai-message-mark"><IconSparkles size={16} /></span>}
+                  {message.role === 'assistant' && <span className="learn-ai-message-mark"><IconMessageChatbot size={17} aria-hidden="true" /></span>}
                   <div className="learn-ai-message-body">
                     <Text className="learn-ai-message-author">{message.role === 'user' ? 'คุณ' : 'Melearn AI'}</Text>
                     <AiResponse blocks={message.blocks} />
@@ -230,11 +283,11 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
             </div>
           ) : (
             <div className="learn-ai-welcome">
-              <div className="learn-ai-welcome-icon"><IconSparkles size={25} /></div>
+              <BrandLogo className="learn-ai-welcome-logo" />
               <h1>สวัสดี วันนี้อยากเรียนรู้อะไร?</h1>
               <p>เลือกตัวอย่างเพื่อดูรูปแบบคำตอบของ Melearn AI</p>
               <div className="learn-ai-starters">
-                {prompts.map((prompt) => <button type="button" key={prompt.text} onClick={() => sendMessage(prompt.text)}><span className="learn-ai-starter-icon">{prompt.icon}</span><span>{prompt.text}</span><span className="learn-ai-starter-arrow">↗</span></button>)}
+                {prompts.map((prompt) => <button type="button" key={prompt.text} onClick={() => sendMessage(prompt.text)}><span className="learn-ai-starter-icon">{prompt.icon}</span><span>{prompt.text}</span><IconArrowUpRight className="learn-ai-starter-arrow" size={16} aria-hidden="true" /></button>)}
               </div>
             </div>
           )}
@@ -256,10 +309,44 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
             />
             <div className="learn-ai-composer-actions"><Text>Enter ส่ง · Shift + Enter ขึ้นบรรทัดใหม่</Text><Button type="primary" aria-label="ส่งคำถาม" icon={<IconArrowUp size={17} />} onClick={() => sendMessage()} disabled={!active?.draft.trim()} /></div>
           </div>
-          <div className="learn-ai-demo-note"><IconSparkles size={14} /><span>โหมดตัวอย่าง · ยังไม่เชื่อมต่อ AI จริง</span></div>
+          <div className="learn-ai-demo-note"><IconInfoCircle size={14} aria-hidden="true" /><span>โหมดตัวอย่าง · ยังไม่เชื่อมต่อ AI จริง</span></div>
           {storageWarning && <div className="learn-ai-storage-warning" role="status">บันทึกประวัติแชตในอุปกรณ์นี้ไม่สำเร็จ</div>}
         </div>
       </section>
+      <Modal
+        zIndex={1200}
+        title="เปลี่ยนชื่อแชต"
+        open={Boolean(renameThreadId)}
+        okText="บันทึกชื่อ"
+        cancelText="ยกเลิก"
+        okButtonProps={{ disabled: !renameTitle.trim() }}
+        onOk={saveThreadTitle}
+        onCancel={() => setRenameThreadId(null)}
+      >
+        <Input
+          autoFocus
+          aria-label="ชื่อแชตใหม่"
+          maxLength={80}
+          value={renameTitle}
+          onChange={(event) => setRenameTitle(event.target.value)}
+          onPressEnter={saveThreadTitle}
+        />
+      </Modal>
+      <Modal
+        zIndex={1200}
+        title="ลบแชตนี้หรือไม่?"
+        open={Boolean(deleteThreadId)}
+        okText="ลบแชต"
+        cancelText="ยกเลิก"
+        okButtonProps={{ danger: true }}
+        onOk={() => {
+          if (deleteThreadId) deleteThread(deleteThreadId);
+          setDeleteThreadId(null);
+        }}
+        onCancel={() => setDeleteThreadId(null)}
+      >
+        ประวัติ “{threads.find((thread) => thread.id === deleteThreadId)?.title ?? ''}” และข้อความทั้งหมดจะถูกลบจากอุปกรณ์นี้
+      </Modal>
     </main>
   );
 }

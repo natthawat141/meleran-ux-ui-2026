@@ -1,0 +1,46 @@
+.learner-cart-page { max-width: 1320px; margin-inline: auto; }
+.learner-cart-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr); align-items: start; gap: 20px; }
+.learner-cart-main, .learner-cart-aside { min-width: 0; }
+.learner-cart-aside { display: grid; gap: 14px; }
+.learner-cart-section { min-width: 0; padding: 20px; border: 1px solid #e1e8f0; border-radius: 12px; background: #fff; }
+.learner-cart-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 17px; }
+.learner-cart-section-heading h4.ant-typography { margin: 0 0 3px; }
+.learner-cart-section-heading > .anticon { margin-top: 5px; color: #1677d2; font-size: 20px; }
+.learner-cart-list { display: grid; }
+.learner-cart-item { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; align-items: start; gap: 16px; padding: 17px 0; border-top: 1px solid #edf1f5; }
+.learner-cart-item:first-child { padding-top: 0; border-top: 0; }
+.learner-cart-cover { display: block; overflow: hidden; width: 120px; aspect-ratio: 1.5; border-radius: 9px; background: #eef6fc; }
+.learner-cart-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.learner-cart-cover-empty { border: 1px solid #e2e8ef; }
+.learner-cart-course { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.learner-cart-course-title { color: #24272d; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.learner-cart-course-title a { color: inherit; }
+.learner-cart-course-title a:hover { color: #0074e8; }
+.learner-cart-price { margin: 3px 0 5px; color: #126cc2; font-size: 17px; }
+.learner-cart-price-alert { display: flex; align-items: center; gap: 10px; margin-top: 7px; padding: 10px 12px; border-radius: 9px; background: #f4f9fe; }
+.learner-cart-price-alert > div { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.learner-cart-price-alert .ant-typography { font-size: 12px; line-height: 1.55; }
+.learner-cart-price-alert .ant-typography-secondary { overflow-wrap: anywhere; }
+.learner-cart-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; white-space: nowrap; }
+.learner-cart-actions > a { display: block; }
+.learner-cart-email-section .ant-alert { margin-bottom: 15px; }
+.learner-cart-email-list { display: grid; }
+.learner-cart-email { padding: 14px 0; border-top: 1px solid #edf1f5; }
+.learner-cart-email-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; color: #293441; font-size: 13px; line-height: 1.5; }
+.learner-cart-email-title .ant-tag { flex: 0 0 auto; margin: 0; }
+.learner-cart-email > .ant-typography { font-size: 11px; }
+.learner-cart-email-price { display: flex; align-items: center; gap: 9px; margin-top: 9px; color: #6c7784; font-size: 13px; }
+.learner-cart-email-price strong { color: #176dc2; font-size: 16px; }
+.learner-cart-help { display: grid; gap: 5px; padding: 14px 15px; border-left: 3px solid #98c9f4; border-radius: 0 8px 8px 0; background: #f4f9fe; }
+.learner-cart-help > .ant-typography { font-size: 12px; line-height: 1.7; }
+@media (max-width: 1000px) { .learner-cart-layout { grid-template-columns: minmax(0, 1fr); } .learner-cart-aside { grid-template-columns: minmax(0, 1fr) minmax(220px, .6fr); align-items: start; } }
+@media (max-width: 660px) {
+  .learner-cart-layout { gap: 14px; }
+  .learner-cart-aside { grid-template-columns: minmax(0, 1fr); }
+  .learner-cart-section { padding: 15px 12px; }
+  .learner-cart-item { grid-template-columns: 84px minmax(0, 1fr); gap: 10px; }
+  .learner-cart-cover { width: 84px; }
+  .learner-cart-course-title { font-size: 14px; }
+  .learner-cart-price-alert { align-items: flex-start; padding: 9px; }
+  .learner-cart-actions { grid-column: 2; flex-direction: row; justify-content: flex-start; flex-wrap: wrap; }
+}

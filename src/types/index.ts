@@ -17,6 +17,8 @@ export interface User extends ProfileDetails {
   bio?: string;
   avatar?: string;
   status?: 'active' | 'suspended' | 'pending' | 'invited';
+  baseSharePercent?: number;
+  referralSharePercent?: number;
 }
 
 export interface DemoAccount {
@@ -173,6 +175,9 @@ export interface Enrollment {
   courseId: string;
   userId: string;
   createdAt: string;
+  referralLinkId?: string;
+  referralCode?: string;
+  referralInstructorId?: string;
 }
 
 export interface Order {
@@ -183,7 +188,58 @@ export interface Order {
   status: 'pending' | 'paid' | 'failed' | 'cancelled';
   method?: string;
   createdAt: string;
+  instructorId?: string;
+  instructorSharePercent?: number;
+  instructorShareAmount?: number;
+  platformShareAmount?: number;
+  referralLinkId?: string;
+  referralCode?: string;
+  payoutStatus?: 'pending' | 'transferred';
+  payoutId?: string;
+  paidOutAt?: string;
+  demoFinance?: boolean;
 }
+
+export interface CartItem {
+  id: string;
+  userId: string;
+  courseId: string;
+  createdAt: string;
+  priceAlertEnabled: boolean;
+  referralCode?: string;
+}
+
+export interface PriceAlertEmail {
+  id: string;
+  userId: string;
+  to: string;
+  courseId: string;
+  courseTitle: string;
+  previousPrice: number;
+  newPrice: number;
+  createdAt: string;
+  status: 'mock-sent';
+}
+
+export interface ReferralLink {
+  id: string;
+  code: string;
+  courseId: string;
+  instructorId: string;
+  createdAt: string;
+}
+
+export interface InstructorPayout {
+  id: string;
+  instructorId: string;
+  amount: number;
+  orderCount: number;
+  orderIds: string[];
+  createdAt: string;
+}
+
+export type CreateReferralLinkResult = { ok: true; link: ReferralLink } | { ok: false; message: string };
+export type InstructorPayoutResult = { ok: true; payout: InstructorPayout } | { ok: false; message: string };
 
 export interface Certificate {
   id: string;
@@ -297,6 +353,11 @@ export interface LmsData {
   attempts: QuizAttempt[];
   enrollments: Enrollment[];
   orders: Order[];
+  cartItems: CartItem[];
+  mockPriceEmails: PriceAlertEmail[];
+  referralLinks: ReferralLink[];
+  instructorPayouts: InstructorPayout[];
+  financeDemoSeedVersion?: string;
   certificates: Certificate[];
   instructorRequests: InstructorRequest[];
   invitations: InstructorInvite[];
@@ -371,8 +432,14 @@ export interface LmsContextType {
   removeItem: (courseId: string, chapterId: string, itemId: string) => void;
   saveQuiz: (values: Partial<Quiz>, quizId?: string) => string;
   removeQuiz: (quizId: string) => void;
-  enrollFree: (courseId: string, userId?: string) => void;
-  simulatePayment: (courseId: string, outcome: 'paid' | 'failed') => string;
+  enrollFree: (courseId: string, userId?: string, referralCode?: string | null) => void;
+  simulatePayment: (courseId: string, outcome: 'paid' | 'failed', referralCode?: string | null) => string;
+  addCourseToCart: (courseId: string, referralCode?: string | null) => ActionResult & { alreadyAdded?: boolean };
+  removeCourseFromCart: (cartItemId: string) => boolean;
+  setCoursePriceAlert: (courseId: string, enabled: boolean) => boolean;
+  createReferralLink: (courseId: string) => CreateReferralLinkResult;
+  saveInstructorCommission: (userId: string, base: number, referral: number) => ActionResult;
+  markInstructorPayout: (instructorId: string) => InstructorPayoutResult;
   markContentDone: (courseId: string, itemId: string) => void;
   startAttempt: (quiz: Quiz) => string;
   saveAttemptDraft: (attemptId: string, answers: Record<string, QuizAnswerValue>) => void;

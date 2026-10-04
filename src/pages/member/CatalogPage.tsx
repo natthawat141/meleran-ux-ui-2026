@@ -4,6 +4,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useLms } from '../../store';
 import { CourseCard, CourseProgress, PageTitle } from '../../components/common';
+import { CourseCartButton } from '../../components/CourseCartButton';
 import { instructorFor } from '../../data';
 import { matchesDirectorySearch } from '../../components/DirectorySearch';
 import './catalog.css';
@@ -99,6 +100,7 @@ export function MemberCatalogPage() {
                       <Link to={`/explore/courses/${course.slug}`}>
                         <Button>ดูรายละเอียด</Button>
                       </Link>
+                      {course.price > 0 && <CourseCartButton course={course} />}
                     </Space>
                   )}
                 </div>

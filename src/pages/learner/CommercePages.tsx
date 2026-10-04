@@ -12,6 +12,9 @@ const { Title, Text } = Typography;
 export function CheckoutPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const referralCode = new URLSearchParams(location.search).get('ref');
+  const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
   const { data, simulatePayment } = useLms();
   const [outcome, setOutcome] = useState<'paid' | 'failed'>('paid');
   const course = data.courses.find((item) => item.id === courseId);
@@ -23,20 +26,20 @@ export function CheckoutPage() {
         status="info"
         title="คอร์สนี้เรียนฟรี"
         subTitle="สมัครเรียนได้จากหน้ารายละเอียดคอร์ส"
-        extra={<Link to={`/explore/courses/${course.slug}`}><Button type="primary">กลับไปสมัครเรียนฟรี</Button></Link>}
+        extra={<Link to={`/explore/courses/${course.slug}${referralQuery}`}><Button type="primary">กลับไปสมัครเรียนฟรี</Button></Link>}
       />
     );
   }
 
   const teacher = instructorFor(data, course);
   const order = () => {
-    const orderId = simulatePayment(courseId, outcome);
+    const orderId = simulatePayment(courseId, outcome, referralCode);
     navigate(`/checkout/${orderId}/result`);
   };
 
   return (
     <div className="checkout-page">
-      <Link to={`/courses/${course.slug}`}>
+      <Link to={`/courses/${course.slug}${referralQuery}`}>
         <ArrowLeftOutlined /> กลับหน้าคอร์ส
       </Link>
       <PageTitle
@@ -113,6 +116,7 @@ export function CheckoutResultPage() {
   const course = data.courses.find((item) => item.id === order?.courseId);
 
   if (!order || order.userId !== currentUserId) return <Empty description="ไม่พบรายการนี้" />;
+  const referralQuery = order.referralCode ? `?ref=${encodeURIComponent(order.referralCode)}` : '';
 
   return (
     <div className="checkout-result">
@@ -131,7 +135,7 @@ export function CheckoutResultPage() {
                 <Button type="primary">เริ่มเรียน</Button>
               </Link>
             )}
-            <Link to={`/checkout/${course?.id}`}>
+            <Link to={`/checkout/${course?.id}${referralQuery}`}>
               <Button>{order.status === 'paid' ? 'ดูคอร์ส' : 'ลองชำระอีกครั้ง'}</Button>
             </Link>
             <Link to="/account/orders">

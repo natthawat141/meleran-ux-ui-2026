@@ -50,9 +50,10 @@ export interface CourseCardProps {
   data: LmsData;
   href?: string;
   compact?: boolean;
+  action?: React.ReactNode;
 }
 
-export function CourseCard({ course, data, href, compact = false }: CourseCardProps) {
+export function CourseCard({ course, data, href, compact = false, action }: CourseCardProps) {
   const teacher = instructorFor(data, course);
   const chapterCount = course.chapters?.length ?? 0;
   const lessonCount = course.chapters?.reduce((sum, chapter) => sum + (chapter.items?.length ?? 0), 0) ?? 0;
@@ -90,6 +91,7 @@ export function CourseCard({ course, data, href, compact = false }: CourseCardPr
             {chapterCount} บท · {lessonCount} รายการ
           </Text>
         </div>
+        {action && <div className="course-card-actions">{action}</div>}
       </div>
     </article>
   );

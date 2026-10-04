@@ -1,0 +1,60 @@
+.admin-users-toolbar { display: grid; grid-template-columns: minmax(240px, 1fr) 160px 170px auto; align-items: center; gap: 12px; margin: 4px 0 16px; }
+.admin-user-cell { display: flex; min-width: 250px; align-items: center; gap: 11px; }
+.admin-user-cell .table-course-name { min-width: 0; }
+.admin-user-cell .table-course-name strong, .admin-user-cell .table-course-name .ant-typography { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-user-detail-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+.admin-user-detail-identity { min-width: 0; }
+.admin-user-detail-identity > .ant-typography { display: block; }
+.admin-user-detail-identity h2.ant-typography { margin: 2px 0 0; color: var(--ink-primary, #202a35); font-size: 26px; line-height: 1.35; }
+.admin-user-detail-status { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.admin-user-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; margin: 0 0 22px; border: 1px solid #e0e8f1; border-radius: 10px; background: #fff; }
+.admin-user-metrics > div { display: flex; min-height: 82px; flex-direction: column; justify-content: center; gap: 5px; padding: 14px 20px; border-right: 1px solid #e8edf4; }
+.admin-user-metrics > div:last-child { border-right: 0; }
+.admin-user-metrics span { color: #687586; font-size: 12px; }
+.admin-user-metrics strong { color: #176dc2; font-size: 20px; font-weight: 650; }
+.admin-user-tabs > .ant-tabs-nav { margin-bottom: 18px; }
+.admin-user-tab-content { display: grid; gap: 16px; }
+.admin-user-section { min-width: 0; padding: 20px; border: 1px solid #e0e8f1; border-radius: 10px; background: #fff; }
+.admin-user-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.admin-user-section-heading h5.ant-typography { margin: 0 0 3px; }
+.admin-user-paid-total { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+.admin-user-paid-total strong { color: #176dc2; font-size: 19px; }
+.admin-user-course-list { display: grid; }
+.admin-user-course-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 280px); align-items: center; gap: 24px; padding: 14px 0; border-top: 1px solid #edf1f5; }
+.admin-user-course-row:first-child { padding-top: 0; border-top: 0; }
+.admin-user-course-main { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.admin-user-course-main strong { color: #252b33; }
+.admin-user-course-progress { min-width: 0; }
+.admin-user-timeline { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.admin-user-timeline > li { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: start; gap: 12px; min-height: 76px; padding-bottom: 17px; }
+.admin-user-timeline > li:not(:last-child)::before { position: absolute; top: 31px; bottom: 0; left: 16px; width: 1px; background: #d9e8f8; content: ''; }
+.admin-user-timeline-icon { z-index: 1; display: grid; width: 33px; height: 33px; place-items: center; border: 1px solid #c9e0fa; border-radius: 50%; background: #f1f7fe; color: #1677d2; }
+.admin-user-timeline-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; padding-top: 1px; }
+.admin-user-timeline-copy strong { color: #293441; font-size: 13px; }
+.admin-user-timeline-copy > span, .admin-user-timeline-copy time { color: #697586; font-size: 12px; line-height: 1.6; }
+.admin-user-timeline-copy time { margin-top: 2px; }
+.admin-user-activity-note { margin-top: 7px; }
+@media (max-width: 820px) {
+  .admin-users-toolbar { grid-template-columns: minmax(200px, 1fr) 150px; }
+  .admin-users-toolbar > .ant-typography { grid-column: 1 / -1; }
+  .admin-user-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-user-metrics > div:nth-child(2) { border-right: 0; }
+  .admin-user-metrics > div:nth-child(n + 3) { border-top: 1px solid #e8edf4; }
+}
+@media (max-width: 600px) {
+  .admin-users-toolbar { grid-template-columns: minmax(0, 1fr); }
+  .admin-user-detail-heading { align-items: flex-start; flex-wrap: wrap; gap: 11px; }
+  .admin-user-detail-identity { flex: 1; }
+  .admin-user-detail-identity h2.ant-typography { font-size: 22px; overflow-wrap: anywhere; }
+  .admin-user-detail-status { width: 100%; justify-content: space-between; margin-left: 0; }
+  .admin-user-metrics > div { min-height: 73px; padding: 11px 13px; }
+  .admin-user-metrics strong { font-size: 18px; }
+  .admin-user-section { padding: 15px 12px; }
+  .admin-user-section-heading { align-items: flex-start; }
+  .admin-user-course-row { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .admin-user-timeline > li { grid-template-columns: 30px minmax(0, 1fr); gap: 9px; }
+  .admin-user-timeline-icon { width: 30px; height: 30px; }
+  .admin-user-timeline > li:not(:last-child)::before { top: 29px; left: 14px; }
+  .admin-user-timeline > li > .ant-tag { grid-column: 2; justify-self: start; }
+  .admin-user-paid-total strong { font-size: 16px; }
+}

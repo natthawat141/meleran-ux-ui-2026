@@ -21,6 +21,7 @@ import {
   IconSparkles,
   IconSettings,
   IconShoppingBag,
+  IconShoppingCart,
   IconUsers,
 } from '@tabler/icons-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -48,6 +49,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/learn/ai', icon: <IconSparkles />, label: 'Melearn AI' },
     { key: '/learn/inbox', icon: <IconMessages />, label: 'อินบ็อกซ์' },
     { key: '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
+    { key: '/account/cart', icon: <IconShoppingCart />, label: 'ตะกร้าคอร์ส' },
     { key: '/account/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
     { key: '/account/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
     { key: '/account/profile', icon: <IconSettings />, label: 'บัญชีของฉัน' },
@@ -56,6 +58,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/teach', icon: <IconLayoutDashboard />, label: 'ภาพรวมผู้สอน' },
     { key: '/teach/analytics', icon: <IconChartBar />, label: 'วิเคราะห์การเรียนรู้' },
     { key: '/teach/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
+    { key: '/teach/finance', icon: <IconChartBar />, label: 'รายได้และผู้เรียน' },
     { key: '/teach/courses/new', icon: <IconCirclePlus />, label: 'สร้างคอร์ส' },
     { key: '/teach/assignments', icon: <IconChecklist />, label: 'งานมอบหมาย' },
     { key: '/teach/reviews', icon: <IconClipboardCheck />, label: 'คิวตรวจคำตอบ' },
@@ -68,7 +71,8 @@ const roleMenus: Record<Role, MenuItem[]> = {
   admin: [
     { key: '/admin', icon: <IconLayoutDashboard />, label: 'ภาพรวมระบบ' },
     { key: '/admin/business-analytics', icon: <IconChartBar />, label: 'ภาพรวมธุรกิจ' },
-    { key: '/admin/finance', icon: <IconReceipt />, label: 'รายงานการเงิน' },
+    { key: '/admin/reports/finance', icon: <IconReceipt />, label: 'รายงานการเงิน' },
+    { key: '/admin/finance', icon: <IconChartBar />, label: 'ส่วนแบ่งและยอดโอน' },
     { key: '/admin/analytics', icon: <IconChartBar />, label: 'วิเคราะห์การเรียนรู้' },
     { key: '/admin/articles', icon: <IconArticle />, label: 'บทความ' },
     { key: '/admin/instructors', icon: <IconSchool />, label: 'ผู้สอนและคำขอ' },
@@ -141,6 +145,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     if (result.ok) navigate(roleMeta[nextRole].home);
   };
   const unreadInbox = getInboxThreads(data, currentUser).filter((entry) => entry.unreadCount > 0).length;
+  const cartCount = data.cartItems.filter((item) => item.userId === currentUser?.id).length;
   const navLinks = items.map((item) => {
     const unread = item.key.endsWith('/inbox') && unreadInbox > 0;
     return (
@@ -159,7 +164,8 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           aria-current={selected === item.key ? 'page' : undefined}
           label={compact ? null : item.label}
           leftSection={item.icon}
-          rightSection={unread && !compact ? <Badge color="cobalt" size="sm" variant="light">{unreadInbox}</Badge> : null}
+          rightSection={!compact && (unread || (item.key === '/account/cart' && cartCount > 0))
+            ? <Badge color="cobalt" size="sm" variant="light">{unread ? unreadInbox : cartCount}</Badge> : null}
           className={unread && compact ? 'workspace-rail-unread' : undefined}
           active={selected === item.key}
           onClick={() => setOpened(false)}

@@ -8,6 +8,12 @@ import { mergeInboxDemo } from './mocks/inbox';
 import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model';
 import type {
   ActionResult,
+  CreateReferralLinkResult,
+  InstructorPayoutResult,
+  InstructorPayout,
+  ReferralLink,
+  CartItem,
+  PriceAlertEmail,
   Assignment,
   BlogPost,
   Certificate,
@@ -119,15 +125,34 @@ function loadData(): LmsData & { notifications?: AppNotification[] } {
         if (!quizzes.some((item) => item.id === q.id)) quizzes.push(q);
       });
       const users: User[] = Array.isArray(parsed.users) ? parsed.users : structuredClone(initialData.users || []);
+      users.forEach((user) => {
+        if (user.role !== 'instructor') return;
+        const sample = initialData.users.find((entry) => entry.id === user.id);
+        user.baseSharePercent = Number.isFinite(Number(user.baseSharePercent)) ? Number(user.baseSharePercent) : Number(sample?.baseSharePercent ?? 70);
+        user.referralSharePercent = Number.isFinite(Number(user.referralSharePercent)) ? Number(user.referralSharePercent) : Number(sample?.referralSharePercent ?? 85);
+      });
       (initialData.users || []).forEach((u) => {
         if (!users.some((item) => item.id === u.id)) users.push(u);
       });
       const enrollments: Enrollment[] = Array.isArray(parsed.enrollments)
         ? parsed.enrollments
         : structuredClone(initialData.enrollments || []);
-      (initialData.enrollments || []).forEach((e) => {
+      const financeEnrollmentIds = new Set(['enroll-focus-direct', 'enroll-focus-referral', 'enroll-data-direct', 'enroll-data-referral']);
+      (initialData.enrollments || []).filter((entry) => !financeEnrollmentIds.has(entry.id)).forEach((e) => {
         if (!enrollments.some((item) => item.id === e.id)) enrollments.push(e);
       });
+      const orders: Order[] = Array.isArray(parsed.orders) ? parsed.orders : structuredClone(initialData.orders);
+      const cartItems: CartItem[] = Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
+      const mockPriceEmails: PriceAlertEmail[] = Array.isArray(parsed.mockPriceEmails) ? parsed.mockPriceEmails : [];
+      const referralLinks: ReferralLink[] = Array.isArray(parsed.referralLinks) ? parsed.referralLinks : structuredClone(initialData.referralLinks);
+      const instructorPayouts: InstructorPayout[] = Array.isArray(parsed.instructorPayouts) ? parsed.instructorPayouts : [];
+      if (!parsed.financeDemoSeedVersion && !orders.some((order) => order.status === 'paid')) {
+        initialData.orders.forEach((order) => { if (!orders.some((item) => item.id === order.id)) orders.push(structuredClone(order)); });
+        initialData.enrollments.forEach((entry) => {
+          if (!enrollments.some((item) => item.courseId === entry.courseId && item.userId === entry.userId)) enrollments.push(structuredClone(entry));
+        });
+        initialData.referralLinks.forEach((link) => { if (!referralLinks.some((item) => item.code === link.code)) referralLinks.push(structuredClone(link)); });
+      }
       return mergeInboxDemo({
         ...initialData,
         ...parsed,
@@ -140,6 +165,12 @@ function loadData(): LmsData & { notifications?: AppNotification[] } {
         users,
         certificates: snapshotLegacyCertificateNames(Array.isArray(parsed.certificates) ? parsed.certificates : initialData.certificates, users),
         enrollments,
+        orders,
+        cartItems,
+        mockPriceEmails,
+        referralLinks,
+        instructorPayouts,
+        financeDemoSeedVersion: initialData.financeDemoSeedVersion,
         inboxDemoVersion: parsed.inboxDemoVersion || 0,
         inboxConversations: Array.isArray(parsed.inboxConversations) ? parsed.inboxConversations : [],
         inboxMessages: Array.isArray(parsed.inboxMessages) ? parsed.inboxMessages : [],
@@ -346,6 +377,20 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
           ...values,
         };
         if (!record.cover) record.cover = defaultCourseCover;
+      const previousPrice = Number(existing?.price);
+      const nextPrice = Number(record.price);
+      if (existing?.status === 'published' && record.status === 'published' && Number.isFinite(previousPrice) && Number.isFinite(nextPrice) && previousPrice > nextPrice) {
+        next.cartItems ??= [];
+        next.mockPriceEmails ??= [];
+        const now = new Date().toISOString();
+        const watchers = next.cartItems.filter((entry) => entry.courseId === id && entry.priceAlertEnabled && !next.enrollments.some((enrollment) => enrollment.courseId === id && enrollment.userId === entry.userId) && !next.orders.some((order) => order.courseId === id && order.userId === entry.userId && order.status === 'paid'));
+        watchers.forEach((entry) => {
+          const recipient = next.users.find((user) => user.id === entry.userId);
+          if (!recipient?.email) return;
+          next.mockPriceEmails.unshift({ id: createId('price-email'), userId: entry.userId, courseId: existing.id, courseTitle: record.title, to: recipient.email, previousPrice, newPrice: nextPrice, createdAt: now, status: 'mock-sent' });
+        });
+      }
+
         if (existing) {
           next.courses = next.courses.map((course) => (course.id === id ? record : course));
         } else {
@@ -366,6 +411,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         next.attempts = next.attempts.filter((attempt) => attempt.courseId !== courseId);
         next.enrollments = next.enrollments.filter((item) => item.courseId !== courseId);
         next.certificates = next.certificates.filter((item) => item.courseId !== courseId);
+        next.cartItems = next.cartItems.filter((item) => item.courseId !== courseId);
         Object.keys(next.progress)
           .filter((key) => key.startsWith(`${courseId}:`))
           .forEach((key) => delete next.progress[key]);
@@ -659,47 +705,116 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   );
 
   const enrollFree = useCallback(
-    (courseId: string, userId = currentUser?.id) => {
+    (courseId: string, userId = currentUser?.id, referralCode: string | null = null) => {
       update((next) => {
         const course = next.courses.find((entry) => entry.id === courseId);
         if (!userId || !course || course.price > 0 || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) {
           return next;
         }
-        next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString() });
+        const link = next.referralLinks.find((entry) => entry.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && entry.courseId === course.id && entry.instructorId === course.instructorId);
+        next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString(),
+          ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
         return next;
       });
     },
     [currentUser?.id, update]
   );
 
-  const simulatePayment = useCallback(
-    (courseId: string, outcome: 'paid' | 'failed'): string => {
-      const orderId = createId('order');
-      update((next) => {
-        const course = next.courses.find((item) => item.id === courseId);
-        if (!course || course.price <= 0 || !currentUser) return next;
-        const order: Order = {
-          id: orderId,
-          courseId,
-          userId: currentUser.id,
-          amount: Number(course.price),
-          status: outcome,
-          method: 'บัตรจำลอง',
-          createdAt: new Date().toISOString(),
-        };
-        next.orders.unshift(order);
-        if (
-          outcome === 'paid' &&
-          !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)
-        ) {
-          next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString() });
-        }
-        return next;
+  const simulatePayment = useCallback((courseId: string, outcome: 'paid' | 'failed', referralCode: string | null = null): string => {
+    const orderId = createId('order');
+    update((next) => {
+      const course = next.courses.find((item) => item.id === courseId);
+      if (!course || course.price <= 0 || !currentUser) return next;
+      const instructor = next.users.find((user) => user.id === course.instructorId);
+      const link = (next.referralLinks ?? []).find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === course.id && item.instructorId === course.instructorId);
+      const sharePercent = Number(link ? instructor?.referralSharePercent ?? 85 : instructor?.baseSharePercent ?? 70);
+      const amount = Number(course.price);
+      const instructorShareAmount = Math.round((amount * sharePercent + Number.EPSILON) * 100) / 100;
+      const order: Order = { id: orderId, courseId, userId: currentUser.id, amount, status: outcome, method: 'บัตรจำลอง', createdAt: new Date().toISOString(), instructorId: course.instructorId, ...(outcome === 'paid' ? { instructorSharePercent: sharePercent, instructorShareAmount, platformShareAmount: Math.round((amount - instructorShareAmount + Number.EPSILON) * 100) / 100, payoutStatus: 'pending' } : {}), ...(link ? { referralCode: link.code, referralLinkId: link.id } : {}) };
+      next.orders.unshift(order);
+      if (outcome === 'paid') {
+        next.cartItems = (next.cartItems ?? []).filter((entry) => entry.courseId !== courseId || entry.userId !== currentUser.id);
+        if (!next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
+      }
+      return next;
+    });
+    return orderId;
+  }, [currentUser, update]);
+
+  const addCourseToCart = useCallback((courseId: string, referralCode: string | null = null): ActionResult & { alreadyAdded?: boolean } => {
+    const course = data.courses.find((item) => item.id === courseId && item.status === 'published');
+    if (!currentUser || !['learner', 'admin'].includes(currentUser.role)) return { ok: false, message: 'เข้าสู่ระบบในฐานะผู้เรียนก่อนเพิ่มคอร์ส' };
+    if (!course || course.price <= 0) return { ok: false, message: 'คอร์สนี้ไม่ต้องใช้ตะกร้า' };
+    if (data.enrollments.some((item) => item.courseId === courseId && item.userId === currentUser.id) || data.orders.some((item) => item.courseId === courseId && item.userId === currentUser.id && item.status === 'paid')) return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
+    if (data.cartItems.some((item) => item.courseId === courseId && item.userId === currentUser.id)) return { ok: true, alreadyAdded: true };
+    const referral = data.referralLinks.find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === course.id && item.instructorId === course.instructorId);
+    update((next) => { next.cartItems.push({ id: createId('cart'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), priceAlertEnabled: false, ...(referral ? { referralCode: referral.code } : {}) }); return next; });
+    return { ok: true };
+  }, [currentUser, data.courses, data.enrollments, data.orders, data.cartItems, data.referralLinks, update]);
+
+  const removeCourseFromCart = useCallback((cartItemId: string): boolean => {
+    if (!currentUser || !data.cartItems.some((entry) => entry.id === cartItemId && entry.userId === currentUser.id)) return false;
+    update((next) => {
+      next.cartItems = next.cartItems.filter((entry) => entry.id !== cartItemId);
+      return next;
+    });
+    return true;
+  }, [currentUser, data.cartItems, update]);
+
+  const setCoursePriceAlert = useCallback((courseId: string, enabled: boolean): boolean => {
+    if (!currentUser || !data.cartItems.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) return false;
+    update((next) => {
+      next.cartItems = next.cartItems.map((entry) => {
+        if (entry.courseId !== courseId || entry.userId !== currentUser.id) return entry;
+        return { ...entry, priceAlertEnabled: Boolean(enabled) };
       });
-      return orderId;
-    },
-    [currentUser, update]
-  );
+      return next;
+    });
+    return true;
+  }, [currentUser, data.cartItems, update]);
+
+  const createReferralLink = useCallback((courseId: string): CreateReferralLinkResult => {
+    const course = data.courses.find((item) => item.id === courseId);
+    if (currentUser?.role !== 'instructor' || !course || course.instructorId !== currentUser.id || course.status !== 'published') return { ok: false, message: 'สร้างลิงก์ได้เฉพาะคอร์สที่เผยแพร่ของคุณ' };
+    const link: ReferralLink = { id: createId('ref'), code: createId('code').replace(/^code-/, '').toUpperCase(), instructorId: currentUser.id, courseId, createdAt: new Date().toISOString() };
+    update((next) => { next.referralLinks ??= []; next.referralLinks.unshift(link); return next; });
+    return { ok: true, link };
+  }, [currentUser, data.courses, update]);
+
+  const saveInstructorCommission = useCallback((userId: string, baseSharePercent: number, referralSharePercent: number): ActionResult => {
+    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่กำหนดสัดส่วนได้' };
+    const base = Number(baseSharePercent);
+    const referral = Number(referralSharePercent);
+    const instructor = data.users.find((user) => user.id === userId && user.role === 'instructor');
+    if (!instructor) return { ok: false, message: 'ไม่พบผู้สอน' };
+    if (!Number.isFinite(base) || !Number.isFinite(referral) || base < 0 || base > 100 || referral <= base || referral > 100) return { ok: false, message: 'สัดส่วนลิงก์แนะนำต้องสูงกว่าสัดส่วนปกติ และทั้งคู่ต้องไม่เกิน 100%' };
+    update((next) => { next.users = next.users.map((user) => user.id === userId ? { ...user, baseSharePercent: base, referralSharePercent: referral } : user); return next; });
+    return { ok: true };
+  }, [currentUser, data.users, update]);
+
+  const markInstructorPayout = useCallback((instructorId: string): InstructorPayoutResult => {
+    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่ยืนยันยอดโอนได้' };
+    const eligible = data.orders.filter((order) => {
+      const course = data.courses.find((item) => item.id === order.courseId);
+      return order.status === 'paid' && order.payoutStatus !== 'transferred' && (order.instructorId ?? course?.instructorId) === instructorId;
+    });
+    if (!eligible.length) return { ok: false, message: 'ไม่มียอดรอโอนสำหรับผู้สอนคนนี้' };
+    const teacher = data.users.find((user) => user.id === instructorId);
+    const amount = Math.round(eligible.reduce((sum, order) => {
+      const course = data.courses.find((item) => item.id === order.courseId);
+      const rate = Number(order.instructorSharePercent ?? (order.referralLinkId ? teacher?.referralSharePercent : teacher?.baseSharePercent) ?? 70);
+      return sum + Number(order.instructorShareAmount ?? (Number(order.amount) * rate / 100));
+    }, 0) * 100) / 100;
+    const payout: InstructorPayout = { id: createId('payout'), instructorId, orderIds: eligible.map((order) => order.id), amount, orderCount: eligible.length, createdAt: new Date().toISOString() };
+    const orderIds = new Set(payout.orderIds);
+    update((next) => {
+      next.orders = next.orders.map((order) => orderIds.has(order.id) ? { ...order, payoutStatus: 'transferred', payoutId: payout.id, paidOutAt: payout.createdAt } : order);
+      next.instructorPayouts ??= [];
+      next.instructorPayouts.unshift(payout);
+      return next;
+    });
+    return { ok: true, payout };
+  }, [currentUser, data.courses, data.orders, data.users, update]);
 
   const markContentDone = useCallback(
     (courseId: string, itemId: string) => {
@@ -1298,6 +1413,12 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       removeQuiz,
       enrollFree,
       simulatePayment,
+      addCourseToCart,
+      removeCourseFromCart,
+      setCoursePriceAlert,
+      createReferralLink,
+      saveInstructorCommission,
+      markInstructorPayout,
       markContentDone,
       startAttempt,
       saveAttemptDraft,
@@ -1339,6 +1460,12 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       removeQuiz,
       enrollFree,
       simulatePayment,
+      addCourseToCart,
+      removeCourseFromCart,
+      setCoursePriceAlert,
+      createReferralLink,
+      saveInstructorCommission,
+      markInstructorPayout,
       markContentDone,
       startAttempt,
       saveAttemptDraft,

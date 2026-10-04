@@ -6,7 +6,7 @@
 
 อ่าน [`docs/GIT_CHECKPOINT_POLICY_TH.md`](docs/GIT_CHECKPOINT_POLICY_TH.md) ด้วย: ผู้ใช้ยืนยัน 1 ต.ค. 2026 ให้ commit และ push อัตโนมัติเมื่อชุดงานที่สั่งผ่านการตรวจ พร้อมรายงาน SHA/branch/ผล push รักษา staged/dirty work ของผู้อื่นและแยก branch เมื่อทำพร้อมกัน
 
-Repository นี้เป็น interactive UX prototype ของ Melearn: React + Vite + JavaScript/JSX ยังไม่มี backend Production ข้อมูล บัญชี การจ่ายเงิน และการสลับบทบาทเป็นการจำลองในเบราว์เซอร์
+Repository นี้เป็น interactive UX prototype ของ Melearn: React + Vite + TypeScript/TSX ยังไม่มี backend Production ข้อมูล บัญชี การจ่ายเงิน และการสลับบทบาทเป็นการจำลองในเบราว์เซอร์
 
 เมื่อเปิด repository แยกจาก workspace ให้อ่านไฟล์นี้ได้โดยไม่ต้องมี `D:\code\elearn-prod` อยู่บนเครื่อง เมื่อทำงานใน workspace ใหญ่ ให้อ่าน `../AI_WORKSPACE_GUIDE_TH.md` ด้วย ห้ามแก้โปรเจกต์ reference อื่นโดยอัตโนมัติ
 

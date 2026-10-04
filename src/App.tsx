@@ -19,6 +19,9 @@ import { LearnerDashboardPage, MyCoursesPage } from './pages/learner/DashboardPa
 import { LearnerCoursePage, VideoLessonPage, ArticleLessonPage } from './pages/learner/LessonPages';
 import { QuizIntroPage, QuizAttemptPage, QuizResultPage } from './pages/learner/QuizPages';
 import { CheckoutPage, CheckoutResultPage, OrdersPage, OrderDetailPage } from './pages/learner/CommercePages';
+import { CartPage } from './pages/learner/CartPage';
+import { InstructorFinancePage } from './pages/instructor/InstructorFinancePage';
+import { AdminInstructorFinancePage } from './pages/admin/AdminInstructorFinancePage';
 import { CertificatesPage, CertificateDetailPage, ProfilePage, VerifyCertificatePage } from './pages/learner/AccountPages';
 import { InstructorDashboardPage, InstructorCoursesPage, CourseEditorPage, InstructorCourseOverviewPage } from './pages/instructor/CoursePages';
 import { CurriculumPage, ContentEditorPage } from './pages/instructor/CurriculumPages';
@@ -173,6 +176,7 @@ export function AppRoutes() {
       <Route path="/checkout/:courseId" element={learner(<CheckoutPage />)} />
       <Route path="/checkout/:orderId/result" element={learner(<CheckoutResultPage />)} />
       <Route path="/account/orders" element={learner(<OrdersPage />)} />
+      <Route path="/account/cart" element={learner(<CartPage />)} />
       <Route path="/account/orders/:orderId" element={learner(<OrderDetailPage />)} />
       <Route path="/account/certificates" element={learner(<CertificatesPage />)} />
       <Route path="/account/certificates/:certificateId" element={learner(<CertificateDetailPage />)} />
@@ -186,6 +190,7 @@ export function AppRoutes() {
       />
 
       <Route path="/teach" element={instructor(<InstructorDashboardPage />)} />
+      <Route path="/teach/finance" element={instructor(<InstructorFinancePage />)} />
       <Route path="/teach/analytics" element={instructor(<InstructorAnalyticsRoute />)} />
       <Route path="/teach/courses/:courseId/analytics" element={instructor(<CourseAnalyticsPage />)} />
       <Route path="/teach/courses/:courseId/analytics/learners/:learnerId" element={instructor(<LearnerAnalyticsPage />)} />
@@ -211,7 +216,8 @@ export function AppRoutes() {
 
       <Route path="/admin" element={admin(<AdminDashboardPage />)} />
       <Route path="/admin/business-analytics" element={admin(<AdminBusinessAnalyticsPage />)} />
-      <Route path="/admin/finance" element={admin(<AdminFinanceReportPage />)} />
+      <Route path="/admin/finance" element={admin(<AdminInstructorFinancePage />)} />
+      <Route path="/admin/reports/finance" element={admin(<AdminFinanceReportPage />)} />
       <Route path="/admin/analytics" element={admin(<AnalyticsPage />)} />
       <Route path="/admin/analytics/courses/:courseId" element={admin(<CourseAnalyticsPage />)} />
       <Route path="/admin/analytics/courses/:courseId/learners/:learnerId" element={admin(<LearnerAnalyticsPage />)} />

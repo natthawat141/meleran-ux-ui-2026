@@ -26,6 +26,7 @@ export interface AiThread {
   context: AiContext;
   draft: string;
   messages: AiMessage[];
+  titleEdited?: boolean;
 }
 
 export const AI_MATH_DEMO_PROMPT = 'ดูตัวอย่างคำตอบคณิตศาสตร์';
@@ -82,6 +83,7 @@ export function loadAiThreads(userId: string): AiThread[] {
         id: entry.id, title: entry.title, createdAt: entry.createdAt,
         updatedAt: entry.updatedAt, draft: entry.draft,
         context: readContext(entry.context), messages: entry.messages,
+        ...(entry.titleEdited === true ? { titleEdited: true } : {}),
       });
     }
     return result;

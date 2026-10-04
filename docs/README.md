@@ -14,7 +14,8 @@
 | [`BUSINESS_ANALYTICS_DATA_SPEC.md`](BUSINESS_ANALYTICS_DATA_SPEC.md) | นิยาม metric, raw events, financial records และ draft API/JSON สำหรับระบบจริง |
 | [`ADMIN_MANAGEMENT_GAP_AUDIT_TH.md`](ADMIN_MANAGEMENT_GAP_AUDIT_TH.md) | source audit ของงานแอดมิน สิ่งที่ขาด รายการทำเร็ว และข้อพึ่งพา ยังไม่แบ่งเฟส |
 | [`GIT_CHECKPOINT_POLICY_TH.md`](GIT_CHECKPOINT_POLICY_TH.md) | ผู้ใช้ยืนยันให้ commit และ push อัตโนมัติหลังงานผ่าน พร้อมการสำรอง แยก concurrent work และรายงานจุดย้อนกลับ |
-| [`TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md`](TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md) | คำสั่งย้าย JS/JSX ทั้งหมดเป็น TypeScript แบบรักษา UI/พฤติกรรมเดิม พร้อมขอบเขต ข้อห้าม และเกณฑ์ตรวจ ยังไม่ได้เริ่ม migration |
+| [`TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md`](TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md) | ขอบเขต ข้อห้าม และเกณฑ์ย้าย TypeScript โดยรักษา UI/พฤติกรรมเดิม; source และ tooling ย้ายแล้ว |
+| [`WORKSPACE_INTEGRATION_20261004.md`](WORKSPACE_INTEGRATION_20261004.md) | ผลรวมงาน Git/TypeScript เส้นทางการเงิน หลักฐานการตรวจ และข้อจำกัดของ AI demo |
 | [`INBOX_PERMISSION_SPEC.md`](INBOX_PERMISSION_SPEC.md) | กติกาอินบ็อกซ์ที่ยืนยัน 1 ต.ค. 2026: เส้นทางส่ง สิทธิ์เรียนหมด ทีมดูแล ความเป็นส่วนตัว และส่วนที่ยังไม่ implement |
 
 UI spec บันทึกทิศทางที่เลือกกับพฤติกรรมของต้นแบบ Code spec บอกวิธีต่อ code ปัจจุบัน ทั้งสองไฟล์ไม่อนุมัติสถาปัตยกรรม Production หรือ business rules ที่ยังไม่ตกลง

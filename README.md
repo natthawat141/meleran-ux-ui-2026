@@ -1,6 +1,6 @@
 # E-Learning UX Prototype V2
 
-React + Ant Design prototype. Demo accounts and course data are stored in this browser only.
+React + TypeScript + Ant Design/Mantine prototype. Demo accounts and course data are stored in this browser only.
 
 ## AI / developer instructions
 
@@ -23,3 +23,17 @@ Demo sign-in:
 | Admin | `admin@learn.demo` | `Admin123!` |
 
 Reset the browser demo data from Account → Reset demo data. The instructor role switch in the header is a walkthrough shortcut; use Admin → Instructors to review the invite and approval flows.
+
+## Verification
+
+Use Node.js 24 or later for the native TypeScript test entry. On Windows:
+
+```powershell
+npm.cmd run typecheck
+npm.cmd run build
+node --test tests/business-reports.test.mjs tests/profile-model.test.mjs tests/instructorAnalytics.test.ts tests/instructor-finance.test.mjs
+```
+
+Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
+
+`/learn/ai` is a standalone learner chat page on the same site. It currently stores account-scoped chat history locally and renders demo responses, math and interactive response blocks; no real model or course-document retrieval is connected yet.

@@ -148,7 +148,7 @@ export function LoginPage() {
       </form>
       <GoogleAuthOption label="เข้าสู่ระบบด้วย Google" />
       <div className="auth-switch">
-        ยังไม่มีบัญชี? <Link to="/register">สมัครผู้เรียน</Link>
+        ยังไม่มีบัญชี? <Link to={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}>สมัครผู้เรียน</Link>
       </div>
       <details className="login-demo-accounts">
         <summary>ดูบัญชีสำหรับทดลอง</summary>
@@ -168,7 +168,9 @@ export function LoginPage() {
 
 export function RegisterPage() {
   const { register } = useLms();
+  const location = useLocation();
   const navigate = useNavigate();
+  const next = new URLSearchParams(location.search).get('next');
   const [error, setError] = useState('');
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -187,7 +189,7 @@ export function RegisterPage() {
       setError(result.message || 'สมัครสมาชิกไม่สำเร็จ');
       return;
     }
-    navigate('/learn');
+    navigate(next || '/learn');
   };
 
   return (
@@ -261,7 +263,7 @@ export function RegisterPage() {
       </form>
       <GoogleAuthOption label="สมัครด้วย Google" />
       <div className="auth-switch">
-        มีบัญชีแล้ว? <Link to="/login">เข้าสู่ระบบ</Link>
+        มีบัญชีแล้ว? <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}>เข้าสู่ระบบ</Link>
       </div>
     </AuthPanel>
   );

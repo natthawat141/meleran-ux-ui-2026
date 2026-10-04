@@ -2,9 +2,9 @@
 
 วันที่ 1 ตุลาคม 2026 · เป้าหมาย: `D:\code\elearn-prod\elearning-ux-v2`
 
-**สถานะ: เอกสารสำหรับสั่งงานในอนาคต ยังไม่ได้ย้าย source หรือเพิ่ม dependencies**
+**สถานะ 4 ตุลาคม 2026: application source และ Vite config ย้ายเป็น TypeScript แล้ว; ผลตรวจและข้อจำกัดอยู่ใน [WORKSPACE_INTEGRATION_20261004.md](WORKSPACE_INTEGRATION_20261004.md)**
 
-การสร้างเอกสารนี้ไม่ใช่คำสั่งเริ่ม migration ผู้ใช้ต้องสั่งให้นำเอกสารไปดำเนินงานก่อน เอกสารนี้กำหนดขอบเขตการย้ายภาษาเท่านั้น ไม่อนุมัติ backend, API contract, deployment หรือกติกาธุรกิจเพิ่มเติม
+เอกสารนี้เดิมเป็นคำสั่งสำหรับงานในอนาคต ต่อมาผู้ใช้สั่งดำเนิน migration และรวมงานค้างขึ้น Git แล้ว เอกสารกำหนดขอบเขตการย้ายภาษาเท่านั้น ไม่อนุมัติ backend, API contract, deployment หรือกติกาธุรกิจเพิ่มเติม
 
 การเก็บ checkpoint ใช้ [GIT_CHECKPOINT_POLICY_TH.md](GIT_CHECKPOINT_POLICY_TH.md): ผู้ใช้ยืนยันภายหลังให้ commit และ push อัตโนมัติหลังแต่ละชุดผ่านการตรวจ กติกานี้แทนข้อความเดิมที่ต้องรอคำสั่ง commit/push แยก ห้ามรวมงานค้างผู้อื่นหรือเปลี่ยน checkout ของ agent ที่กำลังทำงาน
 

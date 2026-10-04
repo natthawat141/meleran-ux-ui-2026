@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Alert, Avatar, Button, Descriptions, Empty, Form, Input, Modal, Pagination, Popconfirm, Segmented, Select, Space, Table, Tag, Typography, message } from 'antd';
+import { Alert, Avatar, Button, Descriptions, Empty, Form, Input, Modal, Pagination, Popconfirm, Segmented, Select, Space, Table, Tabs, Tag, Typography, message } from 'antd';
 import type { TableProps } from 'antd';
-import { AppstoreOutlined, ArrowRightOutlined, MailOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, ArrowRightOutlined, BookOutlined, ClockCircleOutlined, DollarOutlined, MailOutlined, PlusOutlined, TrophyOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { PageTitle, StatusTag } from '../../components/common';
+import { CourseProgress, PageTitle, StatusTag } from '../../components/common';
 import { formatPrice, flattenItems, instructorFor } from '../../data';
 import { DirectorySearch, matchesDirectorySearch, useDirectorySearch } from '../../components/DirectorySearch';
-import type { Course, InstructorInvite, InstructorRequest, Role, User } from '../../types';
+import type { Course, InstructorInvite, InstructorRequest, Order, QuizAttempt, Role, User } from '../../types';
 import './admin-courses.css';
 import { BusinessAnalyticsPage } from './BusinessAnalyticsPage';
 import { FinanceReportPage } from './FinanceReportPage';
+import './admin-users.css';
 
 const { Text, Title } = Typography;
 
@@ -32,7 +33,7 @@ export function AdminDashboardPage() {
 
   return (
     <>
-      <PageTitle eyebrow="ผู้ดูแลระบบ" title="ภาพรวมระบบ" subtitle="ตรวจงานที่ต้องดำเนินการและดูสถานะข้อมูลตัวอย่าง" actions={<Space wrap><Link to="/admin/business-analytics"><Button>ภาพรวมธุรกิจ</Button></Link><Link to="/admin/finance"><Button>รายงานการเงิน</Button></Link></Space>} />
+      <PageTitle eyebrow="ผู้ดูแลระบบ" title="ภาพรวมระบบ" subtitle="ตรวจงานที่ต้องดำเนินการและดูสถานะข้อมูลตัวอย่าง" actions={<Space wrap><Link to="/admin/business-analytics"><Button>ภาพรวมธุรกิจ</Button></Link><Link to="/admin/reports/finance"><Button>รายงานการเงิน</Button></Link></Space>} />
       <div className="admin-work-summary">
         <Link to="/admin/users"><span>ผู้เรียนในระบบ</span><strong>{data.users.filter(user => user.role === 'learner').length}</strong><small>จากผู้ใช้ทั้งหมด {data.users.length} คน</small></Link>
         <Link to="/admin/instructors"><span>ผู้สอน</span><strong>{data.users.filter(user => user.role === 'instructor').length}</strong><small>ตรวจผู้สอนและคำขอ</small></Link>
@@ -94,6 +95,7 @@ export function AdminDashboardPage() {
 export function AdminUsersPage() {
   const { data, changeUserRole } = useLms();
   const navigate = useNavigate();
+  const [statusFilter, setStatusFilter] = useState('all');
   const roles = [
     { value: 'all', label: 'ทุกบทบาท' },
     { value: 'learner', label: 'ผู้เรียน' },
@@ -104,10 +106,12 @@ export function AdminUsersPage() {
   const users = data.users.filter(
     (user) =>
       (filter === 'all' || user.role === filter) &&
+      (statusFilter === 'all' || (user.status ?? 'pending') === statusFilter) &&
       matchesDirectorySearch(query, [
         user.id,
         user.name,
         user.email,
+        user.username,
         user.bio,
         user.status,
         user.status === 'active' ? 'ใช้งาน' : 'รอเปิดใช้งาน',
@@ -120,9 +124,12 @@ export function AdminUsersPage() {
     {
       title: 'ผู้ใช้',
       render: (_, user) => (
-        <div className="table-course-name">
-          <strong>{user.name}</strong>
-          <Text type="secondary">{user.email}</Text>
+        <div className="admin-user-cell">
+          <Avatar src={user.avatar} size={38}>{user.name.slice(0, 1) || <UserOutlined />}</Avatar>
+          <div className="table-course-name">
+            <strong>{user.name}</strong>
+            <Text type="secondary">{user.email}{user.username ? ` · @${user.username}` : ''}</Text>
+          </div>
         </div>
       ),
     },
@@ -177,9 +184,19 @@ export function AdminUsersPage() {
         options={roles}
         count={users.length}
       />
+      <div className="admin-users-toolbar">
+        <Select aria-label="กรองตามสถานะ" value={statusFilter} onChange={setStatusFilter} options={[
+          { value: 'all', label: 'ทุกสถานะ' },
+          { value: 'active', label: 'ใช้งาน' },
+          { value: 'pending', label: 'รอเปิดใช้งาน' },
+          { value: 'invited', label: 'ส่งคำเชิญแล้ว' },
+          { value: 'suspended', label: 'ระงับ' },
+        ]} />
+        <Text type="secondary">แสดง {users.length} บัญชี</Text>
+      </div>
       <Alert className="table-note" type="info" showIcon message="การปรับบทบาทมีผลกับบัญชีตัวอย่างในเบราว์เซอร์นี้" />
       <Table
-        key={`${query}:${filter}`}
+        key={`${query}:${filter}:${statusFilter}`}
         rowKey="id"
         columns={columns}
         dataSource={users}
@@ -197,36 +214,59 @@ export function AdminUserDetailPage() {
   const user = data.users.find((item) => item.id === id);
   if (!user) return <Empty description="ไม่พบบัญชีผู้ใช้นี้" />;
 
+  const enrollments = data.enrollments.filter((item) => item.userId === user.id);
+  const orders = data.orders.filter((item) => item.userId === user.id).slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const attempts = data.attempts.filter((item) => item.userId === user.id).slice().sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''));
+  const certificates = data.certificates.filter((item) => item.userId === user.id).slice().sort((a, b) => b.issuedAt.localeCompare(a.issuedAt));
+  const paidTotal = orders.filter((item) => item.status === 'paid').reduce((sum, item) => sum + item.amount, 0);
+  const formatDate = (value?: string, time = false) => {
+    if (!value || Number.isNaN(new Date(value).getTime())) return '—';
+    return new Date(value).toLocaleString('th-TH', time
+      ? { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }
+      : { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+  const orderColumns: TableProps<Order>['columns'] = [
+    { title: 'คอร์ส', render: (_, order) => data.courses.find((course) => course.id === order.courseId)?.title ?? 'ไม่พบข้อมูลคอร์ส' },
+    { title: 'วันที่', dataIndex: 'createdAt', render: (value: string) => formatDate(value, true) },
+    { title: 'ยอดชำระ', dataIndex: 'amount', render: (value: number) => formatPrice(value) },
+    { title: 'ช่องทาง', dataIndex: 'method', render: (value?: string) => value || '—' },
+    { title: 'สถานะ', dataIndex: 'status', render: (value: Order['status']) => <Tag color={value === 'paid' ? 'success' : value === 'failed' || value === 'cancelled' ? 'error' : 'processing'}>{({ paid: 'ชำระแล้ว', pending: 'รอดำเนินการ', failed: 'ไม่สำเร็จ', cancelled: 'ยกเลิก' })[value]}</Tag> },
+    { title: 'รหัสรายการ', dataIndex: 'id' },
+  ];
+  const attemptColumns: TableProps<QuizAttempt>['columns'] = [
+    { title: 'แบบทดสอบ', render: (_, attempt) => data.quizzes.find((quiz) => quiz.id === attempt.quizId)?.title ?? 'แบบทดสอบ' },
+    { title: 'คอร์ส', render: (_, attempt) => data.courses.find((course) => course.id === attempt.courseId)?.title ?? '—' },
+    { title: 'ส่งเมื่อ', dataIndex: 'submittedAt', render: (value?: string) => formatDate(value, true) },
+    { title: 'ผล', render: (_, attempt) => attempt.essayStatus === 'pending' ? <Tag color="processing">รอตรวจข้อเขียน</Tag> : attempt.passed === true ? <Tag color="success">ผ่าน · {attempt.finalPercent ?? attempt.percent ?? 0}%</Tag> : attempt.passed === false ? <Tag color="error">ยังไม่ผ่าน · {attempt.finalPercent ?? attempt.percent ?? 0}%</Tag> : <Tag>กำลังทำ</Tag> },
+  ];
+  const events: { id: string; date: string; title: string; description: string; icon: React.ReactNode; status?: string }[] = [
+    ...enrollments.map((entry) => ({ id: `enrollment-${entry.id}`, date: entry.createdAt, title: 'ลงทะเบียนเรียน', description: data.courses.find((course) => course.id === entry.courseId)?.title ?? 'ไม่พบข้อมูลคอร์ส', icon: <BookOutlined /> })),
+    ...orders.map((entry) => ({ id: `order-${entry.id}`, date: entry.createdAt, title: entry.status === 'paid' ? 'ซื้อคอร์สสำเร็จ' : 'ทำรายการสั่งซื้อ', description: `${data.courses.find((course) => course.id === entry.courseId)?.title ?? 'ไม่พบข้อมูลคอร์ส'} · ${entry.method || 'ไม่ระบุช่องทาง'} · ${formatPrice(entry.amount)}`, icon: <DollarOutlined />, status: entry.status })),
+    ...attempts.flatMap((entry) => entry.submittedAt ? [{ id: `attempt-${entry.id}`, date: entry.submittedAt, title: 'ส่งคำตอบแบบทดสอบ', description: data.quizzes.find((quiz) => quiz.id === entry.quizId)?.title ?? 'แบบทดสอบ', icon: <ClockCircleOutlined />, status: entry.passed === true ? 'ผ่าน' : entry.passed === false ? 'ยังไม่ผ่าน' : 'รอตรวจ' }] : []),
+    ...certificates.map((entry) => ({ id: `certificate-${entry.id}`, date: entry.issuedAt, title: 'ได้รับใบรับรอง', description: data.courses.find((course) => course.id === entry.courseId)?.title ?? 'ไม่พบข้อมูลคอร์ส', icon: <TrophyOutlined /> })),
+  ].filter((entry) => !Number.isNaN(new Date(entry.date).getTime())).sort((a, b) => b.date.localeCompare(a.date));
+  const profileItems: [string, string | string[] | undefined][] = [
+    ['ชื่อผู้ใช้', user.username], ['ชื่อจริง (ไทย)', [user.firstName, user.lastName].filter(Boolean).join(' ')],
+    ['ชื่อจริง (English)', [user.firstNameEnglish, user.lastNameEnglish].filter(Boolean).join(' ')], ['ชื่อบนใบรับรอง', user.certificateName],
+    ['วันเกิด', user.birthDate ? formatDate(user.birthDate) : undefined], ['เบอร์โทรศัพท์', user.phone], ['โรงเรียน / มหาวิทยาลัย', user.school],
+    ['ระดับการศึกษา', user.educationLevel], ['วิชาที่สนใจ', user.interests], ['เป้าหมายการเรียน', user.learningGoals],
+    ['Google ที่เชื่อมไว้ (สถานะเดโม)', user.googleLinkedEmail], ['แนะนำตัว', user.bio],
+  ];
+
   return (
     <>
-      <PageTitle
-        eyebrow="ผู้ใช้งาน"
-        title={user.name}
-        subtitle={user.email}
-        actions={
-          <Link to="/admin/users">
-            <Button>กลับรายการ</Button>
-          </Link>
-        }
-      />
-      <Descriptions bordered column={1}>
-        <Descriptions.Item label="รหัสบัญชี">{user.id}</Descriptions.Item>
-        <Descriptions.Item label="อีเมล">{user.email}</Descriptions.Item>
-        <Descriptions.Item label="สถานะ">{user.status}</Descriptions.Item>
-        <Descriptions.Item label="เปลี่ยนบทบาท">
-          <Select
-            value={user.role}
-            style={{ width: 180 }}
-            onChange={(role: Role) => changeUserRole(user.id, role)}
-            options={[
-              { value: 'learner', label: 'ผู้เรียน' },
-              { value: 'instructor', label: 'ผู้สอน' },
-              { value: 'admin', label: 'แอดมิน' },
-            ]}
-          />
-        </Descriptions.Item>
-        <Descriptions.Item label="แนะนำตัว">{user.bio || '—'}</Descriptions.Item>
-      </Descriptions>
+      <div className="admin-user-detail-heading">
+        <Avatar size={58} src={user.avatar}>{user.name.slice(0, 1) || <UserOutlined />}</Avatar>
+        <div className="admin-user-detail-identity"><Text type="secondary">บัญชีผู้ใช้ · {user.id}</Text><Title level={2}>{user.name}</Title><Text>{user.email}{user.username ? ` · @${user.username}` : ''}</Text></div>
+        <div className="admin-user-detail-status"><Tag color={user.status === 'active' ? 'success' : 'processing'}>{user.status === 'active' ? 'ใช้งาน' : user.status === 'suspended' ? 'ระงับ' : user.status === 'invited' ? 'ส่งคำเชิญแล้ว' : 'รอเปิดใช้งาน'}</Tag><Link to="/admin/users"><Button>กลับรายการ</Button></Link></div>
+      </div>
+      <div className="admin-user-metrics"><div><span>คอร์สที่ลงทะเบียน</span><strong>{enrollments.length}</strong></div><div><span>ยอดซื้อที่ชำระแล้ว</span><strong>{formatPrice(paidTotal)}</strong></div><div><span>ใบรับรอง</span><strong>{certificates.length}</strong></div><div><span>กิจกรรมที่มีวันที่</span><strong>{events.length}</strong></div></div>
+      <Tabs className="admin-user-tabs" items={[
+        { key: 'profile', label: 'ข้อมูลบัญชี', children: <div className="admin-user-tab-content"><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>บัญชีและสิทธิ์</Title><Text type="secondary">ข้อมูลระบุตัวตนและบทบาทของบัญชี</Text></div></div><Descriptions bordered size="small" column={2}><Descriptions.Item label="รหัสบัญชี">{user.id}</Descriptions.Item><Descriptions.Item label="อีเมลเข้าสู่ระบบ">{user.email}</Descriptions.Item><Descriptions.Item label="สถานะ">{user.status ?? 'pending'}</Descriptions.Item><Descriptions.Item label="บทบาท"><Select aria-label="เปลี่ยนบทบาทผู้ใช้" value={user.role} style={{ width: 160 }} onChange={(role: Role) => { changeUserRole(user.id, role); message.success('ปรับบทบาทแล้ว'); }} options={[{ value: 'learner', label: 'ผู้เรียน' }, { value: 'instructor', label: 'ผู้สอน' }, { value: 'admin', label: 'แอดมิน' }]}/></Descriptions.Item></Descriptions></section><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>ข้อมูลส่วนตัวและการเรียน</Title><Text type="secondary">ข้อมูลที่ผู้ใช้กรอกไว้ในโปรไฟล์</Text></div></div><Descriptions bordered size="small" column={2}>{profileItems.map(([label, value]) => <Descriptions.Item key={label} label={label}>{Array.isArray(value) ? value.join(' · ') || '—' : value || '—'}</Descriptions.Item>)}</Descriptions></section><Alert type="info" showIcon message="ข้อมูลโปรไฟล์ที่ยังไม่ได้กรอกจะแสดงเป็น —"/></div> },
+        { key: 'learning', label: 'การเรียนและผลลัพธ์', children: <div className="admin-user-tab-content"><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>คอร์สที่ลงทะเบียน</Title><Text type="secondary">ความคืบหน้าคำนวณจากบทเรียนและแบบทดสอบที่บันทึกไว้</Text></div><Tag color="blue">{enrollments.length} คอร์ส</Tag></div>{enrollments.length ? <div className="admin-user-course-list">{enrollments.map((entry) => { const course = data.courses.find((item) => item.id === entry.courseId); return <div className="admin-user-course-row" key={entry.id}><div className="admin-user-course-main"><strong>{course?.title ?? 'ไม่พบข้อมูลคอร์ส'}</strong><Text type="secondary">ลงทะเบียน {formatDate(entry.createdAt)}{course ? ` · ${course.category} · ${course.level || 'ไม่ระบุระดับ'}` : ''}</Text></div>{course && <div className="admin-user-course-progress"><CourseProgress course={course} data={data} userId={user.id}/></div>}</div>; })}</div> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="ยังไม่มีประวัติลงทะเบียนคอร์ส"/>}</section><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>ผลแบบทดสอบ</Title><Text type="secondary">รายการคำตอบที่ผู้เรียนส่งและสถานะการตรวจ</Text></div></div><Table size="small" rowKey="id" columns={attemptColumns} dataSource={attempts} pagination={{ pageSize: 5, hideOnSinglePage: true }} locale={{ emptyText: 'ยังไม่มีประวัติส่งแบบทดสอบ' }} scroll={{ x: 650 }}/></section><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>ใบรับรอง</Title><Text type="secondary">ใบรับรองที่ออกให้บัญชีนี้</Text></div><Tag color="blue">{certificates.length} ใบ</Tag></div>{certificates.length ? <Table size="small" rowKey="id" dataSource={certificates} pagination={false} columns={[{ title: 'คอร์ส', render: (_, cert) => data.courses.find((course) => course.id === cert.courseId)?.title ?? 'ไม่พบข้อมูลคอร์ส' }, { title: 'ชื่อผู้รับ', dataIndex: 'recipientName', render: (value: string | undefined) => value || user.certificateName || user.name }, { title: 'วันที่ออก', dataIndex: 'issuedAt', render: (value: string) => formatDate(value) }, { title: 'รหัสตรวจสอบ', dataIndex: 'code' }]} scroll={{ x: 520 }}/>: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="ยังไม่มีใบรับรอง"/>}</section></div> },
+        { key: 'purchases', label: 'การซื้อและการชำระเงิน', children: <div className="admin-user-tab-content"><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>ประวัติซื้อคอร์ส</Title><Text type="secondary">แสดงรายการชำระเงินที่บันทึกไว้ในข้อมูลตัวอย่าง</Text></div><div className="admin-user-paid-total"><Text type="secondary">ยอดชำระสำเร็จ</Text><strong>{formatPrice(paidTotal)}</strong></div></div><Table size="small" rowKey="id" columns={orderColumns} dataSource={orders} pagination={{ pageSize: 6, hideOnSinglePage: true }} locale={{ emptyText: 'ยังไม่มีประวัติซื้อคอร์ส' }} scroll={{ x: 760 }}/></section><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>ประวัติเติมเงิน</Title><Text type="secondary">กระเป๋าเงินและรายการเติมเงินของผู้ใช้</Text></div></div><Alert type="info" showIcon message="ต้นแบบนี้ยังไม่มีระบบกระเป๋าเงินหรือข้อมูลประวัติเติมเงิน" description="จึงยังไม่มียอดคงเหลือหรือรายการเติมเงินให้ตรวจสอบ ยอดด้านบนรวมเฉพาะคำสั่งซื้อคอร์สที่สถานะชำระแล้ว"/></section></div> },
+        { key: 'activity', label: 'กิจกรรมในระบบ', children: <div className="admin-user-tab-content"><section className="admin-user-section"><div className="admin-user-section-heading"><div><Title level={5}>ประวัติกิจกรรม</Title><Text type="secondary">เรียงจากรายการล่าสุด โดยแสดงเฉพาะกิจกรรมที่มีวันที่บันทึกไว้</Text></div><Tag color="blue">{events.length} รายการ</Tag></div>{events.length ? <ol className="admin-user-timeline">{events.map((event) => <li key={event.id}><span className="admin-user-timeline-icon">{event.icon}</span><div className="admin-user-timeline-copy"><strong>{event.title}</strong><span>{event.description}</span><time>{formatDate(event.date, true)}</time></div>{event.status && <Tag>{event.status}</Tag>}</li>)}</ol> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="ยังไม่มีประวัติกิจกรรมที่บันทึกไว้"/>}<Alert className="admin-user-activity-note" type="info" showIcon message="ความคืบหน้ารายบทเรียนแสดงในแท็บการเรียน แต่ต้นแบบยังไม่ได้บันทึกเวลาแยกของแต่ละบท"/></section></div> },
+      ]}/>
     </>
   );
 }

@@ -3,6 +3,7 @@ import { Button, Col, Input, Row, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useLms } from '../../store';
 import { CourseCard, PageTitle } from '../../components/common';
+import { CourseCartButton } from '../../components/CourseCartButton';
 import { matchesDirectorySearch } from '../../components/DirectorySearch';
 
 export function PublicCatalogPage() {
@@ -52,7 +53,11 @@ export function PublicCatalogPage() {
         <Row gutter={[22, 22]} className="catalog-grid">
           {courses.map((course) => (
             <Col xs={24} sm={12} xl={8} key={course.id}>
-              <CourseCard course={course} data={data} />
+              <CourseCard
+                course={course}
+                data={data}
+                action={course.price > 0 ? <CourseCartButton course={course} block /> : null}
+              />
             </Col>
           ))}
         </Row>

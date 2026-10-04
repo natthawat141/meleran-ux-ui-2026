@@ -60,7 +60,7 @@ export function BusinessAnalyticsPage({ courses }: { courses: ReportCourse[] }) 
         { title: 'ลงทะเบียน', dataIndex: 'enrollments', align: 'right' }, { title: 'ซื้อสำเร็จ', dataIndex: 'purchases', align: 'right' },
         { title: 'ยอดชำระ', dataIndex: 'collected', align: 'right', render: money },
       ]} /></section>
-      <p className="report-footnote">ข้อมูลตัวอย่างใช้ตรวจ UX และสูตร ยังไม่มีระบบเก็บทราฟฟิกจริง · <Link to="/admin/finance">เปิดรายงานการเงิน</Link></p>
+      <p className="report-footnote">ข้อมูลตัวอย่างใช้ตรวจ UX และสูตร ยังไม่มีระบบเก็บทราฟฟิกจริง · <Link to="/admin/reports/finance">เปิดรายงานการเงิน</Link></p>
     </>}
   </div>;
 }
