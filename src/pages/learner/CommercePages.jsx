@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Descriptions, Empty, Form, Radio, Result, Space, Table, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined, CreditCardOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store.jsx';
 import { PageTitle, StatusTag } from '../../components/common.jsx';
 import { formatPrice, instructorFor } from '../../data.js';
@@ -10,15 +10,18 @@ const { Title, Text, Paragraph } = Typography;
 
 export function CheckoutPage() {
   const { courseId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { data, currentUser, simulatePayment } = useLms();
   const [outcome, setOutcome] = useState('paid');
+  const referralCode = new URLSearchParams(location.search).get('ref')?.trim();
+  const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
   const course = data.courses.find((item) => item.id === courseId);
   if (!course) return <Empty description="ไม่พบคอร์สนี้"/>;
   if (course.price <= 0) return <Result status="info" title="คอร์สนี้เรียนฟรี" subTitle="สมัครเรียนได้จากหน้ารายละเอียดคอร์ส" extra={<Link to={`/explore/courses/${course.slug}`}><Button type="primary">กลับไปสมัครเรียนฟรี</Button></Link>}/>;
   const teacher = instructorFor(data, course);
-  const order = () => { const orderId = simulatePayment(courseId, outcome); navigate(`/checkout/${orderId}/result`); };
-  return <div className="checkout-page"><Link to={`/courses/${course.slug}`}><ArrowLeftOutlined/> กลับหน้าคอร์ส</Link><PageTitle eyebrow="ชำระเงินจำลอง" title="ตรวจสอบรายการสั่งซื้อ" subtitle="การชำระเงินในต้นแบบใช้ข้อมูลจำลอง ไม่มีการรับข้อมูลบัตรจริง"/><div className="checkout-grid"><section className="checkout-main"><Title level={4}>เลือกผลการชำระเพื่อทดลอง</Title><Radio.Group value={outcome} onChange={(event) => setOutcome(event.target.value)} className="payment-outcomes"><Radio value="paid"><span><strong>ชำระสำเร็จ</strong><small>เพิ่มคอร์สในรายการเรียนทันที</small></span></Radio><Radio value="failed"><span><strong>ชำระไม่สำเร็จ</strong><small>สร้างรายการที่ไม่สำเร็จ ทดลองใหม่ได้</small></span></Radio></Radio.Group><Alert showIcon type="info" message="วิธีชำระเงิน: บัตรจำลอง" description="ไม่ต้องกรอกหมายเลขบัตรหรือข้อมูลการเงินจริง"/></section><aside className="checkout-summary"><Title level={4}>สรุปคำสั่งซื้อ</Title><div className="checkout-course"><img src={course.cover} alt=""/><div><Text strong>{course.title}</Text><Text type="secondary">ผู้สอน {teacher?.name}</Text></div></div><Descriptions column={1} size="small"><Descriptions.Item label="ราคา">{formatPrice(course.price)}</Descriptions.Item><Descriptions.Item label="ยอดรวม"><strong>{formatPrice(course.price)}</strong></Descriptions.Item></Descriptions><Button block size="large" type="primary" icon={<CreditCardOutlined/>} onClick={order}>ยืนยันการชำระ</Button><Text className="secure-note"><SafetyCertificateOutlined/> จัดทำเพื่อทดลอง UX เท่านั้น</Text></aside></div></div>;
+  const order = () => { const orderId = simulatePayment(courseId, outcome, referralCode); navigate(`/checkout/${orderId}/result`); };
+  return <div className="checkout-page"><Link to={`/courses/${course.slug}${referralQuery}`}><ArrowLeftOutlined/> กลับหน้าคอร์ส</Link><PageTitle eyebrow="ชำระเงินจำลอง" title="ตรวจสอบรายการสั่งซื้อ" subtitle="การชำระเงินในต้นแบบใช้ข้อมูลจำลอง ไม่มีการรับข้อมูลบัตรจริง"/><div className="checkout-grid"><section className="checkout-main"><Title level={4}>เลือกผลการชำระเพื่อทดลอง</Title><Radio.Group value={outcome} onChange={(event) => setOutcome(event.target.value)} className="payment-outcomes"><Radio value="paid"><span><strong>ชำระสำเร็จ</strong><small>เพิ่มคอร์สในรายการเรียนทันที</small></span></Radio><Radio value="failed"><span><strong>ชำระไม่สำเร็จ</strong><small>สร้างรายการที่ไม่สำเร็จ ทดลองใหม่ได้</small></span></Radio></Radio.Group><Alert showIcon type="info" message="วิธีชำระเงิน: บัตรจำลอง" description="ไม่ต้องกรอกหมายเลขบัตรหรือข้อมูลการเงินจริง"/></section><aside className="checkout-summary"><Title level={4}>สรุปคำสั่งซื้อ</Title><div className="checkout-course"><img src={course.cover} alt=""/><div><Text strong>{course.title}</Text><Text type="secondary">ผู้สอน {teacher?.name}</Text></div></div><Descriptions column={1} size="small"><Descriptions.Item label="ราคา">{formatPrice(course.price)}</Descriptions.Item><Descriptions.Item label="ยอดรวม"><strong>{formatPrice(course.price)}</strong></Descriptions.Item></Descriptions><Button block size="large" type="primary" icon={<CreditCardOutlined/>} onClick={order}>ยืนยันการชำระ</Button><Text className="secure-note"><SafetyCertificateOutlined/> จัดทำเพื่อทดลอง UX เท่านั้น</Text></aside></div></div>;
 }
 
 export function CheckoutResultPage() {
@@ -27,7 +30,8 @@ export function CheckoutResultPage() {
   const order = data.orders.find((item) => item.id === orderId);
   const course = data.courses.find((item) => item.id === order?.courseId);
   if (!order) return <Empty description="ไม่พบรายการนี้"/>;
-  return <div className="checkout-result"><Result status={order.status === 'paid' ? 'success' : 'error'} title={order.status === 'paid' ? 'ชำระเงินสำเร็จ' : 'การชำระเงินไม่สำเร็จ'} subTitle={order.status === 'paid' ? `${course?.title} ถูกเพิ่มไว้ในคอร์สของคุณแล้ว` : 'รายการนี้ยังไม่ได้เปิดสิทธิ์เข้าเรียน คุณกลับไปลองชำระอีกครั้งได้'} extra={<Space wrap>{order.status === 'paid' && <Link to={`/learn/courses/${course?.id}`}><Button type="primary">เริ่มเรียน</Button></Link>}<Link to={`/checkout/${course?.id}`}><Button>{order.status === 'paid' ? 'ดูคอร์ส' : 'ลองชำระอีกครั้ง'}</Button></Link><Link to="/account/orders"><Button>ดูรายการซื้อ</Button></Link></Space>}/></div>;
+  const referralQuery = order.referralCode ? `?ref=${encodeURIComponent(order.referralCode)}` : '';
+  return <div className="checkout-result"><Result status={order.status === 'paid' ? 'success' : 'error'} title={order.status === 'paid' ? 'ชำระเงินสำเร็จ' : 'การชำระเงินไม่สำเร็จ'} subTitle={order.status === 'paid' ? `${course?.title} ถูกเพิ่มไว้ในคอร์สของคุณแล้ว` : 'รายการนี้ยังไม่ได้เปิดสิทธิ์เข้าเรียน คุณกลับไปลองชำระอีกครั้งได้'} extra={<Space wrap>{order.status === 'paid' && <Link to={`/learn/courses/${course?.id}`}><Button type="primary">เริ่มเรียน</Button></Link>}<Link to={`/checkout/${course?.id}${referralQuery}`}><Button>{order.status === 'paid' ? 'ดูคอร์ส' : 'ลองชำระอีกครั้ง'}</Button></Link><Link to="/account/orders"><Button>ดูรายการซื้อ</Button></Link></Space>}/></div>;
 }
 
 export function OrdersPage() {

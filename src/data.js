@@ -18,8 +18,8 @@ export const seedCourseCoverReplacements = {
   'course-focus': { from: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85', previousGenerated: 'course-focus-v1', to: focusCover },
 };
 
-const instructorA = { id: 'u-nalin', name: 'นลิน วัฒนา', email: 'teacher@learn.demo', password: 'Teach123!', role: 'instructor', bio: 'นักออกแบบการเรียนรู้ที่เชื่อว่าทักษะใหม่เริ่มจากการลงมือทำทีละขั้น', status: 'active' };
-const instructorB = { id: 'u-than', name: 'ธนา พูลผล', email: 'than@learn.demo', password: 'Teach123!', role: 'instructor', bio: 'ทำงานด้านข้อมูลและการสื่อสารด้วยภาพมากกว่า 10 ปี', status: 'active' };
+const instructorA = { id: 'u-nalin', name: 'นลิน วัฒนา', email: 'teacher@learn.demo', password: 'Teach123!', role: 'instructor', bio: 'นักออกแบบการเรียนรู้ที่เชื่อว่าทักษะใหม่เริ่มจากการลงมือทำทีละขั้น', status: 'active', baseSharePercent: 65, referralSharePercent: 80 };
+const instructorB = { id: 'u-than', name: 'ธนา พูลผล', email: 'than@learn.demo', password: 'Teach123!', role: 'instructor', bio: 'ทำงานด้านข้อมูลและการสื่อสารด้วยภาพมากกว่า 10 ปี', status: 'active', baseSharePercent: 70, referralSharePercent: 85 };
 const learner = { id: 'u-natee', name: 'นที ใจดี', email: 'learner@learn.demo', password: 'Learn123!', role: 'learner', bio: '', status: 'active' };
 const admin = { id: 'u-admin', name: 'กานต์ ดูแลระบบ', email: 'admin@learn.demo', password: 'Admin123!', role: 'admin', bio: '', status: 'active' };
 
@@ -111,10 +111,27 @@ export const initialData = {
       { id: 'qf-1', type: 'choice', prompt: 'การวางแผนสัปดาห์ที่ยืดหยุ่นควรทำอย่างไร', options: ['ใส่ทุกนาทีให้เต็ม', 'เผื่อพื้นที่สำหรับงานที่เปลี่ยนแปลง', 'ไม่ต้องทบทวนแผน'], answer: 1, points: 1 },
     ] },
   ],
-  enrollments: [{ id: 'enroll-writing', courseId: 'course-writing', userId: learner.id, createdAt: '2026-09-10' }],
+  enrollments: [
+    { id: 'enroll-writing', courseId: 'course-writing', userId: learner.id, createdAt: '2026-09-10' },
+    { id: 'enroll-focus-direct', courseId: 'course-focus', userId: learner.id, createdAt: '2026-09-28T09:00:00.000Z' },
+    { id: 'enroll-focus-referral', courseId: 'course-focus', userId: 'demo-learner-2', referralCode: 'NALIN-FOCUS', referralLinkId: 'ref-seed-nalin-focus', referralInstructorId: instructorA.id, createdAt: '2026-09-29T10:00:00.000Z' },
+    { id: 'enroll-data-direct', courseId: 'course-data', userId: learner.id, createdAt: '2026-09-27T10:00:00.000Z' },
+    { id: 'enroll-data-referral', courseId: 'course-data', userId: 'demo-learner-3', referralCode: 'THANA-DATA', referralLinkId: 'ref-seed-thana-data', referralInstructorId: instructorB.id, createdAt: '2026-09-30T10:00:00.000Z' },
+  ],
   progress: {},
   attempts: [],
-  orders: [],
+  orders: [
+    { id: 'order-demo-focus-direct', courseId: 'course-focus', userId: learner.id, amount: 490, status: 'paid', method: 'บัตรจำลอง', createdAt: '2026-09-28T09:00:00.000Z', instructorId: instructorA.id, instructorSharePercent: 65, instructorShareAmount: 318.5, platformShareAmount: 171.5, payoutStatus: 'pending', demoFinance: true },
+    { id: 'order-demo-focus-referral', courseId: 'course-focus', userId: 'demo-learner-2', amount: 490, status: 'paid', method: 'บัตรจำลอง', createdAt: '2026-09-29T10:00:00.000Z', instructorId: instructorA.id, instructorSharePercent: 80, instructorShareAmount: 392, platformShareAmount: 98, referralCode: 'NALIN-FOCUS', referralLinkId: 'ref-seed-nalin-focus', payoutStatus: 'pending', demoFinance: true },
+    { id: 'order-demo-data-direct', courseId: 'course-data', userId: learner.id, amount: 890, status: 'paid', method: 'บัตรจำลอง', createdAt: '2026-09-27T10:00:00.000Z', instructorId: instructorB.id, instructorSharePercent: 70, instructorShareAmount: 623, platformShareAmount: 267, payoutStatus: 'pending', demoFinance: true },
+    { id: 'order-demo-data-referral', courseId: 'course-data', userId: 'demo-learner-3', amount: 890, status: 'paid', method: 'บัตรจำลอง', createdAt: '2026-09-30T10:00:00.000Z', instructorId: instructorB.id, instructorSharePercent: 85, instructorShareAmount: 756.5, platformShareAmount: 133.5, referralCode: 'THANA-DATA', referralLinkId: 'ref-seed-thana-data', payoutStatus: 'pending', demoFinance: true },
+  ],
+  referralLinks: [
+    { id: 'ref-seed-nalin-focus', code: 'NALIN-FOCUS', instructorId: instructorA.id, courseId: 'course-focus', createdAt: '2026-09-20T09:00:00.000Z' },
+    { id: 'ref-seed-thana-data', code: 'THANA-DATA', instructorId: instructorB.id, courseId: 'course-data', createdAt: '2026-09-20T09:00:00.000Z' },
+  ],
+  instructorPayouts: [],
+  financeDemoSeedVersion: 'instructor-earnings-v1',
   certificates: [],
   instructorRequests: [{ id: 'req-demo', userName: 'ศศิ ธรรมดี', email: 'sasi@example.test', intro: 'อยากแบ่งปันความรู้ด้านการทำงาน', status: 'pending', createdAt: '2026-09-18' }],
   invitations: [],

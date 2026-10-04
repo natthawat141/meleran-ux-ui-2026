@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, Avatar, Button, Col, Input, Row, Space, Tag, Typography } from 'antd';
 import { ArrowRightOutlined, BookOutlined, CheckCircleOutlined, ClockCircleOutlined, PlayCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../store.jsx';
 import { CourseCard, PageTitle, SectionHeading } from '../components/common.jsx';
 import { getCoursePreviewLesson } from '../lib/course-preview.ts';
@@ -20,6 +20,7 @@ export function CatalogPage() {
 
 export function CourseDetailPage() {
   const { slug } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { data, currentUser, enrollFree } = useLms();
   const course = data.courses.find((item) => (item.slug === slug || item.id === slug) && item.status === 'published');
@@ -27,10 +28,12 @@ export function CourseDetailPage() {
   const teacher = instructorFor(data, course);
   const hasPreview = Boolean(getCoursePreviewLesson(course));
   const enrolled = data.enrollments.some((entry) => entry.courseId === course.id && entry.userId === currentUser?.id);
+  const referralCode = new URLSearchParams(location.search).get('ref')?.trim();
+  const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
   const start = () => {
-    if (!currentUser) { navigate(`/login?next=${encodeURIComponent(`/courses/${course.slug}`)}`); return; }
-    if (course.price === 0) { enrollFree(course.id); navigate(`/learn/courses/${course.id}`); }
-    else navigate(`/checkout/${course.id}`);
+    if (!currentUser) { navigate(`/login?next=${encodeURIComponent(`/courses/${course.slug}${referralQuery}`)}`); return; }
+    if (course.price === 0) { enrollFree(course.id, undefined, referralCode); navigate(`/learn/courses/${course.id}`); }
+    else navigate(`/checkout/${course.id}${referralQuery}`);
   };
   return <div className="public-page course-detail-page">
     <div className="detail-hero"><div className="detail-hero-copy"><Space><Tag>{course.category}</Tag><Text type="secondary">ระดับ {course.level}</Text></Space><Title>{course.title}</Title><Paragraph>{course.subtitle}</Paragraph><div className="teacher-byline"><Avatar>{teacher?.name?.slice(0, 1)}</Avatar><div><Text type="secondary">สอนโดย</Text><Link to={`/instructors/${teacher?.id}`}>{teacher?.name}</Link></div></div><div className="detail-hero-actions"><Button size="large" type="primary" onClick={enrolled ? () => navigate(`/learn/courses/${course.id}`) : start}>{enrolled ? 'ไปยังบทเรียน' : course.price === 0 ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'} <ArrowRightOutlined /></Button>{hasPreview && <Link to={`/courses/${course.slug}/preview`}><Button>ทดลองเรียนบทแรก</Button></Link>}<Text className="detail-price">{formatPrice(course.price)}</Text></div></div><div className="detail-cover"><img src={course.cover} alt={`ภาพประกอบคอร์ส ${course.title}`}/><span><PlayCircleOutlined /> เรียนด้วยตัวเอง</span></div></div>
