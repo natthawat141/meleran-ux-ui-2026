@@ -17,6 +17,22 @@
   background: #fff;
 }
 
+.home-v3:has(.home-hero) .home-hero-layout {
+  position: relative;
+}
+
+.home-v3:has(.home-hero) .home-hero-layout::before {
+  content: '';
+  position: absolute;
+  top: 9%;
+  right: 18%;
+  width: 72px;
+  height: 48px;
+  background-image: radial-gradient(circle, rgb(0 116 232 / 35%) 2px, transparent 2.5px);
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+
 .home-v3:has(.home-hero) .home-hero::before,
 .home-v3:has(.home-hero) .home-hero::after {
   content: '';
@@ -89,11 +105,75 @@
 }
 
 .home-v3:has(.home-hero) .brand-team-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: min(1320px, calc(100% - 40px));
   margin-inline: auto;
   padding-block: 68px;
-  background: var(--home-soft-sky);
+  background-color: var(--home-yellow-soft);
+  background-image:
+    radial-gradient(circle, rgb(0 116 232 / 24%) 2px, transparent 2.5px),
+    radial-gradient(circle, transparent 0 22px, var(--home-yellow-accent) 23px 26px, transparent 27px);
+  background-repeat: no-repeat;
+  background-position: 25px 22px, right 28px top 22px;
+  background-size: 40px 40px, 66px 66px;
   border-radius: 48px;
+}
+
+.home-v3:has(.home-hero) .brand-introduction {
+  position: relative;
+}
+
+.home-v3:has(.home-hero) .brand-introduction::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  width: 76px;
+  height: 48px;
+  background-image:
+    radial-gradient(circle, rgb(0 116 232 / 28%) 2px, transparent 2.5px),
+    radial-gradient(circle, transparent 0 12px, var(--home-yellow-accent) 13px 15px, transparent 16px);
+  background-size: 12px 12px, 34px 34px;
+  background-position: 0 0, right top;
+  background-repeat: repeat, no-repeat;
+  pointer-events: none;
+}
+
+.home-v3:has(.home-hero) .brand-introduction > .brand-kicker,
+.home-v3:has(.home-hero) .brand-introduction-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.home-v3:has(.home-hero) .home-teachers {
+  position: relative;
+}
+
+.home-v3:has(.home-hero) .home-teachers::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: 76px;
+  height: 48px;
+  background-image:
+    radial-gradient(circle, rgb(0 116 232 / 28%) 2px, transparent 2.5px),
+    radial-gradient(circle, transparent 0 12px, var(--home-yellow-accent) 13px 15px, transparent 16px);
+  background-size: 12px 12px, 34px 34px;
+  background-position: 0 0, right top;
+  background-repeat: repeat, no-repeat;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .home-v3:has(.home-hero) .home-teachers::before {
+    top: 5px;
+    width: 72px;
+    height: 32px;
+    background-size: 12px 12px, 28px 28px;
+  }
 }
 
 .home-v3:has(.home-hero) .brand-team-layout {
