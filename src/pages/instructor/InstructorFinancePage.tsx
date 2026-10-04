@@ -5,6 +5,7 @@ import { useLms } from '../../store';
 import { PageTitle, SectionHeading } from '../../components/common';
 import { formatPrice } from '../../data';
 import { instructorShareForOrder, isReferralOrder } from '../finance/finance-utils.ts';
+import { orderChannelLabel } from '../../lib/access-code-utils';
 import type { Course, ReferralLink } from '../../types';
 import '../finance/finance.css';
 
@@ -23,6 +24,12 @@ export function InstructorFinancePage() {
   const earned = orders.reduce((sum, order) => sum + instructorShareForOrder(data, order), 0);
   const referredOrders = orders.filter(isReferralOrder);
   const referralEarned = referredOrders.reduce((sum, order) => sum + instructorShareForOrder(data, order), 0);
+  const cashOrders = orders.filter((order) => orderChannelLabel(order) === 'เงินสดผ่านโค้ด');
+  const systemOrders = orders.filter((order) => orderChannelLabel(order) === 'ชำระผ่านระบบ');
+  const freeCodeCount = orders.filter((order) => orderChannelLabel(order) === 'โค้ดเรียนฟรี').length;
+  const cashGross = cashOrders.reduce((sum, order) => sum + Number(order.amount || 0), 0);
+  const cashEarned = cashOrders.reduce((sum, order) => sum + instructorShareForOrder(data, order), 0);
+  const systemGross = systemOrders.reduce((sum, order) => sum + Number(order.amount || 0), 0);
   const platformShare = gross - earned;
   const links = (data.referralLinks ?? []).filter((link) => link.instructorId === currentUser?.id);
   const rate = Number(currentUser?.baseSharePercent ?? 70);
@@ -74,6 +81,7 @@ export function InstructorFinancePage() {
       <div className="finance-kpi"><Text type="secondary">ส่วนแบ่งของคุณ</Text><strong>{money(earned)}</strong><Text type="secondary">แพลตฟอร์มรับ {money(platformShare)}</Text></div>
       <div className="finance-kpi"><Text type="secondary">ส่วนแบ่งจากลิงก์แนะนำ</Text><strong>{money(referralEarned)}</strong><Text type="secondary">{referredOrders.length} รายการชำระ</Text></div>
     </div>
+    <div className="finance-source-breakdown" aria-label="ยอดขายแยกตามช่องทาง"><div><Text type="secondary">ชำระผ่านระบบ</Text><strong>{money(systemGross)}</strong><Text type="secondary">ยอดขาย {systemOrders.length} รายการ</Text></div><div><Text type="secondary">เงินสดผ่านโค้ด</Text><strong>{money(cashGross)}</strong><Text type="secondary">ส่วนแบ่งของคุณ {money(cashEarned)} · {cashOrders.length} รายการ</Text></div><div><Text type="secondary">ใช้โค้ดเรียนฟรี</Text><strong>{freeCodeCount} รายการ</strong><Text type="secondary">ไม่สร้างรายได้หรือส่วนแบ่ง</Text></div></div>
     <section className="finance-section">
       <SectionHeading title="อัตราส่วนแบ่งของคุณ" description="อัตราปัจจุบันที่แอดมินกำหนดเป็นรายบุคคล"/>
       <div className="finance-rate-summary"><div><span>คอร์สทั่วไป</span><div className="finance-rate-values"><strong>คุณ {rate}%</strong><Text type="secondary">แพลตฟอร์ม {100 - rate}%</Text></div></div><div><span>ผู้เรียนที่มาจากลิงก์แนะนำ</span><div className="finance-rate-values"><strong>คุณ {referralRate}%</strong><Text type="secondary">แพลตฟอร์ม {100 - referralRate}%</Text></div></div></div>

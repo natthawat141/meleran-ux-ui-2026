@@ -9,6 +9,7 @@ import { CourseLessonPreviewPage } from './pages/public/CourseLessonPreviewPage'
 import { MemberCatalogPage } from './pages/member/CatalogPage';
 import { MemberCourseDetailPage } from './pages/member/CourseDetailPage';
 import { AdminOrdersPage } from './pages/admin/OrderPages';
+import { AccessCodesPage } from './pages/admin/AccessCodesPage';
 import { AdminCertificatesPage } from './pages/admin/CertificatePages';
 import { LandingPage } from './pages/landing/LandingPage';
 import { AboutPage } from './pages/landing/AboutPage';
@@ -234,6 +235,7 @@ export function AppRoutes() {
       <Route path="/admin/courses/:courseId" element={admin(<AdminCourseDetailPage />)} />
       <Route path="/admin/orders" element={admin(<AdminOrdersPage />)} />
       <Route path="/admin/orders/:orderId" element={admin(<OrderDetailPage />)} />
+      <Route path="/admin/access-codes" element={admin(<AccessCodesPage />)} />
       <Route path="/admin/certificates" element={admin(<AdminCertificatesPage />)} />
       <Route path="/admin/certificates/:certificateId" element={admin(<CertificateDetailPage />)} />
 

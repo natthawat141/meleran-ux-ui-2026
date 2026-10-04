@@ -185,8 +185,14 @@ export interface Order {
   courseId: string;
   userId: string;
   amount: number;
+  listPrice?: number;
+  discountAmount?: number;
   status: 'pending' | 'paid' | 'failed' | 'cancelled';
   method?: string;
+  source?: 'payment' | 'cash_code' | 'free_code';
+  accessCodeId?: string;
+  accessCode?: string;
+  accessCodeKind?: AccessCodeKind;
   createdAt: string;
   instructorId?: string;
   instructorSharePercent?: number;
@@ -194,10 +200,44 @@ export interface Order {
   platformShareAmount?: number;
   referralLinkId?: string;
   referralCode?: string;
-  payoutStatus?: 'pending' | 'transferred';
+  payoutStatus?: 'pending' | 'transferred' | 'not_applicable';
   payoutId?: string;
   paidOutAt?: string;
   demoFinance?: boolean;
+}
+
+export type AccessCodeKind = 'percent' | 'fixed' | 'free' | 'cash';
+
+export interface AccessCode {
+  id: string;
+  code: string;
+  courseId: string;
+  kind: AccessCodeKind;
+  value?: number;
+  userId?: string;
+  receivedAmount?: number;
+  maxUses: number | null;
+  usedCount: number;
+  status: 'active' | 'inactive';
+  createdAt: string;
+  createdBy: string;
+  expiresAt?: string;
+  lastUsedAt?: string;
+}
+
+export interface CreateAccessCodeInput {
+  courseId: string;
+  kind: AccessCodeKind;
+  code?: string;
+  value?: number | null;
+  userId?: string;
+  receivedAmount?: number | null;
+  maxUses?: number | null;
+  expiresAt?: string;
+}
+
+export interface CreateAccessCodeResult extends ActionResult {
+  accessCode?: AccessCode;
 }
 
 export interface CartItem {
@@ -353,6 +393,7 @@ export interface LmsData {
   attempts: QuizAttempt[];
   enrollments: Enrollment[];
   orders: Order[];
+  accessCodes: AccessCode[];
   cartItems: CartItem[];
   mockPriceEmails: PriceAlertEmail[];
   referralLinks: ReferralLink[];
@@ -433,7 +474,9 @@ export interface LmsContextType {
   saveQuiz: (values: Partial<Quiz>, quizId?: string) => string;
   removeQuiz: (quizId: string) => void;
   enrollFree: (courseId: string, userId?: string, referralCode?: string | null) => void;
-  simulatePayment: (courseId: string, outcome: 'paid' | 'failed', referralCode?: string | null) => string;
+  simulatePayment: (courseId: string, outcome: 'paid' | 'failed', referralCode?: string | null, accessCode?: string) => string | null;
+  createAccessCode: (values: CreateAccessCodeInput) => CreateAccessCodeResult;
+  setAccessCodeStatus: (accessCodeId: string, status: 'active' | 'inactive') => ActionResult;
   addCourseToCart: (courseId: string, referralCode?: string | null) => ActionResult & { alreadyAdded?: boolean };
   removeCourseFromCart: (cartItemId: string) => boolean;
   setCoursePriceAlert: (courseId: string, enabled: boolean) => boolean;

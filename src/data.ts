@@ -330,6 +330,7 @@ export const initialData: LmsData = {
   inboxMessages: [] as InboxMessage[],
   cartItems: [],
   mockPriceEmails: [],
+  accessCodes: [],
   referralLinks: [
     { id: 'ref-seed-nalin-focus', code: 'NALIN-FOCUS', instructorId: instructorA.id, courseId: 'course-focus', createdAt: '2026-09-20T09:00:00.000Z' },
     { id: 'ref-seed-thana-data', code: 'THANA-DATA', instructorId: instructorB.id, courseId: 'course-data', createdAt: '2026-09-20T09:00:00.000Z' },

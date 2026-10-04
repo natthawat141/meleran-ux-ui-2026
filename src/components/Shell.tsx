@@ -81,6 +81,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/admin/inbox', icon: <IconMessages />, label: 'อินบ็อกซ์' },
     { key: '/admin/users', icon: <IconUsers />, label: 'ผู้ใช้งาน' },
     { key: '/admin/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
+    { key: '/admin/access-codes', icon: <IconReceipt />, label: 'โค้ดส่วนลด/เงินสด' },
     { key: '/admin/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
     { key: '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
   ],

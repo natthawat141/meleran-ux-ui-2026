@@ -1,0 +1,79 @@
+.access-codes-page {
+  display: grid;
+  gap: 20px;
+}
+
+.access-code-form-panel,
+.access-code-list-panel {
+  padding: 22px;
+  border: 1px solid #e5eaf1;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.access-code-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.access-code-section-heading h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.access-code-section-heading p {
+  margin: 5px 0 0;
+  color: #778294;
+  font-size: 13px;
+}
+
+.access-code-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: #edf6ff;
+  color: #1677ff;
+}
+
+.access-code-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.access-code-control {
+  width: 100%;
+}
+
+.access-code-cash-note,
+.access-code-demo-note {
+  margin-bottom: 16px;
+}
+
+.access-code-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.04em;
+}
+
+.access-code-cell {
+  display: grid;
+  gap: 3px;
+}
+
+@media (max-width: 700px) {
+  .access-code-form-panel,
+  .access-code-list-panel {
+    padding: 16px;
+  }
+
+  .access-code-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
