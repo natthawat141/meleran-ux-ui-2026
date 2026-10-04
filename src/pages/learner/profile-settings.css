@@ -1,0 +1,20 @@
+.profile-settings-v2 { max-width: 1100px; margin: 0 auto; color: #172b44; }
+.profile-v2-header { display: flex; align-items: center; gap: 20px; padding: 20px 24px; margin-bottom: 18px; border-radius: 20px; background: linear-gradient(115deg,#eff8ff,#fff 70%); border: 1px solid #dceeff; }
+.profile-v2-header h1 { margin: 3px 0 2px; font-size: 26px; }
+.profile-v2-header > div:nth-child(2) { min-width: 0; }
+.profile-v2-eyebrow { color: #0074e8; font-weight: 700; }
+.profile-v2-upload { margin-left: auto; }
+.profile-v2-upload .image-upload-preview { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; }
+.profile-v2-upload .image-upload-preview-img { width: 100%; height: 100%; object-fit: cover; }
+.profile-v2-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.profile-v2-card { padding: 20px 22px 8px; background: white; border: 1px solid #e4edf5; border-radius: 18px; box-shadow: 0 5px 20px #193d5b0a; }
+.profile-v2-card-title { display:flex; align-items:center; gap: 12px; margin-bottom: 18px; }
+.profile-v2-card-title > span { display:grid; place-items:center; width:38px; height:38px; flex:0 0 38px; border-radius:50%; background:#e9f5ff; color:#0074e8; font-weight:700; }
+.profile-v2-card-title h2 { font-size:17px; margin:0 0 2px; }
+.profile-v2-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:14px; }
+.profile-v2-wide { grid-column:1 / -1; }
+.profile-v2-certificate-preview { margin: -2px 0 16px; padding: 12px 14px; border-radius:12px; background:#fff4bf; color:#624e08; }
+.profile-v2-google-state { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px; background:#f5faff; border-radius:12px; }
+.profile-v2-demo-tag { margin: 12px 0 14px; color:#6b7280; font-size:12px; }
+.profile-v2-save { display:flex; justify-content:flex-end; padding:18px 0 28px; }
+@media(max-width:760px) { .profile-v2-grid { grid-template-columns:1fr; } .profile-v2-header { padding:16px; gap:12px; flex-wrap:wrap; } .profile-v2-header h1 {font-size:22px;} .profile-v2-fields {grid-template-columns:1fr;} .profile-v2-wide {grid-column:auto;} .profile-v2-card {padding:18px 16px 6px;} .profile-v2-google-state {align-items:flex-start;flex-direction:column;} }
