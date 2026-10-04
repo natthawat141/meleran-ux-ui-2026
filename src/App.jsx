@@ -23,6 +23,7 @@ import { CoursePreviewPage, InstructorLearnersPage } from './pages/instructor/In
 import { InstructorFinancePage } from './pages/instructor/InstructorFinancePage.jsx';
 import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorRequestsPage, AdminInstructorRequestDetailPage, AdminCoursesPage, AdminCourseDetailPage } from './pages/admin/AdminPages.jsx';
 import { AdminInstructorFinancePage } from './pages/admin/AdminInstructorFinancePage.jsx';
+import { AccessCodesPage } from './pages/admin/AccessCodesPage.jsx';
 import { NoAccessPage, NotFoundPage } from './pages/SystemPages.jsx';
 
 function Public({ children }) { return <PublicShell>{children}</PublicShell>; }
@@ -115,6 +116,7 @@ export function AppRoutes() {
     <Route path="/admin/courses/:courseId" element={admin(<AdminCourseDetailPage/>)}/>
     <Route path="/admin/orders" element={admin(<OrdersPage/>)}/>
     <Route path="/admin/orders/:orderId" element={admin(<OrderDetailPage/>)}/>
+    <Route path="/admin/access-codes" element={admin(<AccessCodesPage/>)}/>
     <Route path="/admin/certificates" element={admin(<CertificatesPage/>)}/>
 
     <Route path="/certificates/verify/:code" element={<Public><VerifyCertificatePage/></Public>}/>

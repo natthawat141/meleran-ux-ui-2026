@@ -122,6 +122,7 @@ export const initialData = {
   attempts: [],
   cartItems: [],
   mockPriceEmails: [],
+  accessCodes: [],
   orders: [
     { id: 'order-demo-focus-direct', courseId: 'course-focus', userId: learner.id, amount: 490, status: 'paid', method: 'บัตรจำลอง', createdAt: '2026-09-28T09:00:00.000Z', instructorId: instructorA.id, instructorSharePercent: 65, instructorShareAmount: 318.5, platformShareAmount: 171.5, payoutStatus: 'pending', demoFinance: true },
     { id: 'order-demo-focus-referral', courseId: 'course-focus', userId: 'demo-learner-2', amount: 490, status: 'paid', method: 'บัตรจำลอง', createdAt: '2026-09-29T10:00:00.000Z', instructorId: instructorA.id, instructorSharePercent: 80, instructorShareAmount: 392, platformShareAmount: 98, referralCode: 'NALIN-FOCUS', referralLinkId: 'ref-seed-nalin-focus', payoutStatus: 'pending', demoFinance: true },

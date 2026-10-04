@@ -34,6 +34,7 @@ const roleMenus = {
     { key: '/admin/users', icon: <IconUsers />, label: 'ผู้ใช้งาน' },
     { key: '/admin/finance', icon: <IconChartBar />, label: 'ส่วนแบ่งและยอดโอน' },
     { key: '/admin/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
+    { key: '/admin/access-codes', icon: <IconReceipt />, label: 'โค้ดส่วนลด/เงินสด' },
     { key: '/admin/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
   ],
 };

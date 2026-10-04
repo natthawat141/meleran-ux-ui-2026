@@ -1,0 +1,20 @@
+.access-codes-page { display: grid; gap: 20px; }
+.access-code-demo-note { border-radius: 12px; }
+.access-code-form-panel,
+.access-code-list-panel { min-width: 0; padding: 22px; border: 1px solid var(--mantine-color-gray-3, #e5e7eb); border-radius: 14px; background: #fff; }
+.access-code-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.access-code-section-heading h2 { margin: 0; color: #24272d; font-size: 18px; font-weight: 650; }
+.access-code-section-heading p { margin: 5px 0 0; color: #737983; font-size: 13px; }
+.access-code-icon { display: grid; width: 38px; height: 38px; place-items: center; flex: 0 0 auto; border-radius: 11px; background: #edf6ff; color: #0074e8; }
+.access-code-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; max-width: 880px; }
+.access-code-control { width: 100%; }
+.access-code-form .ant-form-item-extra { min-height: 20px; font-size: 12px; }
+.access-code-cash-note { margin: 0 0 18px; }
+.access-code-value { color: #006bd5; letter-spacing: .04em; }
+.access-code-cell { display: grid; gap: 2px; }
+.access-code-cell strong { font-weight: 600; }
+.access-codes-page .ant-table-wrapper { max-width: 100%; }
+@media (max-width: 680px) {
+  .access-code-form-panel, .access-code-list-panel { padding: 16px; }
+  .access-code-form-grid { grid-template-columns: 1fr; }
+}

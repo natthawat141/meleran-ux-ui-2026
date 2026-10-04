@@ -313,6 +313,9 @@ h1, h2, h3, h4, h5 { text-wrap: balance; }
 .secure-note { display: block; margin-top: 12px; color: var(--ink-secondary); text-align: center; font-size: 11px; }
 .checkout-result { padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
 .order-details { max-width: 780px; }
+.checkout-code-input { width: 100%; max-width: 480px; }
+.checkout-code-message { margin: 12px 0 18px; }
+.admin-order-channels { margin: 0 0 18px; }
 .certificate-progress { display: grid; gap: 12px; padding: 18px 0; margin-top: 20px; border-top: 1px solid var(--line); }
 .certificate-toolbar { display: flex; justify-content: space-between; margin-bottom: 18px; }
 .certificate-paper { display: flex; min-height: 580px; align-items: center; flex-direction: column; justify-content: center; padding: 55px 32px; color: var(--ink); text-align: center; background: var(--surface); border: 1px solid var(--line); }
