@@ -58,14 +58,16 @@ export function LoginPage() {
       </FieldGroup>
     </form>
     <GoogleAuthOption label="เข้าสู่ระบบด้วย Google" />
-    <div className="auth-switch">ยังไม่มีบัญชี? <Link to="/register">สมัครผู้เรียน</Link></div>
+    <div className="auth-switch">ยังไม่มีบัญชี? <Link to={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}>สมัครผู้เรียน</Link></div>
     <details className="login-demo-accounts"><summary>ดูบัญชีสำหรับทดลอง</summary><div className="login-demo-list">{DEMO_ACCOUNTS.map((account) => <div key={account.role}><span>{account.label}</span><code>{account.email}</code><code>{account.password}</code></div>)}</div></details>
   </AuthPanel>;
 }
 
 export function RegisterPage() {
   const { register } = useLms();
+  const location = useLocation();
   const navigate = useNavigate();
+  const next = new URLSearchParams(location.search).get('next');
   const [error, setError] = useState('');
   const submit = (event) => {
     event.preventDefault();
@@ -77,7 +79,7 @@ export function RegisterPage() {
     if (password !== confirm) { setError('รหัสผ่านไม่ตรงกัน'); return; }
     const result = register({ name, email, password });
     if (!result.ok) { setError(result.message); return; }
-    navigate('/learn');
+    navigate(next || '/learn');
   };
   return <AuthPanel variant="entry" title="สร้างบัญชีผู้เรียน" intro="เริ่มเรียนคอร์สฟรีและติดตามความคืบหน้าของคุณ">
     {error && <UiAlert variant="destructive" className="mb-5"><AlertDescription>{error}</AlertDescription></UiAlert>}
@@ -104,7 +106,7 @@ export function RegisterPage() {
       </FieldGroup>
     </form>
     <GoogleAuthOption label="สมัครด้วย Google" />
-    <div className="auth-switch">มีบัญชีแล้ว? <Link to="/login">เข้าสู่ระบบ</Link></div>
+    <div className="auth-switch">มีบัญชีแล้ว? <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}>เข้าสู่ระบบ</Link></div>
   </AuthPanel>;
 }
 

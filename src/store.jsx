@@ -19,9 +19,28 @@ function loadData() {
           ? { ...course, cover: replacement.to } : course;
       }) : structuredClone(initialData.courses);
       courses.forEach((course) => course.chapters.forEach((chapter) => chapter.items.forEach((item) => { if (!item.id) item.id = createId('item'); })));
-      const users = Array.isArray(parsed.users) ? parsed.users : initialData.users;
+      const users = Array.isArray(parsed.users) ? parsed.users.map((user) => {
+        if (user.role !== 'instructor') return user;
+        const sample = initialData.users.find((entry) => entry.id === user.id);
+        return {
+          ...user,
+          baseSharePercent: Number.isFinite(Number(user.baseSharePercent)) ? Number(user.baseSharePercent) : Number(sample?.baseSharePercent ?? 70),
+          referralSharePercent: Number.isFinite(Number(user.referralSharePercent)) ? Number(user.referralSharePercent) : Number(sample?.referralSharePercent ?? 85),
+        };
+      }) : initialData.users;
       const certificates = snapshotLegacyCertificateNames(Array.isArray(parsed.certificates) ? parsed.certificates : initialData.certificates, users);
-      return { ...initialData, ...parsed, users, certificates, courses, blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : structuredClone(initialData.blogPosts) };
+      const orders = Array.isArray(parsed.orders) ? parsed.orders : structuredClone(initialData.orders);
+      const enrollments = Array.isArray(parsed.enrollments) ? parsed.enrollments : structuredClone(initialData.enrollments);
+      const referralLinks = Array.isArray(parsed.referralLinks) ? parsed.referralLinks : structuredClone(initialData.referralLinks);
+      const instructorPayouts = Array.isArray(parsed.instructorPayouts) ? parsed.instructorPayouts : [];
+      if (!parsed.financeDemoSeedVersion && !orders.some((order) => order.status === 'paid')) {
+        initialData.orders.forEach((order) => { if (!orders.some((item) => item.id === order.id)) orders.push(structuredClone(order)); });
+        initialData.enrollments.forEach((enrollment) => {
+          if (!enrollments.some((item) => item.courseId === enrollment.courseId && item.userId === enrollment.userId)) enrollments.push(structuredClone(enrollment));
+        });
+        initialData.referralLinks.forEach((link) => { if (!referralLinks.some((item) => item.code === link.code)) referralLinks.push(structuredClone(link)); });
+      }
+      return { ...initialData, ...parsed, users, certificates, courses, orders, enrollments, referralLinks, instructorPayouts, financeDemoSeedVersion: initialData.financeDemoSeedVersion, blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : structuredClone(initialData.blogPosts) };
     }
   } catch { /* Start with the sample data if storage is unavailable or invalid. */ }
   return structuredClone(initialData);
@@ -243,25 +262,74 @@ export function LmsProvider({ children }) {
     return next;
   }), [update]);
 
-  const enrollFree = useCallback((courseId, userId = currentUser?.id) => update((next) => {
+  const enrollFree = useCallback((courseId, userId = currentUser?.id, referralCode = null) => update((next) => {
     const course = next.courses.find((entry) => entry.id === courseId);
     if (!userId || !course || course.price > 0 || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) return next;
-    next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString() });
+    const link = (next.referralLinks ?? []).find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === course.id && item.instructorId === course.instructorId);
+    next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
     return next;
   }), [currentUser?.id, update]);
 
-  const simulatePayment = useCallback((courseId, outcome) => {
+  const simulatePayment = useCallback((courseId, outcome, referralCode = null) => {
     const orderId = createId('order');
     update((next) => {
       const course = next.courses.find((item) => item.id === courseId);
       if (!course || course.price <= 0 || !currentUser) return next;
-      const order = { id: orderId, courseId, userId: currentUser.id, amount: Number(course.price), status: outcome, method: 'บัตรจำลอง', createdAt: new Date().toISOString() };
+      const instructor = next.users.find((user) => user.id === course.instructorId);
+      const link = (next.referralLinks ?? []).find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === course.id && item.instructorId === course.instructorId);
+      const sharePercent = Number(link ? instructor?.referralSharePercent ?? 85 : instructor?.baseSharePercent ?? 70);
+      const amount = Number(course.price);
+      const instructorShareAmount = Math.round((amount * sharePercent + Number.EPSILON) * 100) / 100;
+      const order = { id: orderId, courseId, userId: currentUser.id, amount, status: outcome, method: 'บัตรจำลอง', createdAt: new Date().toISOString(), instructorId: course.instructorId, ...(outcome === 'paid' ? { instructorSharePercent: sharePercent, instructorShareAmount, platformShareAmount: Math.round((amount - instructorShareAmount + Number.EPSILON) * 100) / 100, payoutStatus: 'pending' } : {}), ...(link ? { referralCode: link.code, referralLinkId: link.id } : {}) };
       next.orders.unshift(order);
-      if (outcome === 'paid' && !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString() });
+      if (outcome === 'paid' && !next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
       return next;
     });
     return orderId;
   }, [currentUser, update]);
+
+  const createReferralLink = useCallback((courseId) => {
+    const course = data.courses.find((item) => item.id === courseId);
+    if (currentUser?.role !== 'instructor' || !course || course.instructorId !== currentUser.id || course.status !== 'published') return { ok: false, message: 'สร้างลิงก์ได้เฉพาะคอร์สที่เผยแพร่ของคุณ' };
+    const link = { id: createId('ref'), code: createId('code').replace(/^code-/, '').toUpperCase(), instructorId: currentUser.id, courseId, createdAt: new Date().toISOString() };
+    update((next) => { next.referralLinks ??= []; next.referralLinks.unshift(link); return next; });
+    return { ok: true, link };
+  }, [currentUser, data.courses, update]);
+
+  const saveInstructorCommission = useCallback((userId, baseSharePercent, referralSharePercent) => {
+    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่กำหนดสัดส่วนได้' };
+    const base = Number(baseSharePercent);
+    const referral = Number(referralSharePercent);
+    const instructor = data.users.find((user) => user.id === userId && user.role === 'instructor');
+    if (!instructor) return { ok: false, message: 'ไม่พบผู้สอน' };
+    if (!Number.isFinite(base) || !Number.isFinite(referral) || base < 0 || base > 100 || referral <= base || referral > 100) return { ok: false, message: 'สัดส่วนลิงก์แนะนำต้องสูงกว่าสัดส่วนปกติ และทั้งคู่ต้องไม่เกิน 100%' };
+    update((next) => { next.users = next.users.map((user) => user.id === userId ? { ...user, baseSharePercent: base, referralSharePercent: referral } : user); return next; });
+    return { ok: true };
+  }, [currentUser, data.users, update]);
+
+  const markInstructorPayout = useCallback((instructorId) => {
+    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่ยืนยันยอดโอนได้' };
+    const eligible = data.orders.filter((order) => {
+      const course = data.courses.find((item) => item.id === order.courseId);
+      return order.status === 'paid' && order.payoutStatus !== 'transferred' && (order.instructorId ?? course?.instructorId) === instructorId;
+    });
+    if (!eligible.length) return { ok: false, message: 'ไม่มียอดรอโอนสำหรับผู้สอนคนนี้' };
+    const teacher = data.users.find((user) => user.id === instructorId);
+    const amount = Math.round(eligible.reduce((sum, order) => {
+      const course = data.courses.find((item) => item.id === order.courseId);
+      const rate = Number(order.instructorSharePercent ?? (order.referralLinkId ? teacher?.referralSharePercent : teacher?.baseSharePercent) ?? 70);
+      return sum + Number(order.instructorShareAmount ?? (Number(order.amount) * rate / 100));
+    }, 0) * 100) / 100;
+    const payout = { id: createId('payout'), instructorId, orderIds: eligible.map((order) => order.id), amount, orderCount: eligible.length, createdAt: new Date().toISOString() };
+    const orderIds = new Set(payout.orderIds);
+    update((next) => {
+      next.orders = next.orders.map((order) => orderIds.has(order.id) ? { ...order, payoutStatus: 'transferred', payoutId: payout.id, paidOutAt: payout.createdAt } : order);
+      next.instructorPayouts ??= [];
+      next.instructorPayouts.unshift(payout);
+      return next;
+    });
+    return { ok: true, payout };
+  }, [currentUser, data.courses, data.orders, data.users, update]);
 
   const markContentDone = useCallback((courseId, itemId) => update((next) => {
     const key = `${courseId}:${itemId}`;
@@ -398,10 +466,11 @@ export function LmsProvider({ children }) {
   const value = useMemo(() => ({
     data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse,
     saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment,
+    createReferralLink, saveInstructorCommission, markInstructorPayout,
     markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest,
     createInstructorInvite, acceptInstructorInvite,
     changeUserRole, updateProfile, resetPassword,
-  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
+  }), [data, currentUser, signIn, signInDemo, signOut, register, resetDemo, saveBlogPost, removeBlogPost, saveCourse, removeCourse, saveChapter, saveChapterWorkspace, reorderCurriculum, removeChapter, saveItem, removeItem, saveQuiz, removeQuiz, enrollFree, simulatePayment, createReferralLink, saveInstructorCommission, markInstructorPayout, markContentDone, startAttempt, saveAttemptDraft, submitAttempt, gradeAttempt, requestInstructor, reviewInstructorRequest, createInstructorInvite, acceptInstructorInvite, changeUserRole, updateProfile, resetPassword]);
 
   return <LmsContext.Provider value={value}>{children}</LmsContext.Provider>;
 }

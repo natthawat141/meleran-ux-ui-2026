@@ -19,7 +19,9 @@ import { CurriculumPage, ContentEditorPage } from './pages/instructor/Curriculum
 import { ChapterWorkspace as ChapterEditorPage } from './pages/instructor/ChapterWorkspace.jsx';
 import { QuizManagerPage, QuizEditorPage, QuizAttemptsPage, GradeEssayPage } from './pages/instructor/QuizPages.jsx';
 import { CoursePreviewPage, InstructorLearnersPage } from './pages/instructor/InsightPages.jsx';
+import { InstructorFinancePage } from './pages/instructor/InstructorFinancePage.jsx';
 import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorRequestsPage, AdminInstructorRequestDetailPage, AdminCoursesPage, AdminCourseDetailPage } from './pages/admin/AdminPages.jsx';
+import { AdminInstructorFinancePage } from './pages/admin/AdminInstructorFinancePage.jsx';
 import { NoAccessPage, NotFoundPage } from './pages/SystemPages.jsx';
 
 function Public({ children }) { return <PublicShell>{children}</PublicShell>; }
@@ -80,6 +82,7 @@ export function AppRoutes() {
     <Route path="/account/profile" element={<RolePage roles={['learner','instructor','admin']}><ProfilePage/></RolePage>}/>
 
     <Route path="/teach" element={instructor(<InstructorDashboardPage/>)}/>
+    <Route path="/teach/finance" element={instructor(<InstructorFinancePage/>)}/>
     <Route path="/teach/courses" element={instructor(<InstructorCoursesPage/>)}/>
     <Route path="/teach/courses/new" element={instructor(<CourseEditorPage/>)}/>
     <Route path="/teach/courses/:courseId" element={instructor(<InstructorCourseOverviewPage/>)}/>
@@ -103,6 +106,7 @@ export function AppRoutes() {
     <Route path="/admin/articles/:id/edit" element={admin(<AdminBlogEditorPage/>)}/>
     <Route path="/admin/users" element={admin(<AdminUsersPage/>)}/>
     <Route path="/admin/users/:id" element={admin(<AdminUserDetailPage/>)}/>
+    <Route path="/admin/finance" element={admin(<AdminInstructorFinancePage/>)}/>
     <Route path="/admin/instructors" element={admin(<AdminInstructorRequestsPage/>)}/>
     <Route path="/admin/instructors/:id" element={admin(<AdminInstructorRequestDetailPage/>)}/>
     <Route path="/admin/courses" element={admin(<AdminCoursesPage/>)}/>
