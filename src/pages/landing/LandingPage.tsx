@@ -8,10 +8,12 @@ import { LandingFaq } from './LearningSections';
 import { LearningGuide } from './LearningGuide';
 import { ReadingCollection } from './ReadingCollection';
 import { BrandIntroduction, FounderPreview } from './BrandStory';
-import { LandingHero } from './LandingHero';
+import { LandingAnnouncement, LandingHero } from './LandingHero';
 import { NewsletterBanner } from './NewsletterBanner';
 import { InstructorSpotlight } from './InstructorSpotlight';
 import './landing.css';
+import './landing-hero.css';
+import './landing-vivid.css';
 
 export const landingTheme: ThemeConfig = {
   inherit: false,
@@ -66,6 +68,7 @@ export function LandingPage() {
     <ConfigProvider theme={homePageTheme}>
       <div className="home-v3">
         <a className="home-skip" href="#home-main">ข้ามไปเนื้อหาหลัก</a>
+        <LandingAnnouncement />
         <LandingHeader />
         <main id="home-main" tabIndex={-1}>
           <LandingHero />

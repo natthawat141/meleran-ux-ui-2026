@@ -1,6 +1,12 @@
 # MeLearn artwork set
 
-These are locally generated concept assets for the UX prototype, not approved production brand files. Generated with OpenAI ImageGen using a single commissioned-art direction: white and pale sky blue, vivid cobalt accents, layered paper-clay dimensional forms, subtle shadows, no stock photography, no embedded text. The Higgsfield Website Builder design recipe informed visual consistency and placement; Higgsfield did not generate these files. Existing MeLearn hero photography and logo are deliberately retained. The default cover for newly created courses is documented separately in `course-default-v1.prompt.md`.
+These are locally generated concept assets for the UX prototype, not approved production brand files. The historical prompts below document earlier artwork and do not override the palette confirmed on 5 October 2026 in `docs/UI_SPEC.md`. The real Melearn logo is retained. The default cover for newly created courses is documented separately in `course-default-v1.prompt.md`.
+
+## Blue/cyan/red landing assets — 5 October 2026
+
+- `melearn-student-hero.webp`: generated from the user's selected landing reference, 1122 × 1402, transparent photographic student illustration with blue/cyan curves, red accents and an illustrative study chart. The person is a generated concept, not a real student testimonial. No embedded copy: headline, floating cards and CTAs are rendered as HTML. Converted from the generated PNG to WebP at quality 90 without changing composition.
+- `melearn-brand-pattern.webp`: generated from the same reference, pale `#f7f9ff` background with soft blue/cyan curves, red capsules and dot patterns at the edges, empty centre for readable HTML. Used behind the instructor showcase, team and newsletter. Converted to WebP at quality 88.
+- Palette: `#0066ff`, `#00c2ff`, `#ff3b5c`, `#f7f9ff`, `#0b1f46`. Existing course/article artwork and the actual team portraits remain in use; no fabricated reviews or outcomes are introduced.
 
 ## Newsletter background
 

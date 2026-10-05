@@ -21,7 +21,8 @@ export function LearningGuide() {
         <LandingPhoto photo={landingPhotos.learning} className="home-guide-photo" />
         <div className="home-guide-content">
           <div className="home-guide-heading">
-            <h2 id="home-guide-title">เรียนรู้ได้<br/>แบบที่เข้ากับชีวิตคุณ</h2>
+            <p className="home-landing-kicker">YOUR LEARNING JOURNEY</p>
+            <h2 id="home-guide-title">เรียนรู้ได้<br/><span>แบบที่เข้ากับชีวิตคุณ</span></h2>
             <p>เริ่มจากความสนใจ แล้วค่อย ๆ พัฒนาทักษะไปด้วยกัน</p>
           </div>
           <ol className="home-learning-steps">

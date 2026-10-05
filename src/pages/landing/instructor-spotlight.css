@@ -52,7 +52,7 @@
 .home-v3:has(.home-hero) .home-teacher-details-button.ant-btn:hover { color: var(--home-blue-hover); }
 .home-v3:has(.home-hero) .home-teacher-carousel-control.ant-btn:hover { border-color: var(--home-blue); color: var(--home-blue); }
 
-.home-teacher-modal { --home-ink: #24272d; --home-muted: #636971; --home-blue: #0074e8; font-family: 'Anuphan Variable', sans-serif; }
+.home-teacher-modal { --home-ink: #0b1f46; --home-muted: #626d82; --home-blue: #0066ff; font-family: 'Anuphan Variable', sans-serif; }
 .home-teacher-modal .ant-modal-title, .home-teacher-modal .ant-modal-body { font-family: 'Anuphan Variable', sans-serif; }
 .home-teacher-modal-content { padding-top: 4px; color: #24272d; }
 .home-teacher-modal-content .ant-tag { margin-bottom: 13px; border-radius: 999px; }
@@ -64,7 +64,7 @@
 .home-teacher-modal-content h4 { margin: 20px 0 8px; color: #24272d; font-size: 15px; font-weight: 550; }
 .home-teacher-modal-content ul { display: grid; gap: 7px; margin: 0 0 20px; padding-left: 22px; color: var(--home-muted); line-height: 1.75; }
 .home-teacher-modal-course-link { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 0 15px; border-radius: 10px; background: var(--home-blue); color: #fff !important; font-weight: 500; text-decoration: none; }
-.home-teacher-modal-course-link:hover { background: #006bd5; }
+.home-teacher-modal-course-link:hover { background: #0052cc; }
 .home-teacher-modal-course-link:focus-visible { outline: 3px solid #309cdb; outline-offset: 3px; }
 
 @media (max-width: 700px) {

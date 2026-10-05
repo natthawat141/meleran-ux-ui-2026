@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form, Input, type InputRef } from 'antd';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import newsletterBackground from '../../assets/generated/newsletter-learning-path-v3.png';
+import newsletterBackground from '../../assets/generated/melearn-brand-pattern.webp';
 import './newsletter.css';
 
 interface NewsletterFormValues {
@@ -36,9 +36,10 @@ export function NewsletterBanner() {
   return (
     <section ref={sectionRef} id="newsletter" className="home-newsletter" aria-labelledby="home-newsletter-title">
       <motion.div className="home-newsletter-background" aria-hidden="true" style={{ y: reducedMotion ? 0 : backgroundY }}>
-        <img src={newsletterBackground} alt="" loading="lazy" decoding="async" width="2172" height="724" />
+        <img src={newsletterBackground} alt="" loading="lazy" decoding="async" width="1536" height="1024" />
       </motion.div>
       <div className="home-newsletter-content">
+        <p className="home-landing-kicker">STAY INSPIRED</p>
         <h2 id="home-newsletter-title">รับข่าวสารจาก melearn</h2>
         <div className="home-newsletter-form-area">
           {submitted ? (

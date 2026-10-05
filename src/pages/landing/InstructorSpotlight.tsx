@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Button, Carousel, Modal, Tag, type CarouselRef } from 'antd';
 import { Link } from 'react-router-dom';
+import { useReducedMotion } from 'motion/react';
 import './instructor-spotlight.css';
 
 type Instructor = {
@@ -60,35 +61,20 @@ const instructors: Instructor[] = [
 
 const portraitSheet = '/images/instructors/instructor-mock-cutouts.png';
 const singlePortrait = '/images/instructors/instructor-nont-mock.png';
-const mobileQuery = '(max-width: 700px)';
 
 export function InstructorSpotlight() {
   const carouselRef = useRef<CarouselRef>(null);
   const [selectedInstructor, setSelectedInstructor] = useState<Instructor | null>(null);
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia(mobileQuery).matches,
-  );
-  const reducedMotion = typeof window !== 'undefined'
-    && (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(mobileQuery);
-    const updateViewport = () => setIsMobile(mediaQuery.matches);
-
-    updateViewport();
-    mediaQuery.addEventListener('change', updateViewport);
-    return () => mediaQuery.removeEventListener('change', updateViewport);
-  }, []);
+  const reducedMotion = useReducedMotion();
 
   const carouselSettings = {
     arrows: false,
     autoplay: false,
-    centerMode: isMobile,
-    centerPadding: isMobile ? '16%' : '0px',
+    centerMode: false,
     draggable: true,
-    dots: false,
+    dots: true,
     infinite: true,
-    slidesToShow: isMobile ? 1 : 3,
+    slidesToShow: 1,
     slidesToScroll: 1,
     speed: reducedMotion ? 0 : 360,
     swipe: true,
@@ -100,7 +86,8 @@ export function InstructorSpotlight() {
     <section className="home-container home-teachers" aria-labelledby="home-teachers-title">
       <div className="home-teachers-heading">
         <div>
-          <h2 id="home-teachers-title">ผู้สอนของเรา</h2>
+          <p className="home-landing-kicker">MELEARN TUTOR</p>
+          <h2 id="home-teachers-title">รู้จักผู้สอนที่พร้อมพาคุณ<span>ไปไกลกว่าเดิม</span></h2>
           <p>เลือกครูที่ใช่ แล้วเริ่มติววิชาที่อยากมั่นใจ</p>
         </div>
       </div>
@@ -112,42 +99,35 @@ export function InstructorSpotlight() {
 
             return (
               <article className="home-teacher-slide" key={instructor.id}>
-                <div className={`home-teacher-portrait home-teacher-portrait-${instructor.id}`}>
-                  <span className="home-teacher-portrait-circle" aria-hidden="true" />
-                  <span className="home-teacher-decoration home-teacher-decoration-ring" aria-hidden="true" />
-                  <span className="home-teacher-decoration home-teacher-decoration-dots" aria-hidden="true" />
-                  <div className={`home-teacher-portrait-window${usesSprite ? '' : ' home-teacher-portrait-window-single'}`}>
-                    <img
-                      className={`home-teacher-portrait-image home-teacher-portrait-image-${instructor.id}`}
-                      src={usesSprite ? portraitSheet : singlePortrait}
-                      alt={`ภาพผู้สอนตัวอย่าง ${instructor.name}`}
-                      style={usesSprite ? { left: `${index * -100}%` } : undefined}
-                      draggable={false}
-                      loading="lazy"
-                    />
+                <div className="home-teacher-feature">
+                  <div className={`home-teacher-portrait home-teacher-portrait-${instructor.id}`}>
+                    <div className={`home-teacher-portrait-window${usesSprite ? '' : ' home-teacher-portrait-window-single'}`}>
+                      <img
+                        className={`home-teacher-portrait-image home-teacher-portrait-image-${instructor.id}`}
+                        src={usesSprite ? portraitSheet : singlePortrait}
+                        alt={`ภาพผู้สอนตัวอย่าง ${instructor.name}`}
+                        style={usesSprite ? { left: `${index * -100}%` } : undefined}
+                        draggable={false}
+                        loading="lazy"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="home-teacher-nameband">
-                  <strong>{instructor.name}</strong>
-                  <span>{instructor.mockName}</span>
-                </div>
-                <div className="home-teacher-subject-band">
-                  <div className="home-teacher-subject-box">
-                    <strong>{instructor.subject}</strong>
-                    <span>{instructor.level}</span>
+                  <div className="home-teacher-slide-content">
+                    <span className="home-teacher-level">{instructor.level}</span>
+                    <h3>{instructor.name}</h3>
+                    <p className="home-teacher-full-name">{instructor.mockName}</p>
+                    <strong className="home-teacher-subject">{instructor.subject}</strong>
+                    <p>{instructor.introduction}</p>
+                    <Button
+                      type="primary"
+                      className="home-teacher-details-button"
+                      onClick={() => setSelectedInstructor(instructor)}
+                      aria-label={`ดูประวัติและหัวข้อที่ติวของ${instructor.name}`}
+                    >
+                      ดูโปรไฟล์ผู้สอน <ArrowRightOutlined aria-hidden="true" />
+                    </Button>
                   </div>
-                </div>
-                <div className="home-teacher-slide-content">
-                  <p>{instructor.introduction}</p>
-                  <Button
-                    type="link"
-                    className="home-teacher-details-button"
-                    onClick={() => setSelectedInstructor(instructor)}
-                    aria-label={`ดูประวัติและหัวข้อที่ติวของ${instructor.name}`}
-                  >
-                    ดูประวัติและหัวข้อที่ติว <ArrowRightOutlined aria-hidden="true" />
-                  </Button>
                 </div>
               </article>
             );

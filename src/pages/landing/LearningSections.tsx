@@ -13,6 +13,7 @@ export function LandingFaq() {
   return (
     <section id="faq" className="home-faq home-section" aria-labelledby="home-faq-title">
       <div className="home-faq-heading">
+        <p className="home-landing-kicker">LET’S GET STARTED</p>
         <h2 id="home-faq-title">มีเรื่องอยากรู้เพิ่มเติม?</h2>
         <p>คำตอบสำหรับการเริ่มเรียนกับ melearn</p>
       </div>

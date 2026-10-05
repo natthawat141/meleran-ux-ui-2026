@@ -20,7 +20,7 @@ Repository นี้เป็น interactive UX prototype ของ Melearn: Rea
 
 ## Design guardrails
 
-- พื้นขาว + ฟ้าอ่อนเย็น + primary `#0074e8`; ข้อความและเงาใช้ neutral เข้ม ฟอนต์ `Anuphan Variable`
+- สีแบรนด์ที่ผู้ใช้ยืนยัน 5 ต.ค. 2026: น้ำเงิน `#0066ff`, cyan `#00c2ff`, แดง `#ff3b5c`, พื้นขาว/`#f7f9ff` และข้อความ navy `#0b1f46`; ฟอนต์ `Anuphan Variable` ดูรายละเอียดใน `docs/UI_SPEC.md` ธีมหน้าอื่นที่ยังใช้สีเดิมให้ปรับเมื่อมีงานระบุหน้านั้น ไม่ขยายงาน Landing ไปทั้งระบบ
 - ห้ามเพิ่มครีม เหลือง earth tone ม่วง หรือส้มเป็นสีตกแต่ง ใช้ semantic status color ของ theme เฉพาะสถานะที่มีความหมาย
 - ใช้โลโก้จริงใน `src/assets/melearn-ui/logo.PNG` และ asset ที่มีอยู่ ห้ามแทนด้วยตัวอักษรหรืออีโมจิ
 - ใช้ component ที่มีอยู่ก่อน: Mantine สำหรับ workspace shell, Ant Design สำหรับ CRUD/form/table, shadcn/Base UI ที่มีอยู่สำหรับ login/register, Tiptap สำหรับเนื้อหา, Motion สำหรับ animation

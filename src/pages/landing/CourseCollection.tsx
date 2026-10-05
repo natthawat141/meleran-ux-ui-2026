@@ -48,7 +48,8 @@ export function CourseCollection({ courses, data }: CourseCollectionProps) {
     <section className="home-container home-section home-courses" id="courses" aria-labelledby="home-courses-title">
       <div className="home-section-heading">
         <div>
-          <h2 id="home-courses-title">ถ้าอยากเรียนรู้ต่อ ลองเริ่มจากตรงนี้</h2>
+          <p className="home-landing-kicker">FIND YOUR NEXT STEP</p>
+          <h2 id="home-courses-title">เลือกคอร์สที่ใช่<span>แล้วไปต่อด้วยกัน</span></h2>
           <p>คอร์สเล็ก ๆ ที่ชวนคุณค่อย ๆ ลงมือทำ</p>
         </div>
         <Link to="/courses" className="home-text-link">ดูคอร์สทั้งหมด <ArrowRightOutlined aria-hidden="true" /></Link>
