@@ -35,6 +35,20 @@ export const landingTheme: ThemeConfig = {
   },
 };
 
+// Scope the new palette to the landing route; public pages keep their existing theme.
+const homePageTheme: ThemeConfig = {
+  ...landingTheme,
+  token: {
+    ...landingTheme.token,
+    colorPrimary: '#0066ff',
+    colorInfo: '#0066ff',
+    colorText: '#0b1f46',
+    colorTextSecondary: '#626d82',
+    colorBorder: '#e1e9f5',
+    colorFillAlter: '#f7f9ff',
+  },
+};
+
 export function LandingPage() {
   const { data } = useLms();
   const courses = data.courses.filter((course) => course.status === 'published');
@@ -49,7 +63,7 @@ export function LandingPage() {
   }, []);
 
   return (
-    <ConfigProvider theme={landingTheme}>
+    <ConfigProvider theme={homePageTheme}>
       <div className="home-v3">
         <a className="home-skip" href="#home-main">ข้ามไปเนื้อหาหลัก</a>
         <LandingHeader />

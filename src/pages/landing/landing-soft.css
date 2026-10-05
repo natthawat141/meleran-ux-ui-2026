@@ -1,12 +1,29 @@
-/* Landing-only visual trial. The hero identifies this page, keeping About and
+/* Landing palette from the user's blue/cyan/red reference. The hero identifies this page, keeping About and
    other consumers of landing.css unchanged, including shared team portraits. */
 .home-v3:has(.home-hero) {
+  --home-blue: #0066ff;
+  --home-blue-hover: #0052cc;
+  --home-cyan: #00c2ff;
+  --home-red: #ff3b5c;
+  --home-ink: #0b1f46;
+  --home-muted: #626d82;
+  --home-sky: #f7f9ff;
+  --home-line: #e1e9f5;
   --home-soft-sky: #e5f4ff;
   --home-bright-sky: #b9e5ff;
-  --home-shape-blue: #74c8f5;
-  --home-yellow-soft: #FFF4BF;
-  --home-yellow-accent: #FFEEA3;
+  --home-shape-blue: var(--home-cyan);
+  --primary-hover: var(--home-blue-hover);
+  background: var(--home-sky);
   overflow: clip;
+}
+
+.home-v3:has(.home-hero) .ant-btn-primary:not(:disabled):hover {
+  background: var(--home-blue-hover);
+  border-color: var(--home-blue-hover);
+}
+
+.home-v3:has(.home-hero) :is(.home-hero h1 span, .brand-introduction h2 span) {
+  color: var(--home-blue);
 }
 
 .home-v3:has(.home-hero) .ant-btn {
@@ -14,7 +31,7 @@
 }
 
 .home-v3:has(.home-hero) .home-hero {
-  background: #fff;
+  background: var(--home-sky);
 }
 
 .home-v3:has(.home-hero) .home-hero-layout {
@@ -28,7 +45,7 @@
   right: 18%;
   width: 72px;
   height: 48px;
-  background-image: radial-gradient(circle, rgb(0 116 232 / 35%) 2px, transparent 2.5px);
+  background-image: radial-gradient(circle, var(--home-cyan) 2px, transparent 2.5px);
   background-size: 12px 12px;
   pointer-events: none;
 }
@@ -56,7 +73,7 @@
   height: 82px;
   right: 46%;
   bottom: 12%;
-  border: 15px solid var(--home-yellow-accent);
+  border: 15px solid var(--home-cyan);
   border-radius: 50%;
 }
 
@@ -78,7 +95,7 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--home-yellow-accent);
+  background: var(--home-red);
   z-index: 0;
 }
 
@@ -114,7 +131,7 @@
   background-color: #fff;
   background-image:
     radial-gradient(circle, rgb(0 116 232 / 24%) 2px, transparent 2.5px),
-    radial-gradient(circle, transparent 0 22px, var(--home-yellow-accent) 23px 26px, transparent 27px);
+    radial-gradient(circle, transparent 0 22px, var(--home-red) 23px 26px, transparent 27px);
   background-repeat: no-repeat;
   background-position: 25px 22px, right 28px top 22px;
   background-size: 40px 40px, 66px 66px;
@@ -134,7 +151,7 @@
   height: 48px;
   background-image:
     radial-gradient(circle, rgb(0 116 232 / 28%) 2px, transparent 2.5px),
-    radial-gradient(circle, transparent 0 12px, var(--home-yellow-accent) 13px 15px, transparent 16px);
+    radial-gradient(circle, transparent 0 12px, var(--home-red) 13px 15px, transparent 16px);
   background-size: 12px 12px, 34px 34px;
   background-position: 0 0, right top;
   background-repeat: repeat, no-repeat;
@@ -160,7 +177,7 @@
   height: 48px;
   background-image:
     radial-gradient(circle, rgb(0 116 232 / 28%) 2px, transparent 2.5px),
-    radial-gradient(circle, transparent 0 12px, var(--home-yellow-accent) 13px 15px, transparent 16px);
+    radial-gradient(circle, transparent 0 12px, var(--home-red) 13px 15px, transparent 16px);
   background-size: 12px 12px, 34px 34px;
   background-position: 0 0, right top;
   background-repeat: repeat, no-repeat;
@@ -225,11 +242,11 @@
   flex: 1;
   padding: 13px 15px 15px;
   border-radius: 0 0 14px 14px;
-  background: var(--home-yellow-soft);
+  background: var(--home-soft-sky);
 }
 
 .home-v3:has(.home-hero) .brand-team-identity h3 { min-height: 3.2em; }
-.home-v3:has(.home-hero) .brand-team-identity p { color: #4f4b38; }
+.home-v3:has(.home-hero) .brand-team-identity p { color: var(--home-muted); }
 
 .home-v3:has(.home-hero) .home-invitation {
   border-bottom: 0;
@@ -239,7 +256,7 @@
 
 .home-v3:has(.home-hero) .home-invitation-prompts {
   padding: 30px;
-  background: #f1f9ff;
+  background: var(--home-soft-sky);
   border-radius: 32px;
 }
 
@@ -269,7 +286,7 @@
 .home-v3:has(.home-hero) .home-invitation-note {
   border-left: 0;
   border-radius: 18px;
-  background: var(--home-yellow-soft);
+  background: var(--home-soft-sky);
 }
 
 .home-v3:has(.home-hero) .home-guide {
@@ -284,12 +301,12 @@
 .home-v3:has(.home-hero) .home-step-icon {
   border: 0;
   border-radius: 50%;
-  background: var(--home-yellow-soft);
+  background: var(--home-soft-sky);
 }
 
 .home-v3:has(.home-hero) .home-guide-photo img,
 .home-v3:has(.home-hero) .home-guide-photo .home-photo-fallback {
-  border-bottom: 10px solid var(--home-yellow-accent);
+  border-bottom: 10px solid var(--home-cyan);
 }
 
 .home-v3:has(.home-hero) .home-course {
@@ -298,8 +315,8 @@
 
 .home-v3:has(.home-hero) .home-course-meta > span:first-child {
   padding: 3px 10px;
-  background: var(--home-yellow-soft);
-  color: #4b431d;
+  background: var(--home-soft-sky);
+  color: var(--home-ink);
   border-radius: 999px;
 }
 
@@ -322,7 +339,7 @@
   right: clamp(14px, 4vw, 52px);
   width: clamp(42px, 6vw, 68px);
   aspect-ratio: 1;
-  border: 9px solid var(--home-yellow-accent);
+  border: 9px solid var(--home-red);
   border-radius: 50%;
   pointer-events: none;
   z-index: -1;

@@ -24,12 +24,12 @@
 .home-teacher-portrait-image-praew { transform: scale(1.03); transform-origin: top center; }
 .home-teacher-portrait-image-nont { width: 100%; max-width: 100%; height: auto; }
 .home-teacher-decoration { position: absolute; z-index: 0; pointer-events: none; }
-.home-teacher-decoration-ring { top: 30px; left: 14%; width: 23px; height: 23px; border: 5px solid #ffd84d; border-radius: 50%; }
-.home-teacher-decoration-dots { top: 82px; right: 12%; width: 34px; height: 65px; background-image: radial-gradient(circle, #ffd84d 2px, transparent 2.5px); background-position: 0 0; background-size: 12px 12px; }
-.home-teacher-nameband { display: flex; align-items: baseline; gap: 7px 12px; min-height: 54px; padding: 7px 17px; border-radius: 10px 10px 0 0; background: #ffd84d; color: #24272d; }
+.home-teacher-decoration-ring { top: 30px; left: 14%; width: 23px; height: 23px; border: 5px solid #ff3b5c; border-radius: 50%; }
+.home-teacher-decoration-dots { top: 82px; right: 12%; width: 34px; height: 65px; background-image: radial-gradient(circle, #00c2ff 2px, transparent 2.5px); background-position: 0 0; background-size: 12px 12px; }
+.home-teacher-nameband { display: flex; align-items: baseline; gap: 7px 12px; min-height: 54px; padding: 7px 17px; border-radius: 10px 10px 0 0; background: #e5f4ff; color: #0b1f46; }
 .home-teacher-nameband strong { font-size: 19px; font-weight: 600; line-height: 1.6; }
 .home-teacher-nameband span { font-size: 12px; font-weight: 400; line-height: 1.6; }
-.home-teacher-subject-band { padding: 8px 10px 9px; border-radius: 0 0 11px 11px; background: #ffd84d; }
+.home-teacher-subject-band { padding: 8px 10px 9px; border-radius: 0 0 11px 11px; background: #b9e5ff; }
 .home-teacher-subject-box { display: flex; min-height: 58px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 5px 9px; border-radius: 8px; background: #fff; color: #24272d; text-align: center; }
 .home-teacher-subject-box strong { font-size: 15px; font-weight: 550; line-height: 1.55; }
 .home-teacher-subject-box span { color: #50545a; font-size: 12px; line-height: 1.5; }
@@ -43,10 +43,14 @@
 .home-teacher-carousel-control-prev { left: -16px; }
 .home-teacher-carousel-control-next { right: -16px; }
 
-.home-v3:has(.home-hero) .home-teacher-decoration-ring { border-color: var(--home-yellow-accent); }
-.home-v3:has(.home-hero) .home-teacher-decoration-dots { background-image: radial-gradient(circle, var(--home-yellow-accent) 2px, transparent 2.5px); }
-.home-v3:has(.home-hero) .home-teacher-nameband { background: var(--home-yellow-soft); }
-.home-v3:has(.home-hero) .home-teacher-subject-band { background: var(--home-yellow-accent); }
+.home-v3:has(.home-hero) .home-teacher-decoration-ring { border-color: var(--home-red); }
+.home-v3:has(.home-hero) .home-teacher-decoration-dots { background-image: radial-gradient(circle, var(--home-cyan) 2px, transparent 2.5px); }
+.home-v3:has(.home-hero) .home-teacher-nameband { background: var(--home-soft-sky); color: var(--home-ink); }
+.home-v3:has(.home-hero) .home-teacher-subject-band { background: var(--home-bright-sky); }
+.home-v3:has(.home-hero) .home-teacher-portrait-circle { background: var(--home-cyan); }
+.home-v3:has(.home-hero) .home-teacher-details-button.ant-btn { color: var(--home-blue); }
+.home-v3:has(.home-hero) .home-teacher-details-button.ant-btn:hover { color: var(--home-blue-hover); }
+.home-v3:has(.home-hero) .home-teacher-carousel-control.ant-btn:hover { border-color: var(--home-blue); color: var(--home-blue); }
 
 .home-teacher-modal { --home-ink: #24272d; --home-muted: #636971; --home-blue: #0074e8; font-family: 'Anuphan Variable', sans-serif; }
 .home-teacher-modal .ant-modal-title, .home-teacher-modal .ant-modal-body { font-family: 'Anuphan Variable', sans-serif; }
