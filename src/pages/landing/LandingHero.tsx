@@ -5,7 +5,8 @@ import { motion, useReducedMotion, useScroll, useTransform, type Variants } from
 import heroImage from '../../assets/generated/melearn-student-hero.webp';
 
 const reveal: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  // Copy stays readable while the entrance motion runs.
+  hidden: { opacity: 1, y: 20 },
   visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20 } },
 };
 

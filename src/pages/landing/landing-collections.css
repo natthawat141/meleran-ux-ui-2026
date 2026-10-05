@@ -21,17 +21,18 @@
 .home-v3 .home-course-avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #edf6ff; color: var(--home-blue); }
 .home-v3 .home-course-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; width: 100%; margin: 18px 0; padding-top: 18px; border-top: 1px solid #eaf0fa; font-size: 12px; color: var(--home-muted); }
 .home-v3 .home-course-bottom strong { font-size: 22px; color: var(--home-blue); }
-.home-v3 .home-course-cta { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px 18px; border-radius: 999px; background: linear-gradient(105deg, #0066ff, #008cda); color: #fff; font-size: 14px; font-weight: 650; }
+.home-v3 .home-course-cta { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px 18px; border-radius: 999px; background: linear-gradient(105deg, #0066ff, #0052cc); color: #fff; font-size: 14px; font-weight: 650; }
 .home-v3 .home-course-cta:hover { background: #0052cc; color: #fff; }
 .home-v3 .home-article-meta { display: flex; align-items: center; gap: 6px; margin: auto 0 16px; color: var(--home-muted); font-size: 12px; }
 .home-v3 .home-articles-new { padding-block: 72px; }
 .home-v3 .home-start { padding-block: 72px; background: #edf6ff url('../../assets/generated/melearn-brand-pattern.webp') center / cover; }
+.home-v3 .home-start .home-collection-heading { padding: 24px 28px; border-radius: 26px; background: #f7f9ff; }
 .home-v3 .home-start-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin: 0; padding: 0; list-style: none; }
 .home-v3 .home-start-steps li { padding: 28px; border: 1px solid #e1ebfb; border-radius: 26px; background: #fff; }
 .home-v3 .home-start-step-top { display: flex; justify-content: space-between; align-items: center; }
 .home-v3 .home-start-icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 18px; background: #e5f4ff; color: #0066ff; font-size: 25px; }
 .home-v3 .home-start-steps li:nth-child(2) .home-start-icon { background: #fff0f3; color: #db2548; }
-.home-v3 .home-start-number { color: #c5d8f2; font-size: 32px; font-weight: 750; }
+.home-v3 .home-start-number { color: #0052cc; font-size: 32px; font-weight: 750; }
 .home-v3 .home-start-steps h3 { margin: 22px 0 8px; color: #0b1f46; font-size: 21px; font-weight: 700; }
 .home-v3 .home-start-steps p { margin: 0; color: var(--home-muted); font-size: 14px; line-height: 1.8; }
 @media (max-width: 1000px) {

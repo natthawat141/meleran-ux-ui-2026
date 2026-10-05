@@ -45,7 +45,7 @@ const homePageTheme: ThemeConfig = {
     colorPrimary: '#0066ff',
     colorInfo: '#0066ff',
     colorText: '#0b1f46',
-    colorTextSecondary: '#626d82',
+    colorTextSecondary: '#4b5870',
     colorBorder: '#e1e9f5',
     colorFillAlter: '#f7f9ff',
   },
