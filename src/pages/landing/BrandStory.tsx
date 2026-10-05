@@ -39,24 +39,6 @@ export function StoryReveal({ children, className = '' }: StoryRevealProps) {
   );
 }
 
-export function BrandIntroduction() {
-  return (
-    <section className="home-container brand-introduction" aria-labelledby="brand-intro-title">
-      <p className="brand-kicker">ความตั้งใจของ melearn</p>
-      <StoryReveal className="brand-introduction-copy">
-        <h2 id="brand-intro-title">
-          พื้นที่เล็ก ๆ สำหรับ<br />ความเป็นไปได้<span>ที่มากขึ้น</span>
-        </h2>
-        <div>
-          <p>ไม่ว่าคุณจะเริ่มจากความสงสัย อยากลองสิ่งใหม่ หรืออยากทำสิ่งเดิมให้ดีขึ้น การเรียนรู้เริ่มได้จากตรงนั้น</p>
-          <p>เราอยากให้ melearn เป็นพื้นที่ที่คุณได้ค่อย ๆ เรียนรู้ ลงมือทำ และเติบโตในจังหวะของตัวเอง</p>
-          <Link className="home-text-link" to="/about">อ่านเรื่องราวของเรา <ArrowRightOutlined aria-hidden="true" /></Link>
-        </div>
-      </StoryReveal>
-    </section>
-  );
-}
-
 export interface FounderPortraitProps {
   founder: Founder;
   eager?: boolean;

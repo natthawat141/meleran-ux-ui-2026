@@ -3,17 +3,17 @@ import { ConfigProvider, type ThemeConfig } from 'antd';
 import { useLms } from '../../store';
 import { LandingHeader, LandingFooter } from './LandingChrome';
 import { CourseCollection } from './CourseCollection';
-import { LearningInvitation } from './LearningInvitation';
 import { LandingFaq } from './LearningSections';
-import { LearningGuide } from './LearningGuide';
+import { LearningStart } from './LearningStart';
 import { ReadingCollection } from './ReadingCollection';
-import { BrandIntroduction, FounderPreview } from './BrandStory';
+import { FounderPreview } from './BrandStory';
 import { LandingAnnouncement, LandingHero } from './LandingHero';
 import { NewsletterBanner } from './NewsletterBanner';
 import { InstructorSpotlight } from './InstructorSpotlight';
 import './landing.css';
 import './landing-hero.css';
 import './landing-vivid.css';
+import './landing-collections.css';
 
 export const landingTheme: ThemeConfig = {
   inherit: false,
@@ -72,12 +72,10 @@ export function LandingPage() {
         <LandingHeader />
         <main id="home-main" tabIndex={-1}>
           <LandingHero />
-          <InstructorSpotlight />
-          <BrandIntroduction />
-          <LearningInvitation />
-          <ReadingCollection posts={data.blogPosts.filter((post) => post.status === 'published')} />
-          <LearningGuide />
           <CourseCollection courses={courses} data={data} />
+          <InstructorSpotlight />
+          <ReadingCollection posts={data.blogPosts.filter((post) => post.status === 'published')} />
+          <LearningStart />
           <LandingFaq />
           <FounderPreview />
           <NewsletterBanner />

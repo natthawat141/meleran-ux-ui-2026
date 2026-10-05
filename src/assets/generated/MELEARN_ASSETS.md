@@ -83,3 +83,11 @@ Prompt:
 ```text
 Use case: stylized-concept. Asset type: landscape 16:9 editorial illustration for a short article about choosing the right graph before presenting data. Original commissioned editorial graphic for the melearn e-learning brand. Same visual identity as the course artwork: precision-cut dimensional paper sculpture, raised cobalt-blue ink surfaces, subtle matte shadows, brilliant white and pale sky-blue with crisp cobalt #0877df. Premium but approachable Thai digital learning design; clean solid pale-blue background, no gradient. Clearly crafted graphic artwork, not photography. No lettering, words, logos, people, devices, books, envelopes, yellow, orange, purple, green, earth tones, fake product UI, random floating decoration or watermark. Subject: several tactile blue chart forms (bars, a stepped shape, and one curved relationship line) being compared on a clean white circular work surface; one chart highlighted by a thin cobalt outline to suggest thoughtful selection. No numerical axes, text or literal app UI. Oblique top-down graphic composition. Must relate to graph choice but look distinct from the ascending three-column data course cover.
 ```
+
+## Landing collection replacement — 5 Oct 2026
+
+`landing-writing-photo.webp`, `landing-data-photo.webp`, and `landing-focus-photo.webp` are AI-generated illustrative student photographs (1448 × 1086), converted to WebP for the new Landing course/article cards. They are illustrative artwork, not actual students or testimonials.
+
+Shared generation direction: realistic Thai young adult students in white/navy clothing, photographic cutout composition matching the supplied Hero reference, pale #F7F9FF background, blue #0066FF and cyan #00C2FF sweeping curves with small red #FF3B5C accents. No typography, logos, UI, clay sculpture or yellow. Subjects: a student writing a notebook; a student learning data with a laptop/chart; two students working together on a study planner.
+
+`LandingArtwork.ts` maps only known bundled v1/v2 prototype covers to this series on Landing. Uploaded/external covers remain intact. Earlier graphic assets remain for other routes; the old Landing learning-guide artwork is no longer rendered.
