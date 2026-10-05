@@ -45,6 +45,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
   learner: [
     { key: '/learn', icon: <IconLayoutDashboard />, label: 'ภาพรวมการเรียน' },
     { key: '/learn/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
+    { key: '/learn/redeem', icon: <IconReceipt />, label: 'แลกรหัสคอร์ส' },
     { key: '/learn/assignments', icon: <IconChecklist />, label: 'งานมอบหมาย' },
     { key: '/learn/ai', icon: <IconSparkles />, label: 'Melearn AI' },
     { key: '/learn/inbox', icon: <IconMessages />, label: 'อินบ็อกซ์' },
@@ -81,7 +82,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/admin/inbox', icon: <IconMessages />, label: 'อินบ็อกซ์' },
     { key: '/admin/users', icon: <IconUsers />, label: 'ผู้ใช้งาน' },
     { key: '/admin/orders', icon: <IconReceipt />, label: 'รายการสั่งซื้อ' },
-    { key: '/admin/access-codes', icon: <IconReceipt />, label: 'โค้ดส่วนลด/เงินสด' },
+    { key: '/admin/access-codes', icon: <IconReceipt />, label: 'โค้ดส่วนลด/รหัสแลกคอร์ส' },
     { key: '/admin/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
     { key: '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
   ],

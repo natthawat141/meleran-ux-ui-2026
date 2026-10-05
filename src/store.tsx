@@ -6,7 +6,7 @@ import { canAccessInboxConversation, getInboxContacts, getInboxLessonContext, in
 import { MAX_INBOX_ATTACHMENT_BYTES, MAX_INBOX_ATTACHMENTS, MAX_INBOX_TOTAL_ATTACHMENT_BYTES } from './api/inboxAttachments';
 import { mergeInboxDemo } from './mocks/inbox';
 import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model';
-import { normalizeAccessCode, quoteAccessCode } from './lib/access-code-utils';
+import { cashCodeShareAmounts, commitCashCodeRedemption, normalizeAccessCode, quoteAccessCode } from './lib/access-code-utils';
 import { assignmentHasHistory, assignmentIncludesLearner, assignmentSaveIssue, canManageCourse, contentRemovalIssue } from './lib/learning-history';
 import type {
   ActionResult,
@@ -217,8 +217,10 @@ function awardCertificate(data: LmsData, courseId: string, userId: string): LmsD
 export function LmsProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<LmsData & { notifications?: AppNotification[] }>(loadData);
   const persistWarnedRef = useRef(false);
+  const redeemingCodesRef = useRef(new Set<string>());
 
   useEffect(() => {
+    redeemingCodesRef.current.clear();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       persistWarnedRef.current = false;
@@ -713,8 +715,13 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   const simulatePayment = useCallback((courseId: string, outcome: 'paid' | 'failed', referralCode: string | null = null, rawAccessCode = ''): string | null => {
     const course = data.courses.find((item) => item.id === courseId);
     if (!course || !currentUser) return null;
+    const submittedCode = data.accessCodes.find((item) => normalizeAccessCode(item.code) === normalizeAccessCode(rawAccessCode));
     const quote = quoteAccessCode({ accessCodes: data.accessCodes, courseId, coursePrice: course.price, userId: currentUser.id, enrollments: data.enrollments, code: rawAccessCode });
     if (!quote.ok) return null;
+    if (submittedCode?.kind === 'cash') {
+      if (redeemingCodesRef.current.has(submittedCode.id)) return null;
+      redeemingCodesRef.current.add(submittedCode.id);
+    }
     const orderId = createId('order');
     update((next) => {
       const nextCourse = next.courses.find((item) => item.id === courseId);
@@ -727,7 +734,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       const link = next.referralLinks.find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === nextCourse.id && item.instructorId === nextCourse.instructorId);
       const sharePercent = Number(link ? instructor?.referralSharePercent ?? 85 : instructor?.baseSharePercent ?? 70);
       const amount = nextQuote.amount;
-      const instructorShareAmount = Math.round((amount * sharePercent + Number.EPSILON) * 100) / 100;
+      const { instructorShareAmount, platformShareAmount } = cashCodeShareAmounts(amount, sharePercent);
       const method = nextQuote.source === 'cash_code' ? 'เงินสดผ่านโค้ด' : nextQuote.source === 'free_code' ? 'โค้ดเรียนฟรี' : 'บัตรจำลอง';
       const order: Order = {
         id: orderId,
@@ -745,14 +752,25 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         ...(finalStatus === 'paid' ? {
           instructorSharePercent: sharePercent,
           instructorShareAmount,
-          platformShareAmount: Math.round((amount - instructorShareAmount + Number.EPSILON) * 100) / 100,
+          platformShareAmount,
           payoutStatus: amount > 0 ? 'pending' : 'not_applicable',
         } : {}),
         ...(link ? { referralCode: link.code, referralLinkId: link.id } : {}),
       };
-      next.orders.unshift(order);
+      if (accessCode?.kind === 'cash' && finalStatus === 'paid') {
+        const transition = commitCashCodeRedemption({ accessCodes: next.accessCodes, orders: next.orders, enrollments: next.enrollments, accessCodeId: accessCode.id, userId: currentUser.id, order, redeemedAt: order.createdAt });
+        if (!transition) return next;
+        next.accessCodes = transition.accessCodes;
+        next.orders = transition.orders;
+        next.enrollments = transition.enrollments;
+      } else {
+        next.orders.unshift(order);
+      }
       if (finalStatus === 'paid') {
-        if (accessCode) next.accessCodes = next.accessCodes.map((item) => item.id === accessCode.id ? { ...item, usedCount: item.usedCount + 1, lastUsedAt: order.createdAt } : item);
+        if (accessCode && accessCode.kind !== 'cash') next.accessCodes = next.accessCodes.map((item) => {
+          if (item.id !== accessCode.id) return item;
+          return { ...item, usedCount: item.usedCount + 1, lastUsedAt: order.createdAt };
+        });
         next.cartItems = next.cartItems.filter((entry) => entry.courseId !== courseId || entry.userId !== currentUser.id);
         if (!next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) {
           next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
@@ -774,8 +792,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     if (data.accessCodes.some((item) => normalizeAccessCode(item.code) === code)) return { ok: false, message: 'มีโค้ดนี้อยู่แล้ว กรุณาใช้รหัสอื่น' };
     const value = Number(values.value);
     const receivedAmount = Number(values.receivedAmount);
-    const learner = kind === 'cash' ? data.users.find((item) => item.id === values.userId && item.role === 'learner') : undefined;
-    if (kind === 'cash' && !learner) return { ok: false, message: 'เลือกผู้เรียนสำหรับโค้ดเงินสด' };
     if (kind === 'percent' && (!Number.isFinite(value) || value <= 0 || value > 100)) return { ok: false, message: 'ส่วนลดต้องอยู่ระหว่าง 1–100%' };
     if (kind === 'fixed' && (!Number.isFinite(value) || value <= 0 || value > Number(course.price))) return { ok: false, message: 'ส่วนลดต้องมากกว่าศูนย์และไม่เกินราคาคอร์ส' };
     if (kind === 'cash' && (!Number.isFinite(receivedAmount) || receivedAmount <= 0 || receivedAmount > Number(course.price))) return { ok: false, message: 'ยอดรับเงินสดต้องมากกว่าศูนย์และไม่เกินราคาคอร์ส' };
@@ -786,13 +802,13 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     const accessCode: AccessCode = {
       id: createId('access-code'), code, courseId: course.id, kind,
       ...(kind === 'percent' || kind === 'fixed' ? { value } : {}),
-      ...(kind === 'cash' && learner ? { userId: learner.id, receivedAmount } : {}),
+      ...(kind === 'cash' ? { receivedAmount } : {}),
       maxUses, usedCount: 0, status: 'active', createdAt: new Date().toISOString(), createdBy: currentUser.id,
       ...(expiryDate ? { expiresAt: expiryDate.toISOString() } : {}),
     };
     update((next) => { next.accessCodes.unshift(accessCode); return next; });
     return { ok: true, accessCode };
-  }, [currentUser, data.accessCodes, data.courses, data.users, update]);
+  }, [currentUser, data.accessCodes, data.courses, update]);
 
   const setAccessCodeStatus = useCallback((accessCodeId: string, status: 'active' | 'inactive'): ActionResult => {
     if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่จัดการโค้ดได้' };

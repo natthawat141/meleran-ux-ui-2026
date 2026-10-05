@@ -95,7 +95,7 @@ export function AdminOrdersPage() {
       <PageTitle eyebrow="ผู้ดูแลระบบ" title="รายการสั่งซื้อทั้งหมด" subtitle="ค้นหาผู้สั่งซื้อ ตรวจยอดรับจริง และแยกช่องทางชำระผ่านระบบกับโค้ดเงินสด" />
       <Descriptions className="admin-order-channels" bordered size="small" column={{ xs: 1, sm: 3 }}>
         <Descriptions.Item label="ชำระผ่านระบบ">{formatPrice(channelTotal('ชำระผ่านระบบ'))}</Descriptions.Item>
-        <Descriptions.Item label="เงินสดผ่านโค้ด">{formatPrice(channelTotal('เงินสดผ่านโค้ด'))}</Descriptions.Item>
+        <Descriptions.Item label="ขายผ่านรหัสแลกคอร์ส">{formatPrice(channelTotal('ขายผ่านรหัสแลกคอร์ส'))}</Descriptions.Item>
         <Descriptions.Item label="โค้ดเรียนฟรี">{paidOrders.filter((order) => orderChannelLabel(order) === 'โค้ดเรียนฟรี').length} รายการ · {formatPrice(channelTotal('โค้ดเรียนฟรี'))}</Descriptions.Item>
       </Descriptions>
       <DirectorySearch

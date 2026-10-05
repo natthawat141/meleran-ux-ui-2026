@@ -49,7 +49,7 @@ export function AdminInstructorFinancePage() {
       ...instructor,
       learnerCount: new Set(enrollments.map((entry) => entry.userId)).size,
       gross: orders.reduce((sum, order) => sum + Number(order.amount || 0), 0),
-      cashGross: orders.filter((order) => orderChannelLabel(order) === 'เงินสดผ่านโค้ด').reduce((sum, order) => sum + Number(order.amount || 0), 0),
+      cashGross: orders.filter((order) => orderChannelLabel(order) === 'ขายผ่านรหัสแลกคอร์ส').reduce((sum, order) => sum + Number(order.amount || 0), 0),
       totalEarned,
       pending,
       pendingOrderCount: pendingOrders.length,
@@ -62,7 +62,7 @@ export function AdminInstructorFinancePage() {
   const transferred = rows.reduce((sum, row) => sum + row.transferred, 0);
   const allPaidOrders = data.orders.filter((order) => order.status === 'paid');
   const systemSales = allPaidOrders.filter((order) => orderChannelLabel(order) === 'ชำระผ่านระบบ').reduce((sum, order) => sum + Number(order.amount || 0), 0);
-  const cashSales = allPaidOrders.filter((order) => orderChannelLabel(order) === 'เงินสดผ่านโค้ด').reduce((sum, order) => sum + Number(order.amount || 0), 0);
+  const cashSales = allPaidOrders.filter((order) => orderChannelLabel(order) === 'ขายผ่านรหัสแลกคอร์ส').reduce((sum, order) => sum + Number(order.amount || 0), 0);
   const freeCodeCount = allPaidOrders.filter((order) => orderChannelLabel(order) === 'โค้ดเรียนฟรี').length;
   const platformRevenue = Math.max(0, gross - earned);
 
@@ -71,7 +71,7 @@ export function AdminInstructorFinancePage() {
     { title: 'ผู้สอน', render: (_, row) => <div className="finance-course-cell"><strong>{row.name}</strong><Text type="secondary">{row.email}</Text></div> },
     { title: 'ผู้เรียน', dataIndex: 'learnerCount', render: (count) => `${count.toLocaleString('th-TH')} คน` },
     { title: 'ยอดขายสำเร็จ', dataIndex: 'gross', render: money },
-    { title: 'ยอดเงินสดผ่านโค้ด', dataIndex: 'cashGross', render: money },
+    { title: 'ยอดขายผ่านรหัสแลกคอร์ส', dataIndex: 'cashGross', render: money },
     { title: 'ส่วนแบ่งรวม', dataIndex: 'totalEarned', render: money },
     { title: 'รอโอน', render: (_, row) => <div className="finance-course-cell"><strong>{money(row.pending)}</strong><Text type="secondary">{row.pendingOrderCount} รายการ</Text></div> },
     { title: 'ตั้งสัดส่วนรายคน', render: (_, row) => <RateEditor instructor={row} onSave={saveInstructorCommission}/> },
@@ -97,7 +97,7 @@ export function AdminInstructorFinancePage() {
       <div className="finance-kpi"><Text type="secondary">ยอดที่ต้องโอน</Text><strong>{money(pending)}</strong><Text type="secondary">รายการที่ยังไม่ทำเครื่องหมายโอน</Text></div>
       <div className="finance-kpi"><Text type="secondary">บันทึกโอนแล้ว</Text><strong>{money(transferred)}</strong><Text type="secondary">ยอดในประวัติการโอนจำลอง</Text></div>
     </div>
-    <div className="finance-source-breakdown" aria-label="แยกยอดขายและส่วนแบ่งตามช่องทาง"><div><Text type="secondary">ชำระผ่านระบบ</Text><strong>{money(systemSales)}</strong><Text type="secondary">ยอดรับจริงหลังส่วนลด</Text></div><div><Text type="secondary">เงินสดผ่านโค้ด</Text><strong>{money(cashSales)}</strong><Text type="secondary">บันทึกเป็นรายการขายและยอดรอโอน</Text></div><div><Text type="secondary">ส่วนแบ่งแพลตฟอร์ม</Text><strong>{money(platformRevenue)}</strong><Text type="secondary">หลังแบ่งส่วนผู้สอน</Text></div><div><Text type="secondary">ใช้โค้ดเรียนฟรี</Text><strong>{freeCodeCount} รายการ</strong><Text type="secondary">ไม่นับเป็นรายได้</Text></div></div>
+    <div className="finance-source-breakdown" aria-label="แยกยอดขายและส่วนแบ่งตามช่องทาง"><div><Text type="secondary">ชำระผ่านระบบ</Text><strong>{money(systemSales)}</strong><Text type="secondary">ยอดรับจริงหลังส่วนลด</Text></div><div><Text type="secondary">ขายผ่านรหัสแลกคอร์ส</Text><strong>{money(cashSales)}</strong><Text type="secondary">บันทึกเป็นรายการขายและยอดรอโอน</Text></div><div><Text type="secondary">ส่วนแบ่งแพลตฟอร์ม</Text><strong>{money(platformRevenue)}</strong><Text type="secondary">หลังแบ่งส่วนผู้สอน</Text></div><div><Text type="secondary">ใช้โค้ดเรียนฟรี</Text><strong>{freeCodeCount} รายการ</strong><Text type="secondary">ไม่นับเป็นรายได้</Text></div></div>
     <section className="finance-section">
       <SectionHeading title="รายได้แยกตามผู้สอน" description="ตั้ง % ผู้สอนเป็นรายคน และกำหนด % ลิงก์แนะนำให้สูงกว่าอัตราปกติ ส่วนที่เหลือเป็นส่วนแบ่งแพลตฟอร์ม ยอดย้อนหลังยึดตามวันที่ชำระ"/>
       <Table rowKey="id" dataSource={rows} columns={columns} pagination={false} scroll={{ x: 1180 }} locale={{ emptyText: <Empty description="ยังไม่มีบัญชีผู้สอน"/> }}/>

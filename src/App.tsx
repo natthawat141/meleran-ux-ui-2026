@@ -19,7 +19,7 @@ import { LoginPage, RegisterPage, BecomeInstructorPage, DemoAccountPage, VerifyE
 import { LearnerDashboardPage, MyCoursesPage } from './pages/learner/DashboardPages';
 import { LearnerCoursePage, VideoLessonPage, ArticleLessonPage } from './pages/learner/LessonPages';
 import { QuizIntroPage, QuizAttemptPage, QuizResultPage } from './pages/learner/QuizPages';
-import { CheckoutPage, CheckoutResultPage, OrdersPage, OrderDetailPage } from './pages/learner/CommercePages';
+import { CheckoutPage, CheckoutResultPage, OrdersPage, OrderDetailPage, RedeemCourseCodePage } from './pages/learner/CommercePages';
 import { CartPage } from './pages/learner/CartPage';
 import { InstructorFinancePage } from './pages/instructor/InstructorFinancePage';
 import { AdminInstructorFinancePage } from './pages/admin/AdminInstructorFinancePage';
@@ -158,6 +158,7 @@ export function AppRoutes() {
 
       <Route path="/learn" element={learner(<LearnerDashboardPage />)} />
       <Route path="/learn/courses" element={learner(<MyCoursesPage />)} />
+      <Route path="/learn/redeem" element={learner(<RedeemCourseCodePage />)} />
       <Route path="/learn/assignments" element={learner(<AssignmentsPage />)} />
       <Route path="/learn/ai" element={
         <RolePage roles={['learner', 'admin']} standalone>
