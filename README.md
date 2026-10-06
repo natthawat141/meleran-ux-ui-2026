@@ -1,6 +1,6 @@
 # E-Learning UX Prototype V2
 
-**Approved business scope:** [Melearn Final 1.5](docs/MELEARN_V1_SCOPE.md), reviewed and confirmed by the owner on 6 October 2026. This is the source of truth for the first month. [Release matrix](docs/FEATURE_RELEASE_MATRIX.md) tracks implementation readiness separately. Existing checkout, finance and inbox screens are legacy prototypes outside this scope.
+**Approved business scope:** [Melearn Final 1.6](docs/MELEARN_V1_SCOPE.md), based on the owner-reviewed Final 1.5 and the confirmed Stripe/AI-practice additions on 6 October 2026. This is the source of truth for the first month. [Release matrix](docs/FEATURE_RELEASE_MATRIX.md) tracks implementation readiness separately. Stripe course payments are now in scope. Cart/order history, finance and inbox screens remain legacy prototypes outside V1.
 
 React + TypeScript + Ant Design/Mantine prototype. Demo accounts and course data are stored in this browser only.
 
@@ -16,11 +16,15 @@ Run from this directory with `npm install`, then `npm run dev -- --port 5174`.
 
 V1 uses YouTube links. Mux/Bunny has not been selected. `.env.example` retains the optional `VITE_MUX_ENV_KEY` from the prototype for potential Mux Data analytics; do not treat it as a required V1 integration. `.env.local` is ignored by Git. The current prototype does not yet initialize Mux analytics, so adding this value alone does not enable tracking.
 
+## New first-month requirements
+
+AI accepts “สร้างแบบฝึกหัด” or `/quiz` and returns an interactive multiple-choice set in chat, with saved answers and feedback. These practice scores do not affect course progress or certificates. Stripe course checkout grants lifetime enrollment after server-verified payment; redemption codes remain another entry path. The current UI responses and checkout are still browser-local mocks: neither real quiz generation nor Stripe/payment APIs are connected by this documentation update.
+
 ## Feature readiness and preview builds
 
 [Feature Release Matrix](docs/FEATURE_RELEASE_MATRIX.md) inventories all routes and separates UI, business approval, backend, and release readiness. `src/config/features.ts` controls route availability; every current feature is a prototype.
 
-Development and Preview allow `prototype`, `integration`, and `released`; Staging allows `integration` and `released`; Production allows only `released`. `disabled` is blocked everywhere. First-month scope follows the approved Final 1.5. Items marked Later have no committed delivery date. Phase metadata does not open routes.
+Development and Preview allow `prototype`, `integration`, and `released`; Staging allows `integration` and `released`; Production allows only `released`. `disabled` is blocked everywhere. First-month scope follows the approved Final 1.6. Items marked Later have no committed delivery date. Phase metadata does not open routes.
 
 `npm run dev` keeps the existing prototype walkthrough. For a built UX preview:
 

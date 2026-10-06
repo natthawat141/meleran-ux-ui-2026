@@ -1,6 +1,6 @@
 # Melearn Code Spec
 
-**ข้อมูลหลักที่เจ้าของยืนยัน 6 ต.ค. 2026:** [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.5 กำหนดกติกาธุรกิจ สิทธิ์ และขอบเขตหนึ่งเดือนแรก เอกสารนี้อธิบายวิธีทำต้นแบบ หากข้อความหรือพฤติกรรมเดิมขัดกัน ให้ใช้ฉบับหลัก และระบุส่วนที่โค้ดยังไม่ตรง ห้ามถือว่าต้นแบบพร้อม Production
+**ข้อมูลหลักที่เจ้าของยืนยัน 6 ต.ค. 2026:** [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.6 กำหนดกติกาธุรกิจ สิทธิ์ และขอบเขตหนึ่งเดือนแรก เอกสารนี้อธิบายวิธีทำต้นแบบ หากข้อความหรือพฤติกรรมเดิมขัดกัน ให้ใช้ฉบับหลัก และระบุส่วนที่โค้ดยังไม่ตรง ห้ามถือว่าต้นแบบพร้อม Production
 
 
 อัปเดต 6 ตุลาคม 2026 ข้อกำหนดสำหรับต่อ UX prototype ปัจจุบัน อ่าน [`UI_SPEC.md`](UI_SPEC.md) ควบคู่ก่อนแก้หน้าจอ
@@ -158,4 +158,10 @@ Preview ปกติ: `http://127.0.0.1:5174/` ตรวจ server ที่ร�
 - ใช้ YouTube Link ก่อน Upload Video API ต้องตอบไม่พร้อมและไม่สร้าง upload record ส่วน Mux Data key ที่มีเป็นข้อมูลต้นแบบ ไม่ใช่การเลือกผู้ให้บริการวิดีโอ
 - AI ของต้นแบบยังตอบ mock และเก็บประวัติใน browser ส่วนระบบจริงต้องเก็บคำถาม/คำตอบใน Database บังคับสิทธิ์คอร์ส และนับโควตาที่ server ตามฉบับหลัก ค่า limit อยู่จุดกลางแก้ได้ ไม่ใช้ quota ที่ client เป็นหลักฐาน
 - คอร์สใช้ draft → pending_review → approved → published; แก้ approved ก่อน publish ต้องตรวจใหม่ published แก้เนื้อหาได้ทันที การแก้เฉพาะ AI/Transcript ไม่เปลี่ยนสถานะอนุมัติ
-- Checkout/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่ใน source เป็นของต้นแบบเดิม ไม่เพิ่มงานเหล่านี้ในรอบหนึ่งเดือน
+- Cart/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่ใน source เป็นของต้นแบบเดิม ไม่เพิ่มงานเหล่านี้ในรอบหนึ่งเดือน
+
+## ขอบเขต Stripe และ AIPractice ที่เพิ่ม
+
+- Registry แยก `payments` (เดือนแรก) จาก `commerce` (Cart/Orders ที่ยังไม่ทำ) ทุกสถานะยัง prototype การมี route checkout ไม่ใช่หลักฐานเชื่อม Stripe จริง
+- ระบบจริงใช้ Stripe Session/PaymentEvent ตรวจราคา บัญชี ลายเซ็น Webhook และผลจ่าย ณ server ก่อนสร้างหรือคืน Enrollment เดิม ไม่เพิ่ม Order/Cart Domain จากชื่อพารามิเตอร์เก่าใน prototype
+- AIPractice แยกจาก Quiz/QuizAttempt จัดเก็บชุดคำถามและผลในแชต ตรวจ response schema ก่อนคิด Prompt สำเร็จ การตอบและอ่านผลไม่เรียก model หรือนับ Prompt เพิ่ม

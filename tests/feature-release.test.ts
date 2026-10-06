@@ -42,7 +42,13 @@ test('feature metadata uses recognized statuses and scope labels', () => {
   for (const key of Object.values(ROUTE_FEATURES)) assert.ok(Object.hasOwn(FEATURES, key), key);
   assert.equal(ROUTE_FEATURES['/learn/redeem'], 'accessCodes');
   assert.equal(ROUTE_FEATURES['/admin/access-codes'], 'accessCodes');
-  assert.equal(ROUTE_FEATURES['/checkout/:courseId'], 'commerce');
+  assert.equal(FEATURES.payments.phase, 1);
+  assert.equal(FEATURES.payments.status, 'prototype');
+  assert.equal(FEATURES.commerce.phase, 'later');
+  assert.equal(ROUTE_FEATURES['/checkout/:courseId'], 'payments');
+  assert.equal(ROUTE_FEATURES['/checkout/:orderId/result'], 'payments');
+  assert.equal(ROUTE_FEATURES['/account/cart'], 'commerce');
+  assert.equal(ROUTE_FEATURES['/account/orders'], 'commerce');
   assert.equal(ROUTE_FEATURES['/learn/assignments'], 'assignments');
 });
 

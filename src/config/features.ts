@@ -2,7 +2,7 @@ export type FeatureStatus = 'prototype' | 'integration' | 'released' | 'disabled
 export type FeatureEnvironment = 'development' | 'preview' | 'staging' | 'production';
 export type FeaturePhase = 1 | 'later';
 
-// Phase 1 is confirmed in Final 1.5; later means outside that scope, with no committed date.
+// Phase 1 is confirmed in Final 1.6; later means outside that scope, with no committed date.
 // Runtime status reflects the current browser-local prototype evidence, not planned delivery scope.
 export const FEATURES = {
   publicSite: { status: 'prototype', phase: 1 },
@@ -16,6 +16,7 @@ export const FEATURES = {
   assignments: { status: 'prototype', phase: 'later' },
   certificates: { status: 'prototype', phase: 1 },
   accessCodes: { status: 'prototype', phase: 1 },
+  payments: { status: 'prototype', phase: 1 },
   commerce: { status: 'prototype', phase: 'later' },
   operations: { status: 'prototype', phase: 1 },
   analytics: { status: 'prototype', phase: 'later' },
@@ -91,8 +92,8 @@ export const ROUTE_FEATURES = {
   '/admin/certificates': 'certificates',
   '/admin/certificates/:certificateId': 'certificates',
   '/certificates/verify/:code': 'certificates',
-  '/checkout/:courseId': 'commerce',
-  '/checkout/:orderId/result': 'commerce',
+  '/checkout/:courseId': 'payments',
+  '/checkout/:orderId/result': 'payments',
   '/account/orders': 'commerce',
   '/account/cart': 'commerce',
   '/account/orders/:orderId': 'commerce',

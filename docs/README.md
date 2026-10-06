@@ -6,7 +6,7 @@
 
 | เอกสาร | หน้าที่ |
 | --- | --- |
-| [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) | **ข้อมูลหลัก Final 1.5 ที่เจ้าของตรวจและยืนยันแล้ว**: Domain, permission, flow, scope หนึ่งเดือน และกรณีตรวจรับ |
+| [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) | **ข้อมูลหลัก Final 1.6 จากฉบับ 1.5 ที่เจ้าของตรวจแล้วและคำยืนยันเพิ่ม Stripe/AI practice**: Domain, permission, flow, scope หนึ่งเดือน และกรณีตรวจรับ |
 | [FEATURE_RELEASE_MATRIX.md](FEATURE_RELEASE_MATRIX.md) | ความพร้อมของต้นแบบ/API/release แยกจากการอนุมัติกติกาธุรกิจ |
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
@@ -22,7 +22,7 @@
 
 อ่านฉบับหลักก่อน UI/CODE spec ซึ่งใช้รักษาแบรนด์และวิธีทำต้นแบบ การอนุมัติธุรกิจไม่เท่ากับ backend พร้อมหรือเลือกสแตกแล้ว
 
-Inbox, Finance, Orders, Checkout และ analytics แบบใหญ่จากร่างเดิมไม่อยู่ในรอบแรก เอกสารเก็บประวัติไม่ใช่งานที่ต้องทำให้ครบ
+Stripe Checkout ซื้อคอร์สแล้วได้สิทธิ์และ AI สร้างชุดฝึกในแชตอยู่ในรอบแรกแล้ว ส่วน Inbox, Finance, Orders/Cart แบบเต็ม และ analytics แบบใหญ่ยังไม่ทำ เอกสารเก็บประวัติไม่ใช่งานที่ต้องทำให้ครบ
 
 ## ใช้กับ AI แต่ละตัว
 

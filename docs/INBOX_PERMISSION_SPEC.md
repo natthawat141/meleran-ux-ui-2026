@@ -4,6 +4,6 @@
 
 Inbox และการถามผู้สอนยังไม่ทำในรอบแรก สิทธิ์เรียนใช้ได้ตลอดตามฉบับหลัก กติกาเดิมเรื่องสิทธิ์หมดอายุไม่ใช่กติกาปัจจุบัน
 
-อ่าน [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.5 ที่เจ้าของยืนยันแล้ว
+อ่าน [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.6 ที่เจ้าของยืนยันแล้ว
 
 [ต้นฉบับเพื่อดูประวัติ](archive/pre-final-20261006/INBOX_PERMISSION_SPEC.md)

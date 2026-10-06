@@ -1,12 +1,12 @@
 # Feature Release Matrix — Melearn
 
-อัปเดต 6 ตุลาคม 2026 · โครงการ UX prototype · อ้างอิงขอบเขต [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.5
+อัปเดต 6 ตุลาคม 2026 · โครงการ UX prototype · อ้างอิงขอบเขต [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6
 
-Final 1.5 เป็นแหล่งตัดสิน scope รอบ 1 เดือน ส่วนคู่มือ V3 และ behavior ในต้นแบบเป็นข้อมูลอ้างอิงเมื่อไม่ขัดกับ Final 1.5 เอกสารนี้เทียบ scope ที่ยืนยันกับเส้นทางปัจจุบันใน `src/App.tsx`; การมี route หรือคลิกได้ไม่ใช่หลักฐานว่าฟีเจอร์พร้อมใช้จริง
+Final 1.6 เป็นแหล่งตัดสิน scope รอบ 1 เดือน ส่วนคู่มือ V3 และ behavior ในต้นแบบเป็นข้อมูลอ้างอิงเมื่อไม่ขัดกับ Final 1.6 เอกสารนี้เทียบ scope ที่ยืนยันกับเส้นทางปัจจุบันใน `src/App.tsx`; การมี route หรือคลิกได้ไม่ใช่หลักฐานว่าฟีเจอร์พร้อมใช้จริง
 
 ## ขอบเขตและสถานะ
 
-Phase 1 หมายถึงอยู่ในขอบเขตส่งมอบเดือนแรกที่ยืนยันใน Final 1.5 รวมหน้า public ที่จำเป็นต่อการเข้าถึงคอร์สและ Blog ตามบทบาท ส่วน Later / ยังไม่ทำ หมายถึงอยู่นอก scope เดือนแรก ไม่มีวันที่หรือคำมั่นว่าจะทำในรอบถัดไป ไม่ใช่ลำดับที่อนุมัติให้เริ่มพัฒนา
+Phase 1 หมายถึงอยู่ในขอบเขตส่งมอบเดือนแรกที่ยืนยันใน Final 1.6 รวมหน้า public ที่จำเป็นต่อการเข้าถึงคอร์สและ Blog ตามบทบาท ส่วน Later / ยังไม่ทำ หมายถึงอยู่นอก scope เดือนแรก ไม่มีวันที่หรือคำมั่นว่าจะทำในรอบถัดไป ไม่ใช่ลำดับที่อนุมัติให้เริ่มพัฒนา
 
 | Feature key | Feature | Phase / scope | UI | Business Rule | Backend | Runtime | Staging | Production |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -21,19 +21,20 @@ Phase 1 หมายถึงอยู่ในขอบเขตส่งมอ
 | `assignments` | Assignment ที่แยกจากแบบฝึกหัดในคอร์ส | Later | Prototype | Approved exclusion: Assignment แยกจาก Quiz ในคอร์สไม่อยู่ในรอบแรก | None; browser demo | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `certificates` | ออก / แสดง / ตรวจสอบใบรับรอง | 1 | Prototype | Approved: ออกเมื่อ progress ครบและแบบฝึกหัดผ่านตามเกณฑ์; เก็บ completion snapshot เพื่อคงใบเดิม | None; browser state | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `accessCodes` | Redeem / Admin ออกและจัดการ Redeem Code | 1 | Prototype | Approved: Admin ออก/ดู/ยกเลิก Unused; โค้ดผูกคอร์สใช้ครั้งเดียว; ผู้มีสิทธิ์ Redeem ได้ Enrollment | None; browser state | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `commerce` | Cart / Checkout / Orders / Payment | Later | Prototype | Approved exclusion: ไม่มี Payment gateway, Cart, Checkout หรือ Order ในรอบแรก | None; simulated | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `payments` | Stripe Checkout / ผลจ่าย / ให้สิทธิ์อัตโนมัติ | 1 | Prototype; checkout เดิมยัง mock | Approved: จ่าย Stripe สำเร็จแล้วได้ Enrollment ทันที Redeem ยังเป็นอีกช่องทาง; ไม่มี Cart/Order history แบบเต็ม | None; ไม่มี Stripe API/Webhook จริง | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `commerce` | Cart / Orders / ส่วนลด | Later | Prototype | Approved exclusion: Cart/Order history แบบเต็มและส่วนลดยังไม่ทำ | None; simulated | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `operations` | Admin overview / บัญชี / เพิ่มผู้สอน | 1 | Prototype | Approved: Admin สร้างบัญชี เพิ่ม Instructor จัดการคอร์ส อนุมัติ และออก/ดูโค้ด | None; browser admin actions | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `analytics` | Analytics การเรียนและรายงานธุรกิจ | Later | Prototype | Approved exclusion: ไม่ทำ Business Analytics, Big Data หรือ pipeline วิเคราะห์รอบแรก | None; local read models | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `finance` | รายได้ / ส่วนแบ่ง / การจ่ายเงิน | Later | Prototype | Approved exclusion: ไม่มีส่วนแบ่ง รายงานการเงิน การจ่ายเงิน หรือ Refund | None; demo calculations | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `inbox` | กล่องข้อความและถามผู้สอน | Later | Prototype | Approved exclusion: ไม่ทำ Inbox หรือถามผู้สอนในรอบแรก | None; browser messages | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `blog` | อ่าน Blog / Admin เขียนและเผยแพร่ | 1 | Prototype | Approved: ทุกบทบาทอ่าน Published; Admin เขียน แก้ และเผยแพร่ | None; browser articles | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `aiTeacher` | AI Course Support / Transcript / ประวัติและโควตา | 1 | Demo; ยังไม่เชื่อม AI จริง | Approved: AI Course Support, Transcript, ประวัติ และ 20 prompts สำเร็จ/บัญชี/วันไทย; หน้าวิเคราะห์ Admin ทำภายหลัง | None; local demo | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `aiTeacher` | AI Course Support / Transcript / ประวัติและโควตา | 1 | Demo; ยังไม่เชื่อม AI จริง | Approved: AI Course Support, Transcript, คำสั่งสร้างแบบฝึกหัดในแชต ประวัติ และ 20 prompts สำเร็จ/บัญชี/วันไทย; หน้าวิเคราะห์ Admin ทำภายหลัง | None; local demo | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 
 ทุกสถานะ Runtime เริ่มที่ `prototype` เพราะ repository นี้ยังเป็น browser-local prototype ไม่มี Production API, persistence, auth enforcement, payment หรือ server authorization ที่ผ่านตรวจรับ การระบุ Phase 1 บอก scope ที่ยืนยัน ไม่ได้แปลว่า implementation เสร็จหรือเปิดใช้งานจริง
 
-Feature key `accessCodes` แยกจาก `commerce`: รอบแรกมี Redeem และเครื่องมือ Admin จัดการโค้ด แต่ไม่มีการขายผ่านเว็บไซต์ ตะกร้า Checkout หรือรายการ Order `assignments` แยกจาก `assessment` ตามข้อยกเว้น Assignment ที่อยู่นอก scope
+Feature key `accessCodes` แยกจาก `commerce`: รอบแรกมี Redeem และเครื่องมือ Admin จัดการโค้ด และมี `payments` สำหรับซื้อรายคอร์สผ่าน Stripe แล้วได้สิทธิ์ทันที ไม่มีตะกร้า/Order history แบบเต็ม `assignments` แยกจาก `assessment` ตามข้อยกเว้น Assignment ที่อยู่นอก scope
 
-Final 1.5 ไม่ทำ Referral และไม่มี Referral route ใน `App.tsx`; หน้าวิเคราะห์คำถาม AI สำหรับ Admin ก็ยังไม่มี route และไม่ใช่ส่วนของ `aiTeacher` learner flow
+Final 1.6 ไม่ทำ Referral และไม่มี Referral route ใน `App.tsx`; หน้าวิเคราะห์คำถาม AI สำหรับ Admin ก็ยังไม่มี route และไม่ใช่ส่วนของ `aiTeacher` learner flow
 
 ## Environment gate
 
@@ -125,8 +126,8 @@ Build default เป็น production และปิด route ของ prototy
 | `/admin/certificates` | `certificates` |
 | `/admin/certificates/:certificateId` | `certificates` |
 | `/certificates/verify/:code` | `certificates` |
-| `/checkout/:courseId` | `commerce` |
-| `/checkout/:orderId/result` | `commerce` |
+| `/checkout/:courseId` | `payments` |
+| `/checkout/:orderId/result` | `payments` |
 | `/account/orders` | `commerce` |
 | `/account/cart` | `commerce` |
 | `/account/orders/:orderId` | `commerce` |
@@ -153,6 +154,8 @@ Build default เป็น production และปิด route ของ prototy
 | `*` | — |
 ## การอัปเดต
 
-เมื่อเปลี่ยน route หรือ feature ให้แก้ `FEATURES`, `ROUTE_FEATURES` และ inventory นี้พร้อมกัน; tests ตรวจ route coverage, wrapper, phase, runtime status และคู่ route/key ระหว่างเอกสารกับ code การเลื่อนเข้า/ออก Phase ต้องยึด Final 1.5 หรือคำยืนยันใหม่จากเจ้าของ ไม่ใช้ข้อเสนอ Phase ใน V3 มาแทน
+เมื่อเปลี่ยน route หรือ feature ให้แก้ `FEATURES`, `ROUTE_FEATURES` และ inventory นี้พร้อมกัน; tests ตรวจ route coverage, wrapper, phase, runtime status และคู่ route/key ระหว่างเอกสารกับ code การเลื่อนเข้า/ออก Phase ต้องยึด Final 1.6 หรือคำยืนยันใหม่จากเจ้าของ ไม่ใช้ข้อเสนอ Phase ใน V3 มาแทน
 
 การ build/typecheck ผ่านไม่ได้ยืนยัน Business Rule, API readiness, UX acceptance, staging หรือ production readiness การปล่อย Production ต้องมีหลักฐานตาม scope และการตรวจรับที่ตกลงแยกต่างหาก
+
+Stripe และ AI สร้างแบบฝึกหัดเพิ่มตามคำยืนยันล่าสุดใน Final 1.6 สถานะ runtime ยัง prototype; renderer เดิมมีโจทย์ฝึก mock แต่ยังไม่มีคำสั่งสร้างชุดฝึกจาก model และยังไม่มี Stripe integration จริง ชื่อ `:orderId` ของ route ผลจ่ายเดิมไม่บังคับสร้าง Order Domain
