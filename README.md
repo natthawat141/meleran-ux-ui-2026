@@ -36,4 +36,14 @@ node --test tests/business-reports.test.mjs tests/profile-model.test.mjs tests/i
 
 Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
 
+## Email verification and course review prototype
+
+Self-service email registration creates an unverified account and a local verification link. Login is allowed, while enrollment, redemption and learning require verification. Links expire after 24 hours and work once. `/verify-email` offers a new mock link after a prototype cooldown of 60 seconds. No email is sent and Resend is not connected. Existing demo accounts and Admin-created accounts without an unverified flag keep their access.
+
+Google mode only simulates linking a matching email to the currently signed-in account. It does not perform OAuth, create users or merge accounts.
+
+Courses follow `draft → pending_review → approved → published`. The owner Instructor or Admin submits a draft, Admin approves or returns it with a reason at `/admin/courses/reviews`, and the owner or Admin publishes an approved course. Editing an approved or pending course returns it to draft; published edits remain published.
+
+Checks and browser walkthrough results: [Email verification and course review](docs/EMAIL_VERIFICATION_COURSE_REVIEW_20261006.md).
+
 `/learn/ai` is a standalone learner chat page on the same site. It currently stores account-scoped chat history locally and renders demo responses, math and interactive response blocks; no real model or course-document retrieval is connected yet.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Space, Tag, Typography } from 'antd';
+import { Alert, Button, Space, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
@@ -39,11 +39,14 @@ export function PublicCourseDetailPage() {
   const start = () => {
     if (!currentUser) {
       navigate(login);
+    } else if (currentUser.role !== 'admin' && currentUser.emailVerified === false) {
+      navigate('/verify-email');
     } else if (enrolled) {
       navigate(`/learn/courses/${course.id}`);
     } else if (course.price === 0) {
-      enrollFree(course.id, undefined, referralCode);
-      navigate(`/learn/courses/${course.id}`);
+      const result = enrollFree(course.id, undefined, referralCode);
+      if (result.ok) navigate(`/learn/courses/${course.id}`);
+      else message.info(result.message);
     } else {
       navigate(`/checkout/${course.id}${referralQuery}`);
     }
@@ -93,6 +96,7 @@ export function PublicCourseDetailPage() {
           <span><PlayCircleOutlined aria-hidden="true" /> เรียนด้วยตัวเอง</span>
         </div>
       </div>
+      {currentUser?.emailVerified === false && <Alert className="top-space" type="info" showIcon message="ยืนยันอีเมลก่อนลงเรียนหรือซื้อคอร์ส" description={<Link to="/verify-email">เปิดหน้าส่งลิงก์ยืนยันจำลอง</Link>} />}
       <div className="detail-content-grid">
         <main>
           <CourseOutline course={course} />

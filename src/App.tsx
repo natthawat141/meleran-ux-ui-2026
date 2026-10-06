@@ -9,6 +9,7 @@ import { CourseLessonPreviewPage } from './pages/public/CourseLessonPreviewPage'
 import { MemberCatalogPage } from './pages/member/CatalogPage';
 import { MemberCourseDetailPage } from './pages/member/CourseDetailPage';
 import { AdminOrdersPage } from './pages/admin/OrderPages';
+import { CourseReviewPage } from './pages/admin/CourseReviewPage';
 import { AccessCodesPage } from './pages/admin/AccessCodesPage';
 import { AdminCertificatesPage } from './pages/admin/CertificatePages';
 import { LandingPage } from './pages/landing/LandingPage';
@@ -86,6 +87,15 @@ function RolePage({ roles, children, standalone = false }: { roles: Role[]; chil
       </WorkspaceShell>
     );
   }
+  const needsEmailVerification = currentUser.role !== 'admin' && currentUser.emailVerified === false;
+  const learningPath = location.pathname === '/learn'
+    || location.pathname === '/learn/courses'
+    || location.pathname.startsWith('/learn/courses/')
+    || location.pathname === '/learn/redeem'
+    || location.pathname.startsWith('/learn/quizzes/')
+    || location.pathname.startsWith('/learn/attempts/')
+    || location.pathname.startsWith('/checkout/');
+  if (needsEmailVerification && learningPath) return <Public><VerifyEmailPage /></Public>;
   if (currentUser.role === 'instructor' && location.pathname.startsWith('/teach/')) {
     const attempt = data.attempts.find((item) => item.id === params.attemptId);
     const quiz = data.quizzes.find((item) => item.id === params.quizId);
@@ -233,6 +243,7 @@ export function AppRoutes() {
       <Route path="/admin/instructors" element={admin(<AdminInstructorRequestsPage />)} />
       <Route path="/admin/instructors/:id" element={admin(<AdminInstructorRequestDetailPage />)} />
       <Route path="/admin/courses" element={admin(<AdminCoursesPage />)} />
+      <Route path="/admin/courses/reviews" element={admin(<CourseReviewPage />)} />
       <Route path="/admin/courses/:courseId" element={admin(<AdminCourseDetailPage />)} />
       <Route path="/admin/orders" element={admin(<AdminOrdersPage />)} />
       <Route path="/admin/orders/:orderId" element={admin(<OrderDetailPage />)} />

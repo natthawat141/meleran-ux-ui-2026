@@ -78,6 +78,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/admin/articles', icon: <IconArticle />, label: 'บทความ' },
     { key: '/admin/instructors', icon: <IconSchool />, label: 'ผู้สอนและคำขอ' },
     { key: '/admin/courses', icon: <IconBook2 />, label: 'คอร์สทั้งหมด' },
+    { key: '/admin/courses/reviews', icon: <IconClipboardCheck />, label: 'คิวตรวจคอร์ส' },
     { key: '/admin/assignments', icon: <IconChecklist />, label: 'จัดการงานมอบหมาย' },
     { key: '/admin/inbox', icon: <IconMessages />, label: 'อินบ็อกซ์' },
     { key: '/admin/users', icon: <IconUsers />, label: 'ผู้ใช้งาน' },

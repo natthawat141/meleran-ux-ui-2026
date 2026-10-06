@@ -8,6 +8,8 @@ import { mergeInboxDemo } from './mocks/inbox';
 import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model';
 import { cashCodeShareAmounts, commitCashCodeRedemption, normalizeAccessCode, quoteAccessCode } from './lib/access-code-utils';
 import { assignmentHasHistory, assignmentIncludesLearner, assignmentSaveIssue, canManageCourse, contentRemovalIssue } from './lib/learning-history';
+import { EMAIL_VERIFICATION_RESEND_COOLDOWN_MS, EMAIL_VERIFICATION_TTL_MS, verificationResendAvailable, verificationResendRemainingMs, verificationTokenState } from './lib/email-verification';
+import { canEditCourse, canPublishCourse, canReviewCourse, canSubmitCourse, coursePublicationIssue, invalidateCourseReview } from './lib/course-review';
 import type {
   ActionResult,
   AccessCode,
@@ -28,6 +30,7 @@ import type {
   Course,
   CourseItem,
   Enrollment,
+  EmailVerification,
   InboxConversation,
   InboxMessage,
   LmsContextType,
@@ -244,6 +247,18 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     [data.users, data.currentUserId]
   );
 
+  const createVerification = useCallback((userId: string, now = new Date()): EmailVerification => {
+    const createdAt = now.toISOString();
+    return {
+      id: createId('email-verification'),
+      userId,
+      token: globalThis.crypto?.randomUUID?.() ?? createId('token'),
+      createdAt,
+      expiresAt: new Date(now.getTime() + EMAIL_VERIFICATION_TTL_MS).toISOString(),
+      lastSentAt: createdAt,
+    };
+  }, []);
+
   const commitLearningChange = useCallback((next: LmsData): ActionResult => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
     catch { return { ok: false, message: 'บันทึกไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ' }; }
@@ -280,16 +295,84 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         role: 'learner',
         bio: '',
         status: 'active',
+        emailVerified: false,
       };
+      const verification = createVerification(user.id);
       update((next) => {
         next.users.push(user);
+        next.emailVerifications ??= [];
+        next.emailVerifications.push(verification);
         next.currentUserId = user.id;
         return next;
       });
-      return { ok: true, user };
+      return { ok: true, user, verificationUrl: `/verify-email?token=${encodeURIComponent(verification.token)}` };
     },
-    [data.users, update]
+    [createVerification, data.users, update]
   );
+
+  const verifyEmail = useCallback((token: string): ActionResult => {
+    const verification = (data.emailVerifications ?? []).find((entry) => entry.token === token);
+    const state = verificationTokenState(verification);
+    if (state === 'missing') return { ok: false, message: 'ลิงก์ยืนยันนี้ไม่ถูกต้องหรือไม่มีอยู่แล้ว' };
+    if (state === 'used') return { ok: false, message: 'ลิงก์นี้ใช้ยืนยันไปแล้ว เข้าสู่ระบบได้ตามปกติ' };
+    if (state === 'expired') return { ok: false, message: 'ลิงก์หมดอายุแล้ว ขอส่งลิงก์ยืนยันใหม่ได้' };
+    if (!verification) return { ok: false, message: 'ไม่พบลิงก์ยืนยันนี้' };
+    const user = data.users.find((entry) => entry.id === verification.userId);
+    if (!user) return { ok: false, message: 'ไม่พบบัญชีที่ต้องการยืนยัน' };
+    update((next) => {
+      const target = next.emailVerifications?.find((entry) => entry.id === verification.id);
+      const targetUser = next.users.find((entry) => entry.id === verification.userId);
+      if (target && !target.usedAt && verificationTokenState(target) === 'valid' && targetUser) {
+        target.usedAt = new Date().toISOString();
+        targetUser.emailVerified = true;
+      }
+      return next;
+    });
+    return { ok: true, user, message: 'ยืนยันอีเมลในต้นแบบสำเร็จแล้ว' };
+  }, [data.emailVerifications, data.users, update]);
+
+  const resendVerificationEmail = useCallback((): ActionResult => {
+    if (!currentUser) return { ok: false, message: 'เข้าสู่ระบบก่อนขอลิงก์ยืนยัน' };
+    if (currentUser.emailVerified !== false) return { ok: false, message: 'บัญชีนี้ไม่ต้องยืนยันอีเมลเพิ่ม' };
+    const existing = (data.emailVerifications ?? []).filter((entry) => entry.userId === currentUser.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+    const now = Date.now();
+    if (!verificationResendAvailable(existing, now)) {
+      const waitSeconds = Math.ceil(verificationResendRemainingMs(existing, now) / 1000);
+      return { ok: false, message: `ส่งลิงก์อีกครั้งได้ในประมาณ ${waitSeconds} วินาที` };
+    }
+    const verification = createVerification(currentUser.id, new Date(now));
+    update((next) => {
+      next.emailVerifications ??= [];
+      next.emailVerifications = next.emailVerifications.filter((entry) => entry.userId !== currentUser.id);
+      next.emailVerifications.push(verification);
+      return next;
+    });
+    return { ok: true, message: 'สร้างลิงก์ยืนยันจำลองแล้ว ไม่มีการส่งอีเมลจริง', verificationUrl: `/verify-email?token=${encodeURIComponent(verification.token)}` };
+  }, [createVerification, currentUser, data.emailVerifications, update]);
+
+  const simulateGoogleAuth = useCallback((email: string): ActionResult => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) return { ok: false, message: 'กรอกอีเมลสำหรับจำลองให้ถูกต้อง' };
+    if (!currentUser) return { ok: false, message: 'เข้าสู่ระบบบัญชี Melearn เดิมก่อน แล้วจึงทดลองเชื่อม Google' };
+    const emailOwner = data.users.find((user) => user.email.toLowerCase() === normalizedEmail);
+    const linkedOwner = data.users.find((user) => user.googleLinkedEmail?.toLowerCase() === normalizedEmail);
+    if ((emailOwner && emailOwner.id !== currentUser.id) || (linkedOwner && linkedOwner.id !== currentUser.id)) {
+      return { ok: false, message: 'อีเมล Google นี้เป็นของบัญชีอื่น กรุณาเข้าสู่ระบบบัญชีนั้นก่อน ระบบไม่รวมบัญชีอัตโนมัติ' };
+    }
+    if (normalizedEmail !== currentUser.email.toLowerCase()) {
+      return { ok: false, message: 'เพื่อยืนยันอีเมล ให้จำลอง Google ด้วยอีเมลเดียวกับบัญชีที่เข้าสู่ระบบอยู่' };
+    }
+    if (currentUser.googleLinkedEmail && currentUser.googleLinkedEmail.toLowerCase() !== normalizedEmail) return { ok: false, message: 'บัญชีนี้เชื่อม Google ไว้แล้ว' };
+    update((next) => {
+      const user = next.users.find((entry) => entry.id === currentUser.id);
+      if (user) {
+        user.googleLinkedEmail = normalizedEmail;
+        user.emailVerified = true;
+      }
+      return next;
+    });
+    return { ok: true, message: 'บันทึกสถานะ Google จำลองให้บัญชีที่เข้าสู่ระบบแล้ว ไม่มีการยืนยัน OAuth จริงหรือเปลี่ยนบทบาท' };
+  }, [currentUser, data.users, update]);
 
   const signOut = useCallback(() => {
     update((next) => {
@@ -370,11 +453,21 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       ) {
         return null;
       }
+      const selectedInstructorId = currentUser.role === 'admin'
+        ? values.instructorId || target?.instructorId
+        : target?.instructorId || currentUser.id;
+      if (!data.users.some((user) => user.id === selectedInstructorId && user.role === 'instructor')) return null;
       const savedId = id ?? createId('course');
       update((next) => {
         const existing = next.courses.find((course) => course.id === id);
+        const now = new Date().toISOString();
+        const previousStatus = existing?.status ?? 'draft';
+        const fields = ['slug', 'title', 'subtitle', 'description', 'category', 'level', 'price', 'instructorId', 'cover', 'chapters', 'outcomes'] as const;
+        const changed = Boolean(existing && fields.some((field) => JSON.stringify(values[field] ?? existing[field]) !== JSON.stringify(existing[field])));
+        const editableCourse = existing && changed
+          ? invalidateCourseReview(existing, currentUser.id, now)
+          : existing;
         const record: Course = {
-          id: savedId,
           slug: values.slug || values.title?.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-') || savedId,
           title: values.title ?? existing?.title ?? '',
           subtitle: values.subtitle ?? existing?.subtitle,
@@ -382,16 +475,17 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
           category: values.category ?? existing?.category ?? 'ทั่วไป',
           level: values.level ?? existing?.level ?? 'เริ่มต้น',
           price: values.price ?? existing?.price ?? 0,
-          instructorId:
-            currentUser.role === 'admin'
-              ? values.instructorId || existing?.instructorId || currentUser.id
-              : existing?.instructorId || currentUser.id,
           chapters: existing?.chapters ?? [],
-          status: values.status ?? existing?.status ?? 'draft',
           cover: values.cover ?? existing?.cover ?? defaultCourseCover,
-          updatedAt: new Date().toISOString(),
-          ...existing,
-          ...values,
+          ...(existing ?? {}),
+          ...(values ?? {}),
+          id: savedId,
+          updatedAt: now,
+          status: editableCourse?.status ?? previousStatus,
+          instructorId: currentUser.role === 'admin'
+            ? values.instructorId || existing?.instructorId || currentUser.id
+            : existing?.instructorId || currentUser.id,
+          reviewHistory: editableCourse?.reviewHistory ?? existing?.reviewHistory,
         };
         if (!record.cover) record.cover = defaultCourseCover;
       const previousPrice = Number(existing?.price);
@@ -417,11 +511,67 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       });
       return savedId;
     },
-    [currentUser, data.courses, update]
+    [currentUser, data.courses, data.users, update]
   );
+
+  const submitCourseForReview = useCallback((courseId: string): ActionResult => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    if (!course || !canSubmitCourse(currentUser, course)) return { ok: false, message: 'ส่งตรวจได้เฉพาะฉบับร่างที่คุณมีสิทธิ์จัดการ' };
+    const issue = coursePublicationIssue(course, data.users, data.quizzes);
+    if (issue) return { ok: false, message: issue };
+    const now = new Date().toISOString();
+    update((next) => {
+      const target = next.courses.find((entry) => entry.id === courseId);
+      if (!target || !canSubmitCourse(currentUser, target)) return next;
+      target.status = 'pending_review';
+      target.reviewHistory = [...(target.reviewHistory ?? []), { action: 'submitted', actorId: currentUser!.id, at: now }];
+      target.updatedAt = now;
+      return next;
+    });
+    return { ok: true, message: 'ส่งคอร์สให้แอดมินตรวจแล้ว' };
+  }, [currentUser, data.courses, data.quizzes, data.users, update]);
+
+  const reviewCourse = useCallback((courseId: string, decision: 'approve' | 'return', reason = ''): ActionResult => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    if (!course || !canReviewCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ตรวจคอร์สนี้ หรือคอร์สไม่ได้อยู่ในคิวตรวจ' };
+    if (decision === 'approve') {
+      const issue = coursePublicationIssue(course, data.users, data.quizzes);
+      if (issue) return { ok: false, message: issue };
+    }
+    if (decision === 'return' && !reason.trim()) return { ok: false, message: 'ระบุเหตุผลก่อนส่งคอร์สกลับให้ผู้สอน' };
+    const now = new Date().toISOString();
+    update((next) => {
+      const target = next.courses.find((entry) => entry.id === courseId);
+      if (!target || !canReviewCourse(currentUser, target)) return next;
+      target.status = decision === 'approve' ? 'approved' : 'draft';
+      target.reviewHistory = [...(target.reviewHistory ?? []), { action: decision === 'approve' ? 'approved' : 'returned', actorId: currentUser!.id, at: now, ...(reason.trim() ? { reason: reason.trim() } : {}) }];
+      target.updatedAt = now;
+      return next;
+    });
+    return { ok: true, message: decision === 'approve' ? 'อนุมัติคอร์สแล้ว รอผู้สอนหรือแอดมินเผยแพร่' : 'ส่งคอร์สกลับให้ผู้สอนแล้ว' };
+  }, [currentUser, data.courses, data.quizzes, data.users, update]);
+
+  const publishCourse = useCallback((courseId: string): ActionResult => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    if (!course || !canPublishCourse(currentUser, course)) return { ok: false, message: 'เผยแพร่ได้หลังอนุมัติ และต้องเป็นผู้สอนเจ้าของคอร์สหรือแอดมิน' };
+    const issue = coursePublicationIssue(course, data.users, data.quizzes);
+    if (issue) return { ok: false, message: issue };
+    const now = new Date().toISOString();
+    update((next) => {
+      const target = next.courses.find((entry) => entry.id === courseId);
+      if (!target || !canPublishCourse(currentUser, target)) return next;
+      target.status = 'published';
+      target.updatedAt = now;
+      target.reviewHistory = [...(target.reviewHistory ?? []), { action: 'published', actorId: currentUser!.id, at: now }];
+      return next;
+    });
+    return { ok: true, message: 'เผยแพร่คอร์สแล้ว' };
+  }, [currentUser, data.courses, data.quizzes, data.users, update]);
 
   const removeCourse = useCallback(
     (courseId: string) => {
+      const course = data.courses.find((entry) => entry.id === courseId);
+      if (!course || !canEditCourse(currentUser, course)) return;
       update((next) => {
         next.courses = next.courses.filter((course) => course.id !== courseId);
         next.quizzes = next.quizzes.filter((quiz) => quiz.courseId !== courseId);
@@ -435,11 +585,14 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         return next;
       });
     },
-    [update]
+    [currentUser, data.courses, update]
   );
 
   const saveChapter = useCallback(
     (courseId: string, values: Partial<Chapter>, chapterId?: string) => {
+      const course = data.courses.find((entry) => entry.id === courseId);
+      if (!course || !canEditCourse(currentUser, course)) return;
+      const now = new Date().toISOString();
       update((next) => {
         next.courses = next.courses.map((course) => {
           if (course.id !== courseId) return course;
@@ -453,12 +606,12 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
           const chapters = (chapterId || values.id)
             ? course.chapters.map((item) => (item.id === targetId ? chapter : item))
             : [...course.chapters, chapter];
-          return { ...course, chapters, updatedAt: new Date().toISOString() };
+          return { ...invalidateCourseReview(course, currentUser!.id, now), chapters, updatedAt: now };
         });
         return next;
       });
     },
-    [update]
+    [currentUser, data.courses, update]
   );
 
   // Reordering changes IDs' positions only, preserving content and learning history.
@@ -484,6 +637,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       const next = structuredClone(data);
       const target = next.courses.find((entry) => entry.id === courseId);
       if (!target) return { ok: false, message: 'ไม่พบคอร์ส' };
+      Object.assign(target, invalidateCourseReview(target, currentUser.id, new Date().toISOString()));
 
       if (chapterId) {
         const chapter = target.chapters.find((entry) => entry.id === chapterId);
@@ -548,6 +702,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       const next = structuredClone(data);
       const target = next.courses.find((entry) => entry.id === courseId);
       if (!target) return { ok: false, message: 'ไม่พบคอร์ส' };
+      Object.assign(target, invalidateCourseReview(target, currentUser.id, new Date().toISOString()));
       target.chapters = target.chapters.map((entry) => (entry.id === chapter.id ? structuredClone(chapter) : entry));
       target.updatedAt = new Date().toISOString();
       const retained = new Set(quizzes.map((quiz) => quiz.id));
@@ -574,6 +729,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     if (issue) return { ok: false, message: issue };
     const quizIds = chapter.items.flatMap((item) => 'quizId' in item && item.quizId ? [item.quizId] : []);
     const next = structuredClone(data);
+    const targetCourse = next.courses.find((entry) => entry.id === courseId);
+    if (targetCourse && currentUser) Object.assign(targetCourse, invalidateCourseReview(targetCourse, currentUser.id, new Date().toISOString()));
     next.quizzes = next.quizzes.filter((quiz) => !quizIds.includes(quiz.id));
     next.courses = next.courses.map((entry) => entry.id === courseId ? { ...entry, chapters: entry.chapters.filter((item) => item.id !== chapterId) } : entry);
     return commitLearningChange(next);
@@ -581,12 +738,15 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
 
   const saveItem = useCallback(
     (courseId: string, chapterId: string, values: Partial<CourseItem>) => {
+      const course = data.courses.find((entry) => entry.id === courseId);
+      if (!course || !canEditCourse(currentUser, course)) return;
+      const now = new Date().toISOString();
       update((next) => {
         next.courses = next.courses.map((course) =>
           course.id !== courseId
             ? course
             : {
-                ...course,
+                ...invalidateCourseReview(course, currentUser!.id, now),
                 chapters: course.chapters.map((chapter) =>
                   chapter.id !== chapterId
                     ? chapter
@@ -602,7 +762,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         return next;
       });
     },
-    [update]
+    [currentUser, data.courses, update]
   );
 
   const removeItem = useCallback((courseId: string, chapterId: string, itemId: string): ActionResult => {
@@ -611,6 +771,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     const issue = contentRemovalIssue(data, currentUser, courseId, [item]);
     if (issue) return { ok: false, message: issue };
     const next = structuredClone(data);
+    const targetCourse = next.courses.find((entry) => entry.id === courseId);
+    if (targetCourse && currentUser) Object.assign(targetCourse, invalidateCourseReview(targetCourse, currentUser.id, new Date().toISOString()));
     const quizId = 'quizId' in item ? item.quizId : undefined;
     if (quizId) next.quizzes = next.quizzes.filter((quiz) => quiz.id !== quizId);
     next.courses = next.courses.map((entry) => entry.id !== courseId ? entry : { ...entry, chapters: entry.chapters.map((chapter) => chapter.id !== chapterId ? chapter : { ...chapter, items: chapter.items.filter((content) => content.id !== itemId) }) });
@@ -674,6 +836,10 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
             }
           }
         }
+        const affectedIds = new Set([existing?.courseId, values.courseId].filter((id): id is string => Boolean(id)));
+        if (currentUser) next.courses.forEach((course) => {
+          if (affectedIds.has(course.id)) Object.assign(course, invalidateCourseReview(course, currentUser.id, new Date().toISOString()));
+        });
         return next;
       });
       return resultId;
@@ -691,16 +857,23 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     const issue = contentRemovalIssue(data, currentUser, course.id, items);
     if (issue) return { ok: false, message: issue };
     const next = structuredClone(data);
+    const targetCourse = next.courses.find((entry) => entry.id === course.id);
+    if (targetCourse && currentUser) Object.assign(targetCourse, invalidateCourseReview(targetCourse, currentUser.id, new Date().toISOString()));
     next.quizzes = next.quizzes.filter((entry) => entry.id !== quizId);
     next.courses = next.courses.map((entry) => ({ ...entry, chapters: entry.chapters.map((chapter) => ({ ...chapter, items: chapter.items.filter((item) => !('quizId' in item) || item.quizId !== quizId) })) }));
     return commitLearningChange(next);
   }, [currentUser, data, commitLearningChange]);
 
   const enrollFree = useCallback(
-    (courseId: string, userId = currentUser?.id, referralCode: string | null = null) => {
+    (courseId: string, userId = currentUser?.id, referralCode: string | null = null): ActionResult => {
+      if (!currentUser || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return { ok: false, message: 'ยืนยันอีเมลก่อนลงเรียน' };
+      if (userId !== currentUser.id) return { ok: false, message: 'ลงเรียนได้เฉพาะบัญชีที่เข้าสู่ระบบ' };
+      const course = data.courses.find((entry) => entry.id === courseId);
+      if (!course || course.status !== 'published' || course.price > 0) return { ok: false, message: 'คอร์สนี้ไม่พร้อมลงเรียนฟรี' };
+      if (data.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
       update((next) => {
         const course = next.courses.find((entry) => entry.id === courseId);
-        if (!userId || !course || course.price > 0 || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) {
+        if (!userId || !course || course.price > 0 || course.status !== 'published' || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) {
           return next;
         }
         const link = next.referralLinks.find((entry) => entry.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && entry.courseId === course.id && entry.instructorId === course.instructorId);
@@ -708,13 +881,14 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
           ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
         return next;
       });
+      return { ok: true };
     },
-    [currentUser?.id, update]
+    [currentUser, data.courses, data.enrollments, update]
   );
 
   const simulatePayment = useCallback((courseId: string, outcome: 'paid' | 'failed', referralCode: string | null = null, rawAccessCode = ''): string | null => {
     const course = data.courses.find((item) => item.id === courseId);
-    if (!course || !currentUser) return null;
+    if (!course || !currentUser || (currentUser.role !== 'admin' && currentUser.emailVerified === false) || course.status !== 'published') return null;
     const submittedCode = data.accessCodes.find((item) => normalizeAccessCode(item.code) === normalizeAccessCode(rawAccessCode));
     const quote = quoteAccessCode({ accessCodes: data.accessCodes, courseId, coursePrice: course.price, userId: currentUser.id, enrollments: data.enrollments, code: rawAccessCode });
     if (!quote.ok) return null;
@@ -820,6 +994,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   const addCourseToCart = useCallback((courseId: string, referralCode: string | null = null): ActionResult & { alreadyAdded?: boolean } => {
     const course = data.courses.find((item) => item.id === courseId && item.status === 'published');
     if (!currentUser || !['learner', 'admin'].includes(currentUser.role)) return { ok: false, message: 'เข้าสู่ระบบในฐานะผู้เรียนก่อนเพิ่มคอร์ส' };
+    if (currentUser.role !== 'admin' && currentUser.emailVerified === false) return { ok: false, message: 'ยืนยันอีเมลก่อนเริ่มซื้อคอร์ส' };
     if (!course || course.price <= 0) return { ok: false, message: 'คอร์สนี้ไม่ต้องใช้ตะกร้า' };
     if (data.enrollments.some((item) => item.courseId === courseId && item.userId === currentUser.id) || data.orders.some((item) => item.courseId === courseId && item.userId === currentUser.id && item.status === 'paid')) return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
     if (data.cartItems.some((item) => item.courseId === courseId && item.userId === currentUser.id)) return { ok: true, alreadyAdded: true };
@@ -894,7 +1069,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
 
   const markContentDone = useCallback(
     (courseId: string, itemId: string) => {
-      if (!currentUser?.id) return;
+      if (!currentUser?.id || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return;
       update((next) => {
         const key = `${courseId}:${itemId}`;
         next.progress[key] = { ...(next.progress[key] ?? {}), [currentUser.id]: true };
@@ -906,6 +1081,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
 
   const startAttempt = useCallback((quiz: Quiz, assignmentId: string | null = null): string | null => {
     if (!currentUser || !data.quizzes.some((entry) => entry.id === quiz.id && entry.courseId === quiz.courseId)) return null;
+    if (currentUser.role !== 'admin' && currentUser.emailVerified === false) return null;
     const enrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === currentUser.id);
     if (currentUser.role !== 'admin' && (currentUser.role !== 'learner' || !enrolled)) return null;
     if (assignmentId) {
@@ -922,6 +1098,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   }, [currentUser, data, commitLearningChange]);
 
   const saveAttemptDraft = useCallback((attemptId: string, answers: Record<string, QuizAnswerValue>) => {
+    if (!currentUser || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return;
     update((next) => {
       next.attempts = next.attempts.map((attempt) => attempt.id === attemptId && attempt.userId === currentUser?.id && attempt.status === 'in_progress' ? { ...attempt, answers: structuredClone(answers) } : attempt);
       return next;
@@ -931,7 +1108,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   const submitAttempt = useCallback(
     (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string): string | null => {
       let attemptId = existingAttemptId ?? createId('attempt');
-      if (!currentUser?.id) return null;
+      if (!currentUser?.id || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return null;
       const existingAttempt = data.attempts.find((entry) => entry.id === existingAttemptId);
       if (existingAttemptId && (!existingAttempt || existingAttempt.userId !== currentUser.id || existingAttempt.status !== 'in_progress' || existingAttempt.quizId !== quiz.id)) return null;
       quiz = existingAttempt?.quizSnapshot ?? quiz;
@@ -1410,10 +1587,16 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       signInDemo,
       signOut,
       register,
+      verifyEmail,
+      resendVerificationEmail,
+      simulateGoogleAuth,
       resetDemo,
       saveBlogPost,
       removeBlogPost,
       saveCourse,
+      submitCourseForReview,
+      reviewCourse,
+      publishCourse,
       removeCourse,
       saveChapter,
       saveChapterWorkspace,
@@ -1460,10 +1643,16 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       signInDemo,
       signOut,
       register,
+      verifyEmail,
+      resendVerificationEmail,
+      simulateGoogleAuth,
       resetDemo,
       saveBlogPost,
       removeBlogPost,
       saveCourse,
+      submitCourseForReview,
+      reviewCourse,
+      publishCourse,
       removeCourse,
       saveChapter,
       saveChapterWorkspace,
