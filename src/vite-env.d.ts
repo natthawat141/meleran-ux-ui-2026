@@ -37,4 +37,6 @@ declare module '*.mp4' {
 
 interface ImportMetaEnv {
   readonly VITE_APP_ENV?: string;
+  /** Public same-origin API path prefix, for example /api. Never put secrets here. */
+  readonly VITE_API_BASE_URL?: string;
 }

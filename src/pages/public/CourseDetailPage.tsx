@@ -4,7 +4,6 @@ import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { PageTitle } from '../../components/common';
-import { CourseCartButton } from '../../components/CourseCartButton';
 import { CourseOutline } from '../../components/CourseOutline';
 import { UserAvatar } from '../../components/UserAvatar';
 import { formatPrice, instructorFor } from '../../data';
@@ -78,9 +77,6 @@ export function PublicCourseDetailPage() {
                   : `เข้าสู่ระบบเพื่อ${course.price === 0 ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'}`}{' '}
               <ArrowRightOutlined aria-hidden="true" />
             </Button>
-            {course.price > 0 && !enrolled && (
-              <CourseCartButton course={course} referralCode={referralCode} size="large" />
-            )}
             {hasPreview && (
               <Link to={`/courses/${course.slug}/preview`}>
                 <Button size="large">ทดลองเรียนบทแรก</Button>

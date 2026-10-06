@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Alert, Button, Descriptions, Empty, Input, Radio, Result, Space, Table, Typography, type TableProps } from 'antd';
-import { ArrowLeftOutlined, CreditCardOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { Alert, Button, Descriptions, Empty, Input, Result, Space, Table, Typography, type TableProps } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { PageTitle, StatusTag } from '../../components/common';
 import { formatPrice, instructorFor } from '../../data';
 import { normalizeAccessCode, orderChannelLabel, quoteAccessCode } from '../../lib/access-code-utils';
 import type { Order } from '../../types';
+import { StripeCheckoutPage, StripePaymentResultPage } from './StripePaymentPages';
+import { getPaymentEligibility } from '../../api/payments';
 
 const { Title, Text } = Typography;
 
@@ -21,7 +23,7 @@ export function RedeemCourseCodePage() {
     if (!accessCode) { setError('ไม่พบรหัสสิทธิ์คอร์สนี้'); return; }
     const course = data.courses.find((item) => item.id === accessCode.courseId && item.status === 'published' && Number(item.price) > 0);
     if (!course) { setError('คอร์สของรหัสนี้ไม่พร้อมให้แลก'); return; }
-    navigate(`/checkout/${course.id}?mode=redeem&code=${encodeURIComponent(accessCode.code)}`);
+    navigate(`/checkout/${course.id}?channel=redeem&mode=redeem&code=${encodeURIComponent(accessCode.code)}`);
   };
   return <div className="checkout-page">
     <PageTitle eyebrow="พื้นที่เรียนรู้" title="แลกรหัสคอร์ส" subtitle="เข้าสู่ระบบด้วยบัญชีผู้เรียน แล้วกรอกรหัสที่ได้รับเพื่อยืนยันสิทธิ์เข้าเรียน"/>
@@ -34,22 +36,26 @@ export function RedeemCourseCodePage() {
 }
 
 export function CheckoutPage() {
+  const location = useLocation();
+  return new URLSearchParams(location.search).get('channel') === 'redeem' ? <RedeemCheckoutPage /> : <StripeCheckoutPage />;
+}
+
+function RedeemCheckoutPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const referralCode = new URLSearchParams(location.search).get('ref');
   const initialCode = new URLSearchParams(location.search).get('code') ?? '';
-  const redemptionMode = new URLSearchParams(location.search).get('mode') === 'redeem';
   const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
   const { data, currentUser, simulatePayment } = useLms();
-  const [outcome, setOutcome] = useState<'paid' | 'failed'>('paid');
   const [draftCode, setDraftCode] = useState(initialCode);
   const [appliedCode, setAppliedCode] = useState(initialCode);
   const [codeMessage, setCodeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const course = data.courses.find((item) => item.id === courseId);
 
   if (!course || !courseId) return <Empty description="ไม่พบคอร์สนี้" />;
-  if (course.price <= 0) {
+  const eligibility = getPaymentEligibility(currentUser, course, data.enrollments);
+  if (course.price <= 0 && course.status === 'published') {
     return (
       <Result
         status="info"
@@ -62,27 +68,27 @@ export function CheckoutPage() {
 
   const teacher = instructorFor(data, course);
   const quoteFor = (code: string) => quoteAccessCode({ accessCodes: data.accessCodes, courseId, coursePrice: course.price, userId: currentUser?.id ?? '', enrollments: data.enrollments, code });
-  const candidateQuote = quoteFor(appliedCode);
-  const quote = candidateQuote.ok && candidateQuote.source === 'cash_code' && !redemptionMode
-    ? { ok: false as const, message: 'ใช้รหัสแลกคอร์สที่หน้า “แลกรหัสคอร์ส”' }
-    : candidateQuote.ok && redemptionMode && candidateQuote.source !== 'cash_code'
+  const candidateQuote = appliedCode ? quoteFor(appliedCode) : null;
+  const quote = !candidateQuote
+    ? { ok: false as const, message: 'กรอกรหัสแลกคอร์สเพื่อดำเนินการ' }
+    : candidateQuote.ok && candidateQuote.source !== 'cash_code'
       ? { ok: false as const, message: 'รหัสนี้ไม่ใช่รหัสแลกคอร์ส' }
       : candidateQuote;
-  const automaticAccess = quote.ok && ((quote.source === 'cash_code' && redemptionMode) || quote.source === 'free_code');
   const applyCode = (rawCode = draftCode) => {
     const normalized = normalizeAccessCode(rawCode);
     if (!normalized) { setAppliedCode(''); setCodeMessage(null); return; }
     const result = quoteFor(normalized);
     if (!result.ok) { setAppliedCode(normalized); setCodeMessage(null); return; }
-    if (result.source === 'cash_code' && !redemptionMode) { setAppliedCode(normalized); setCodeMessage({ type: 'error', text: 'ใช้รหัสแลกคอร์สที่หน้า “แลกรหัสคอร์ส”' }); return; }
+    if (result.source !== 'cash_code') { setAppliedCode(normalized); setCodeMessage({ type: 'error', text: 'รหัสนี้ไม่ใช่รหัสแลกคอร์ส' }); return; }
     setDraftCode(normalized);
     setAppliedCode(normalized);
-    setCodeMessage({ type: 'success', text: result.source === 'cash_code' ? `ราคาขายของรหัสสิทธิ์ ${formatPrice(result.amount)} · ยอดขายจะบันทึกเมื่อยืนยันแลกสิทธิ์` : result.source === 'free_code' ? 'โค้ดนี้ให้สิทธิ์เรียนฟรี' : `ใช้โค้ดแล้ว ลด ${formatPrice(result.discountAmount)}` });
+    setCodeMessage({ type: 'success', text: `ตรวจพบรหัสแลกคอร์ส มูลค่า ${formatPrice(result.amount)}` });
   };
   const order = () => {
-    const orderId = simulatePayment(courseId, automaticAccess ? 'paid' : outcome, referralCode, appliedCode);
+    if (!eligibility.eligible || !quote.ok || quote.source !== 'cash_code') return;
+    const orderId = simulatePayment(courseId, 'paid', referralCode, appliedCode);
     if (!orderId) { setCodeMessage({ type: 'error', text: 'ใช้โค้ดนี้ไม่ได้ กรุณาตรวจสอบสถานะโค้ดอีกครั้ง' }); return; }
-    navigate(`/checkout/${orderId}/result`);
+    navigate(`/checkout/${orderId}/result?channel=redeem`);
   };
 
   return (
@@ -91,24 +97,25 @@ export function CheckoutPage() {
         <ArrowLeftOutlined /> กลับหน้าคอร์ส
       </Link>
       <PageTitle
-        eyebrow={redemptionMode ? 'ยืนยันสิทธิ์คอร์ส' : 'ชำระเงินจำลอง'}
-        title={redemptionMode ? 'ยืนยันแลกรหัสคอร์ส' : 'ตรวจสอบรายการสั่งซื้อ'}
-        subtitle={redemptionMode ? 'ตรวจสอบคอร์สและราคาขายก่อนยืนยัน ระบบจะบันทึกรายการขายเมื่อแลกสำเร็จ' : 'การชำระเงินในต้นแบบใช้ข้อมูลจำลอง ไม่มีการรับข้อมูลบัตรจริง'}
+        eyebrow="ยืนยันสิทธิ์คอร์ส"
+        title="ยืนยันแลกรหัสคอร์ส"
+        subtitle="ตรวจสอบคอร์สและมูลค่ารหัสก่อนยืนยันแลกสิทธิ์"
       />
       <div className="checkout-grid">
         <section className="checkout-main">
-          <Title level={4}>{redemptionMode ? 'รหัสแลกคอร์ส' : 'มีโค้ดส่วนลดหรือเรียนฟรี?'}</Title>
-          <Space.Compact className="checkout-code-input"><Input value={draftCode} onChange={(event) => { setDraftCode(event.target.value); if (normalizeAccessCode(event.target.value) !== appliedCode) setAppliedCode(''); setCodeMessage(null); }} onPressEnter={() => applyCode()} placeholder={redemptionMode ? 'กรอกรหัสแลกคอร์ส' : 'กรอกรหัสส่วนลดหรือเรียนฟรี'} aria-label={redemptionMode ? 'รหัสแลกคอร์ส' : 'รหัสส่วนลดหรือเรียนฟรี'}/><Button onClick={() => applyCode()}>{redemptionMode ? 'ตรวจสอบรหัส' : 'ใช้โค้ด'}</Button></Space.Compact>
+          <Title level={4}>รหัสแลกคอร์ส</Title>
+          {!eligibility.eligible && <Alert className="checkout-code-message" type="warning" showIcon message={{
+            course_unavailable: 'คอร์สนี้ยังไม่พร้อมให้แลกสิทธิ์',
+            not_allowed: 'บัญชีนี้แลกรหัสคอร์สไม่ได้',
+            suspended: 'บัญชีนี้ยังทำรายการไม่ได้',
+            email_unverified: 'กรุณายืนยันอีเมลก่อนแลกรหัสคอร์ส',
+            already_enrolled: 'คุณมีสิทธิ์เรียนคอร์สนี้อยู่แล้ว',
+            course_owner: 'ผู้สอนไม่สามารถแลกรหัสคอร์สของตนเอง',
+          }[eligibility.reason]} />}
+          <Space.Compact className="checkout-code-input"><Input value={draftCode} onChange={(event) => { setDraftCode(event.target.value); if (normalizeAccessCode(event.target.value) !== appliedCode) setAppliedCode(''); setCodeMessage(null); }} onPressEnter={() => applyCode()} placeholder="กรอกรหัสแลกคอร์ส" aria-label="รหัสแลกคอร์ส"/><Button onClick={() => applyCode()}>ตรวจสอบรหัส</Button></Space.Compact>
           {codeMessage && <Alert className="checkout-code-message" type={codeMessage.type} showIcon message={codeMessage.text}/>}
           {appliedCode && !quote.ok && <Alert className="checkout-code-message" type="error" showIcon message={quote.message}/>}
-          {automaticAccess ? <Alert showIcon type="info" message={quote.source === 'cash_code' ? 'พร้อมแลกรหัสคอร์ส' : 'โค้ดนี้ให้เรียนฟรี'} description={quote.source === 'cash_code' ? 'เมื่อยืนยัน ระบบจะเพิ่มคอร์สในรายการเรียนและบันทึกยอดขายตามราคาที่กำหนดไว้ พร้อมคำนวณส่วนแบ่งผู้สอน' : 'ยืนยันเพื่อเพิ่มคอร์สในรายการเรียนโดยไม่คิดรายได้หรือส่วนแบ่ง'}/> : !redemptionMode && <>
-            <Title level={4}>เลือกผลการชำระเพื่อทดลอง</Title>
-            <Radio.Group value={outcome} onChange={(event) => setOutcome(event.target.value)} className="payment-outcomes">
-              <Radio value="paid"><span><strong>ชำระสำเร็จ</strong><small>เพิ่มคอร์สในรายการเรียนทันที</small></span></Radio>
-              <Radio value="failed"><span><strong>ชำระไม่สำเร็จ</strong><small>สร้างรายการที่ไม่สำเร็จ ทดลองใหม่ได้</small></span></Radio>
-            </Radio.Group>
-            <Alert showIcon type="info" message="วิธีชำระเงิน: บัตรจำลอง" description="ไม่ต้องกรอกหมายเลขบัตรหรือข้อมูลการเงินจริง"/>
-          </>}
+          {quote.ok && <Alert showIcon type="info" message="พร้อมแลกรหัสคอร์ส" description="ยืนยันเพื่อเพิ่มคอร์สนี้ในรายการเรียน"/>}
         </section>
         <aside className="checkout-summary">
           <Title level={4}>สรุปคำสั่งซื้อ</Title>
@@ -120,23 +127,17 @@ export function CheckoutPage() {
             </div>
           </div>
           <Descriptions column={1} size="small">
-            <Descriptions.Item label="ราคาเต็ม">{formatPrice(course.price)}</Descriptions.Item>
-            {quote.ok && quote.discountAmount > 0 && <Descriptions.Item label="ส่วนลด">−{formatPrice(quote.discountAmount)}</Descriptions.Item>}
-            <Descriptions.Item label={quote.ok && quote.source === 'cash_code' ? 'ราคาขายตามรหัส' : automaticAccess ? 'ยอดสุทธิ' : 'ยอดที่ต้องชำระ'}><strong>{formatPrice(quote.ok ? quote.amount : course.price)}</strong></Descriptions.Item>
+            <Descriptions.Item label="มูลค่ารหัส">{formatPrice(quote.ok ? quote.amount : course.price)}</Descriptions.Item>
           </Descriptions>
           <Button
             block
             size="large"
             type="primary"
-            icon={<CreditCardOutlined />}
-            disabled={!quote.ok}
+            disabled={!eligibility.eligible || !quote.ok || quote.source !== 'cash_code'}
             onClick={order}
           >
-            {redemptionMode ? 'ยืนยันแลกรหัสคอร์ส' : automaticAccess ? 'ยืนยันรับสิทธิ์เข้าเรียน' : 'ยืนยันการชำระ'}
+            ยืนยันแลกรหัสคอร์ส
           </Button>
-          <Text className="secure-note">
-            <SafetyCertificateOutlined /> จัดทำเพื่อทดลอง UX เท่านั้น
-          </Text>
         </aside>
       </div>
     </div>
@@ -144,14 +145,21 @@ export function CheckoutPage() {
 }
 
 export function CheckoutResultPage() {
+  const location = useLocation();
+  return new URLSearchParams(location.search).get('channel') === 'redeem' ? <RedeemCheckoutResultPage /> : <StripePaymentResultPage />;
+}
+
+function RedeemCheckoutResultPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const { data, currentUser } = useLms();
   const currentUserId = currentUser?.id ?? '';
   const order = data.orders.find((item) => item.id === orderId);
   const course = data.courses.find((item) => item.id === order?.courseId);
 
-  if (!order || order.userId !== currentUserId) return <Empty description="ไม่พบรายการนี้" />;
+  if (!order || order.userId !== currentUserId || order.source !== 'cash_code') return <Empty description="ไม่พบรายการ Redeem นี้" />;
   const referralQuery = order.referralCode ? `?ref=${encodeURIComponent(order.referralCode)}` : '';
+  const redeemQuery = new URLSearchParams({ channel: 'redeem', code: order.accessCode ?? '' });
+  if (order.referralCode) redeemQuery.set('ref', order.referralCode);
   const successTitle = order.source === 'cash_code' ? 'แลกรหัสคอร์สสำเร็จ' : order.method === 'โค้ดเรียนฟรี' ? 'รับสิทธิ์เรียนแล้ว' : 'ชำระเงินสำเร็จ';
 
   return (
@@ -171,7 +179,7 @@ export function CheckoutResultPage() {
                 <Button type="primary">เริ่มเรียน</Button>
               </Link>
             )}
-            <Link to={`/checkout/${course?.id}${referralQuery}`}>
+            <Link to={`/checkout/${course?.id}?${redeemQuery.toString()}`}>
               <Button>{order.status === 'paid' ? 'ดูคอร์ส' : 'ลองชำระอีกครั้ง'}</Button>
             </Link>
             <Link to="/account/orders">

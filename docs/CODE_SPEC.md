@@ -110,7 +110,7 @@
 - Public blog อ่านได้โดยไม่ login แต่ create/edit/delete blog เป็น admin ในรุ่นนี้; blog กับบทอ่านในคอร์สเป็นข้อมูลคนละชนิด
 - Routes ต้องรองรับเปิดตรง refresh, not-found, no-access และ back path ที่ถูก context อย่าผูกสิทธิ์กับการที่เข้ามาผ่านปุ่มเพียงทางเดียว
 - คำขอแก้ UI ไม่อนุญาตขยายสิทธิ์ role เดิมหรือเปลี่ยน business rule เอง ถ้ามี requirement ใหม่ให้ระบุความต่างอย่างชัดเจน
-- Prototype client checks ไม่ใช่ Production security; Google OAuth, email verification, server permissions และฐานข้อมูลยังต้องมี implementation จริง; Payment Gateway และ MCP อยู่นอกขอบเขตรอบแรก
+- Prototype client checks ไม่ใช่ Production security; Google OAuth, email verification, server permissions และฐานข้อมูลยังต้องมี implementation จริง; Stripe Checkout อยู่ในขอบเขตรอบแรก ส่วน MCP ยังไม่ทำ
 
 ## 8. Rich content และ upload
 
@@ -163,5 +163,5 @@ Preview ปกติ: `http://127.0.0.1:5174/` ตรวจ server ที่ร�
 ## ขอบเขต Stripe และ AIPractice ที่เพิ่ม
 
 - Registry แยก `payments` (เดือนแรก) จาก `commerce` (Cart/Orders ที่ยังไม่ทำ) ทุกสถานะยัง prototype การมี route checkout ไม่ใช่หลักฐานเชื่อม Stripe จริง
-- ระบบจริงใช้ Stripe Session/PaymentEvent ตรวจราคา บัญชี ลายเซ็น Webhook และผลจ่าย ณ server ก่อนสร้างหรือคืน Enrollment เดิม ไม่เพิ่ม Order/Cart Domain จากชื่อพารามิเตอร์เก่าใน prototype
+- ระบบจริงใช้ Stripe Session/PaymentEvent ตรวจราคา บัญชี ลายเซ็น Webhook และผลจ่าย ณ server ก่อนสร้างหรือคืน Enrollment เดิม; การให้สิทธิ์ต้องเกิดจาก Webhook ที่ตรวจแล้วเท่านั้น GET สถานะและหน้าผลจ่ายต้องไม่ให้สิทธิ์ ไม่เพิ่ม Order/Cart Domain จากชื่อพารามิเตอร์เก่าใน prototype
 - AIPractice แยกจาก Quiz/QuizAttempt จัดเก็บชุดคำถามและผลในแชต ตรวจ response schema ก่อนคิด Prompt สำเร็จ การตอบและอ่านผลไม่เรียก model หรือนับ Prompt เพิ่ม

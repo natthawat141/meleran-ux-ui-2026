@@ -23,3 +23,7 @@
 - พฤติกรรม Redeem ผ่าน order/ส่วนแบ่ง และตัวเลือกอัปโหลดวิดีโอเดิมต้องปรับเมื่อทำ API จริงตามฉบับหลัก ไม่อ้างว่าระบบจริงพร้อมแล้ว
 - ยังไม่กำหนด soft/hard delete และระยะเวลาเก็บข้อมูลหลังลบแชต ไม่เติมนโยบายนี้จากการคาดเดา
 - แยก User/Admin frontend, Main/AI API และ PostgreSQL เป็นเรื่องที่คุยด้านเทคนิค ยังไม่ใช่ข้อสรุป stack ในเอกสารที่ยืนยัน
+
+## Stripe Webhook-only ตามคำยืนยันล่าสุด
+
+ปรับ Business Logic ทั้ง 14 ข้อ Flow API และกรณีตรวจรับ ให้ Webhook ที่ตรวจลายเซ็นแล้วเป็นผู้ให้ Enrollment เท่านั้น Success Page อ่านสถานะ ยกเลิก API /verify ที่ให้สิทธิ์จากหน้าผลจ่าย Checkout frontend เตรียมเรียก Payment API; Backend/Webhook จริงยังไม่มีใน repository นี้

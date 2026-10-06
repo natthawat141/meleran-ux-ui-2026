@@ -115,6 +115,7 @@ function RolePage({ roles, children, standalone = false }: { roles: Role[]; chil
 }
 
 const learner = (element: React.ReactNode) => <RolePage roles={['learner', 'admin']}>{element}</RolePage>;
+const paymentUser = (element: React.ReactNode) => <RolePage roles={['learner', 'instructor']}>{element}</RolePage>;
 const instructor = (element: React.ReactNode) => <RolePage roles={['instructor', 'admin']}>{element}</RolePage>;
 const admin = (element: React.ReactNode) => <RolePage roles={['admin']}>{element}</RolePage>;
 
@@ -186,8 +187,8 @@ export function AppRoutes() {
       <Route path="/learn/quizzes/:quizId" element={featureElement('/learn/quizzes/:quizId', learner(<QuizIntroPage />))} />
       <Route path="/learn/attempts/:attemptId" element={featureElement('/learn/attempts/:attemptId', learner(<QuizAttemptPage />))} />
       <Route path="/learn/attempts/:attemptId/result" element={featureElement('/learn/attempts/:attemptId/result', learner(<QuizResultPage />))} />
-      <Route path="/checkout/:courseId" element={featureElement('/checkout/:courseId', learner(<CheckoutPage />))} />
-      <Route path="/checkout/:orderId/result" element={featureElement('/checkout/:orderId/result', learner(<CheckoutResultPage />))} />
+      <Route path="/checkout/:courseId" element={featureElement('/checkout/:courseId', paymentUser(<CheckoutPage />))} />
+      <Route path="/checkout/:orderId/result" element={featureElement('/checkout/:orderId/result', paymentUser(<CheckoutResultPage />))} />
       <Route path="/account/orders" element={featureElement('/account/orders', learner(<OrdersPage />))} />
       <Route path="/account/cart" element={featureElement('/account/cart', learner(<CartPage />))} />
       <Route path="/account/orders/:orderId" element={featureElement('/account/orders/:orderId', learner(<OrderDetailPage />))} />

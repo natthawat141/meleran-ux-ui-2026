@@ -276,18 +276,28 @@ Permission ต้องตรวจขอบเขตและสถานะร
 
 #### ซื้อคอร์สผ่าน Stripe
 
-- ซื้อรายคอร์สแบบจ่ายครั้งเดียวจากหน้ารายละเอียดคอร์ส ไม่ต้องมีตะกร้า ใช้ Stripe Checkout เป็นหน้ารับเงิน
-- ผู้ซื้อเข้าสู่ระบบและผ่านเงื่อนไขบัญชีในหัวข้อ 2.1 ก่อนเริ่มจ่าย ผู้สมัครอีเมลเองต้องยืนยันก่อน บัญชีที่ Admin สร้างเริ่มซื้อ/เรียนได้ทันทีตามสิทธิ์เดิม
-- ซื้อได้เฉพาะคอร์สเสียเงิน Published ที่ไม่มีสิทธิ์เรียนอยู่แล้ว Instructor ซื้อคอร์สคนอื่นได้ ห้ามซื้อคอร์สตนเอง และ Admin ซื้อไม่ได้
-- Server สร้าง Payment และ Checkout Session จากราคาและ currency ของคอร์ส ไม่รับราคาหรือสถานะจ่ายสำเร็จจาก browser เก็บราคา ณ ตอนเริ่มจ่ายไว้ตรวจผล
-- เมื่อ server ตรวจ Stripe ว่าชำระสำเร็จแล้ว ให้ Enrollment ทันทีโดยไม่รอ Admin อนุมัติและไม่ต้อง Redeem เพิ่ม สิทธิ์เรียนใช้ได้ตลอดตามกติกาเดิม
-- ถ้ายังรอยืนยันผล จ่ายไม่สำเร็จ หรือ Session หมดอายุ ยังไม่ให้สิทธิ์ใหม่ หน้าเว็บแสดงสถานะจริงและทางกลับคอร์ส การกดกลับ/ยกเลิกที่ browser ไม่ใช่หลักฐานว่าจ่ายล้มเหลว
-- การกลับจาก Stripe ให้ server ตรวจ Session ของ Payment ที่เป็นของบัญชีนั้น แล้วใช้คำสั่งให้สิทธิ์เดียวกับ Webhook เพื่อให้เริ่มเรียนได้ทันทีเมื่อยืนยันได้ การปิด browser ก่อนกลับไม่ทำให้สิทธิ์หาย
-- Webhook และการตรวจ Session ซ้ำให้สิทธิ์ได้ครั้งเดียว หากมี Enrollment อยู่แล้ว เช่น Redeem ระหว่างรอผล ให้ใช้สิทธิ์เดิม เก็บ Payment สำเร็จไว้ ไม่ใช้โค้ดหรือสร้าง Enrollment ซ้ำ
-- เก็บข้อมูล Payment และสถานะให้สิทธิ์ใน Database ตั้งแต่รอบแรก ผู้ซื้ออ่านผลการซื้อครั้งนั้นได้ Admin อ่านข้อมูลเพื่อจัดการกรณีผิดปกติ ไม่เพิ่ม Finance Dashboard หรือหน้าประวัติ Orders แบบเต็ม
-- ยังไม่มีนโยบาย Refund ที่ยืนยัน การเพิ่ม Stripe ไม่ใช่การอนุมัติระบบคืนเงินอัตโนมัติ ส่วนแบ่ง Instructor, payout, subscription หรือ coupon
+1. คอร์สเสียเงินได้รับสิทธิ์เรียนได้ทั้งจากการชำระเงินผ่าน Stripe หรือ Redeem Code
+2. ผู้ใช้ต้องเข้าสู่ระบบและผ่านเงื่อนไขบัญชีในหัวข้อ 2.1 ก่อนเริ่ม Checkout ผู้สมัครด้วยอีเมลเองต้องยืนยันก่อน ส่วนบัญชีที่ Admin สร้างเริ่มซื้อ/เรียนได้ทันทีตามสิทธิ์เดิม
+3. Backend สร้าง Stripe Checkout Session จาก Course และราคาปัจจุบัน ผู้ใช้หรือ Frontend กำหนดราคาที่จะชำระเองไม่ได้ ระบบเก็บราคาและ currency ณ ตอนสร้าง Session ไว้กับ Payment
+4. เฟสแรกใช้ Stripe Checkout เป็นหน้ารับเงิน ซื้อรายคอร์สแบบจ่ายครั้งเดียว ไม่สร้าง Payment UI หรือตะกร้าเอง
+5. หลังสร้าง Checkout ระบบส่งผู้ใช้ไปยัง Stripe เพื่อดำเนินการชำระเงิน
+6. การกลับมายัง Success Page ไม่ถือว่าเป็นหลักฐานการชำระเงินสำเร็จ หน้านี้อ่านสถานะจาก Backend เท่านั้น
+7. ระบบให้ Enrollment หลัง Backend ได้รับและตรวจสอบ Stripe Webhook ที่ยืนยันการชำระเงินสำเร็จแล้วเท่านั้น การเปิด Success Page หรือขออ่านสถานะต้องไม่เรียกคำสั่งให้สิทธิ์
+8. Webhook ต้องตรวจ Stripe Signature จาก raw body ก่อนประมวลผล เหตุการณ์ที่ตรวจไม่ผ่านต้องไม่เปลี่ยน Payment หรือ Enrollment
+9. Payment Event เดิมที่ส่งซ้ำต้องไม่สร้าง Enrollment หรือรายการชำระเงินซ้ำ รวมถึงกรณีประมวลผลพร้อมกัน
+10. เมื่อชำระสำเร็จ Enrollment ที่สร้างใหม่มีแหล่งสิทธิ์ `stripe` และเรียนได้ตลอด
+11. การชำระล้มเหลว ถูกยกเลิก หรือ Checkout หมดอายุไม่สร้าง Enrollment การกดย้อนกลับที่ browser ไม่เปลี่ยนผลชำระสำเร็จที่ Backend ได้รับแล้ว
+12. ผู้ที่มี Enrollment ของคอร์สอยู่แล้วต้องไม่ถูกสร้างสิทธิ์ซ้ำจาก Payment เดียวกัน หาก Redeem ระหว่างรอชำระ ให้เชื่อม Payment กับ Enrollment เดิมและเก็บแหล่งสิทธิ์เดิมไว้
+13. Redeem Code ยังคงใช้งานได้เป็นช่องทางให้สิทธิ์อีกแบบหนึ่ง
+14. ระบบ Refund อัตโนมัติไม่อยู่ในเฟสนี้ เว้นแต่กำหนดเพิ่มภายหลัง ข้อนี้ไม่กำหนดนโยบาย Refund ของธุรกิจ
 
-ใช้ Checkout Sessions สำหรับหน้ารับเงิน และตรวจผลที่ server/ให้สิทธิ์ซ้ำอย่างปลอดภัยตาม [Stripe Checkout](https://docs.stripe.com/payments/checkout) และ [Stripe Fulfillment](https://docs.stripe.com/checkout/fulfillment.md?payment-ui=stripe-hosted)
+ซื้อได้เฉพาะคอร์สเสียเงิน Published ที่ยังไม่มีสิทธิ์เรียน Instructor ซื้อคอร์สคนอื่นได้ ห้ามซื้อคอร์สตนเอง และ Admin ซื้อไม่ได้
+
+เก็บ Payment, PaymentEvent และสถานะให้สิทธิ์ใน Database ผู้ซื้ออ่านสถานะของตนเองได้ Admin อ่านเพื่อดูแลรายการผิดปกติ ไม่เพิ่ม Finance Dashboard, Order history แบบเต็ม, ส่วนแบ่ง Instructor, payout, subscription หรือ coupon
+
+หาก Webhook ยังมาไม่ถึง ให้หน้าผลจ่ายแสดงรอยืนยันและตรวจสถานะใหม่ได้ การปิด browser ไม่ขัดขวาง Webhook ให้สิทธิ์ เมื่อบันทึกสิทธิ์ล้มเหลวให้ลองประมวลผลเหตุการณ์ที่ตรวจแล้วใหม่โดยไม่เรียกเก็บเงินซ้ำ
+
+ใช้ [Stripe Checkout](https://docs.stripe.com/payments/checkout) และ [Stripe Webhook](https://docs.stripe.com/webhooks/signature) ตามกติกา Webhook-only ของ Melearn แม้ตัวอย่าง [Stripe Fulfillment](https://docs.stripe.com/checkout/fulfillment.md?payment-ui=stripe-hosted) มีทางเรียก fulfillment จาก landing page ด้วย แต่ระบบนี้ไม่ใช้ทางนั้น
 
 ### 2.5 การเรียนและ Progress
 
@@ -495,7 +505,7 @@ Instructor ใช้สิทธิ์ผู้เรียนในคอร์
 | เชื่อม Google และกู้รหัสผ่าน | User, AuthIdentity, PasswordReset, EmailDelivery | auth.link_google_self, auth.reset_password_self |
 | เขียนและอ่าน Blog | BlogPost, User | blog.read_public, blog.create, blog.update, blog.publish |
 | สร้าง/ตรวจ/เผยแพร่คอร์ส | Course, Chapter, ContentItem, Quiz, Question, CourseReview | course.create, course.update, course.submit_review, course.review, course.publish |
-| ซื้อคอร์สด้วย Stripe | User, Course, Payment, PaymentEvent, Enrollment | payment.checkout_self, payment.read_self, payment.read_admin; server ให้สิทธิ์เมื่อยืนยันผล |
+| ซื้อคอร์สด้วย Stripe | User, Course, Payment, PaymentEvent, Enrollment | payment.checkout_self, payment.read_self, payment.read_admin; Backend ให้สิทธิ์จาก Webhook ที่ตรวจแล้วเท่านั้น |
 | ลงเรียนคอร์สฟรี | User, Course, Enrollment | enrollment.create_self |
 | ออก/ใช้โค้ด | RedeemCode, Course, User, Enrollment | redeem_code.create, redeem_code.read, redeem_code.redeem_self |
 | เรียนและทำแบบฝึกหัด | Enrollment, Progress, QuizAttempt, Answer | course.read_content, progress.update_self, quiz.attempt_self |
@@ -912,15 +922,21 @@ flowchart TD
 flowchart TD
     PAY_USER["Learner / Instructor คอร์สคนอื่น"] --> PAY_CHECK{"บัญชีพร้อม / Published / เสียเงิน<br/>ยังไม่มีสิทธิ์ / ไม่ใช่ Admin หรือเจ้าของ"}
     PAY_CHECK -->|ไม่ผ่าน| PAY_DENY["ไม่สร้าง Checkout Session"]
-    PAY_CHECK -->|ผ่าน| PAY_CREATE["Server เก็บ Payment และราคา Snapshot<br/>สร้างหรือใช้ Stripe Session เดิมที่ยังเปิด"]
-    PAY_CREATE --> PAY_STRIPE["Stripe Checkout"]
-    PAY_STRIPE --> PAY_RETURN["หน้าผลจ่ายขอ Server ตรวจ Session ของตนเอง"]
-    PAY_STRIPE --> PAY_WEBHOOK["Stripe Webhook ถึง Server<br/>ตรวจลายเซ็นและ event_id"]
-    PAY_RETURN --> PAY_VERIFY{"ตรวจ Stripe ว่าจ่ายแล้วจริงหรือไม่"}
-    PAY_WEBHOOK --> PAY_VERIFY
-    PAY_VERIFY -->|ยังไม่จ่าย / Failed / Expired| PAY_STATUS["เก็บและแสดงสถานะจริง<br/>ยังไม่ให้สิทธิ์ใหม่"]
-    PAY_VERIFY -->|ชำระสำเร็จ| PAY_GRANT["คำสั่งให้สิทธิ์เดียวกัน<br/>บันทึก Succeeded + Enrollment / คืนสิทธิ์เดิม"]
-    PAY_GRANT --> PAY_LEARN["เข้าเรียนได้ตลอดทันที<br/>ไม่รอ Admin / ไม่ต้องใช้โค้ด"]
+    PAY_CHECK -->|ผ่าน| PAY_CREATE["Backend เก็บ Payment และราคา Snapshot<br/>สร้างหรือใช้ Stripe Session เดิมที่ยังเปิด"]
+    PAY_CREATE --> PAY_STRIPE["ส่งผู้ใช้ไป Stripe Checkout"]
+    PAY_STRIPE --> PAY_RETURN["Success Page อ่านสถานะจาก Backend<br/>ไม่ให้สิทธิ์เอง"]
+    PAY_STRIPE --> PAY_WEBHOOK["Stripe Webhook ถึง Backend"]
+    PAY_WEBHOOK --> PAY_SIGNATURE{"Stripe Signature ถูกต้องหรือไม่"}
+    PAY_SIGNATURE -->|ไม่ถูกต้อง| PAY_REJECT["ปฏิเสธ ไม่เปลี่ยนข้อมูล"]
+    PAY_SIGNATURE -->|ถูกต้อง| PAY_VERIFY{"ยืนยันชำระสำเร็จหรือไม่"}
+    PAY_VERIFY -->|ยังไม่สำเร็จ / ล้มเหลว / หมดอายุ| PAY_STATUS["บันทึกสถานะจริง ยังไม่ให้สิทธิ์"]
+    PAY_VERIFY -->|ชำระสำเร็จ| PAY_GRANT["ประมวลผล event ซ้ำอย่างปลอดภัย<br/>Succeeded + Enrollment source stripe<br/>หรือเชื่อม Enrollment เดิม"]
+    PAY_GRANT --> PAY_STORED["Backend บันทึกสิทธิ์แล้ว"]
+    PAY_RETURN --> PAY_READ{"Backend บันทึกสิทธิ์แล้วหรือยัง"}
+    PAY_READ -->|ยัง| PAY_WAIT["รอ Webhook / ตรวจสถานะใหม่"]
+    PAY_WAIT --> PAY_RETURN
+    PAY_READ -->|แล้ว| PAY_LEARN["เข้าเรียนได้ตลอด<br/>ไม่รอ Admin / ไม่ต้องใช้โค้ด"]
+    PAY_STORED --> PAY_LEARN
 ```
 
 #### 4.4.11 AI — สร้างและตอบแบบฝึกหัดในแชต
@@ -1123,13 +1139,14 @@ Admin สร้างบทความ Draft → เพิ่มชื่อ Sl
 | --- | --- |
 | Pending | มี Payment/Session แต่ยังไม่ยืนยันว่าเงินสำเร็จ ยังไม่ให้สิทธิ์ |
 | Processing | วิธีจ่ายที่เปิดใช้กำลังรอผลจาก Stripe ยังไม่ให้สิทธิ์ |
-| Succeeded | Server ยืนยันว่าจ่ายสำเร็จ เก็บ paid_at และให้/เชื่อม Enrollment |
+| Succeeded | Backend ตรวจ Webhook ที่ยืนยันจ่ายสำเร็จแล้ว เก็บ paid_at และให้/เชื่อม Enrollment |
 | Failed | Stripe ยืนยันว่าจ่ายไม่สำเร็จ เก็บเหตุผลที่แสดงได้ ลองซื้อใหม่ได้ตามผลจริง |
+| Cancelled | Backend ยืนยันว่ารายการถูกยกเลิกโดยยังไม่ชำระ ไม่ให้สิทธิ์; การกลับ cancel URL อย่างเดียวไม่ตั้งสถานะนี้ |
 | Expired | Stripe Session หมดอายุโดยยังไม่จ่าย สร้างคำขอซื้อใหม่ได้ |
 
 เก็บ `fulfillment_status` แยกจากสถานะเงิน เช่น pending/granted/failed จ่ายสำเร็จแล้วแต่บันทึกสิทธิ์ผิดพลาดต้องคง Succeeded และลองให้สิทธิ์เดิมใหม่ ไม่เรียกเก็บเงินใหม่และไม่แจ้งว่าผู้ใช้ยังไม่จ่าย
 
-การกดปุ่มซื้อซ้ำ/สองแท็บใช้ request_id และ Checkout Session ที่ยังเปิดของ User/Course เดิมเมื่อทำได้ ไม่สร้างรายการเรียกเก็บใหม่ทุกครั้ง Event เก่าหรือ callback ซ้ำไม่ลดสถานะ Succeeded หรือสร้าง Enrollment เพิ่ม ถ้าจ่ายซ้ำจริงยังเก็บทุกรายการสำเร็จและระบุกรณีผิดปกติให้ดูแล ไม่ลบเงินรับหรือกำหนดนโยบายคืนเงินเอง
+การกดปุ่มซื้อซ้ำ/สองแท็บใช้ request_id และ Checkout Session ที่ยังเปิดของ User/Course เดิมเมื่อทำได้ ไม่สร้างรายการเรียกเก็บใหม่ทุกครั้ง Event เก่าหรือคำขออ่านสถานะซ้ำไม่ลดสถานะ Succeeded หรือสร้าง Enrollment เพิ่ม ถ้าจ่ายซ้ำจริงยังเก็บทุกรายการสำเร็จและระบุกรณีผิดปกติให้ดูแล ไม่ลบเงินรับหรือกำหนดนโยบายคืนเงินเอง
 
 ### 5.12 AIPractice ในแชต
 
@@ -1238,9 +1255,8 @@ Request แก้ Chapter/Item/Quiz ต้องตรวจข้อมูล�
 | Method/Path | ผู้ทำ | เงื่อนไขและผล |
 | --- | --- | --- |
 | POST /me/payments/checkout | payment.checkout_self | รับ course_id/request_id ตรวจบัญชี/สิทธิ์/ราคา ณ server สร้าง Payment และ Stripe Checkout Session คืน payment_id และ checkout_url; ถ้ามีสิทธิ์แล้วคืนสิทธิ์เดิมโดยไม่เก็บเงินเพิ่ม |
-| GET /me/payments/{id} | payment.read_self | คืนสถานะจ่าย สถานะให้สิทธิ์ และทางเข้าเรียนของบัญชีตนเอง |
-| POST /me/payments/{id}/verify | payment.read_self | ตรวจ Stripe Session ที่ server และให้สิทธิ์ด้วยคำสั่งเดียวกับ Webhook ไม่เชื่อผลจาก URL/Request |
-| POST /webhooks/stripe | Stripe → server | ตรวจลายเซ็นจาก raw body ผูก Session/Payment/User/Course ที่ server เก็บไว้ บันทึก PaymentEvent แล้วประมวลผลซ้ำอย่างปลอดภัย |
+| GET /me/payments/{id} | payment.read_self | อ่านสถานะจ่าย สถานะให้สิทธิ์ และ Enrollment ของบัญชีตนเองจาก Database เท่านั้น ไม่ให้สิทธิ์หรือเรียก fulfillment |
+| POST /webhooks/stripe | Stripe → server | ตรวจลายเซ็นจาก raw body ผูก Session/Payment/User/Course ที่ server เก็บไว้ บันทึก PaymentEvent แล้วให้สิทธิ์จากเหตุการณ์ที่ยืนยันชำระสำเร็จเท่านั้น ประมวลผลซ้ำอย่างปลอดภัย |
 | GET /admin/payments/{id} | payment.read_admin | อ่านผลจ่ายและเหตุการณ์เพื่อดูแลรายการผิดปกติ ไม่ใช่ Finance Dashboard หรือคำสั่ง Refund |
 
 Webhook สำหรับ `checkout.session.completed` ต้องตรวจ payment_status ว่าจ่ายจริงก่อนให้สิทธิ์ หากเปิดวิธีจ่ายที่ยืนยันช้า ให้รองรับ `checkout.session.async_payment_succeeded` และ `checkout.session.async_payment_failed` ด้วยตาม [Stripe Fulfillment](https://docs.stripe.com/checkout/fulfillment.md?payment-ui=stripe-hosted)
@@ -1248,6 +1264,16 @@ Webhook สำหรับ `checkout.session.completed` ต้องตรวจ
 ตรวจ [Stripe-Signature](https://docs.stripe.com/webhooks/signature) ก่อนเชื่อเหตุการณ์ ไม่ส่ง Secret Key/Webhook Secret ให้ frontend บันทึกการประมวลผลกับผล Payment/Enrollment ให้สอดคล้องกัน event_id ที่เคยรับแต่ประมวลผลล้มเหลวต้องลองต่อได้ การเห็น event_id เดิมไม่ใช่เหตุให้ข้ามงานที่ยังไม่เสร็จ
 
 รอบนี้มีหน้าผลจ่าย/รอผล/ผิดพลาดและทางเข้าเรียน ไม่มี Cart/Order history แบบเต็ม คำว่า `orderId` ใน URL ต้นแบบเดิมไม่บังคับให้สร้าง Order Domain ในระบบจริง
+
+#### ข้อมูลที่ Frontend ใช้กับ Payment API
+
+- `POST /me/payments/checkout` รับเฉพาะ `course_id` และ `request_id` จาก Frontend Backend ระบุผู้ซื้อจาก session ที่ตรวจแล้วและอ่านราคาจาก Course
+- เมื่อสร้าง Session สำเร็จ คืน `payment_id` และ `checkout_url` ของ Stripe Checkout; หากมีสิทธิ์แล้ว คืน `already_enrolled=true`, `course_id` และ `enrollment` เดิม โดยไม่สร้างรายการเรียกเก็บเพิ่ม
+- `GET /me/payments/{id}` คืน `payment_id`, `course_id`, `status`, `fulfillment_status` และ `enrollment` ของเจ้าของ Payment
+- `status` ใช้ `pending`, `processing`, `succeeded`, `failed`, `cancelled`, `expired`; `fulfillment_status` ใช้ `pending`, `granted`, `failed` และ `enrollment` เป็น null จนเชื่อมสิทธิ์ได้
+- Enrollment ที่คืนมี `id`, `course_id`, `source` โดย source เป็น `free`, `redeem` หรือ `stripe` ตามสิทธิ์จริง หากสร้างใหม่จากการจ่ายให้ใช้ `stripe` หากเชื่อมสิทธิ์เดิมให้คงแหล่งเดิม
+- หน้าผลจ่ายแสดง “เริ่มเรียน” เมื่อ `status=succeeded`, `fulfillment_status=granted` และ Enrollment ตรงกับคอร์สเท่านั้น การอ่านข้อมูลนี้ไม่สร้างสิทธิ์ หากรับเงินแล้วแต่ให้สิทธิ์ยังไม่สำเร็จ ให้รอ/ตรวจสถานะใหม่และไม่ให้ผู้ใช้จ่ายซ้ำ
+- Frontend ส่ง credentials ตามการเข้าสู่ระบบจริง ไม่ใช้บัญชีเดโมใน localStorage เป็นหลักฐานยืนยันตัวตนกับ API หาก API ยังไม่มีหรือไม่คืนข้อมูลตาม contract ให้แสดงระบบไม่พร้อมหรือข้อผิดพลาด ไม่จำลองว่าชำระสำเร็จ
 
 ### 6.6 Assessment
 
@@ -1491,15 +1517,18 @@ Blog ทำเป็นชุดงานอ่าน/เขียนสาธ�
 
 | รหัส | การกระทำ | ผลที่ต้องตรวจ |
 | --- | --- | --- |
-| P01 | บัญชีพร้อมซื้อคอร์ส Published ผ่าน Stripe สำเร็จ | Server ยืนยันผล ให้ Enrollment โดยไม่รอ Admin/ไม่ใช้โค้ด เข้าเรียนได้ตลอด |
+| P01 | บัญชีพร้อมซื้อคอร์ส Published ผ่าน Stripe สำเร็จ | Backend ตรวจ Webhook แล้วสร้าง Enrollment source stripe โดยไม่รอ Admin/ไม่ใช้โค้ด เข้าเรียนได้ตลอด |
 | P02 | Admin หรือ Instructor ซื้อคอร์สตนเอง; สมัครอีเมลยังไม่ยืนยัน | ปฏิเสธก่อนสร้าง Session; บัญชีที่ Admin สร้างเรียนได้ทันทีตามข้อยกเว้น |
 | P03 | แก้ราคา course_id payment_id หรือสถานะใน Request/URL | ใช้ราคาจาก server เข้าถึงเฉพาะ Payment ของตน ไม่ได้สิทธิ์ผิดคอร์สหรือจากสถานะปลอม |
 | P04 | จ่ายไม่สำเร็จ กดกลับ Session หมดอายุ หรือยังรอผล | แสดงผลตาม Stripe/server ยังไม่ให้สิทธิ์ใหม่; browser ยกเลิกอย่างเดียวไม่ทับผลจ่ายสำเร็จ |
 | P05 | จ่ายแล้วปิด browser ก่อนกลับจาก Stripe | Webhook ให้สิทธิ์ได้ เปิดบัญชีเดิมแล้วเรียนต่อได้ |
-| P06 | ส่ง Webhook ปลอม ส่งซ้ำ หรือ return/สองแท็บเรียกตรวจพร้อมกัน | ปฏิเสธลายเซ็นผิด; ผลจริงให้สิทธิ์หนึ่งครั้ง ไม่มี Enrollment ซ้ำ |
+| P06 | ส่ง Webhook ปลอม ส่งซ้ำ หรือสองแท็บอ่านสถานะพร้อมกัน | ปฏิเสธลายเซ็นผิด; Webhook จริงให้สิทธิ์หนึ่งครั้ง ไม่มี Payment หรือ Enrollment ซ้ำ; GET ไม่ให้สิทธิ์ |
 | P07 | จ่ายสำเร็จแต่บันทึกสิทธิ์ล้มเหลว | เก็บ Succeeded และ fulfillment failed ลองให้สิทธิ์ต่อได้โดยไม่เก็บเงินใหม่ |
 | P08 | Redeem สำเร็จระหว่างรอผลจ่าย หรือมี Payment จ่ายซ้ำจริง | ใช้ Enrollment เดิม เก็บผลเงินทุกรายการ ไม่ใช้โค้ดเพิ่ม ไม่สร้าง Refund policy อัตโนมัติ |
 | P09 | เปลี่ยนราคาคอร์สหลังเริ่มจ่าย / กดซื้อซ้ำขณะ Session ยังเปิด | ตรวจจากราคา Snapshot เดิม; การลอง request เดิมไม่สร้างการเก็บเงินใหม่ทุกครั้ง |
+| P10 | เปิด Success Page หรือเติม status=success ใน URL ก่อน Webhook มาถึง | อ่านสถานะ Pending/Processing จาก Backend ไม่สร้างสิทธิ์และไม่มีปุ่มเริ่มเรียน; หลัง Webhook สำเร็จจึงแสดงสิทธิ์ |
+| P11 | Frontend ส่งราคาหรือ User ID ที่แก้เองในคำขอ Checkout | Backend ใช้ตัวตนจาก session และราคาปัจจุบันของ Course เท่านั้น ปฏิเสธหรือไม่ใช้ค่าที่ไม่ได้อยู่ใน contract |
+| P12 | Redeem สำเร็จก่อน Webhook ของ Payment เดิม | เชื่อม Payment กับ Enrollment เดิม ไม่สร้างสิทธิ์ซ้ำและไม่เขียนทับ source redeem |
 
 ### 9.4 Progress และแบบฝึกหัด
 
@@ -1591,7 +1620,7 @@ Blog ทำเป็นชุดงานอ่าน/เขียนสาธ�
 
 **เรียนจนได้ใบรับรอง:** กดจบวิดีโอและบทอ่านครบ แบบฝึกหัดทุกชุดส่งครบ คะแนนสูงสุดมากกว่า 70% และไม่มีคำตอบรอคะแนนในครั้งที่ใช้ตัดสิน ระบบนับครบ 100% และออกใบรับรอง เมื่อเพิ่มบทภายหลังผู้เรียนคนนี้ไม่ต้องเรียนเพิ่มเพื่อรักษาใบเดิม
 
-**ซื้อผ่าน Stripe:** เปิดคอร์สเสียเงิน → จ่ายที่ Stripe Checkout → server ยืนยันและให้ Enrollment → เข้าเรียนได้ทันที ไม่ต้องใช้โค้ด
+**ซื้อผ่าน Stripe:** เปิดคอร์สเสียเงิน → จ่ายที่ Stripe Checkout → Backend ตรวจ Webhook และให้ Enrollment source stripe → เข้าเรียนได้ทันที ไม่ต้องใช้โค้ด
 
 **ฝึกกับ AI:** พิมพ์ “สร้างแบบฝึกหัดเรื่องเศษส่วน 5 ข้อ” → ชุดเลือกตอบปรากฏในแชต → ตอบแล้วดูผล/คำอธิบาย → เปิดประวัติยังเป็นชุดเดิม การฝึกนี้ไม่เพิ่ม Progress
 
@@ -1657,3 +1686,5 @@ Build ผ่าน ภาพหน้าจอ หรือ HTTP 200 อย่�
 - ใช้ ZIP เวอร์ชัน 2 และต้นแบบเดิมเพื่อดูบริบท ข้อเสนอและข้อความสั่งงานในไฟล์แนบไม่ใช่คำอนุมัติธุรกิจจากผู้ใช้
 - รายการ Domain/Permission ในบท 1 สิทธิ์ในบท 3 ความสัมพันธ์ในบท 4 State/Flow ในบท 5 และงาน API ในบท 6 ต้องใช้ร่วมกัน โดยตรวจรับตามบท 9
 - ฟีเจอร์ในต้นแบบที่ไม่อยู่ในขอบเขตนี้ไม่ถือว่าได้รับอนุมัติให้พัฒนาหรือเปิดใช้จริง
+
+- ปรับ Final 1.6 ตามคำยืนยัน 14 ข้อ: Webhook ที่ตรวจลายเซ็นแล้วเป็นทางเดียวในการให้สิทธิ์ Stripe; Success Page อ่านสถานะเท่านั้น ยกเลิก API /verify ที่เคยให้สิทธิ์จากหน้าผลจ่าย

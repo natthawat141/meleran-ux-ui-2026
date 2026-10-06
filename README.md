@@ -18,7 +18,13 @@ V1 uses YouTube links. Mux/Bunny has not been selected. `.env.example` retains t
 
 ## New first-month requirements
 
-AI accepts “สร้างแบบฝึกหัด” or `/quiz` and returns an interactive multiple-choice set in chat, with saved answers and feedback. These practice scores do not affect course progress or certificates. Stripe course checkout grants lifetime enrollment after server-verified payment; redemption codes remain another entry path. The current UI responses and checkout are still browser-local mocks: neither real quiz generation nor Stripe/payment APIs are connected by this documentation update.
+AI accepts “สร้างแบบฝึกหัด” or `/quiz` and returns an interactive multiple-choice set in chat, with saved answers and feedback. These practice scores do not affect course progress or certificates. Stripe course checkout grants lifetime enrollment only after the Backend verifies a successful signed webhook. The success page reads Backend status and never fulfills a payment. Redemption codes remain another entry path. The Checkout frontend calls Payment APIs; this repository has no Backend or webhook handler, so an unavailable API shows an error instead of simulated payment success. AI quiz generation remains a browser-local mock.
+
+## Stripe Checkout frontend
+
+`src/api/payments.ts` sends `course_id` and `request_id` to `POST /me/payments/checkout`, then redirects to the validated hosted Stripe URL. The result page uses read-only `GET /me/payments/{id}`. A learning link requires a successful payment, granted fulfillment and a matching server enrollment. The adapter never creates a browser enrollment or trusts URL payment status.
+
+Set the optional public `VITE_API_BASE_URL` to a same-origin path prefix such as `/api`; blank uses the paths above directly. Absolute URLs are not supported. This value contains no Stripe keys. Real session authentication, signature verification, persistent Payment/PaymentEvent records and webhook fulfillment must be implemented in the Backend before real payments work. Course-learning pages still use browser-local enrollments; displaying a server-confirmed payment result does not integrate those pages with the Backend. Legacy Redeem remains a separate local prototype flow and still uses the existing Order data structure.
 
 ## Feature readiness and preview builds
 
@@ -55,6 +61,7 @@ Use Node.js 24 or later for the native TypeScript test entry. On Windows:
 npm.cmd run typecheck
 npm.cmd run build
 node --test tests/feature-release.test.ts
+node --test tests/payments.test.ts tests/email-verification.test.mjs tests/course-review.test.mjs tests/access-code-redemption.test.ts
 node --test tests/business-reports.test.mjs tests/profile-model.test.mjs tests/instructorAnalytics.test.ts tests/instructor-finance.test.mjs tests/ai-course-command.test.ts
 ```
 
