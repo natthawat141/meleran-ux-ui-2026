@@ -1,0 +1,56 @@
+/* Workspace corrections shared by the current prototype previews. */
+.workspace-content-inner { min-width: 0; }
+.workspace-content-inner > * { min-width: 0; }
+
+.workspace-shell .ant-tag.ant-tag-filled.ant-tag-success,
+.workspace-shell .ant-tag.ant-tag-filled.ant-tag-green {
+  color: var(--success);
+  background: #ecfdf3;
+  border: 1px solid #a7e0bd;
+  font-weight: 600;
+}
+.workspace-shell .ant-alert.ant-alert-success {
+  background: #ecfdf3;
+  border-color: #a7e0bd;
+}
+.workspace-shell .ant-alert.ant-alert-success .ant-alert-icon { color: var(--success); }
+
+.course-form-page { min-width: 0; container: course-form / inline-size; }
+.course-editor-publish { min-width: 0; }
+.course-editor-publish .ant-alert { margin-bottom: 18px; }
+.course-editor-publish .ant-alert-content { min-width: 0; }
+.course-editor-publish .ant-alert-message,
+.course-editor-publish .ant-alert-title { overflow-wrap: anywhere; }
+.course-editor-publish .ant-alert-description {
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  scrollbar-width: thin;
+}
+.course-editor-details { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.course-editor-details .ant-radio-group { display: inline-flex; max-width: 100%; }
+.course-editor-details .ant-radio-button-wrapper { flex: 1; white-space: nowrap; }
+@container course-form (max-width: 960px) {
+  .course-form-page .form-page-grid { grid-template-columns: minmax(0, 1fr); }
+  .course-editor-publish { position: static; }
+}
+
+.finance-page { min-width: 0; width: 100%; }
+.finance-section { min-width: 0; }
+.finance-section .ant-table-wrapper { min-width: 0; max-width: 100%; }
+.finance-course-cell { overflow-wrap: anywhere; }
+.finance-rate-editor { min-width: 0; width: 260px; }
+.finance-rate-editor > .ant-btn { flex-basis: 100%; width: fit-content; max-width: fit-content; }
+.finance-section .ant-table-content { scrollbar-width: auto; }
+.finance-section .ant-table-content:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.admin-users-toolbar { display: flex; flex-wrap: wrap; gap: 12px; }
+.admin-users-toolbar > .ant-select { width: min(100%, 260px); min-width: 0; }
+
+@media (max-width: 680px) {
+  .course-editor-details { grid-template-columns: minmax(0, 1fr); }
+  .finance-section { padding-inline: 12px; }
+  .finance-kpi { min-width: 0; padding-inline: 14px; }
+  .finance-source-breakdown { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-users-toolbar { align-items: flex-start; flex-direction: column; }
+  .admin-users-toolbar > .ant-select { width: 100%; }
+}
