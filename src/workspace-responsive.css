@@ -33,6 +33,10 @@
 @container course-form (max-width: 960px) {
   .course-form-page .form-page-grid { grid-template-columns: minmax(0, 1fr); }
   .course-editor-publish { position: static; }
+  .course-editor-details { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+  .course-editor-details .ant-form-item:nth-child(3) { grid-column: 1 / -1; }
+  .course-editor-details .ant-radio-group { display: grid; width: min(100%, 360px); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .course-editor-details .ant-radio-button-wrapper { display: grid; min-width: 0; place-items: center; height: auto; min-height: 42px; padding: 6px 8px; line-height: 1.4; white-space: normal; text-align: center; }
 }
 
 .finance-page { min-width: 0; width: 100%; }
