@@ -3,6 +3,7 @@
 ใช้กติกาและสเปกกลางต่อไปนี้ทุกครั้งที่ทำงานใน repository นี้:
 
 @./AGENTS.md
+@./docs/MELEARN_V1_SCOPE.md
 @./docs/UI_SPEC.md
 @./docs/CODE_SPEC.md
 @./docs/GIT_CHECKPOINT_POLICY_TH.md

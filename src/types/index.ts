@@ -56,6 +56,10 @@ export interface VideoItem {
   description?: string;
   summary?: string;
   videoFilename?: string;
+  /** Admin-managed AI knowledge metadata. Never render this field in learner-facing UI. */
+  transcript?: string;
+  transcriptUpdatedAt?: string;
+  transcriptUpdatedBy?: string;
 }
 
 export interface ArticleItem {
@@ -103,6 +107,8 @@ export interface Course {
   updatedAt?: string;
   createdAt?: string;
   reviewHistory?: CourseReviewEvent[];
+  /** Admin-managed AI knowledge setting; absent legacy values are treated as disabled. */
+  aiEnabled?: boolean;
 }
 
 export interface CourseReviewEvent {
@@ -457,6 +463,11 @@ export interface ActionResult {
   verificationUrl?: string;
 }
 
+export interface SaveTranscriptResult extends ActionResult {
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
 export interface ReorderResult {
   ok: boolean;
   message?: string;
@@ -498,6 +509,8 @@ export interface LmsContextType {
   submitCourseForReview: (courseId: string) => ActionResult;
   reviewCourse: (courseId: string, decision: 'approve' | 'return', reason?: string) => ActionResult;
   publishCourse: (courseId: string) => ActionResult;
+  setCourseAiEnabled: (courseId: string, enabled: boolean) => ActionResult;
+  saveVideoTranscript: (courseId: string, chapterId: string, videoId: string, transcript: string) => SaveTranscriptResult;
   removeCourse: (courseId: string) => void;
   saveChapter: (courseId: string, chapter: Partial<Chapter>, chapterId?: string) => void;
   saveChapterWorkspace: (courseId: string, chapter: Chapter, quizzes: Quiz[], baseline: string) => WorkspaceSaveResult;

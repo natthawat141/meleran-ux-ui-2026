@@ -1,5 +1,7 @@
 # AGENTS.md — Melearn UX/UI
 
+**กติกาธุรกิจและขอบเขตที่เจ้าของยืนยัน 6 ต.ค. 2026 อยู่ใน [docs/MELEARN_V1_SCOPE.md](docs/MELEARN_V1_SCOPE.md) Final 1.5 ให้อ่านก่อนทำงาน ข้อความในร่างเก่าและพฤติกรรมต้นแบบที่ขัดกันไม่มีน้ำหนักเหนือฉบับนี้ การอนุมัติเอกสารไม่ใช่การยืนยันว่าโค้ดครบหรือ Production พร้อม**
+
 ## Read before editing
 
 อ่าน [`docs/UI_SPEC.md`](docs/UI_SPEC.md) และ [`docs/CODE_SPEC.md`](docs/CODE_SPEC.md) ให้ครบก่อนแก้ UI หรือ code ใช้ [`docs/README.md`](docs/README.md) สำหรับแผนผังเอกสารและวิธีเปิดกับ AI แต่ละตัว

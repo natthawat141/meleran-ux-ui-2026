@@ -10,6 +10,7 @@ import { cashCodeShareAmounts, commitCashCodeRedemption, normalizeAccessCode, qu
 import { assignmentHasHistory, assignmentIncludesLearner, assignmentSaveIssue, canManageCourse, contentRemovalIssue } from './lib/learning-history';
 import { EMAIL_VERIFICATION_RESEND_COOLDOWN_MS, EMAIL_VERIFICATION_TTL_MS, verificationResendAvailable, verificationResendRemainingMs, verificationTokenState } from './lib/email-verification';
 import { canEditCourse, canPublishCourse, canReviewCourse, canSubmitCourse, coursePublicationIssue, invalidateCourseReview } from './lib/course-review';
+import { preserveCourseAiMetadata, preserveVideoTranscripts, saveVideoTranscript as saveVideoTranscriptRecord, setCourseAiEnabled as setCourseAiEnabledRecord } from './lib/ai-course-support';
 import type {
   ActionResult,
   AccessCode,
@@ -43,6 +44,7 @@ import type {
   Role,
   SendInboxMessageArgs,
   SendInboxMessageResult,
+  SaveTranscriptResult,
   User,
   WorkspaceSaveResult,
 } from './types';
@@ -110,13 +112,14 @@ function loadData(): LmsData & { notifications?: AppNotification[] } {
               : course;
           })
         : structuredClone(initialData.courses);
-      courses.forEach((course) =>
+      courses.forEach((course) => {
+        course.aiEnabled = course.aiEnabled === true;
         course.chapters.forEach((chapter) =>
           chapter.items.forEach((item) => {
             if (!item.id) item.id = createId('item');
           })
-        )
-      );
+        );
+      });
       const assignments: Assignment[] =
         Array.isArray(parsed.assignments) && parsed.assignments.length
           ? parsed.assignments.map((assignment: Assignment & { learnerIds?: unknown }) => 'learnerIds' in assignment && Array.isArray(assignment.learnerIds) ? { ...assignment, stage: assignment.stage ?? 'practice', assigneeType: 'specific', assigneeIds: assignment.learnerIds.filter((id: unknown): id is string => typeof id === 'string') } : assignment)
@@ -190,7 +193,9 @@ function loadData(): LmsData & { notifications?: AppNotification[] } {
   } catch {
     /* Start with the sample data if storage is unavailable or invalid. */
   }
-  return structuredClone(initialData) as LmsData & { notifications?: AppNotification[] };
+  const initial = structuredClone(initialData);
+  initial.courses.forEach((course) => { course.aiEnabled = false; });
+  return initial as LmsData & { notifications?: AppNotification[] };
 }
 
 function awardCertificate(data: LmsData, courseId: string, userId: string): LmsData {
@@ -444,7 +449,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   );
 
   const saveCourse = useCallback(
-    (values: Partial<Course>, id?: string): string | null => {
+    (rawValues: Partial<Course>, id?: string): string | null => {
       const target = data.courses.find((course) => course.id === id);
       if (
         !currentUser ||
@@ -453,6 +458,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       ) {
         return null;
       }
+      const candidate = Object.assign({ id: id ?? '', slug: '', title: '', category: '', level: '', price: 0, instructorId: '', status: 'draft', cover: '', chapters: [] }, target ?? {}, rawValues) as Course;
+      const values: Partial<Course> = preserveVideoTranscripts(target, preserveCourseAiMetadata(target, candidate));
       const selectedInstructorId = currentUser.role === 'admin'
         ? values.instructorId || target?.instructorId
         : target?.instructorId || currentUser.id;
@@ -487,6 +494,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
             : existing?.instructorId || currentUser.id,
           reviewHistory: editableCourse?.reviewHistory ?? existing?.reviewHistory,
         };
+        Object.assign(record, preserveCourseAiMetadata(existing, record));
+        Object.assign(record, preserveVideoTranscripts(existing, record));
         if (!record.cover) record.cover = defaultCourseCover;
       const previousPrice = Number(existing?.price);
       const nextPrice = Number(record.price);
@@ -568,6 +577,31 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     return { ok: true, message: 'เผยแพร่คอร์สแล้ว' };
   }, [currentUser, data.courses, data.quizzes, data.users, update]);
 
+  const setCourseAiEnabled = useCallback((courseId: string, enabled: boolean): ActionResult => {
+    const existing = data.courses.find((entry) => entry.id === courseId);
+    const result = setCourseAiEnabledRecord(existing, currentUser?.role, enabled);
+    if (!result.ok || !result.course) return { ok: false, message: result.message };
+    const next = structuredClone(data);
+    next.courses = next.courses.map((course) => course.id === courseId ? result.course! : course);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึกการตั้งค่า AI ไม่ได้ พื้นที่เก็บในเบราว์เซอร์ไม่พอ' }; }
+    setData(next);
+    return { ok: true, message: result.message };
+  }, [currentUser?.role, data, setData]);
+
+  const saveVideoTranscript = useCallback((courseId: string, chapterId: string, videoId: string, transcript: string): SaveTranscriptResult => {
+    const existing = data.courses.find((entry) => entry.id === courseId);
+    const updatedAt = new Date().toISOString();
+    const result = saveVideoTranscriptRecord(existing, currentUser?.role, chapterId, videoId, transcript, currentUser?.id ?? '', updatedAt);
+    if (!result.ok || !result.course) return { ok: false, message: result.message };
+    const next = structuredClone(data);
+    next.courses = next.courses.map((course) => course.id === courseId ? result.course! : course);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); }
+    catch { return { ok: false, message: 'บันทึก Transcript ไม่ได้ พื้นที่เก็บในเบราว์เซอร์อาจไม่พอ ลองลดขนาดเนื้อหา' }; }
+    setData(next);
+    return { ok: true, message: result.message, updatedAt, updatedBy: currentUser?.id };
+  }, [currentUser?.id, currentUser?.role, data, setData]);
+
   const removeCourse = useCallback(
     (courseId: string) => {
       const course = data.courses.find((entry) => entry.id === courseId);
@@ -593,20 +627,26 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       const course = data.courses.find((entry) => entry.id === courseId);
       if (!course || !canEditCourse(currentUser, course)) return;
       const now = new Date().toISOString();
+      const targetId = chapterId ?? values.id;
+      const original = targetId ? course.chapters.find((entry) => entry.id === targetId) : undefined;
+      const candidate: Chapter = {
+        id: targetId ?? createId('ch'),
+        title: values.title ?? '',
+        description: values.description ?? '',
+        items: values.items ?? original?.items ?? [],
+      };
+      const safeChapter = preserveVideoTranscripts(course, { ...course, chapters: original
+        ? course.chapters.map((entry) => entry.id === candidate.id ? candidate : entry)
+        : [...course.chapters, candidate] }).chapters.find((entry) => entry.id === candidate.id)!;
+      if (original && JSON.stringify(original) === JSON.stringify(safeChapter)) return;
       update((next) => {
         next.courses = next.courses.map((course) => {
           if (course.id !== courseId) return course;
-          const targetId = chapterId ?? values.id ?? createId('ch');
-          const chapter: Chapter = {
-            id: targetId,
-            title: values.title ?? '',
-            description: values.description ?? '',
-            items: values.items ?? course.chapters.find((item) => item.id === targetId)?.items ?? [],
-          };
-          const chapters = (chapterId || values.id)
-            ? course.chapters.map((item) => (item.id === targetId ? chapter : item))
-            : [...course.chapters, chapter];
-          return { ...invalidateCourseReview(course, currentUser!.id, now), chapters, updatedAt: now };
+          const chapters = original
+            ? course.chapters.map((item) => (item.id === safeChapter.id ? safeChapter : item))
+            : [...course.chapters, safeChapter];
+          const editable = invalidateCourseReview(course, currentUser!.id, now);
+          return { ...preserveVideoTranscripts(editable, { ...editable, chapters }), updatedAt: now };
         });
         return next;
       });
@@ -669,6 +709,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       const course = data.courses.find((entry) => entry.id === courseId);
       const existing = course?.chapters.find((entry) => entry.id === chapter.id);
       if (
+        !course ||
         !existing ||
         !currentUser ||
         (currentUser.role !== 'admin' && !(currentUser.role === 'instructor' && course?.instructorId === currentUser.id))
@@ -682,6 +723,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       if (baseline !== JSON.stringify({ chapter: existing, quizzes: oldQuizzes })) {
         return { ok: false, message: 'ข้อมูลบทถูกเปลี่ยนแล้ว กรุณาโหลดหน้าใหม่ก่อนแก้ต่อ' };
       }
+      const safeChapter = preserveVideoTranscripts(course, { ...course, chapters: course.chapters.map((entry) => entry.id === chapter.id ? chapter : entry) }).chapters.find((entry) => entry.id === chapter.id)!;
+      if (JSON.stringify({ chapter: safeChapter, quizzes }) === JSON.stringify({ chapter: existing, quizzes: oldQuizzes })) return { ok: true, message: 'ไม่มีการเปลี่ยนแปลงเนื้อหาหลัก' };
       for (const old of existing.items) {
         const replacement = chapter.items.find((item) => item.id === old.id);
         const hasProgress = Object.values(data.progress[`${courseId}:${old.id}`] || {}).some(Boolean);
@@ -703,7 +746,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       const target = next.courses.find((entry) => entry.id === courseId);
       if (!target) return { ok: false, message: 'ไม่พบคอร์ส' };
       Object.assign(target, invalidateCourseReview(target, currentUser.id, new Date().toISOString()));
-      target.chapters = target.chapters.map((entry) => (entry.id === chapter.id ? structuredClone(chapter) : entry));
+      target.chapters = preserveVideoTranscripts(course!, { ...target, chapters: target.chapters.map((entry) => (entry.id === chapter.id ? structuredClone(safeChapter) : entry)) }).chapters;
       target.updatedAt = new Date().toISOString();
       const retained = new Set(quizzes.map((quiz) => quiz.id));
       const removed = new Set(oldQuizzes.filter((quiz) => !retained.has(quiz.id)).map((quiz) => quiz.id));
@@ -737,9 +780,15 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   }, [currentUser, data, commitLearningChange]);
 
   const saveItem = useCallback(
-    (courseId: string, chapterId: string, values: Partial<CourseItem>) => {
+    (courseId: string, chapterId: string, rawValues: Partial<CourseItem>) => {
       const course = data.courses.find((entry) => entry.id === courseId);
       if (!course || !canEditCourse(currentUser, course)) return;
+      const { transcript: _transcript, transcriptUpdatedAt: _updatedAt, transcriptUpdatedBy: _updatedBy, ...values } = rawValues as Partial<CourseItem> & { transcript?: string; transcriptUpdatedAt?: string; transcriptUpdatedBy?: string };
+      if (Object.keys(values).every((key) => key === 'id')) return;
+      if (values.id) {
+        const existingItem = course.chapters.find((entry) => entry.id === chapterId)?.items.find((item) => item.id === values.id);
+        if (existingItem && JSON.stringify(existingItem) === JSON.stringify({ ...existingItem, ...values })) return;
+      }
       const now = new Date().toISOString();
       update((next) => {
         next.courses = next.courses.map((course) =>
@@ -753,7 +802,11 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
                     : {
                         ...chapter,
                         items: values.id
-                          ? chapter.items.map((item) => (item.id === values.id ? ({ ...item, ...values } as CourseItem) : item))
+                          ? chapter.items.map((item) => {
+                              if (item.id !== values.id) return item;
+                              const { transcript: _injectedTranscript, transcriptUpdatedAt: _ignoredAt, transcriptUpdatedBy: _ignoredBy, ...safeValues } = values as Partial<CourseItem> & { transcript?: string; transcriptUpdatedAt?: string; transcriptUpdatedBy?: string };
+                              return { ...item, ...safeValues } as CourseItem;
+                            })
                           : [...chapter.items, { ...values, id: createId('item') } as CourseItem],
                       }
                 ),
@@ -1597,6 +1650,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       submitCourseForReview,
       reviewCourse,
       publishCourse,
+      setCourseAiEnabled,
+      saveVideoTranscript,
       removeCourse,
       saveChapter,
       saveChapterWorkspace,
@@ -1653,6 +1708,8 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       submitCourseForReview,
       reviewCourse,
       publishCourse,
+      setCourseAiEnabled,
+      saveVideoTranscript,
       removeCourse,
       saveChapter,
       saveChapterWorkspace,

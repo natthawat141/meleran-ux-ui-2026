@@ -1,26 +1,28 @@
 # คู่มือ AI และสเปก Melearn UX/UI
 
-อัปเดต 1 ตุลาคม 2026 ชุดนี้ใช้ให้ AI หรือผู้พัฒนาคนใหม่ต่อจากงานปัจจุบัน โดยรักษาหน้าตา flow และรูปแบบ code ที่ตกลงไว้
+อัปเดต 6 ตุลาคม 2026 ชุดนี้ใช้ให้ AI หรือผู้พัฒนาคนใหม่ต่อจากงานปัจจุบัน โดยรักษาหน้าตา flow และรูปแบบ code ที่ตกลงไว้
 
 ## อ่านอะไรเมื่อเริ่ม
 
 | เอกสาร | หน้าที่ |
 | --- | --- |
+| [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) | **ข้อมูลหลัก Final 1.5 ที่เจ้าของตรวจและยืนยันแล้ว**: Domain, permission, flow, scope หนึ่งเดือน และกรณีตรวจรับ |
+| [FEATURE_RELEASE_MATRIX.md](FEATURE_RELEASE_MATRIX.md) | ความพร้อมของต้นแบบ/API/release แยกจากการอนุมัติกติกาธุรกิจ |
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
-| [`BUSINESS_ANALYTICS_UI_SPEC.md`](BUSINESS_ANALYTICS_UI_SPEC.md) | หน้าภาพรวมธุรกิจและรายงานการเงิน ตัวกรอง กราฟ ledger และ UX acceptance |
-| [`INSTRUCTOR_ANALYTICS_UI_SPEC.md`](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | Analytics ผู้สอนที่เห็นเฉพาะคอร์สตนเอง: UX ทั้ง 5 มุม กติกาแบบฝึกหัด/ก่อน–หลัง งาน Luna และ acceptance |
-| [`BUSINESS_ANALYTICS_DATA_SPEC.md`](BUSINESS_ANALYTICS_DATA_SPEC.md) | นิยาม metric, raw events, financial records และ draft API/JSON สำหรับระบบจริง |
-| [`ADMIN_MANAGEMENT_GAP_AUDIT_TH.md`](ADMIN_MANAGEMENT_GAP_AUDIT_TH.md) | source audit ของงานแอดมิน สิ่งที่ขาด รายการทำเร็ว และข้อพึ่งพา ยังไม่แบ่งเฟส |
+| [BUSINESS_ANALYTICS_UI_SPEC.md](BUSINESS_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
+| [INSTRUCTOR_ANALYTICS_UI_SPEC.md](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
+| [BUSINESS_ANALYTICS_DATA_SPEC.md](BUSINESS_ANALYTICS_DATA_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
+| [ADMIN_MANAGEMENT_GAP_AUDIT_TH.md](ADMIN_MANAGEMENT_GAP_AUDIT_TH.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [`GIT_CHECKPOINT_POLICY_TH.md`](GIT_CHECKPOINT_POLICY_TH.md) | ผู้ใช้ยืนยันให้ commit และ push อัตโนมัติหลังงานผ่าน พร้อมการสำรอง แยก concurrent work และรายงานจุดย้อนกลับ |
 | [`TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md`](TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md) | ขอบเขต ข้อห้าม และเกณฑ์ย้าย TypeScript โดยรักษา UI/พฤติกรรมเดิม; source และ tooling ย้ายแล้ว |
 | [`WORKSPACE_INTEGRATION_20261004.md`](WORKSPACE_INTEGRATION_20261004.md) | ผลรวมงาน Git/TypeScript เส้นทางการเงิน หลักฐานการตรวจ และข้อจำกัดของ AI demo |
-| [`INBOX_PERMISSION_SPEC.md`](INBOX_PERMISSION_SPEC.md) | กติกาอินบ็อกซ์ที่ยืนยัน 1 ต.ค. 2026: เส้นทางส่ง สิทธิ์เรียนหมด ทีมดูแล ความเป็นส่วนตัว และส่วนที่ยังไม่ implement |
+| [INBOX_PERMISSION_SPEC.md](INBOX_PERMISSION_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 
-UI spec บันทึกทิศทางที่เลือกกับพฤติกรรมของต้นแบบ Code spec บอกวิธีต่อ code ปัจจุบัน ทั้งสองไฟล์ไม่อนุมัติสถาปัตยกรรม Production หรือ business rules ที่ยังไม่ตกลง
+อ่านฉบับหลักก่อน UI/CODE spec ซึ่งใช้รักษาแบรนด์และวิธีทำต้นแบบ การอนุมัติธุรกิจไม่เท่ากับ backend พร้อมหรือเลือกสแตกแล้ว
 
-งานเกี่ยวกับอินบ็อกซ์ให้อ่าน `INBOX_PERMISSION_SPEC.md` เพิ่มก่อนแก้ flow หรือสิทธิ์ กติกาที่ผู้ใช้ยืนยันในไฟล์นี้มีน้ำหนักเหนือพฤติกรรมต้นแบบเดิม ส่วนรายละเอียดที่ยังไม่ตัดสินต้องไม่เติมเป็น requirement ที่อนุมัติแล้ว
+Inbox, Finance, Orders, Checkout และ analytics แบบใหญ่จากร่างเดิมไม่อยู่ในรอบแรก เอกสารเก็บประวัติไม่ใช่งานที่ต้องทำให้ครบ
 
 ## ใช้กับ AI แต่ละตัว
 
@@ -40,12 +42,22 @@ UI spec บันทึกทิศทางที่เลือกกับพ
 
 ## ตัวอย่างคำสั่งเริ่มงาน
 
-> อ่าน AGENTS.md, docs/UI_SPEC.md และ docs/CODE_SPEC.md ก่อน ดู source ของ route `/teach/courses/course-writing/curriculum` แล้วแก้ปัญหา [ระบุปัญหา] โดยรักษาแบรนด์และ flow ที่มีอยู่ ใช้ component ที่ติดตั้งแล้ว แก้เฉพาะขอบเขตนี้ เปิด preview และรายงานผลตรวจที่ทำจริง
+> อ่าน AGENTS.md, docs/MELEARN_V1_SCOPE.md, docs/UI_SPEC.md และ docs/CODE_SPEC.md ก่อน ดู source ของ route `/teach/courses/course-writing/curriculum` แล้วแก้ปัญหา [ระบุปัญหา] โดยรักษาแบรนด์และ flow ที่มีอยู่ ใช้ component ที่ติดตั้งแล้ว แก้เฉพาะขอบเขตนี้ เปิด preview และรายงานผลตรวจที่ทำจริง
 
 ## การอัปเดตสเปก
+
+### AI Course Support ใน UX prototype
+
+แอดมินเปิดหรือปิด Melearn AI ที่หน้าตั้งค่าคอร์ส และบันทึกข้อความ AI Transcript จากหน้าแก้วิดีโอโดยแยกจาก draft บทเรียน ข้อมูลจำลองเก็บใน `localStorage` ผ่าน `aiEnabled` และ `VideoItem.transcript` (ตรงกับชื่อ `ai_enabled` และ `VideoTranscript` ในเอกสาร scope) ผู้เรียนที่ลงทะเบียนและเปิด AI แล้ว รวมถึงแอดมินหรือเจ้าของคอร์สที่เปิด AI ใช้เลือกบริบทคอร์สได้ ส่วนบัญชีสมัครด้วยอีเมลที่ยังไม่ยืนยันไม่มีสิทธิ์บริบทการเรียน; บัญชีที่ Admin สร้างเริ่มเรียนได้ทันทีตามฉบับหลัก การตอบแชตยังเป็น mock; ไม่มี model, retrieval backend, API หรือ network integration
+
+ตรวจ helper ด้วย `node --test tests/ai-course-support.test.mjs` ร่วมกับ `npm.cmd run typecheck` และ `npm.cmd run build`
 
 - เมื่อผู้ใช้เปลี่ยนทิศทางหรือยืนยัน pattern ใหม่ อัปเดต section ที่เกี่ยวข้องใน UI/CODE spec พร้อมวันที่และเหตุผลสั้น ๆ
 - แยกสิ่งที่ผู้ใช้ยืนยันออกจากสิ่งที่ AI เสนอหรือเพิ่ง implement อย่าเขียนว่าอนุมัติแล้วเพียงเพราะ build ผ่าน
 - เปลี่ยนรายละเอียดสี/พฤติกรรมในสเปกกลาง ไม่ทำสำเนารายละเอียดทั้งหมดใน GEMINI หรือ Cursor rule
 - ข้อกำหนดสั้นใน AGENTS/rule ต้องสอดคล้องกับสเปก ถ้าทิศทางหลักเปลี่ยน ให้แก้ข้อความย่อเหล่านั้นในงานเดียวกัน
 - เอกสารร่างใน workspace ชั้นนอกเป็นข้อมูลประกอบ หากขัดกับ feedback ล่าสุด ให้ยึด feedback ล่าสุดและบันทึกความต่าง
+
+## การปรับเอกสารเดิม
+
+ดู [รายการที่แก้และข้อจำกัดโค้ด](DOCUMENT_RECONCILIATION_20261006.md) เอกสารประวัติใน `archive/` มีไว้ตรวจที่มา ห้ามนำมาแทนฉบับหลัก

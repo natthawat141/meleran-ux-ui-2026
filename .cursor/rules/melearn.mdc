@@ -7,7 +7,7 @@ alwaysApply: true
 
 ก่อนแก้ ให้อ่านไฟล์ต่อไปนี้จาก repository root ให้ครบ:
 
-1. `AGENTS.md`
+1. `AGENTS.md` และ `docs/MELEARN_V1_SCOPE.md` — กติกาธุรกิจที่เจ้าของยืนยัน
 2. `docs/UI_SPEC.md`
 3. `docs/CODE_SPEC.md`
 4. `docs/GIT_CHECKPOINT_POLICY_TH.md` — commit และ push อัตโนมัติเมื่อชุดงานผ่านการตรวจ พร้อมรายงาน; แยกงานเมื่อมี agent ทำพร้อมกัน
@@ -15,7 +15,7 @@ alwaysApply: true
 ใช้ไฟล์เหล่านี้เป็นแหล่งกติกากลาง อย่าอนุมานสเปกจาก prototype รุ่นเก่าหรือ template ภายนอก
 
 - React/Vite prototype; ยังไม่ใช่ Production backend
-- White/light sky-blue, primary `#0074e8`, neutral dark text/shadows, Anuphan Variable
+- ใช้ชุดสีแบรนด์และฟอนต์ตาม `docs/UI_SPEC.md` ไม่คัดลอก palette อีกชุดไว้ใน rule
 - ใช้ logo/asset Melearn จริง ห้ามอีโมจิแทนไอคอนและห้ามสี earth tone หรือสีตกแต่งนอกแบรนด์
 - ใช้ existing Mantine/Ant Design/shadcn/Tiptap/Motion ตามบริบทของหน้า ไม่สร้าง control ซ้ำเอง
 - แยก page/component/state/style และรักษา flow ที่ผู้ใช้ยืนยัน

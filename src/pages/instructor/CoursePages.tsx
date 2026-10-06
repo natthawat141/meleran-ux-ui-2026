@@ -11,6 +11,7 @@ import {
   Radio,
   Row,
   Select,
+  Switch,
   Space,
   Table,
   Typography,
@@ -223,7 +224,7 @@ interface CourseFormValues {
 
 export function CourseEditorPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, saveCourse, submitCourseForReview, publishCourse, currentUser, removeCourse } = useLms();
+  const { data, saveCourse, submitCourseForReview, publishCourse, setCourseAiEnabled, currentUser, removeCourse } = useLms();
   const navigate = useNavigate();
   const course = data.courses.find((item) => item.id === courseId);
   const isNew = !courseId || courseId === 'new';
@@ -402,6 +403,28 @@ export function CourseEditorPage() {
                   )}
                 </div>
               </section>
+              {!isNew && currentUser?.role === 'admin' && (
+                <section className="editor-section" aria-labelledby="course-ai-settings-heading">
+                  <div className="course-editor-section-heading">
+                    <span>AI</span>
+                    <div>
+                      <Title level={4} id="course-ai-settings-heading">Melearn AI สำหรับคอร์สนี้</Title>
+                      <p>เปิดเพื่อให้ผู้เรียนที่ลงทะเบียนเลือกใช้ความรู้จากคอร์สนี้ในหน้า Melearn AI</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={course?.aiEnabled === true}
+                    checkedChildren="เปิด"
+                    unCheckedChildren="ปิด"
+                    aria-label="เปิด Melearn AI สำหรับคอร์สนี้"
+                    onChange={(enabled) => {
+                      const result = setCourseAiEnabled(course!.id, enabled);
+                      if (result.ok) message.success(result.message); else message.error(result.message);
+                    }}
+                  />
+                  <p>การตั้งค่านี้ไม่เปลี่ยนผลการเรียนหรือสถานะอนุมัติคอร์ส</p>
+                </section>
+              )}
             </div>
             <aside className="editor-aside course-editor-publish">
               <Title level={5}>การเผยแพร่</Title>
