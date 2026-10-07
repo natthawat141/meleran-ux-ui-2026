@@ -1,30 +1,25 @@
 export type FeatureStatus = 'prototype' | 'integration' | 'released' | 'disabled';
 export type FeatureEnvironment = 'development' | 'preview' | 'staging' | 'production';
-export type FeaturePhase = 1 | 'later';
 
-// Phase 1 is confirmed in Final 1.6; later means outside that scope, with no committed date.
-// Runtime status reflects the current browser-local prototype evidence, not planned delivery scope.
+// Runtime status records the current prototype evidence; phase is a proposed delivery order.
 export const FEATURES = {
   publicSite: { status: 'prototype', phase: 1 },
   auth: { status: 'prototype', phase: 1 },
   courseCatalog: { status: 'prototype', phase: 1 },
   learning: { status: 'prototype', phase: 1 },
   profile: { status: 'prototype', phase: 1 },
-  instructorOnboarding: { status: 'prototype', phase: 'later' },
-  instructorCourses: { status: 'prototype', phase: 1 },
-  assessment: { status: 'prototype', phase: 1 },
-  assignments: { status: 'prototype', phase: 'later' },
-  certificates: { status: 'prototype', phase: 1 },
-  accessCodes: { status: 'prototype', phase: 1 },
-  payments: { status: 'prototype', phase: 1 },
-  commerce: { status: 'prototype', phase: 'later' },
-  operations: { status: 'prototype', phase: 1 },
-  analytics: { status: 'prototype', phase: 'later' },
-  finance: { status: 'prototype', phase: 'later' },
-  inbox: { status: 'prototype', phase: 'later' },
-  blog: { status: 'prototype', phase: 1 },
-  aiTeacher: { status: 'prototype', phase: 1 },
-} as const satisfies Record<string, { status: FeatureStatus; phase: FeaturePhase }>;
+  instructorOnboarding: { status: 'prototype', phase: 2 },
+  instructorCourses: { status: 'prototype', phase: 2 },
+  assessment: { status: 'prototype', phase: 3 },
+  certificates: { status: 'prototype', phase: 3 },
+  commerce: { status: 'prototype', phase: 4 },
+  operations: { status: 'prototype', phase: 5 },
+  analytics: { status: 'prototype', phase: 6 },
+  finance: { status: 'prototype', phase: 6 },
+  inbox: { status: 'prototype', phase: 6 },
+  blog: { status: 'prototype', phase: 6 },
+  aiTeacher: { status: 'prototype', phase: 6 },
+} as const satisfies Record<string, { status: FeatureStatus; phase: number }>;
 
 export type FeatureKey = keyof typeof FEATURES;
 
@@ -32,47 +27,32 @@ export const ROUTE_FEATURES = {
   '/': 'publicSite',
   '/about': 'publicSite',
   '/instructors/:id': 'publicSite',
+
   '/login': 'auth',
   '/register': 'auth',
+  '/invite/:token': 'instructorOnboarding',
   '/verify-email': 'auth',
   '/forgot-password': 'auth',
   '/reset-password': 'auth',
-  '/invite/:token': 'instructorOnboarding',
+
   '/courses': 'courseCatalog',
   '/courses/:slug': 'courseCatalog',
   '/courses/:slug/preview': 'courseCatalog',
   '/explore/courses': 'courseCatalog',
   '/explore/courses/:slug': 'courseCatalog',
-  '/articles': 'blog',
-  '/articles/:id': 'blog',
-  '/admin/articles': 'blog',
-  '/admin/articles/new': 'blog',
-  '/admin/articles/:id/edit': 'blog',
-  '/become-instructor': 'instructorOnboarding',
+
   '/learn': 'learning',
   '/learn/courses': 'learning',
   '/learn/courses/:courseId': 'learning',
   '/learn/courses/:courseId/videos/:itemId': 'learning',
   '/learn/courses/:courseId/articles/:itemId': 'learning',
-  '/learn/redeem': 'accessCodes',
-  '/admin/access-codes': 'accessCodes',
-  '/learn/assignments': 'assignments',
-  '/teach/assignments': 'assignments',
-  '/admin/assignments': 'assignments',
-  '/learn/ai': 'aiTeacher',
-  '/learn/inbox': 'inbox',
-  '/teach/inbox': 'inbox',
-  '/admin/inbox': 'inbox',
-  '/learn/courses/:courseId/quizzes/:itemId': 'assessment',
-  '/learn/quizzes/:quizId': 'assessment',
-  '/learn/attempts/:attemptId': 'assessment',
-  '/learn/attempts/:attemptId/result': 'assessment',
-  '/teach/reviews': 'assessment',
-  '/teach/quizzes/:quizId/attempts': 'assessment',
-  '/teach/attempts/:attemptId/grade': 'assessment',
-  '/teach/courses/:courseId/quizzes': 'instructorCourses',
-  '/teach/quizzes': 'instructorCourses',
-  '/teach/quizzes/:quizId': 'instructorCourses',
+
+  '/account/profile': 'profile',
+
+  '/become-instructor': 'instructorOnboarding',
+  '/admin/instructors': 'instructorOnboarding',
+  '/admin/instructors/:id': 'instructorOnboarding',
+
   '/teach': 'instructorCourses',
   '/teach/courses': 'instructorCourses',
   '/teach/courses/new': 'instructorCourses',
@@ -82,28 +62,45 @@ export const ROUTE_FEATURES = {
   '/teach/courses/:courseId/chapters/:chapterId': 'instructorCourses',
   '/teach/courses/:courseId/videos/:itemId': 'instructorCourses',
   '/teach/courses/:courseId/articles/:itemId': 'instructorCourses',
+  '/teach/courses/:courseId/quizzes': 'instructorCourses',
+  '/teach/quizzes': 'instructorCourses',
+  '/teach/quizzes/:quizId': 'instructorCourses',
   '/teach/courses/:courseId/preview': 'instructorCourses',
   '/admin/courses': 'instructorCourses',
   '/admin/courses/reviews': 'instructorCourses',
   '/admin/courses/:courseId': 'instructorCourses',
-  '/account/profile': 'profile',
+
+  '/learn/assignments': 'assessment',
+  '/learn/courses/:courseId/quizzes/:itemId': 'assessment',
+  '/learn/quizzes/:quizId': 'assessment',
+  '/learn/attempts/:attemptId': 'assessment',
+  '/learn/attempts/:attemptId/result': 'assessment',
+  '/teach/assignments': 'assessment',
+  '/teach/quizzes/:quizId/attempts': 'assessment',
+  '/teach/attempts/:attemptId/grade': 'assessment',
+  '/teach/reviews': 'assessment',
+  '/admin/assignments': 'assessment',
+
   '/account/certificates': 'certificates',
   '/account/certificates/:certificateId': 'certificates',
   '/admin/certificates': 'certificates',
   '/admin/certificates/:certificateId': 'certificates',
   '/certificates/verify/:code': 'certificates',
-  '/checkout/:courseId': 'payments',
-  '/checkout/:orderId/result': 'payments',
+
+  '/learn/redeem': 'commerce',
+  '/checkout/:courseId': 'commerce',
+  '/checkout/:orderId/result': 'commerce',
   '/account/orders': 'commerce',
   '/account/cart': 'commerce',
   '/account/orders/:orderId': 'commerce',
   '/admin/orders': 'commerce',
   '/admin/orders/:orderId': 'commerce',
+  '/admin/access-codes': 'commerce',
+
   '/admin': 'operations',
   '/admin/users': 'operations',
   '/admin/users/:id': 'operations',
-  '/admin/instructors': 'instructorOnboarding',
-  '/admin/instructors/:id': 'instructorOnboarding',
+
   '/teach/analytics': 'analytics',
   '/teach/courses/:courseId/analytics': 'analytics',
   '/teach/courses/:courseId/analytics/learners/:learnerId': 'analytics',
@@ -113,16 +110,28 @@ export const ROUTE_FEATURES = {
   '/admin/analytics': 'analytics',
   '/admin/analytics/courses/:courseId': 'analytics',
   '/admin/analytics/courses/:courseId/learners/:learnerId': 'analytics',
+
   '/teach/finance': 'finance',
   '/admin/finance': 'finance',
   '/admin/reports/finance': 'finance',
+
+  '/learn/inbox': 'inbox',
+  '/teach/inbox': 'inbox',
+  '/admin/inbox': 'inbox',
+
+  '/articles': 'blog',
+  '/articles/:id': 'blog',
+  '/admin/articles': 'blog',
+  '/admin/articles/new': 'blog',
+  '/admin/articles/:id/edit': 'blog',
+
+  '/learn/ai': 'aiTeacher',
 } as const satisfies Record<string, FeatureKey>;
 
 export type FeatureRoutePath = keyof typeof ROUTE_FEATURES;
 
 const ENVIRONMENTS = ['development', 'preview', 'staging', 'production'] as const satisfies readonly FeatureEnvironment[];
 const STATUS_RANK: Record<FeatureStatus, number> = { prototype: 0, integration: 1, released: 2, disabled: -1 };
-
 export function getFeatureEnvironment(input: { mode: string; dev: boolean; appEnvironment?: string }): FeatureEnvironment {
   const explicit = input.appEnvironment;
   if (explicit !== undefined) return ENVIRONMENTS.includes(explicit as FeatureEnvironment) ? explicit as FeatureEnvironment : 'production';

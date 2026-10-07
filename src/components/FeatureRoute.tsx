@@ -4,9 +4,19 @@ import { NotFoundPage } from '../pages/SystemPages';
 import { PublicShell } from './Shell';
 
 export function FeatureRoute({ path, children }: { path: FeatureRoutePath; children: ReactNode }) {
-  const environment = getFeatureEnvironment({ mode: import.meta.env.MODE, dev: import.meta.env.DEV, appEnvironment: import.meta.env.VITE_APP_ENV });
+  const environment = getFeatureEnvironment({
+    mode: import.meta.env.MODE,
+    dev: import.meta.env.DEV,
+    appEnvironment: import.meta.env.VITE_APP_ENV,
+  });
   const feature = ROUTE_FEATURES[path];
-  if (!isFeatureEnabled(FEATURES[feature].status, environment)) return <PublicShell><NotFoundPage /></PublicShell>;
+  if (!isFeatureEnabled(FEATURES[feature].status, environment)) {
+    return (
+      <PublicShell>
+        <NotFoundPage />
+      </PublicShell>
+    );
+  }
   return children;
 }
 

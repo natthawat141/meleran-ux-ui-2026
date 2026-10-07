@@ -20,7 +20,7 @@ test('feature status access matrix is exhaustive across environments', () => {
   }
 });
 
-test('environment resolution honors explicit values and fail-closes invalid values', () => {
+test('environment resolution honors exact explicit values and fail-closes invalid values', () => {
   for (const environment of environments) {
     assert.equal(getFeatureEnvironment({ mode: 'production', dev: false, appEnvironment: environment }), environment);
   }
@@ -34,22 +34,14 @@ test('environment resolution honors explicit values and fail-closes invalid valu
   assert.equal(getFeatureEnvironment({ mode: 'unknown', dev: false }), 'production');
 });
 
-test('feature metadata uses recognized statuses and scope labels', () => {
+test('feature metadata uses recognized statuses, positive phases, and known route keys', () => {
+  assert.ok(Object.keys(FEATURES).length > 0);
   for (const feature of Object.values(FEATURES)) {
     assert.ok(statuses.includes(feature.status), feature.status);
-    assert.ok(feature.phase === 1 || feature.phase === 'later', String(feature.phase));
+    assert.ok(Number.isInteger(feature.phase) && feature.phase > 0, String(feature.phase));
   }
-  for (const key of Object.values(ROUTE_FEATURES)) assert.ok(Object.hasOwn(FEATURES, key), key);
-  assert.equal(ROUTE_FEATURES['/learn/redeem'], 'accessCodes');
-  assert.equal(ROUTE_FEATURES['/admin/access-codes'], 'accessCodes');
-  assert.equal(FEATURES.payments.phase, 1);
-  assert.equal(FEATURES.payments.status, 'prototype');
-  assert.equal(FEATURES.commerce.phase, 'later');
-  assert.equal(ROUTE_FEATURES['/checkout/:courseId'], 'payments');
-  assert.equal(ROUTE_FEATURES['/checkout/:orderId/result'], 'payments');
-  assert.equal(ROUTE_FEATURES['/account/cart'], 'commerce');
-  assert.equal(ROUTE_FEATURES['/account/orders'], 'commerce');
-  assert.equal(ROUTE_FEATURES['/learn/assignments'], 'assignments');
+  for (const featureKey of Object.values(ROUTE_FEATURES)) assert.ok(Object.hasOwn(FEATURES, featureKey), featureKey);
+  assert.equal(ROUTE_FEATURES['/invite/:token'], 'instructorOnboarding');
 });
 
 type AppRoute = { path: string; openingTag: string };
@@ -88,62 +80,66 @@ function getAppRoutes(): AppRoute[] {
   return routes;
 }
 
-test('every concrete route has its own matching outer gate; only system fallbacks remain ungated', () => {
+test('each App route has a unique path and its own matching outer feature wrapper', () => {
   const routes = getAppRoutes();
   const paths = routes.map(({ path }) => path);
   assert.equal(new Set(paths).size, paths.length, 'App route paths are unique');
-  const fallbacks = routes.filter(({ path }) => path === '/403' || path === '*');
-  assert.deepEqual(fallbacks.map(({ path }) => path).sort(), ['*', '/403']);
-  const concrete = routes.filter(({ path }) => path !== '/403' && path !== '*');
-  assert.deepEqual(concrete.map(({ path }) => path).sort(), Object.keys(ROUTE_FEATURES).sort());
-  for (const { path, openingTag } of concrete) {
-    const outerGate = /\belement=\{\s*featureElement\(\s*(['"])([^'"]+)\1\s*,/.exec(openingTag);
-    assert.equal(outerGate?.[2], path, `${path} outer wrapper matches its route`);
+
+  const systemFallbacks = routes.filter(({ path }) => path === '/403' || path === '*');
+  assert.deepEqual(systemFallbacks.map(({ path }) => path).sort(), ['*', '/403']);
+  const concreteRoutes = routes.filter(({ path }) => path !== '/403' && path !== '*');
+  assert.deepEqual(concreteRoutes.map(({ path }) => path).sort(), Object.keys(ROUTE_FEATURES).sort());
+
+  for (const { path, openingTag } of concreteRoutes) {
+    const wrapper = /\belement=\{\s*featureElement\(\s*(['"])([^'"]+)\1\s*,/.exec(openingTag);
+    assert.equal(wrapper?.[2], path, `${path} has a matching outer featureElement in its Route opening tag`);
   }
-  for (const { path, openingTag } of fallbacks) {
-    assert.doesNotMatch(openingTag, /\belement=\{\s*featureElement\(/, `${path} remains ungated`);
+  for (const { path, openingTag } of systemFallbacks) {
+    assert.doesNotMatch(openingTag, /\belement=\{\s*featureElement\(/, `${path} remains an ungated system route`);
   }
 });
 
-test('feature summary and route inventory match the code registry', () => {
-  const doc = fs.readFileSync(new URL('../docs/FEATURE_RELEASE_MATRIX.md', import.meta.url), 'utf8');
-  const lines = doc.split(/\r?\n/);
-  const header = lines.findIndex((line) => line.startsWith('| Feature key | Feature | Phase / scope |'));
-  assert.notEqual(header, -1, 'feature summary table exists');
-  const summaryRows: string[] = [];
-  for (let index = header + 1; index < lines.length && lines[index].startsWith('|'); index += 1) {
-    if (/^\| `[^`]+` \|/.test(lines[index])) summaryRows.push(lines[index]);
+test('feature summary and full route inventory match the code registry', () => {
+  const document = fs.readFileSync(new URL('../docs/FEATURE_RELEASE_MATRIX.md', import.meta.url), 'utf8');
+  const documentLines = document.split(/\r?\n/);
+  const summaryHeaderIndex = documentLines.findIndex((line) => line.startsWith('| Feature key | Feature | Phase (เสนอ) |'));
+  assert.notEqual(summaryHeaderIndex, -1, 'feature summary table exists');
+  const summaryLines: string[] = [];
+  for (let index = summaryHeaderIndex + 1; index < documentLines.length && documentLines[index].startsWith('|'); index += 1) {
+    if (/^\| `[^`]+` \|/.test(documentLines[index])) summaryLines.push(documentLines[index]);
   }
-  const summary = summaryRows.map((line) => {
+  const summary = summaryLines.map((line) => {
     const cells = line.split('|').map((cell) => cell.trim()).filter(Boolean);
     const key = /^`([^`]+)`$/.exec(cells[0] ?? '')?.[1];
-    const phase = cells[2];
+    const phase = Number(cells[2]);
     const status = /^`(prototype|integration|released|disabled)`$/.exec(cells[6] ?? '')?.[1];
-    assert.ok(key, `summary feature key: ${line}`);
-    assert.ok(phase === '1' || phase === 'Later', `recognized scope label for ${key}`);
-    assert.ok(status, `runtime status for ${key}`);
+    assert.ok(key, `feature summary key: ${line}`);
+    assert.ok(Number.isInteger(phase) && phase > 0, `positive integer phase for ${key}`);
+    assert.ok(status, `recognized runtime status for ${key}`);
     return { key, phase, status };
   });
-  assert.equal(new Set(summary.map(({ key }) => key)).size, summary.length, 'summary keys are unique');
+  assert.equal(new Set(summary.map(({ key }) => key)).size, summary.length, 'feature summary keys are unique');
   assert.deepEqual(summary.map(({ key }) => key).sort(), Object.keys(FEATURES).sort());
   for (const { key, phase, status } of summary) {
-    const feature = FEATURES[key as keyof typeof FEATURES];
-    assert.equal(phase, feature.phase === 'later' ? 'Later' : String(feature.phase), `${key} scope`);
-    assert.equal(status, feature.status, `${key} runtime`);
+    assert.equal(phase, FEATURES[key as keyof typeof FEATURES].phase, `${key} proposed phase`);
+    assert.equal(status, FEATURES[key as keyof typeof FEATURES].status, `${key} runtime status`);
   }
 
-  const inventorySection = doc.split('## Route inventory จาก App.tsx')[1]?.split('## การอัปเดต')[0];
+  const inventorySection = document.split('## Inventory จาก App.tsx')[1]?.split('## วิธีเปลี่ยนสถานะและตรวจรับ')[0];
   assert.ok(inventorySection, 'route inventory section exists');
   const inventory = inventorySection.split(/\r?\n/).flatMap((line) => {
     const match = /^\|\s*`([^`]+)`\s*\|\s*(`([^`]+)`|—)\s*\|/.exec(line);
-    return match ? [{ path: match[1], key: match[3] ?? '—' }] : [];
+    return match ? [{ path: match[1], featureKey: match[3] ?? '—' }] : [];
   });
-  assert.equal(new Set(inventory.map(({ path }) => path)).size, inventory.length, 'documented paths are unique');
-  assert.deepEqual(inventory.filter(({ key }) => key === '—'), [
-    { path: '/403', key: '—' }, { path: '*', key: '—' },
+  assert.equal(new Set(inventory.map(({ path }) => path)).size, inventory.length, 'documented inventory paths are unique');
+  const systemFallbacks = inventory.filter(({ featureKey }) => featureKey === '—');
+  assert.deepEqual(systemFallbacks, [
+    { path: '/403', featureKey: '—' },
+    { path: '*', featureKey: '—' },
   ]);
   assert.deepEqual(
-    inventory.filter(({ key }) => key !== '—').map(({ path, key }) => `${path}=${key}`).sort(),
-    Object.entries(ROUTE_FEATURES).map(([path, key]) => `${path}=${key}`).sort(),
+    inventory.filter(({ featureKey }) => featureKey !== '—')
+      .map(({ path, featureKey }) => `${path}=${featureKey}`).sort(),
+    Object.entries(ROUTE_FEATURES).map(([path, featureKey]) => `${path}=${featureKey}`).sort(),
   );
 });

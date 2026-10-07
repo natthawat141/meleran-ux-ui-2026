@@ -100,10 +100,10 @@
 
 ## 7. Permission และ route
 
-- [Feature Release Matrix](FEATURE_RELEASE_MATRIX.md) และ `src/config/features.ts` แยกขอบเขตส่งมอบจากความพร้อม runtime ทุก feature ยังเป็น prototype
-- `FeatureRoute` ครอบ feature routes ก่อน role gate; Development/Preview เปิด prototype/integration/released, Staging เปิด integration/released, Production เปิด released เท่านั้น disabled ปิดทุก environment
-- Default `npm run build` ใช้ Production และปิด feature ต้นแบบ Preview ใช้ `npm.cmd run build -- --mode preview`; `VITE_APP_ENV` ที่ไม่รู้จักใช้ Production; build เสร็จแล้วเปลี่ยน environment ไม่ได้โดยไม่ rebuild
-- Config/Matrices/route mapping/tests ต้องอัปเดตร่วมกัน Route gates ไม่ใช่ API security และไม่ได้ลบ source ของ feature ออกจาก bundle
+- [Feature Release Matrix](FEATURE_RELEASE_MATRIX.md) และ `src/config/features.ts` แยกความพร้อมของ UI, กติกาธุรกิจ, Backend และการเปิด route ทุก feature ยังเป็น prototype; phase metadata ไม่มีผลเปิด route
+- `FeatureRoute` ใน `src/components/FeatureRoute.tsx` ครอบทุก feature route ก่อนตรวจ role/ownership; `/403` และ `*` เป็น system fallback เพิ่มหรือเปลี่ยน route แล้วอัปเดต `FEATURES`, `ROUTE_FEATURES`, matrix และ tests ให้ตรงกัน
+- Development/Preview เปิด `prototype`, `integration`, `released`; Staging เปิด `integration`, `released`; Production เปิด `released` เท่านั้น; `disabled` ปิดทุกที่ Default build ใช้ Production; สร้าง preview ด้วย `npm.cmd run build -- --mode preview` แล้ว `npm.cmd run preview`; `VITE_APP_ENV` ที่ไม่รู้จักปิด feature แบบ Production
+- Route gate ไม่ใช่การตรวจสิทธิ์ฝั่ง API และไม่เอา source ออกจาก bundle; ต้องบังคับ role, ownership และสิทธิ์ข้อมูลใน Backend ก่อน release
 
 - ศึกษา `RolePage` ใน `App.tsx` และ checks ใน actions ปัจจุบัน อย่าเชื่อว่าซ่อนปุ่มแล้วผู้ใช้เข้าหน้านั้นไม่ได้
 - ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้และใช้ `/teach/...` workspace ตาม route เดิมได้
