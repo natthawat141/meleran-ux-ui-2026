@@ -18,3 +18,7 @@ config_file = "agents/melearn_scope.toml"
 [agents.melearn_ui_authoring]
 description = "R0 read-only inventory of shared UI, CSS/theme and actual authoring reuse."
 config_file = "agents/melearn_ui_authoring.toml"
+
+[agents.melearn_complex]
+description = "Independent high-difficulty review or bounded implementation for authorized Melearn work."
+config_file = "agents/melearn_complex.toml"
