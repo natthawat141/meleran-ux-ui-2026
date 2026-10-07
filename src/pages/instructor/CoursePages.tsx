@@ -2,15 +2,10 @@ import React from 'react';
 import {
   Button,
   Col,
-  Alert,
   Empty,
   Form,
-  Input,
-  InputNumber,
-  Radio,
-  Row,
-  Select,
   Switch,
+  Row,
   Space,
   Table,
   Typography,
@@ -25,6 +20,10 @@ import { flattenItems } from '../../data';
 import defaultCourseCover from '../../assets/generated/course-default-v2.png';
 import { ImageUploadField } from '../../components/ImageUploadField';
 import type { Course } from '../../types';
+import {
+  CourseMetadataEditor,
+  type CourseMetadataFormValues,
+} from '../../features/course-authoring/CourseMetadataEditor';
 
 const { Text, Title } = Typography;
 
@@ -198,31 +197,25 @@ export function InstructorCoursesPage() {
   );
 }
 
-interface CourseFormValues {
-  title: string;
-  subtitle: string;
-  description: string;
-  outcomesText?: string;
-  cover?: string;
-  instructorId: string;
-  category: string;
-  level: string;
-  price: number;
-  pricingType: 'free' | 'paid';
-}
-
 export function CourseEditorPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const { data, saveCourse, submitCourseForReview, publishCourse, setCourseAiEnabled, currentUser } = useLms();
   const navigate = useNavigate();
   const course = data.courses.find((item) => item.id === courseId);
   const isNew = !courseId || courseId === 'new';
-  const [form] = Form.useForm<CourseFormValues>();
+  const [form] = Form.useForm<CourseMetadataFormValues>();
 
-  const initialValues = course
+  const initialValues: Partial<CourseMetadataFormValues> = course
     ? {
-        ...course,
+        title: course.title,
+        subtitle: course.subtitle,
+        description: course.description,
         outcomesText: course.outcomes?.join('\n'),
+        cover: course.cover,
+        instructorId: course.instructorId,
+        category: course.category,
+        level: course.level,
+        price: course.price,
         pricingType: course.price === 0 ? 'free' : 'paid',
       }
     : {
@@ -233,10 +226,9 @@ export function CourseEditorPage() {
         instructorId: currentUser?.role === 'instructor' ? currentUser.id : '',
       };
 
-  const selectedPricingType = Form.useWatch('pricingType', form) ?? (course?.price ? 'paid' : 'free');
   const latestReturn = [...(course?.reviewHistory ?? [])].reverse().find((event) => event.action === 'returned');
 
-  const submit = (values: CourseFormValues) => {
+  const submit = (values: CourseMetadataFormValues) => {
     if (values.pricingType === 'paid' && Number(values.price) <= 0) {
       message.error('กรอกราคามากกว่า 0 บาทสำหรับคอร์สที่มีค่าใช้จ่าย');
       return;
@@ -282,176 +274,77 @@ export function CourseEditorPage() {
           </Link>
         }
       />
-      <div className="form-page course-form-page">
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={initialValues}
-          onFinish={submit}
-          key={course?.id ?? 'new'}
-        >
-          <div className="form-page-grid">
-            <div className="course-editor-main">
-              <section className="editor-section">
-                <div className="course-editor-section-heading">
-                  <span>01</span>
-                  <div>
-                    <Title level={4}>แนะนำคอร์ส</Title>
-                    <p>บอกผู้เรียนว่าคอร์สนี้เกี่ยวกับอะไรและช่วยเขาได้อย่างไร</p>
-                  </div>
+      <CourseMetadataEditor
+        form={form}
+        initialValues={initialValues}
+        isNew={isNew}
+        savedCourse={
+          course
+            ? { id: course.id, status: course.status, price: course.price }
+            : undefined
+        }
+        canAssignInstructor={currentUser?.role === 'admin'}
+        instructors={
+          currentUser?.role === 'admin'
+            ? data.users
+                .filter((user) => user.role === 'instructor')
+                .map((user) => ({ id: user.id, name: user.name }))
+            : []
+        }
+        returnedReason={latestReturn?.reason}
+        canSubmitForReview={
+          course?.status === 'draft' &&
+          (currentUser?.role === 'instructor' || currentUser?.role === 'admin')
+        }
+        canPublish={course?.status === 'approved'}
+        adminExtension={
+          !isNew && currentUser?.role === 'admin' && course ? (
+            <section className="editor-section" aria-labelledby="course-ai-settings-heading">
+              <div className="course-editor-section-heading">
+                <span>AI</span>
+                <div>
+                  <Title level={4} id="course-ai-settings-heading">Melearn AI สำหรับคอร์สนี้</Title>
+                  <p>เปิดเพื่อให้ผู้เรียนที่ลงทะเบียนเลือกใช้ความรู้จากคอร์สนี้ในหน้า Melearn AI</p>
                 </div>
-                <Form.Item
-                  name="title"
-                  label="ชื่อคอร์ส"
-                  rules={[{ required: true, message: 'กรอกชื่อคอร์ส' }]}
-                >
-                  <Input size="large" maxLength={100} placeholder="ชื่อที่สื่อสารหัวข้อได้ชัดเจน" />
-                </Form.Item>
-                <Form.Item
-                  name="subtitle"
-                  label="คำโปรยสั้น"
-                  rules={[{ required: true, message: 'สรุปว่าคอร์สนี้ช่วยเรื่องอะไร' }]}
-                >
-                  <Input maxLength={160} placeholder="สรุปสิ่งที่ผู้เรียนจะได้รับในหนึ่งประโยค" />
-                </Form.Item>
-                <Form.Item
-                  name="description"
-                  label="รายละเอียดคอร์ส"
-                  rules={[{ required: true, message: 'เพิ่มรายละเอียดคอร์ส' }]}
-                >
-                  <Input.TextArea
-                    rows={5}
-                    placeholder="เล่าว่าจะเรียนเรื่องอะไร เหมาะกับใคร และนำไปใช้ได้อย่างไร"
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="outcomesText"
-                  label="ผลลัพธ์ที่ผู้เรียนจะได้"
-                  extra="เขียนหนึ่งข้อในแต่ละบรรทัด"
-                >
-                  <Input.TextArea
-                    rows={3}
-                    placeholder={'เข้าใจพื้นฐานของหัวข้อ\nลองนำไปใช้กับงานจริง'}
-                  />
-                </Form.Item>
-              </section>
-              <section className="editor-section">
-                <div className="course-editor-section-heading">
-                  <span>02</span>
-                  <div>
-                    <Title level={4}>ภาพปกคอร์ส</Title>
-                    <p>ภาพนี้จะแสดงในหน้ารวมคอร์สและหน้ารายละเอียด</p>
-                  </div>
-                </div>
-                <Form.Item name="cover">
-                  <ImageUploadField fallback={defaultCourseCover} />
-                </Form.Item>
-              </section>
-              <section className="editor-section">
-                <div className="course-editor-section-heading">
-                  <span>03</span>
-                  <div>
-                    <Title level={4}>รายละเอียดเพิ่มเติม</Title>
-                    <p>ช่วยให้ผู้เรียนค้นพบคอร์สที่เหมาะกับตัวเอง</p>
-                  </div>
-                </div>
-                {currentUser?.role === 'admin' && (
-                  <Form.Item
-                    name="instructorId"
-                    label="ผู้สอนประจำคอร์ส"
-                    rules={[{ required: true, message: 'เลือกผู้สอน' }]}
-                  >
-                    <Select
-                      options={data.users
-                        .filter((user) => user.role === 'instructor')
-                        .map((user) => ({ value: user.id, label: user.name }))}
-                    />
-                  </Form.Item>
-                )}
-                <div className="course-editor-details">
-                  <Form.Item name="category" label="หมวดหมู่">
-                    <Select
-                      options={['การสื่อสาร', 'ข้อมูลและดิจิทัล', 'การทำงาน', 'การออกแบบ'].map(
-                        (value) => ({ value })
-                      )}
-                    />
-                  </Form.Item>
-                  <Form.Item name="level" label="ระดับ">
-                    <Select options={['เริ่มต้น', 'กลาง', 'ขั้นสูง'].map((value) => ({ value }))} />
-                  </Form.Item>
-                  <Form.Item name="pricingType" label="ค่าเรียน">
-                    <Radio.Group optionType="button" buttonStyle="solid">
-                      <Radio.Button value="free">เรียนฟรี</Radio.Button>
-                      <Radio.Button value="paid">มีค่าใช้จ่าย</Radio.Button>
-                    </Radio.Group>
-                  </Form.Item>
-                  {selectedPricingType === 'paid' && (
-                    <Form.Item name="price" label="ราคาคอร์ส" rules={[{ required: true, message: 'กรอกราคาคอร์ส' }]}>
-                      <InputNumber min={1} precision={0} step={50} addonAfter="บาท" style={{ width: '100%' }} />
-                    </Form.Item>
-                  )}
-                </div>
-              </section>
-              {!isNew && currentUser?.role === 'admin' && (
-                <section className="editor-section" aria-labelledby="course-ai-settings-heading">
-                  <div className="course-editor-section-heading">
-                    <span>AI</span>
-                    <div>
-                      <Title level={4} id="course-ai-settings-heading">Melearn AI สำหรับคอร์สนี้</Title>
-                      <p>เปิดเพื่อให้ผู้เรียนที่ลงทะเบียนเลือกใช้ความรู้จากคอร์สนี้ในหน้า Melearn AI</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={course?.aiEnabled === true}
-                    checkedChildren="เปิด"
-                    unCheckedChildren="ปิด"
-                    aria-label="เปิด Melearn AI สำหรับคอร์สนี้"
-                    onChange={(enabled) => {
-                      const result = setCourseAiEnabled(course!.id, enabled);
-                      if (result.ok) message.success(result.message); else message.error(result.message);
-                    }}
-                  />
-                  <p>การตั้งค่านี้ไม่เปลี่ยนผลการเรียนหรือสถานะอนุมัติคอร์ส</p>
-                </section>
-              )}
-            </div>
-            <aside className="editor-aside course-editor-publish">
-              <Title level={5}>การเผยแพร่</Title>
-              <p>ส่งตรวจและเผยแพร่ผ่านขั้นตอนอนุมัติของแอดมิน</p>
-              <div className="course-publish-note">
-                <StatusTag status={course?.status ?? 'draft'} />
-                {course?.status === 'approved' && <p>คอร์สผ่านการตรวจแล้ว พร้อมเผยแพร่</p>}
-                {course?.status === 'pending_review' && <p>กำลังรอแอดมินตรวจ หากแก้ไขต้องส่งตรวจใหม่</p>}
-                {course?.status === 'published' && <p>คอร์สเผยแพร่แล้ว การแก้ไขจะอัปเดตทันที</p>}
-                {(!course || course.status === 'draft') && <p>ฉบับร่างยังไม่แสดงให้ผู้เรียนทั่วไปเห็น</p>}
               </div>
-              {latestReturn?.reason && <Alert className="bottom-space" type="warning" showIcon message="เหตุผลที่แอดมินส่งกลับ" description={latestReturn.reason} />}
-              <Button block type="primary" htmlType="submit">
-                {isNew ? 'สร้างคอร์ส' : 'บันทึกการเปลี่ยนแปลง'}
-              </Button>
-              {course?.status === 'draft' && (currentUser?.role === 'instructor' || currentUser?.role === 'admin') && (
-                <Button block className="top-space" onClick={() => {
-                  const result = submitCourseForReview(course.id);
+              <Switch
+                checked={course.aiEnabled === true}
+                checkedChildren="เปิด"
+                unCheckedChildren="ปิด"
+                aria-label="เปิด Melearn AI สำหรับคอร์สนี้"
+                onChange={(enabled) => {
+                  const result = setCourseAiEnabled(course.id, enabled);
                   if (result.ok) message.success(result.message); else message.error(result.message);
-                }}>ส่งตรวจคอร์ส</Button>
-              )}
-              {course?.status === 'approved' && (
-                <Button block className="top-space" onClick={() => {
-                  const result = publishCourse(course.id);
-                  if (result.ok) message.success(result.message); else message.error(result.message);
-                }}>เผยแพร่คอร์ส</Button>
-              )}
-              {!isNew && (
-                <Link to={`/teach/courses/${course?.id}/preview`}>
-                  <Button block className="top-space">
-                    ดูตัวอย่างคอร์ส
-                  </Button>
-                </Link>
-              )}
-            </aside>
-          </div>
-        </Form>
-      </div>
+                }}
+              />
+              <p>การตั้งค่านี้ไม่เปลี่ยนผลการเรียนหรือสถานะอนุมัติคอร์ส</p>
+            </section>
+          ) : null
+        }
+        defaultCover={defaultCourseCover}
+        ImageUploadField={ImageUploadField}
+        StatusTag={StatusTag}
+        onFinish={submit}
+        onSubmitForReview={() => {
+          if (!course) return;
+          const result = submitCourseForReview(course.id);
+          if (result.ok) message.success(result.message);
+          else message.error(result.message);
+        }}
+        onPublish={() => {
+          if (!course) return;
+          const result = publishCourse(course.id);
+          if (result.ok) message.success(result.message);
+          else message.error(result.message);
+        }}
+        previewAction={
+          course ? (
+            <Link to={`/teach/courses/${course.id}/preview`}>
+              <Button block className="top-space">ดูตัวอย่างคอร์ส</Button>
+            </Link>
+          ) : null
+        }
+      />
     </>
   );
 }
