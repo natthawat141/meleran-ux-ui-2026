@@ -2,20 +2,14 @@
 
 /* Clear-sky concept: white, light through blue, and the original melearn assets. */
 .home-v3 {
-  --home-ink: #24272d;
-  --home-muted: #636971;
-  --home-blue: #0074e8;
-  --home-sky: #f1f9ff;
-  --home-line: #e5e7eb;
-  --home-shadow-rest: 0 2px 6px rgb(0 0 0 / 3%);
-  --home-shadow-raised: 0 14px 32px rgb(0 0 0 / 10%), 0 3px 8px rgb(0 0 0 / 4%);
+  --home-line: var(--line);
   --ink: var(--home-ink);
   --ink-secondary: var(--home-muted);
   --primary: var(--home-blue);
-  --primary-hover: #006bd5;
+  --primary-hover: var(--home-blue-hover);
   background: #fff;
   color: var(--home-ink);
-  font-family: 'Anuphan Variable', sans-serif;
+  font-family: var(--font-family);
   font-size: 16px;
   line-height: 1.7;
   min-height: 100dvh;
@@ -26,12 +20,12 @@
 .home-v3 h2 { font-size: clamp(25px, 2.4vw, 34px); line-height: 1.4; }
 .home-v3 a { color: inherit; text-decoration: none; }
 .home-v3 a:hover { color: var(--home-blue); }
-.home-v3 :is(a, button, [tabindex]):focus-visible { outline: 3px solid #309cdb; outline-offset: 5px; }
+.home-v3 :is(a, button, [tabindex]):focus-visible { outline: 3px solid var(--home-focus-ring); outline-offset: 5px; }
 .home-v3 section[id] { scroll-margin-top: 100px; }
 .home-container { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
 .home-v3 .ant-btn { font-family: inherit; font-weight: 500; border-radius: 10px; box-shadow: none; }
 .home-v3 .ant-btn-primary { color: #fff; background: var(--home-blue); border-color: var(--home-blue); box-shadow: 0 3px 8px rgb(0 0 0 / 9%); }
-.home-v3 .ant-btn-primary:not(:disabled):hover { color: #fff; background: #006bd5; border-color: #006bd5; }
+.home-v3 .ant-btn-primary:not(:disabled):hover { color: #fff; background: var(--home-blue-hover); border-color: var(--home-blue-hover); }
 .home-v3 .ant-btn-lg { height: 49px; padding-inline: 23px; font-size: 16px; }
 .home-v3 .ant-btn:active { transform: translateY(1px); }
 .home-skip { position: fixed; left: 20px; top: -100px; z-index: 100; padding: 12px 20px; background: white; border: 2px solid var(--home-blue); border-radius: 8px; }
@@ -49,13 +43,13 @@
 .home-desktop-account { gap: 24px; }
 .home-desktop-account .ant-btn { font-size: 14px; height: 42px; padding-inline: 21px; }
 .home-header .home-menu-trigger { display: none; width: 42px; height: 42px; align-items: center; justify-content: center; padding: 0; font-size: 18px; }
-.home-mobile-drawer { font-family: 'Anuphan Variable', sans-serif; }
+.home-mobile-drawer { font-family: var(--font-family); }
 .home-mobile-nav { display: grid; gap: 8px; }
-.home-mobile-nav a { display: block; padding: 13px 10px; color: #24272d; font-size: 17px; border-radius: 8px; }
-.home-mobile-nav a:hover, .home-mobile-nav a:focus-visible { background: #f1f9ff; color: #0074e8; }
+.home-mobile-nav a { display: block; padding: 13px 10px; color: var(--home-ink); font-size: 17px; border-radius: 8px; }
+.home-mobile-nav a:hover, .home-mobile-nav a:focus-visible { background: var(--home-sky); color: var(--home-blue); }
 .home-mobile-account { display: grid; gap: 8px; padding-top: 19px; margin-top: 14px; border-top: 1px solid var(--home-line); }
 .home-mobile-nav a.home-mobile-primary { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #fff; background: var(--home-blue); font-weight: 550; }
-.home-mobile-nav a.home-mobile-primary:hover, .home-mobile-nav a.home-mobile-primary:focus-visible { color: #fff; background: #006bd5; }
+.home-mobile-nav a.home-mobile-primary:hover, .home-mobile-nav a.home-mobile-primary:focus-visible { color: #fff; background: var(--home-blue-hover); }
 
 /* Full-bleed brand image. Overscan keeps the parallax layer inside the hero. */
 .home-hero { position: relative; isolation: isolate; overflow: hidden; background: #eef8ff; }
@@ -108,7 +102,7 @@
 .home-empty { padding: 36px 0; color: var(--home-muted); }
 
 /* A quiet neutral surface balances the blue learning artwork. */
-.home-guide { padding-block: 72px; background: #f8f9fa; }
+.home-guide { padding-block: 72px; background: var(--canvas); }
 .home-guide-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 76px; align-items: center; }
 .home-guide-heading { text-align: left; }
 .home-guide-heading h2 { font-size: clamp(28px, 2.8vw, 39px); }

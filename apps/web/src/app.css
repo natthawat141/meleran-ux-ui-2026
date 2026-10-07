@@ -1,2 +1,4 @@
 @source "../../../src";
 @source "./";
+@source "../../../packages/ui/src";
+@import '@melearn/ui/tailwind.css';

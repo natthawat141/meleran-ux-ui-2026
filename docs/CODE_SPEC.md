@@ -21,7 +21,7 @@
 - ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
 - `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
 - แต่ละแอปมี page/route orchestration ของตนเอง `course-authoring` เป็น feature ที่ยืนยันแล้ว แต่ `packages/course-authoring` เป็น candidate for extraction ไม่ใช่ package บังคับตั้งแต่แรก ให้ R0/R6 ตรวจผู้ใช้ร่วมและ dependencies แล้ว extract เฉพาะส่วนที่มี interface ชัด หาก split apps ต้องใช้ร่วมทันทีให้ตัดสินส่วนขั้นต่ำจากหลักฐานใน R0 ไม่ copy editor ทั้งก้อนเป็นสองชุดหรือ import source ข้ามแอป ส่วนร่วมรับข้อมูล draft/capabilities/คำสั่ง ไม่ผูก `useLms()`, layout หรือ route เฉพาะแอป
-- `packages/ui` เป็น shared UI/theme adapters (R2b export `PageTitle`/`StatusTag`; R3a เพิ่ม `MelearnUiProvider`, Mantine theme และ Ant theme tokens); Web/Admin เป็นเจ้าของ Router กับ LmsProvider ของตน CSS variables/Tailwind semantic theme ยังอยู่ระหว่าง R3b; `packages/api-client` เป็น HTTP/error infrastructure; `packages/contracts` เป็น types ตาม API contract ไม่คัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract ตัว export ของ API client/contracts ยังว่างจนผ่าน R4a/R4b
+- `packages/ui` เป็น shared UI/theme adapters (R2b export `PageTitle`/`StatusTag`; R3a เพิ่ม `MelearnUiProvider`; R3b ใช้ `design-tokens.json` เป็น source เดียวที่ TypeScript adapters อ่านและ generator แปลงเป็น `tokens.css`/`tailwind.css`); Web/Admin เป็นเจ้าของ Router กับ LmsProvider ของตน และแต่ละ app stylesheet import shared Tailwind พร้อมลงทะเบียน source scope ของแอป; `src/shadcn.css`/`src/styles.css` คงเป็น compatibility imports สำหรับ legacy; `packages/api-client` เป็น HTTP/error infrastructure; `packages/contracts` เป็น types ตาม API contract ไม่คัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract ตัว export ของ API client/contracts ยังว่างจนผ่าน R4a/R4b
 - Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ระหว่าง migration อนุญาตเฉพาะ alias `@legacy/*` ไปยัง prototype root ที่ระบุในแผน; ลบ alias เมื่อ slice ถูกย้ายแล้ว
 - `App.tsx` ประกอบ providers/router เท่านั้น; route แยก Public/Auth/Learner/Instructor ของ Web และพื้นที่ Admin ของอีกแอป ใช้ nested layouts พร้อม boundary สำหรับ loading/error/no-access/not-found ตาม flow
 - Page ดูแล route params/query และประกอบหน้าจอ; feature component ดูแล behavior ของ feature; shared UI ดูแล presentation/interaction ทั่วไป ไม่เรียก API เฉพาะธุรกิจเอง
@@ -50,8 +50,9 @@
 | Workspace notification menu | `src/components/WorkspaceNotifications.tsx`, `workspace-notifications.css` |
 | Review queue / grading workspace | `src/pages/instructor/LearnerReviewQueuePage.tsx`, `QuizPages.tsx`, `review-queue.css`, `grading-workspace.css` |
 | Shared title/status exports | `packages/ui/src/`; legacy common re-exports from package |
-| Tokens / light-dark foundation | `src/theme.ts` |
-| CSS กลาง / style ที่ปรับธีม | `src/styles.css`, `src/system-theme.css` |
+| Tokens / light-dark foundation | `packages/ui/src/design-tokens.json`, `design-tokens.ts`, `theme.ts` |
+| Generated CSS / Tailwind theme | `packages/ui/src/tokens.css`, `tailwind.css`; generator `scripts/generate-ui-tokens.mjs` |
+| CSS compatibility / system overrides | `src/styles.css`, `src/shadcn.css`, `src/system-theme.css` |
 | Landing/public brand chrome | `src/pages/landing/LandingPage.tsx`, `LandingChrome.tsx`, `landing.css` |
 | About / รายชื่อทีมร่วมกัน | `src/pages/landing/AboutPage.tsx`, `BrandStory.tsx`, `brand-story.css` |
 | Auth / shadcn controls | `src/pages/AuthPages.tsx`, `src/components/ui/`, `src/shadcn.css` |
@@ -102,14 +103,17 @@
 
 ## 5. Theme และ CSS
 
-- ค่า app tokens อยู่ใน `theme.ts`, Ant provider อยู่ใน `main.tsx`, Landing มี provider ของตนใน `LandingPage.tsx`; ตรวจทั้ง provider และ cascade ก่อนแก้สี/ขนาดที่ดูไม่ตรง
+- `packages/ui/src/design-tokens.json` เป็น source ของ palette, semantic CSS variables, light/dark foundation, Mantine/Ant adapter และ Landing profile; `design-tokens.ts` แก้ token references ก่อนใช้, ส่วน `tokens.css`/`tailwind.css` เป็น generated files ห้ามแก้เอง ให้ใช้ `npm.cmd run tokens:generate` และตรวจ `npm.cmd run tokens:check` แทน
+- `apps/web/src/app.css` และ `apps/admin/src/app.css` import shared Tailwind stylesheet และวาง `@source` ของ app, `packages/ui/src` และ legacy `src` ใน compiler chain เดียวกัน; shared Tailwind stylesheet ไม่ import Preflight เพื่อไม่ reset prototype CSS ค่า semantic utilities เช่น `bg-primary`, `bg-surface`, `text-ink`, `border-line` ต้องอ้าง variables เดียวกับ library adapters
+- Ant/Mantine provider อยู่ใน `packages/ui`; Landing มี ConfigProvider ซ้อนเพื่อคง profile ของ route และ palette แบรนด์อยู่ใน token source แต่ apply ผ่าน selector/theme เฉพาะ Landing อย่าย้าย scope ไปหน้าอื่นโดยไม่สั่ง
+- `npm.cmd run build`, `build:web` และ `build:admin` ตรวจ generated token files ก่อน build; เมื่อเปลี่ยน token ให้ตรวจ cascade/import order และหน้า shared ที่ใช้ provider ด้วย
 - ใช้ token/CSS variable ปัจจุบันก่อนเพิ่ม literal ใหม่ CSS เฉพาะ page อยู่ข้าง page และมี class namespace เช่น `home-`, `blog-`, `chapter-`
 - ไม่ override global `.ant-btn`, `input`, `h2` เพื่อแก้หน้าเดียว ไม่เพิ่ม `!important` ต่อท้ายไฟล์เรื่อย ๆ ถ้าปัญหาเกิดจาก specificity/import order ให้แก้ rule ที่เป็นต้นเหตุ
 - อ่าน `styles.css` และ `system-theme.css` เมื่อ component ที่แก้ใช้ style กลาง หลาย selector เก่ามี override ภายหลัง ห้ามใช้ selector แรกที่เจอเป็นข้อสรุป
 - ใช้ grid/flex, minmax, wrap, gutter และ aspect-ratio สำหรับ layout ไม่ใช้ absolute positioning เพื่อแก้ toolbar ชนกัน Absolute ใช้ได้กับ background/overlay ตามหน้าที่
 - ค่าเริ่มต้น light; dark tokens มีอยู่แล้ว ยังไม่เปิด toggle ไม่อ้างว่าภาพ/editor/public ทั้งระบบรองรับ dark ครบ
 - งานที่เปลี่ยน token กลางต้องเช็กหน้าที่ใช้ร่วมกันอย่างพอประมาณ โดยไม่ขยายเป็น redesign ทุกหน้า
-- เป้าหมายหลัง refactor คือ design tokens ชุดเดียวใน `packages/ui` สำหรับ Web/Admin โดย Tailwind theme, CSS variables และ library providers อ้างต้นทางเดียวกัน; ไม่เก็บ hex ซ้ำใน theme.ts, stylesheet และ component variants ส่วน CSS เฉพาะ editor/animation ใช้ได้เมื่อมี owner ชัดและอ้าง tokens
+- เป้าหมายหลัง refactor คือ design tokens ชุดเดียวใน `packages/ui` สำหรับ Web/Admin โดย Tailwind theme, CSS variables และ library providers อ้างต้นทางเดียวกัน; R3b สร้าง code gate นี้แล้ว แต่ visual/computed-style, contrast, keyboard และ responsive QA ยังต้องทำ ส่วน CSS เฉพาะ editor/animation ใช้ได้เมื่อมี owner ชัดและอ้าง tokens
 
 ## 6. State และการบันทึก
 

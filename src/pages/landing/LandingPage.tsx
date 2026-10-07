@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { ConfigProvider, type ThemeConfig } from 'antd';
+import { designTokens } from '@melearn/ui';
 import { useLms } from '../../store';
 import { LandingHeader, LandingFooter } from './LandingChrome';
 import { CourseCollection } from './CourseCollection';
@@ -18,22 +19,33 @@ import './landing-collections.css';
 export const landingTheme: ThemeConfig = {
   inherit: false,
   token: {
-    colorPrimary: '#0074e8',
-    colorInfo: '#0074e8',
-    colorText: '#233e53',
-    colorTextSecondary: '#546e81',
-    colorBgContainer: '#ffffff',
-    colorBorder: '#d5e7f2',
-    colorFillAlter: '#f0f8fd',
-    fontFamily: '"Anuphan Variable", sans-serif',
-    fontSize: 16,
-    borderRadius: 12,
-    controlHeight: 44,
+    colorPrimary: designTokens.colorModes.light.colorPrimary,
+    colorInfo: designTokens.colorModes.light.colorInfo,
+    colorText: designTokens.landing.default.colorText,
+    colorTextSecondary: designTokens.landing.default.colorTextSecondary,
+    colorBgContainer: designTokens.colorModes.light.colorBgContainer,
+    colorBorder: designTokens.landing.default.colorBorder,
+    colorFillAlter: designTokens.landing.default.colorFillAlter,
+    fontFamily: designTokens.fontFamily,
+    fontSize: designTokens.landing.default.fontSize,
+    borderRadius: designTokens.landing.default.borderRadius,
+    controlHeight: designTokens.landing.default.controlHeight,
   },
   components: {
-    Button: { primaryShadow: 'none', defaultShadow: 'none', fontWeight: 500 },
-    Tabs: { horizontalItemGutter: 28, titleFontSize: 15 },
-    Collapse: { headerBg: '#ffffff', contentBg: '#ffffff', headerPadding: '22px 0' },
+    Button: {
+      primaryShadow: designTokens.landing.legacy.buttonPrimaryShadow,
+      defaultShadow: designTokens.landing.legacy.buttonDefaultShadow,
+      fontWeight: designTokens.landing.legacy.buttonFontWeight,
+    },
+    Tabs: {
+      horizontalItemGutter: designTokens.landing.default.tabsGutter,
+      titleFontSize: designTokens.landing.default.tabsTitleFontSize,
+    },
+    Collapse: {
+      headerBg: designTokens.colorModes.light.colorBgContainer,
+      contentBg: designTokens.colorModes.light.colorBgContainer,
+      headerPadding: designTokens.landing.default.collapseHeaderPadding,
+    },
   },
 };
 
@@ -42,12 +54,12 @@ const homePageTheme: ThemeConfig = {
   ...landingTheme,
   token: {
     ...landingTheme.token,
-    colorPrimary: '#0066ff',
-    colorInfo: '#0066ff',
-    colorText: '#0b1f46',
-    colorTextSecondary: '#4b5870',
-    colorBorder: '#e1e9f5',
-    colorFillAlter: '#f7f9ff',
+    colorPrimary: designTokens.landing.brand.blue,
+    colorInfo: designTokens.landing.brand.blue,
+    colorText: designTokens.landing.brand.ink,
+    colorTextSecondary: designTokens.landing.brand.muted,
+    colorBorder: designTokens.landing.brand.line,
+    colorFillAlter: designTokens.landing.brand.sky,
   },
 };
 

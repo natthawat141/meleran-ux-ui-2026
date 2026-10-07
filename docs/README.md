@@ -11,11 +11,12 @@
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
-| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | Web/Admin สองแอป; inventory → scope cleanup → split → shared UI/router → contract → migrate; R1/R2a/R2b code gate และ R3a theme/provider ผ่าน; R3b tokens และ R3c routes เป็นงานถัดไป |
+| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | Web/Admin สองแอป; inventory → scope cleanup → split → shared UI/router → contract → migrate; R1/R2a/R2b, R3a และ R3b code gate ผ่าน; R3b UX QA บางส่วนและ R3c routes ยังเปิด |
 | [R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md) | ผล R0/Lead review: inventory 89 routes, KEEP/ADAPT/REMOVE, state/packages/authoring boundaries, baseline 51 tests และ execution plan; R1 ผ่านแล้ว; inventory เดิมอ้าง source baseline |
 | [ROUTE_MIGRATION_LEDGER_TH.md](ROUTE_MIGRATION_LEDGER_TH.md) | R2a หลักฐาน controlled Course metadata seam และ Web/Admin route compatibility ledger; route ใหม่ยังไม่เปิดใช้ |
 | [R1_SCOPE_CLEANUP_REPORT_TH.md](R1_SCOPE_CLEANUP_REPORT_TH.md) | ผล scope cleanup, retained routes, legacy snapshot compatibility และหลักฐานการตรวจ |
 | [R3_THEME_PROVIDER_REPORT_TH.md](R3_THEME_PROVIDER_REPORT_TH.md) | R3a: รวม Mantine/Ant themes กับ UI provider ใน `packages/ui`; typecheck/build ผ่าน; CSS/Tailwind tokens และ visual QA ยังแยกเป็นงานถัดไป |
+| [R3_CSS_TOKENS_REPORT_TH.md](R3_CSS_TOKENS_REPORT_TH.md) | R3b: token source JSON เชื่อม Mantine/Ant, CSS variables และ Tailwind; checks/build ผ่าน; browser smoke โหลด Web Landing กับ Admin Dashboard ได้, visual/contrast/keyboard/responsive QA ยังไม่ครบ |
 | [R0 workflow ใน .codex](../.codex/workflows/r0-inventory.md) | วิธี Lead dispatch สี่ Luna xhigh inventory roles, common evidence format, read-only boundary, baseline/review/report และ approval ก่อน implementation |
 | [BUSINESS_ANALYTICS_UI_SPEC.md](BUSINESS_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [INSTRUCTOR_ANALYTICS_UI_SPEC.md](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
@@ -28,7 +29,7 @@
 
 อ่านฉบับหลักก่อน UI/CODE spec ซึ่งใช้รักษาแบรนด์และวิธีทำต้นแบบ การอนุมัติธุรกิจไม่เท่ากับ backend พร้อมหรือเลือกสแตกแล้ว
 
-ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก R0 สำรวจและตรวจ baseline แล้ว ผู้ใช้อนุมัติให้ทำต่อแล้ว R1/R2a/R2b code gate และ R3a ผ่าน checkpoint; Web/Admin ใช้ theme/provider จาก `packages/ui` ร่วมกันแล้ว ขณะที่หน้า, store และ CSS legacy ยังทยอยย้ายตาม feature; R3b tokens และ R3c route modules เป็นงานถัดไป
+ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก R0 สำรวจและตรวจ baseline แล้ว ผู้ใช้อนุมัติให้ทำต่อแล้ว R1/R2a/R2b code gate, R3a และ R3b code gate ผ่าน checkpoint; CSS variables/Tailwind กับ theme adapters อ่าน token source ใน `packages/ui` แล้ว ขณะที่ visual QA ของ token surfaces และ R3c route modules ยังเปิด
 
 ใช้ชื่อเป้าหมาย `apps/web` และ `apps/admin` รองรับ build/deploy แยกกัน มี basic CI หลัง split apps และชุด Containerization/CI-CD ช่วงเตรียมส่งมอบ Cloud Run ยังเป็น candidate โครงสร้างตัวอย่างไม่ใช่คำสั่งเปลี่ยนชื่อ checkout หรือ repository
 

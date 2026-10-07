@@ -1,16 +1,16 @@
 /* Landing palette from the user's blue/cyan/red reference. The hero identifies this page, keeping About and
    other consumers of landing.css unchanged, including shared team portraits. */
 .home-v3:has(.home-hero) {
-  --home-blue: #0066ff;
-  --home-blue-hover: #0052cc;
-  --home-cyan: #00c2ff;
-  --home-red: #ff3b5c;
-  --home-ink: #0b1f46;
-  --home-muted: #4b5870;
-  --home-sky: #f7f9ff;
-  --home-line: #e1e9f5;
-  --home-soft-sky: #e5f4ff;
-  --home-bright-sky: #b9e5ff;
+  --home-blue: var(--brand-blue);
+  --home-blue-hover: var(--brand-blue-hover);
+  --home-cyan: var(--brand-cyan);
+  --home-red: var(--brand-red);
+  --home-ink: var(--brand-ink);
+  --home-muted: var(--brand-muted);
+  --home-sky: var(--brand-sky);
+  --home-line: var(--brand-line);
+  --home-soft-sky: var(--brand-soft-sky);
+  --home-bright-sky: var(--brand-bright-sky);
   --home-shape-blue: var(--home-cyan);
   --primary-hover: var(--home-blue-hover);
   background: var(--home-sky);
@@ -130,7 +130,7 @@
   padding-block: 68px;
   background-color: #fff;
   background-image:
-    radial-gradient(circle, rgb(0 116 232 / 24%) 2px, transparent 2.5px),
+    radial-gradient(circle, var(--home-decoration-blue-24) 2px, transparent 2.5px),
     radial-gradient(circle, transparent 0 22px, var(--home-red) 23px 26px, transparent 27px);
   background-repeat: no-repeat;
   background-position: 25px 22px, right 28px top 22px;
@@ -150,7 +150,7 @@
   width: 76px;
   height: 48px;
   background-image:
-    radial-gradient(circle, rgb(0 116 232 / 28%) 2px, transparent 2.5px),
+    radial-gradient(circle, var(--home-decoration-blue-28) 2px, transparent 2.5px),
     radial-gradient(circle, transparent 0 12px, var(--home-red) 13px 15px, transparent 16px);
   background-size: 12px 12px, 34px 34px;
   background-position: 0 0, right top;
@@ -176,7 +176,7 @@
   width: 76px;
   height: 48px;
   background-image:
-    radial-gradient(circle, rgb(0 116 232 / 28%) 2px, transparent 2.5px),
+    radial-gradient(circle, var(--home-decoration-blue-28) 2px, transparent 2.5px),
     radial-gradient(circle, transparent 0 12px, var(--home-red) 13px 15px, transparent 16px);
   background-size: 12px 12px, 34px 34px;
   background-position: 0 0, right top;

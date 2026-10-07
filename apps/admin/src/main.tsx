@@ -7,7 +7,6 @@ import { AdminRoutes } from './App';
 import './app.css';
 import '@mantine/core/styles.css';
 import '@fontsource-variable/anuphan';
-import '@legacy/shadcn.css';
 import '@legacy/styles.css';
 import '@legacy/system-theme.css';
 import '@legacy/workspace-responsive.css';

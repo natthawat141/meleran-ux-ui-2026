@@ -1,0 +1,46 @@
+/* Generated from design-tokens.json by scripts/generate-ui-tokens.mjs. */
+:root {
+    --font-family: 'Anuphan Variable', sans-serif;
+    --focus-ring: rgb(75 111 229 / 38%);
+    --ink: #24272d;
+    --ink-secondary: #636971;
+    --ink-tertiary: #818994;
+    --primary: #0074e8;
+    --primary-hover: #006bd5;
+    --primary-soft: #edf7ff;
+    --accent: #0074e8;
+    --accent-soft: #f1f9ff;
+    --highlight: #0074e8;
+    --highlight-soft: #edf7ff;
+    --canvas: #f8f9fa;
+    --surface: #ffffff;
+    --surface-muted: #f4f6f8;
+    --line: #e5e7eb;
+    --line-soft: #edf0f2;
+    --success: #1e7a57;
+    --warning: #8a6a2e;
+    --danger: #b34e4b;
+    --radius: 14px;
+    --mantine-color-dimmed: #636971;
+    --home-blue: var(--primary);
+    --home-blue-hover: var(--primary-hover);
+    --home-ink: var(--ink);
+    --home-muted: var(--ink-secondary);
+    --home-line: var(--line);
+    --home-sky: #f1f9ff;
+    --home-focus-ring: #309cdb;
+    --home-decoration-blue-24: rgb(0 116 232 / 24%);
+    --home-decoration-blue-28: rgb(0 116 232 / 28%);
+    --home-shadow-rest: 0 2px 6px rgb(0 0 0 / 3%);
+    --home-shadow-raised: 0 14px 32px rgb(0 0 0 / 10%), 0 3px 8px rgb(0 0 0 / 4%);
+    --brand-blue: #0066ff;
+    --brand-blue-hover: #0052cc;
+    --brand-cyan: #00c2ff;
+    --brand-red: #ff3b5c;
+    --brand-ink: #0b1f46;
+    --brand-muted: #4b5870;
+    --brand-sky: #f7f9ff;
+    --brand-line: #e1e9f5;
+    --brand-soft-sky: #e5f4ff;
+    --brand-bright-sky: #b9e5ff;
+}

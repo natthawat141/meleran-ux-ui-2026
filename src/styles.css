@@ -1,31 +1,8 @@
+@import '@melearn/ui/tokens.css';
+
 :root {
-  /* Shared with the approved landing page: white, clean blue, neutral ink. */
-  --ink: #24272d;
-  --ink-secondary: #636971;
-  --ink-tertiary: #818994;
-  --primary: #0074e8;
-  --primary-hover: #006bd5;
-  --primary-soft: #edf7ff;
-  --accent: #0074e8;
-  --accent-soft: #f1f9ff;
-  --highlight: #0074e8;
-  --highlight-soft: #edf7ff;
-  --canvas: #f8f9fa;
-  --surface: #ffffff;
-  --surface-muted: #f4f6f8;
-  --line: #e5e7eb;
-  --line-soft: #edf0f2;
-  --success: #1e7a57;
-  --warning: #8a6a2e;
-  --danger: #b34e4b;
-  --radius: 14px;
-  --mantine-color-dimmed: #636971;
-  --home-blue: #0074e8;
-  --home-ink: #24272d;
-  --home-muted: #636971;
-  --home-line: #e5e7eb;
   color-scheme: light;
-  font-family: 'Anuphan Variable', sans-serif;
+  font-family: var(--font-family);
   background: var(--canvas);
   color: var(--ink);
   font-synthesis: none;
@@ -38,7 +15,7 @@ body { min-width: 320px; min-height: 100vh; margin: 0; color: var(--ink); backgr
 button, input, textarea { font: inherit; }
 a { color: var(--primary); text-decoration: none; }
 a:hover { color: var(--primary-hover); }
-button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 3px solid rgb(75 111 229 / 38%); outline-offset: 2px; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
 h1, h2, h3, h4, h5 { text-wrap: balance; }
 .ant-typography { color: var(--ink); }
 .ant-typography-secondary { color: var(--ink-secondary) !important; }

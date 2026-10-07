@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./tailwind.css": "./src/tailwind.css",
+    "./tokens.css": "./src/tokens.css"
   },
   "peerDependencies": {
     "antd": "^6.6.5",
