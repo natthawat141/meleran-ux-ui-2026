@@ -9,6 +9,7 @@
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
+| [`FEATURE_RELEASE_MATRIX.md`](FEATURE_RELEASE_MATRIX.md) | Inventory ทุก route, Phase ที่เสนอ, หลักฐาน UI/business/backend และสถานะเปิด feature ตาม environment |
 | [`BUSINESS_ANALYTICS_UI_SPEC.md`](BUSINESS_ANALYTICS_UI_SPEC.md) | หน้าภาพรวมธุรกิจและรายงานการเงิน ตัวกรอง กราฟ ledger และ UX acceptance |
 | [`INSTRUCTOR_ANALYTICS_UI_SPEC.md`](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | Analytics ผู้สอนที่เห็นเฉพาะคอร์สตนเอง: UX ทั้ง 5 มุม กติกาแบบฝึกหัด/ก่อน–หลัง งาน Luna และ acceptance |
 | [`BUSINESS_ANALYTICS_DATA_SPEC.md`](BUSINESS_ANALYTICS_DATA_SPEC.md) | นิยาม metric, raw events, financial records และ draft API/JSON สำหรับระบบจริง |

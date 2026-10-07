@@ -106,6 +106,11 @@ Read-model รายงานธุรกิจ/การเงิน: `src/api/
 
 ## 7. Permission และ route
 
+- อัปเดต 5 ต.ค. 2026: [Feature Release Matrix](FEATURE_RELEASE_MATRIX.md) แยก UI/business/backend/runtime readiness; `src/config/features.ts` เป็น registry กลาง (`FEATURES`, `ROUTE_FEATURES`) ทุก feature ยังเป็น prototype และ Phase เป็นข้อเสนอ ไม่ใช้เลข Phase เปิด route
+- `FeatureRoute` ใน `src/components/FeatureRoute.tsx` ครอบทุก feature route ใน `App.tsx` ผ่าน `featureElement(path, element)` ตรวจ environment ก่อน child/role gate; ปิดแล้วแสดง NotFoundPage เดิม `/403` และ `*` เป็น system fallback ที่ไม่ผูก feature เพิ่ม route/status ต้องอัปเดต config และ matrix ใน PR เดียวกัน tests ตรวจ coverage และความสอดคล้อง
+- Development/Preview เปิด prototype/integration/released; Staging เปิด integration/released; Production เปิด released เท่านั้น disabled ปิดทุกที่ Default `npm run build` เป็น Production และซ่อน feature ปัจจุบันทั้งหมด UX preview ใช้ `npm.cmd run build -- --mode preview` ก่อน `npm.cmd run preview` ค่าที่ไม่รู้จักปิดไว้ตาม Production ดู `VITE_APP_ENV` และข้อจำกัดใน matrix
+- Route gate ไม่เปลี่ยน role/ownership เดิม ไม่ครอบ inline action/side effect ที่ฝังในหน้าอื่น และไม่ใช่ server security ก่อน release ต้องตรวจ scope ทั้งกลุ่ม/dependencies และ API enforcement ด้วย ไม่อ้างว่า push/build คือ deploy
+
 - ศึกษา `RolePage` ใน `App.tsx` และ checks ใน actions ปัจจุบัน อย่าเชื่อว่าซ่อนปุ่มแล้วผู้ใช้เข้าหน้านั้นไม่ได้
 - ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้และใช้ `/teach/...` workspace ตาม route เดิมได้
 - Public blog อ่านได้โดยไม่ login แต่ create/edit/delete blog เป็น admin ในรุ่นนี้; blog กับบทอ่านในคอร์สเป็นข้อมูลคนละชนิด

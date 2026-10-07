@@ -34,3 +34,7 @@ declare module '*.mp4' {
   const src: string;
   export default src;
 }
+
+interface ImportMetaEnv {
+  readonly VITE_APP_ENV?: string;
+}

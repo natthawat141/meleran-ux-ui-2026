@@ -75,7 +75,7 @@ export function AdminInstructorFinancePage() {
     { title: 'ส่วนแบ่งรวม', dataIndex: 'totalEarned', render: money },
     { title: 'รอโอน', render: (_, row) => <div className="finance-course-cell"><strong>{money(row.pending)}</strong><Text type="secondary">{row.pendingOrderCount} รายการ</Text></div> },
     { title: 'ตั้งสัดส่วนรายคน', render: (_, row) => <RateEditor instructor={row} onSave={saveInstructorCommission}/> },
-    { title: 'การโอน', render: (_, row) => <Popconfirm title={`ยืนยันยอดโอนจำลอง ${money(row.pending)} ให้ ${row.name}?`} description="การทำเครื่องหมายนี้ใช้บันทึกในต้นแบบเท่านั้น ไม่มีการโอนเงินจริง" okText="บันทึกว่าโอนแล้ว" cancelText="ยกเลิก" disabled={!row.pendingOrderCount} onConfirm={() => {
+    { title: 'การโอน', width: 190, fixed: 'right', render: (_, row) => <Popconfirm title={`ยืนยันยอดโอนจำลอง ${money(row.pending)} ให้ ${row.name}?`} description="การทำเครื่องหมายนี้ใช้บันทึกในต้นแบบเท่านั้น ไม่มีการโอนเงินจริง" okText="บันทึกว่าโอนแล้ว" cancelText="ยกเลิก" disabled={!row.pendingOrderCount} onConfirm={() => {
       const result = markInstructorPayout(row.id);
       result.ok ? message.success(`บันทึกยอด ${money(result.payout.amount)} ว่าโอนแล้ว`) : message.error(result.message);
     }}><Button size="small" disabled={!row.pendingOrderCount}>{row.pendingOrderCount ? 'ทำเครื่องหมายโอนแล้ว' : 'ยังไม่มียอด'}</Button></Popconfirm> },
@@ -100,11 +100,11 @@ export function AdminInstructorFinancePage() {
     <div className="finance-source-breakdown" aria-label="แยกยอดขายและส่วนแบ่งตามช่องทาง"><div><Text type="secondary">ชำระผ่านระบบ</Text><strong>{money(systemSales)}</strong><Text type="secondary">ยอดรับจริงหลังส่วนลด</Text></div><div><Text type="secondary">ขายผ่านรหัสแลกคอร์ส</Text><strong>{money(cashSales)}</strong><Text type="secondary">บันทึกเป็นรายการขายและยอดรอโอน</Text></div><div><Text type="secondary">ส่วนแบ่งแพลตฟอร์ม</Text><strong>{money(platformRevenue)}</strong><Text type="secondary">หลังแบ่งส่วนผู้สอน</Text></div><div><Text type="secondary">ใช้โค้ดเรียนฟรี</Text><strong>{freeCodeCount} รายการ</strong><Text type="secondary">ไม่นับเป็นรายได้</Text></div></div>
     <section className="finance-section">
       <SectionHeading title="รายได้แยกตามผู้สอน" description="ตั้ง % ผู้สอนเป็นรายคน และกำหนด % ลิงก์แนะนำให้สูงกว่าอัตราปกติ ส่วนที่เหลือเป็นส่วนแบ่งแพลตฟอร์ม ยอดย้อนหลังยึดตามวันที่ชำระ"/>
-      <Table rowKey="id" dataSource={rows} columns={columns} pagination={false} scroll={{ x: 1180 }} locale={{ emptyText: <Empty description="ยังไม่มีบัญชีผู้สอน"/> }}/>
+      <Table rowKey="id" dataSource={rows} columns={columns} pagination={false} scroll={{ x: 1320 }} locale={{ emptyText: <Empty description="ยังไม่มีบัญชีผู้สอน"/> }}/>
     </section>
     <section className="finance-section">
       <SectionHeading title="ประวัติการโอนจำลอง" description="รายการที่แอดมินทำเครื่องหมายว่าโอนแล้วในต้นแบบ"/>
-      <Table rowKey="id" dataSource={data.instructorPayouts ?? []} columns={payoutColumns} pagination={{ pageSize: 6, hideOnSinglePage: true }} locale={{ emptyText: <Empty description="ยังไม่มีรายการโอน"/> }}/>
+      <Table rowKey="id" dataSource={data.instructorPayouts ?? []} columns={payoutColumns} scroll={{ x: 640 }} pagination={{ pageSize: 6, hideOnSinglePage: true }} locale={{ emptyText: <Empty description="ยังไม่มีรายการโอน"/> }}/>
     </section>
   </div>;
 }
