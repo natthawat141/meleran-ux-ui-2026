@@ -1,8 +1,9 @@
 # Melearn Code Spec
 
-Read-model รายงานธุรกิจ/การเงิน: `src/api/businessAnalytics.ts`; fixtures แยก store ที่ `src/mocks/businessAnalytics.ts`; หน้า `BusinessAnalyticsPage.tsx`, `FinanceReportPage.tsx` รับ course props ผ่าน admin wrappers ดู [data contract](BUSINESS_ANALYTICS_DATA_SPEC.md) และ [admin gaps](ADMIN_MANAGEMENT_GAP_AUDIT_TH.md) ไม่ถือ mock เป็น backend schema ที่อนุมัติแล้ว
+**ข้อมูลหลักที่เจ้าของยืนยัน 6 ต.ค. 2026:** [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.6 กำหนดกติกาธุรกิจ สิทธิ์ และขอบเขตหนึ่งเดือนแรก เอกสารนี้อธิบายวิธีทำต้นแบบ หากข้อความหรือพฤติกรรมเดิมขัดกัน ให้ใช้ฉบับหลัก และระบุส่วนที่โค้ดยังไม่ตรง ห้ามถือว่าต้นแบบพร้อม Production
 
-อัปเดต 1 ตุลาคม 2026 ข้อกำหนดสำหรับต่อ UX prototype ปัจจุบัน อ่าน [`UI_SPEC.md`](UI_SPEC.md) ควบคู่ก่อนแก้หน้าจอ
+
+อัปเดต 6 ตุลาคม 2026 ข้อกำหนดสำหรับต่อ UX prototype ปัจจุบัน อ่าน [`UI_SPEC.md`](UI_SPEC.md) ควบคู่ก่อนแก้หน้าจอ
 
 ## 1. ข้อเท็จจริงและขอบเขต
 
@@ -49,7 +50,7 @@ Read-model รายงานธุรกิจ/การเงิน: `src/api/
 
 - คอร์ส public อยู่ `src/pages/public/` และคอร์สสำหรับผู้ล็อกอินอยู่ `src/pages/member/` ผ่าน routes `/courses[/:slug]` และ `/explore/courses[/:slug]` ตามลำดับ ห้ามนำ page เดียวมาใช้สองบริบท รายการโครงสร้างบทที่เป็น presentation ใช้ `CourseOutline` ร่วมได้
 - `PublicCourseEntry` ส่งสมาชิกที่เปิด URL public ไปยัง URL สมาชิกของคอร์สเดียวกัน รายการ/รายละเอียดทั้งสองแบบแสดงเฉพาะคอร์ส published; ไม่ใช้ catalog เปิด draft แทนหน้าจัดการ/preview
-- แอดมินใช้ `src/pages/admin/OrderPages.tsx` และ `CertificatePages.tsx` สำหรับรายการทั้งหมด หน้าบัญชีใน `src/pages/learner/` กรอง owner แม้ผู้ใช้เป็นแอดมิน รายละเอียดตรวจ owner หรือบริบท route admin ที่มี guard ก่อนแสดงข้อมูล
+- ใบรับรองหน้าบัญชีผู้เรียนกรองเจ้าของเสมอ รวมถึงเมื่อผู้ใช้เป็น Admin รายการรวมของ Admin ใช้ route และ guard แยกตามฉบับหลัก
 - `DirectorySearch` เก็บคำค้นและตัวกรองใน URL ใช้รายการ field ที่ระบุอย่างชัดเจนในการค้น ไม่ค้นจากการ serialize user ทั้งก้อนหรือข้อมูลรหัสผ่าน การเปลี่ยนคำค้น/ตัวกรองเริ่ม pagination ใหม่ และ returnTo ของรายละเอียดจำกัดให้เป็น path รายการภายในที่ตรงกัน
 
 - Page รับ route/context และประกอบหน้าจอ; component ดูแล interaction/การแสดงผลที่เกี่ยวข้อง; action/state อยู่ใน store; style แยกตามบริบท
@@ -90,28 +91,26 @@ Read-model รายงานธุรกิจ/การเงิน: `src/api/
 - หน้าตรวจงานเก็บเฉพาะ draft คะแนน/feedback ใน `sessionStorage` ตาม user/attempt เพื่อกลับมาต่อในแท็บเดิมได้; ใช้ `gradeAttempt` เดิมเมื่อบันทึกและล้าง draft จากแท็บเมื่อเสร็จ ไม่ใช้ draft เปลี่ยนผลคะแนนหรือ Analytics ล่วงหน้า
 - คิวตรวจเก็บ course/courseId, mode และคำค้น `q` ใน URL; ส่ง `returnTo` ให้หน้าตรวจ และใช้บริบทเดียวกันสำหรับงานก่อนหน้า/ถัดไป โดยคง role scoping และลำดับ FIFO
 - แจ้งเตือน prototype อยู่ใน `data.notifications` ของ store เดิม สร้างจาก `submitAttempt`, `gradeAttempt` และ `saveAssignment`; เมนูกรอง recipient ตามบัญชีปัจจุบัน และ `markNotificationRead` แก้เฉพาะรายการของบัญชีนั้น ไม่สร้างแจ้งเตือนซ้ำเมื่อส่ง/ตรวจ attempt เดิม
-- งานอินบ็อกซ์ต้องอ่าน [INBOX_PERMISSION_SPEC.md](INBOX_PERMISSION_SPEC.md) ซึ่งเป็นกติกาผู้ใช้ยืนยัน 1 ต.ค. 2026 ก่อน implementation เอกสารแยกสิ่งที่ตกลงแล้วออกจากพฤติกรรมต้นแบบและข้อที่ยังต้องตัดสิน
-- Implementation ต้นแบบปัจจุบันใช้ `data.inboxConversations`/`data.inboxMessages` ใน store เดิม ผ่าน `sendInboxMessage` และ `markInboxConversationRead` ตรวจ participant และผู้สอนเจ้าของคอร์สในทั้ง selector/action contacts มาจาก enrollment หรือแอดมินรายบัญชีที่ active; ยังไม่บังคับสิทธิ์เรียนหมดสำหรับการส่งใน thread เดิม และยังไม่มีเรื่องทีมดูแลพร้อมการมอบหมาย
-- อินบ็อกซ์รองรับไฟล์ภาพ/วิดีโอที่คัดชนิดและขนาดใน `src/api/inboxAttachments.ts`; รูปภาพย่อผ่าน `readImageFile`, วิดีโอเก็บเป็น data URL ในข้อมูล browser เดิม, `sendInboxMessage` ตรวจรายการและ quota ก่อนล้างข้อความ/ไฟล์จาก composer การไม่ผ่าน quota ต้องรักษาฉบับร่าง; ข้อจำกัดตัวอย่าง 3 ไฟล์, 5 MB ต่อไฟล์, 8 MB รวม ไม่ใช่ข้อกำหนด Production และการส่งจริงควรใช้ file storage/API
-- Routes `/learn/inbox`, `/teach/inbox`, `/admin/inbox` ใช้ `?thread=` เปิดตรง/refresh และ `?recipient=&course=` สำหรับ compose ใหม่ ไม่ส่งข้อความตอนเพียงเลือกผู้รับ เก็บ draft ใน sessionStorage ตามบัญชี/บทสนทนาและตรวจ browser persistence ก่อนล้าง draft เมื่อส่ง
-- ข้อความเก็บเป็น plain text และ render ผ่าน React; mark-read เปลี่ยน readBy และแจ้งเตือนของผู้รับนั้นเท่านั้น Browser-local messaging ไม่ใช่การส่งข้ามอุปกรณ์หรือ permission enforcement ของ Production
-- `AskInstructorButton` เปิด compose ด้วย `recipient`, `course`, `item` หรือ `chapter`; store ตรวจ enrollment/ผู้รับ/บท/รายการเนื้อหาและสร้าง snapshot ของชื่อคอร์ส บท และ item จากข้อมูลจริงใน store ไม่รับชื่อที่กรอกเองจาก URL บริบทอยู่ต่อข้อความและ draft แยกตาม item หรือ chapter
-- `src/mocks/inbox.ts` สร้างบทสนทนาจำลองและ migrate ครั้งเดียวด้วย `inboxDemoVersion` เพิ่มเฉพาะ thread ที่ยังไม่มี ไม่แทรก fixtures ใน thread เดิมหรือ reset ข้อมูลผู้ใช้ ลิงก์บริบทตรวจว่าเนื้อหายังอยู่ก่อนสร้าง URL
+- Inbox ยังไม่ทำในรอบแรก เอกสาร INBOX_PERMISSION_SPEC เป็นทางเข้าประวัติ ไม่ใช้เป็นกติกาใหม่
 - รักษา `courseId`, `chapterId`, `itemId`, `quizId` และการเชื่อมกัน ตรวจว่าการเพิ่ม/ลบเนื้อหาไม่ทิ้ง reference ที่ใช้ไม่ได้
 - การบันทึกบทและแบบฝึกหัดร่วมกันใช้ action เดิม เช่น `saveChapterWorkspace` ตรวจสิทธิ์/validation/result จาก action ไม่เขียน path แยกที่บันทึกเพียงครึ่งหนึ่ง
 - ให้ `saved`/success feedback หลัง action สำเร็จ ไม่ใช้ timeout สุ่มเพื่อแกล้งบันทึกสำเร็จ หาก browser storage เต็ม ต้องแจ้งผู้ใช้ ไม่กล่าวว่าข้อมูลถูกเก็บแล้ว
 - ไม่ reset seed/role/user session/localStorage เพื่อให้ preview สวยโดยไม่ได้รับคำขอ รักษาข้อมูลเดโมที่ผู้ใช้แก้และรองรับข้อมูลเก่าเท่าที่การเปลี่ยนแปลงต้องใช้
 - Draft ออกหน้าต้องมี dirty-state behavior ตาม UX spec; preview ใช้ draft เดียวกับ editor ไม่แสดงข้อมูลที่บันทึกเก่าโดยไม่บอก
-- รหัสแลกคอร์สชนิด `cash` เป็น stock ที่แอดมินเตรียมขายล่วงหน้า โดย `receivedAmount` คือราคาขายที่ตั้งไว้ ไม่ใช่รายได้จนกว่าจะแลกสำเร็จ ผู้เรียนเข้าสู่ระบบที่ `/learn/redeem` แล้วแลกรหัสกับคอร์สที่ผูกไว้; action checkout สร้าง paid order, snapshot ส่วนแบ่ง และ enrollment พร้อมผูกผู้ใช้/เวลาไว้กับรหัสเมื่อสำเร็จเท่านั้น รหัสใช้ครั้งเดียว ข้อมูลเก่าที่มี `userId` ยังคงจำกัดบัญชีนั้น โค้ดส่วนลดและเรียนฟรียังใช้ flow checkout เดิม
 
 ## 7. Permission และ route
+
+- [Feature Release Matrix](FEATURE_RELEASE_MATRIX.md) และ `src/config/features.ts` แยกขอบเขตส่งมอบจากความพร้อม runtime ทุก feature ยังเป็น prototype
+- `FeatureRoute` ครอบ feature routes ก่อน role gate; Development/Preview เปิด prototype/integration/released, Staging เปิด integration/released, Production เปิด released เท่านั้น disabled ปิดทุก environment
+- Default `npm run build` ใช้ Production และปิด feature ต้นแบบ Preview ใช้ `npm.cmd run build -- --mode preview`; `VITE_APP_ENV` ที่ไม่รู้จักใช้ Production; build เสร็จแล้วเปลี่ยน environment ไม่ได้โดยไม่ rebuild
+- Config/Matrices/route mapping/tests ต้องอัปเดตร่วมกัน Route gates ไม่ใช่ API security และไม่ได้ลบ source ของ feature ออกจาก bundle
 
 - ศึกษา `RolePage` ใน `App.tsx` และ checks ใน actions ปัจจุบัน อย่าเชื่อว่าซ่อนปุ่มแล้วผู้ใช้เข้าหน้านั้นไม่ได้
 - ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้และใช้ `/teach/...` workspace ตาม route เดิมได้
 - Public blog อ่านได้โดยไม่ login แต่ create/edit/delete blog เป็น admin ในรุ่นนี้; blog กับบทอ่านในคอร์สเป็นข้อมูลคนละชนิด
 - Routes ต้องรองรับเปิดตรง refresh, not-found, no-access และ back path ที่ถูก context อย่าผูกสิทธิ์กับการที่เข้ามาผ่านปุ่มเพียงทางเดียว
 - คำขอแก้ UI ไม่อนุญาตขยายสิทธิ์ role เดิมหรือเปลี่ยน business rule เอง ถ้ามี requirement ใหม่ให้ระบุความต่างอย่างชัดเจน
-- Prototype client checks ไม่ใช่ Production security; Google/Firebase, payment, server permissions และ MCP ยังต้องมี implementation จริงตามงานอนาคต
+- Prototype client checks ไม่ใช่ Production security; Google OAuth, email verification, server permissions และฐานข้อมูลยังต้องมี implementation จริง; Stripe Checkout อยู่ในขอบเขตรอบแรก ส่วน MCP ยังไม่ทำ
 
 ## 8. Rich content และ upload
 
@@ -151,3 +150,18 @@ Preview ปกติ: `http://127.0.0.1:5174/` ตรวจ server ที่ร�
 - ไม่ commit secrets, `.env`, `node_modules`, `dist`, ข้อมูลผู้เรียนจริง หรือ artifact ที่ใช้ได้เฉพาะเครื่องนี้
 - อัปเดต docs เมื่อเปลี่ยน route/pattern/guideline ที่เอกสารกล่าวถึง โดยรักษาข้อเท็จจริง implementation แยกจากสิ่งที่ผู้ใช้อนุมัติ
 - AGENTS/GEMINI/Cursor rules เป็นทางเข้ากติกาชุดเดียว รายละเอียด UX/code อยู่ใน UI/CODE spec ไม่เพิ่ม README อีกหลายชุดที่สั่งคนละอย่าง
+
+## กติกาที่ใช้ต่อระบบจริง
+
+- อ่าน [ฉบับหลัก](MELEARN_V1_SCOPE.md) ก่อนเปลี่ยน Domain/permission/API; โครงสร้าง browser-local store ไม่ใช่ database contract
+- Redeem ในระบบจริงผูกหนึ่งโค้ดกับหนึ่งคอร์ส ใช้ครั้งเดียว ไม่มีวันหมดอายุ เก็บผู้ใช้และเวลาที่ใช้ Admin ยกเลิกได้เฉพาะโค้ดที่ยังไม่ใช้ ไม่ต้องสร้าง Order หรือ snapshot ส่วนแบ่งเพื่อแลกโค้ด
+- ใช้ YouTube Link ก่อน Upload Video API ต้องตอบไม่พร้อมและไม่สร้าง upload record ส่วน Mux Data key ที่มีเป็นข้อมูลต้นแบบ ไม่ใช่การเลือกผู้ให้บริการวิดีโอ
+- AI ของต้นแบบยังตอบ mock และเก็บประวัติใน browser ส่วนระบบจริงต้องเก็บคำถาม/คำตอบใน Database บังคับสิทธิ์คอร์ส และนับโควตาที่ server ตามฉบับหลัก ค่า limit อยู่จุดกลางแก้ได้ ไม่ใช้ quota ที่ client เป็นหลักฐาน
+- คอร์สใช้ draft → pending_review → approved → published; แก้ approved ก่อน publish ต้องตรวจใหม่ published แก้เนื้อหาได้ทันที การแก้เฉพาะ AI/Transcript ไม่เปลี่ยนสถานะอนุมัติ
+- Cart/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่ใน source เป็นของต้นแบบเดิม ไม่เพิ่มงานเหล่านี้ในรอบหนึ่งเดือน
+
+## ขอบเขต Stripe และ AIPractice ที่เพิ่ม
+
+- Registry แยก `payments` (เดือนแรก) จาก `commerce` (Cart/Orders ที่ยังไม่ทำ) ทุกสถานะยัง prototype การมี route checkout ไม่ใช่หลักฐานเชื่อม Stripe จริง
+- ระบบจริงใช้ Stripe Session/PaymentEvent ตรวจราคา บัญชี ลายเซ็น Webhook และผลจ่าย ณ server ก่อนสร้างหรือคืน Enrollment เดิม; การให้สิทธิ์ต้องเกิดจาก Webhook ที่ตรวจแล้วเท่านั้น GET สถานะและหน้าผลจ่ายต้องไม่ให้สิทธิ์ ไม่เพิ่ม Order/Cart Domain จากชื่อพารามิเตอร์เก่าใน prototype
+- AIPractice แยกจาก Quiz/QuizAttempt จัดเก็บชุดคำถามและผลในแชต ตรวจ response schema ก่อนคิด Prompt สำเร็จ การตอบและอ่านผลไม่เรียก model หรือนับ Prompt เพิ่ม

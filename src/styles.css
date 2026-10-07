@@ -314,6 +314,10 @@ h1, h2, h3, h4, h5 { text-wrap: balance; }
 .checkout-course .ant-typography { font-size: 12px; }
 .secure-note { display: block; margin-top: 12px; color: var(--ink-secondary); text-align: center; font-size: 11px; }
 .checkout-result { padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.stripe-payment-price { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; margin: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stripe-payment-checking { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 16px; color: var(--ink-secondary); }
+.stripe-payment-actions { display: flex; justify-content: center; width: 100%; }
+.stripe-payment-id { margin-top: 20px; text-align: center; }
 .order-details { max-width: 780px; }
 .checkout-code-input { width: 100%; margin-bottom: 12px; }
 .checkout-code-message, .admin-order-channels { margin-bottom: 16px; }
@@ -468,6 +472,7 @@ h1, h2, h3, h4, h5 { text-wrap: balance; }
 }
 
 @media (max-width: 600px) {
+  .checkout-page .page-title > div:first-child { flex: initial; }
   .public-header { flex-wrap: wrap; gap: 0; height: auto; min-height: 62px; padding: 10px 12px; }
   .public-header .brand-lockup small, .public-nav { display: none; }
   .public-header > .ant-space { margin-left: auto; }

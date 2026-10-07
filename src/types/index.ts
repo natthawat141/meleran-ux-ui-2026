@@ -17,6 +17,8 @@ export interface User extends ProfileDetails {
   bio?: string;
   avatar?: string;
   status?: 'active' | 'suspended' | 'pending' | 'invited';
+  /** False is set only for accounts created through the self-service email flow. Missing means a legacy/admin account. */
+  emailVerified?: boolean;
   baseSharePercent?: number;
   referralSharePercent?: number;
 }
@@ -54,6 +56,10 @@ export interface VideoItem {
   description?: string;
   summary?: string;
   videoFilename?: string;
+  /** Admin-managed AI knowledge metadata. Never render this field in learner-facing UI. */
+  transcript?: string;
+  transcriptUpdatedAt?: string;
+  transcriptUpdatedBy?: string;
 }
 
 export interface ArticleItem {
@@ -94,12 +100,32 @@ export interface Course {
   level: string;
   price: number;
   instructorId: string;
-  status: 'draft' | 'published' | 'archived';
+  status: 'draft' | 'pending_review' | 'approved' | 'published' | 'archived';
   cover: string;
   chapters: Chapter[];
   outcomes?: string[];
   updatedAt?: string;
   createdAt?: string;
+  reviewHistory?: CourseReviewEvent[];
+  /** Admin-managed AI knowledge setting; absent legacy values are treated as disabled. */
+  aiEnabled?: boolean;
+}
+
+export interface CourseReviewEvent {
+  action: 'submitted' | 'approved' | 'returned' | 'published' | 'approval_invalidated';
+  actorId: string;
+  at: string;
+  reason?: string;
+}
+
+export interface EmailVerification {
+  id: string;
+  userId: string;
+  token: string;
+  createdAt: string;
+  expiresAt: string;
+  usedAt?: string;
+  lastSentAt: string;
 }
 
 export interface ChoiceQuestion {
@@ -392,6 +418,7 @@ export interface InboxConversation {
 
 export interface LmsData {
   users: User[];
+  emailVerifications?: EmailVerification[];
   currentUserId: string | null;
   courses: Course[];
   blogPosts: BlogPost[];
@@ -433,6 +460,12 @@ export interface ActionResult {
   ok: boolean;
   message?: string;
   user?: User;
+  verificationUrl?: string;
+}
+
+export interface SaveTranscriptResult extends ActionResult {
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface ReorderResult {
@@ -466,10 +499,18 @@ export interface LmsContextType {
   signInDemo: (role: Role) => ActionResult;
   signOut: () => void;
   register: (values: { name: string; email: string; password?: string }) => ActionResult;
+  verifyEmail: (token: string) => ActionResult;
+  resendVerificationEmail: () => ActionResult;
+  simulateGoogleAuth: (email: string) => ActionResult;
   resetDemo: () => void;
   saveBlogPost: (values: Partial<BlogPost>, postId?: string) => string | null;
   removeBlogPost: (postId: string) => boolean;
   saveCourse: (values: Partial<Course>, courseId?: string) => string | null;
+  submitCourseForReview: (courseId: string) => ActionResult;
+  reviewCourse: (courseId: string, decision: 'approve' | 'return', reason?: string) => ActionResult;
+  publishCourse: (courseId: string) => ActionResult;
+  setCourseAiEnabled: (courseId: string, enabled: boolean) => ActionResult;
+  saveVideoTranscript: (courseId: string, chapterId: string, videoId: string, transcript: string) => SaveTranscriptResult;
   removeCourse: (courseId: string) => void;
   saveChapter: (courseId: string, chapter: Partial<Chapter>, chapterId?: string) => void;
   saveChapterWorkspace: (courseId: string, chapter: Chapter, quizzes: Quiz[], baseline: string) => WorkspaceSaveResult;
@@ -479,7 +520,7 @@ export interface LmsContextType {
   removeItem: (courseId: string, chapterId: string, itemId: string) => ActionResult;
   saveQuiz: (values: Partial<Quiz>, quizId?: string) => string | null;
   removeQuiz: (quizId: string) => ActionResult;
-  enrollFree: (courseId: string, userId?: string, referralCode?: string | null) => void;
+  enrollFree: (courseId: string, userId?: string, referralCode?: string | null) => ActionResult;
   simulatePayment: (courseId: string, outcome: 'paid' | 'failed', referralCode?: string | null, accessCode?: string) => string | null;
   createAccessCode: (values: CreateAccessCodeInput) => CreateAccessCodeResult;
   setAccessCodeStatus: (accessCodeId: string, status: 'active' | 'inactive') => ActionResult;

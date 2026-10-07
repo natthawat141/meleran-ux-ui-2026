@@ -463,6 +463,7 @@ export function AdminCoursesPage() {
   const navigate = useNavigate();
   const [view, setView] = useState<'table' | 'card'>('table');
   const [cardPage, setCardPage] = useState(1);
+  const pendingCourseCount = data.courses.filter((course) => course.status === 'pending_review').length;
 
   const columns: TableProps<Course>['columns'] = [
     {
@@ -506,13 +507,10 @@ export function AdminCoursesPage() {
         eyebrow="ผู้ดูแลระบบ"
         title="คอร์สทั้งหมด"
         subtitle="สร้างคอร์สและจัดการเนื้อหาของผู้สอนทุกคน"
-        actions={
-          <Link to="/teach/courses/new">
-            <Button type="primary" icon={<PlusOutlined />}>
-              สร้างคอร์ส
-            </Button>
-          </Link>
-        }
+        actions={<Space>
+          <Link to="/admin/courses/reviews"><Button>คิวตรวจคอร์ส ({pendingCourseCount})</Button></Link>
+          <Link to="/teach/courses/new"><Button type="primary" icon={<PlusOutlined />}>สร้างคอร์ส</Button></Link>
+        </Space>}
       />
       <div className="admin-courses-toolbar">
         <span>{data.courses.length} คอร์ส</span>
@@ -604,9 +602,10 @@ export function AdminCourseDetailPage() {
         title={course.title}
         subtitle={course.subtitle}
         actions={
-          <Link to="/admin/courses">
-            <Button>กลับรายการ</Button>
-          </Link>
+          <Space>
+            <Link to={`/teach/courses/${course.id}/preview`}><Button>ดูตัวอย่าง / เผยแพร่</Button></Link>
+            <Link to="/admin/courses"><Button>กลับรายการ</Button></Link>
+          </Space>
         }
       />
       <Descriptions bordered column={1}>

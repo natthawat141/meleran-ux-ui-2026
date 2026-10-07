@@ -11,13 +11,14 @@ const { Text, Title } = Typography;
 
 export function CoursePreviewPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, saveCourse } = useLms();
+  const { data, currentUser, submitCourseForReview, publishCourse } = useLms();
   const course = data.courses.find((item) => item.id === courseId);
 
   if (!course) return <Empty description="ไม่พบคอร์สนี้" />;
 
   const checks: [string, boolean][] = [
     ['มีชื่อและคำอธิบายคอร์ส', Boolean(course.title && course.description)],
+    ['มีผู้สอน', data.users.some((user) => user.id === course.instructorId && user.role === 'instructor')],
     ['มีอย่างน้อยหนึ่งบท', course.chapters.length > 0],
     ['มีเนื้อหาในบทเรียน', flattenItems(course).length > 0],
     [
@@ -94,13 +95,15 @@ export function CoursePreviewPage() {
             className="top-space"
             block
             type="primary"
-            disabled={!ready || course.status === 'published'}
+            disabled={!ready || (course.status !== 'draft' && course.status !== 'approved') || (course.status === 'draft' && currentUser?.role !== 'instructor' && currentUser?.role !== 'admin')}
             onClick={() => {
-              saveCourse({ ...course, status: 'published' }, course.id);
-              message.success('เผยแพร่คอร์สแล้ว');
+              const result = course.status === 'approved'
+                ? publishCourse(course.id)
+                : submitCourseForReview(course.id);
+              if (result.ok) message.success(result.message); else message.error(result.message);
             }}
           >
-            {course.status === 'published' ? 'เผยแพร่แล้ว' : 'เผยแพร่คอร์ส'}
+            {course.status === 'published' ? 'เผยแพร่แล้ว' : course.status === 'approved' ? 'เผยแพร่คอร์ส' : course.status === 'pending_review' ? 'รอแอดมินตรวจ' : 'ส่งตรวจคอร์ส'}
           </Button>
         </aside>
       </div>

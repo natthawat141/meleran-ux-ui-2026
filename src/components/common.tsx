@@ -119,6 +119,7 @@ export function StatusTag({ status }: StatusTagProps) {
   const values: Record<string, [string, string]> = {
     published: ['cobalt', 'เผยแพร่แล้ว'],
     draft: ['gray', 'ฉบับร่าง'],
+    pending_review: ['orange', 'รอตรวจคอร์ส'],
     pending: ['gray', 'รอตรวจ'],
     paid: ['cobalt', 'ชำระแล้ว'],
     failed: ['red', 'ไม่สำเร็จ'],

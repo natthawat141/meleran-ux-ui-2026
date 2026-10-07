@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Button,
   Col,
+  Alert,
   Empty,
   Form,
   Input,
@@ -10,6 +11,7 @@ import {
   Radio,
   Row,
   Select,
+  Switch,
   Space,
   Table,
   Typography,
@@ -218,12 +220,11 @@ interface CourseFormValues {
   level: string;
   price: number;
   pricingType: 'free' | 'paid';
-  status: 'draft' | 'published';
 }
 
 export function CourseEditorPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, saveCourse, currentUser, removeCourse } = useLms();
+  const { data, saveCourse, submitCourseForReview, publishCourse, setCourseAiEnabled, currentUser, removeCourse } = useLms();
   const navigate = useNavigate();
   const course = data.courses.find((item) => item.id === courseId);
   const isNew = !courseId || courseId === 'new';
@@ -240,12 +241,11 @@ export function CourseEditorPage() {
         level: 'เริ่มต้น',
         price: 0,
         pricingType: 'free' as const,
-        status: 'draft' as const,
-        instructorId: currentUser?.id ?? '',
+        instructorId: currentUser?.role === 'instructor' ? currentUser.id : '',
       };
 
-  const selectedStatus = Form.useWatch('status', form) ?? course?.status ?? 'draft';
   const selectedPricingType = Form.useWatch('pricingType', form) ?? (course?.price ? 'paid' : 'free');
+  const latestReturn = [...(course?.reviewHistory ?? [])].reverse().find((event) => event.action === 'returned');
 
   const submit = (values: CourseFormValues) => {
     if (values.pricingType === 'paid' && Number(values.price) <= 0) {
@@ -273,7 +273,7 @@ export function CourseEditorPage() {
       message.error('ไม่สามารถบันทึกคอร์สนี้ได้');
       return;
     }
-    message.success(isNew ? 'สร้างคอร์สแล้ว' : 'บันทึกข้อมูลคอร์สแล้ว');
+    message.success(isNew ? 'สร้างคอร์สแล้ว' : 'บันทึกข้อมูลคอร์สแล้ว การแก้คอร์สที่รอตรวจหรืออนุมัติจะกลับเป็นฉบับร่างและต้องส่งตรวจใหม่');
     navigate(`/teach/courses/${savedId}`);
   };
 
@@ -374,7 +374,7 @@ export function CourseEditorPage() {
                   >
                     <Select
                       options={data.users
-                        .filter((user) => ['instructor', 'admin'].includes(user.role))
+                        .filter((user) => user.role === 'instructor')
                         .map((user) => ({ value: user.id, label: user.name }))}
                     />
                   </Form.Item>
@@ -403,26 +403,55 @@ export function CourseEditorPage() {
                   )}
                 </div>
               </section>
+              {!isNew && currentUser?.role === 'admin' && (
+                <section className="editor-section" aria-labelledby="course-ai-settings-heading">
+                  <div className="course-editor-section-heading">
+                    <span>AI</span>
+                    <div>
+                      <Title level={4} id="course-ai-settings-heading">Melearn AI สำหรับคอร์สนี้</Title>
+                      <p>เปิดเพื่อให้ผู้เรียนที่ลงทะเบียนเลือกใช้ความรู้จากคอร์สนี้ในหน้า Melearn AI</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={course?.aiEnabled === true}
+                    checkedChildren="เปิด"
+                    unCheckedChildren="ปิด"
+                    aria-label="เปิด Melearn AI สำหรับคอร์สนี้"
+                    onChange={(enabled) => {
+                      const result = setCourseAiEnabled(course!.id, enabled);
+                      if (result.ok) message.success(result.message); else message.error(result.message);
+                    }}
+                  />
+                  <p>การตั้งค่านี้ไม่เปลี่ยนผลการเรียนหรือสถานะอนุมัติคอร์ส</p>
+                </section>
+              )}
             </div>
             <aside className="editor-aside course-editor-publish">
               <Title level={5}>การเผยแพร่</Title>
-              <p>บันทึกเป็นฉบับร่างก่อน แล้วกลับมาแก้ไขได้ทุกเมื่อ</p>
-              <Form.Item name="status" label="สถานะ">
-                <Select
-                  options={[
-                    { value: 'draft', label: 'ฉบับร่าง' },
-                    { value: 'published', label: 'เผยแพร่แล้ว' },
-                  ]}
-                />
-              </Form.Item>
+              <p>ส่งตรวจและเผยแพร่ผ่านขั้นตอนอนุมัติของแอดมิน</p>
               <div className="course-publish-note">
-                {selectedStatus === 'published'
-                  ? 'คอร์สจะปรากฏในหน้าคอร์สสาธารณะหลังบันทึก'
-                  : 'ฉบับร่างยังไม่แสดงให้ผู้เรียนทั่วไปเห็น'}
+                <StatusTag status={course?.status ?? 'draft'} />
+                {course?.status === 'approved' && <p>คอร์สผ่านการตรวจแล้ว พร้อมเผยแพร่</p>}
+                {course?.status === 'pending_review' && <p>กำลังรอแอดมินตรวจ หากแก้ไขต้องส่งตรวจใหม่</p>}
+                {course?.status === 'published' && <p>คอร์สเผยแพร่แล้ว การแก้ไขจะอัปเดตทันที</p>}
+                {(!course || course.status === 'draft') && <p>ฉบับร่างยังไม่แสดงให้ผู้เรียนทั่วไปเห็น</p>}
               </div>
+              {latestReturn?.reason && <Alert className="bottom-space" type="warning" showIcon message="เหตุผลที่แอดมินส่งกลับ" description={latestReturn.reason} />}
               <Button block type="primary" htmlType="submit">
                 {isNew ? 'สร้างคอร์ส' : 'บันทึกการเปลี่ยนแปลง'}
               </Button>
+              {course?.status === 'draft' && (currentUser?.role === 'instructor' || currentUser?.role === 'admin') && (
+                <Button block className="top-space" onClick={() => {
+                  const result = submitCourseForReview(course.id);
+                  if (result.ok) message.success(result.message); else message.error(result.message);
+                }}>ส่งตรวจคอร์ส</Button>
+              )}
+              {course?.status === 'approved' && (
+                <Button block className="top-space" onClick={() => {
+                  const result = publishCourse(course.id);
+                  if (result.ok) message.success(result.message); else message.error(result.message);
+                }}>เผยแพร่คอร์ส</Button>
+              )}
               {!isNew && (
                 <Link to={`/teach/courses/${course?.id}/preview`}>
                   <Button block className="top-space">

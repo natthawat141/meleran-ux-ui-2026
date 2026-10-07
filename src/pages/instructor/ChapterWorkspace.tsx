@@ -68,7 +68,7 @@ interface UndoState {
 }
 
 function Workspace({ course, initial, initialItem, initialAdd, initialView }: WorkspaceProps) {
-  const { data, saveChapterWorkspace, removeChapter } = useLms();
+  const { data, currentUser, saveChapterWorkspace, saveVideoTranscript, removeChapter } = useLms();
   const navigate = useNavigate();
   const initialQuizzes = (): Quiz[] =>
     initial.items
@@ -98,6 +98,8 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
   const [undo, setUndo] = useState<UndoState | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [transcriptDraft, setTranscriptDraft] = useState('');
+  const [transcriptSaving, setTranscriptSaving] = useState(false);
   const dragging = useRef<string | null>(null);
 
   const dirty = JSON.stringify({ chapter: draft, quizzes }) !== baseline;
@@ -105,6 +107,19 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
   dirtyRef.current = dirty;
 
   const item = draft.items.find((entry) => entry.id === selected);
+  const transcriptDirty = Boolean(item?.type === 'video' && transcriptDraft !== (item.transcript ?? ''));
+  const transcriptDirtyRef = useRef(transcriptDirty);
+  transcriptDirtyRef.current = transcriptDirty;
+  useEffect(() => {
+    setTranscriptDraft(item?.type === 'video' ? item.transcript ?? '' : '');
+  }, [item?.id, item?.type === 'video' ? item.transcript : undefined]);
+  const confirmTranscriptChange = () => {
+    if (!transcriptDirtyRef.current) return true;
+    if (!window.confirm('AI Transcript ยังไม่ได้บันทึก ต้องการทิ้งข้อความนี้และเปลี่ยนหน้าหรือไม่?')) return false;
+    setTranscriptDraft(item?.type === 'video' ? item.transcript ?? '' : '');
+    transcriptDirtyRef.current = false;
+    return true;
+  };
   const quiz =
     item && 'quizId' in item && item.quizId
       ? quizzes.find((entry) => entry.id === item.quizId)
@@ -144,14 +159,14 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
 
   useEffect(() => {
     const beforeUnload = (event: BeforeUnloadEvent) => {
-      if (dirtyRef.current) {
+      if (dirtyRef.current || transcriptDirtyRef.current) {
         event.preventDefault();
         event.returnValue = '';
       }
     };
     const click = (event: MouseEvent) => {
       const anchor = (event.target as HTMLElement | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
-      if (!dirtyRef.current || !anchor || anchor.target === '_blank') return;
+      if ((!dirtyRef.current && !transcriptDirtyRef.current) || !anchor || anchor.target === '_blank') return;
       const target = new URL(anchor.href, window.location.href);
       if (target.pathname === location.pathname && target.search === location.search) return;
       if (
@@ -165,7 +180,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     const pop = (event: PopStateEvent) => {
       if (location.pathname + location.search + location.hash === original) return;
       if (
-        dirtyRef.current &&
+        (dirtyRef.current || transcriptDirtyRef.current) &&
         !window.confirm('ออกจากบทและทิ้งการเปลี่ยนแปลงที่ยังไม่บันทึกหรือไม่?')
       ) {
         event.stopImmediatePropagation();
@@ -187,6 +202,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     if (!draft.title.trim()) return 'กรอกชื่อบทก่อนบันทึก';
     for (const entry of draft.items) {
       if (!entry.title.trim()) {
+        if (!confirmTranscriptChange()) return 'AI Transcript ยังไม่ได้บันทึก กรุณาบันทึกหรือเลือกทิ้งก่อน';
         setSelected(entry.id);
         return 'รายการเนื้อหาต้องมีชื่อ';
       }
@@ -194,6 +210,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
         entry.type === 'video' &&
         !/^(https?:\/\/|data:video\/(mp4|webm);base64,)/i.test(entry.videoUrl || '')
       ) {
+        if (!confirmTranscriptChange()) return 'AI Transcript ยังไม่ได้บันทึก กรุณาบันทึกหรือเลือกทิ้งก่อน';
         setSelected(entry.id);
         return `เพิ่มวิดีโอให้ “${entry.title}” ก่อนบันทึก`;
       }
@@ -202,6 +219,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
         !entry.articleBody?.trim() &&
         !JSON.stringify(entry.articleDoc || {}).includes('"image"')
       ) {
+        if (!confirmTranscriptChange()) return 'AI Transcript ยังไม่ได้บันทึก กรุณาบันทึกหรือเลือกทิ้งก่อน';
         setSelected(entry.id);
         return `เพิ่มเนื้อหาให้ “${entry.title}” ก่อนบันทึก`;
       }
@@ -220,6 +238,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                   !question.options[question.answer]?.trim()))
           )
         ) {
+          if (!confirmTranscriptChange()) return 'AI Transcript ยังไม่ได้บันทึก กรุณาบันทึกหรือเลือกทิ้งก่อน';
           setSelected(entry.id);
           return `ตรวจโจทย์ ตัวเลือก คะแนน และเกณฑ์ผ่านของ “${entry.title}” ให้ครบ`;
         }
@@ -249,9 +268,33 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     return true;
   };
 
+  const saveTranscript = () => {
+    if (item?.type !== 'video' || currentUser?.role !== 'admin') return;
+    setTranscriptSaving(true);
+    const result = saveVideoTranscript(course.id, draft.id, item.id, transcriptDraft);
+    setTranscriptSaving(false);
+    if (!result.ok) { message.error(result.message); return; }
+    const withTranscript = (chapter: Chapter) => ({
+      ...chapter,
+      items: chapter.items.map((entry) => entry.id === item.id && entry.type === 'video'
+        ? { ...entry, transcript: transcriptDraft, transcriptUpdatedAt: result.updatedAt, transcriptUpdatedBy: result.updatedBy }
+        : entry),
+    });
+    setDraft((current) => withTranscript(current));
+    try {
+      const previous = JSON.parse(baseline) as { chapter: Chapter; quizzes: Quiz[] };
+      setBaseline(JSON.stringify({ chapter: withTranscript(previous.chapter), quizzes: previous.quizzes }));
+    } catch {
+      setBaseline(JSON.stringify({ chapter: withTranscript(initial), quizzes: initialQuizzes() }));
+    }
+    message.success(result.message);
+  };
+
   const back = () => {
+    if (transcriptDirtyRef.current && !window.confirm('Transcript ยังไม่ได้บันทึก ต้องการออกและทิ้งข้อความนี้หรือไม่?')) return;
     const go = () => {
       dirtyRef.current = false;
+      transcriptDirtyRef.current = false;
       navigate(`/teach/courses/${course.id}/curriculum`);
     };
     if (!dirty) {
@@ -286,6 +329,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
   };
 
   const add = () => {
+    if (!confirmTranscriptChange()) return;
     if (!newTitle.trim() || !adding) return;
     const itemId = createId('item');
     let entry: CourseItem;
@@ -327,6 +371,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     });
 
   const remove = (entry: CourseItem) => {
+    if (selected === entry.id && !confirmTranscriptChange()) return;
     if (hasHistory(entry)) {
       message.info('รายการนี้มีประวัติการเรียนหรือคำตอบ จึงยังนำออกไม่ได้');
       return;
@@ -435,6 +480,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
             <Button
               size="small"
               onClick={() => {
+                if (!confirmTranscriptChange()) return;
                 setDraft((current) => {
                   const items = [...current.items];
                   items.splice(undo.index, 0, undo.item);
@@ -455,7 +501,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
           <button
             type="button"
             className={`chapter-settings-link ${selected === 'settings' ? 'is-active' : ''}`}
-            onClick={() => setSelected('settings')}
+            onClick={() => { if (confirmTranscriptChange()) setSelected('settings'); }}
           >
             <SettingOutlined /> ข้อมูลบท
           </button>
@@ -491,7 +537,9 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                 <button
                   className="chapter-outline-select"
                   aria-current={selected === entry.id ? 'true' : undefined}
-                  onClick={() => setSelected(entry.id)}
+                  onClick={() => {
+                    if (confirmTranscriptChange()) setSelected(entry.id);
+                  }}
                 >
                   <span className="chapter-item-kind">
                     {kinds[entry.type]?.icon} {kinds[entry.type]?.label} · {index + 1}
@@ -608,6 +656,24 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                   />
                 </label>
                 {item.type === 'video' && <VideoEditor item={item} onChange={updateItem} />}
+                {item.type === 'video' && currentUser?.role === 'admin' && (
+                  <div className="chapter-field-stack" aria-label="Transcript สำหรับ Melearn AI">
+                    <label className="chapter-field-label" htmlFor="video-transcript">AI Transcript</label>
+                    <Input.TextArea
+                      id="video-transcript"
+                      rows={12}
+                      value={transcriptDraft}
+                      onChange={(event) => setTranscriptDraft(event.target.value)}
+                      placeholder={'วางข้อความ Transcript ตามต้นฉบับ รวม timestamp เช่น 30:00 และ 30:06'}
+                    />
+                    <small>เก็บเป็นข้อความต้นฉบับสำหรับความรู้ AI เท่านั้น ไม่แสดงในหน้าเรียนหรือหน้า Preview</small>
+                    {!initial.items.some((entry) => entry.id === item.id) && <small>บันทึกวิดีโอก่อนเพิ่ม Transcript</small>}
+                    <Button type="default" loading={transcriptSaving} onClick={saveTranscript} disabled={transcriptDraft === (item.transcript ?? '') || !initial.items.some((entry) => entry.id === item.id)}>
+                      บันทึก Transcript
+                    </Button>
+                    <small>บันทึกแยกจากวิดีโอและแบบฝึกหัด</small>
+                  </div>
+                )}
                 {item.type === 'article' && (
                   <div>
                     <label className="chapter-field-label">เนื้อหาบทอ่าน</label>

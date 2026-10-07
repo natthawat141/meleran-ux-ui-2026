@@ -1,9 +1,8 @@
 import React from 'react';
-import { Alert, Button, Empty, Space, Tag, Typography } from 'antd';
+import { Alert, Button, Empty, Space, Tag, Typography, message } from 'antd';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { CourseProgress, PageTitle } from '../../components/common';
-import { CourseCartButton } from '../../components/CourseCartButton';
 import { CourseOutline } from '../../components/CourseOutline';
 import { AskInstructorButton } from '../../components/AskInstructorButton';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -33,18 +32,22 @@ export function MemberCourseDetailPage() {
   const enrolled = data.enrollments.some(
     (entry) => entry.courseId === course.id && entry.userId === currentUserId
   );
-  const canLearn = currentUser?.role === 'learner' || currentUser?.role === 'admin';
+  const canLearn = currentUser?.role === 'learner' || currentUser?.role === 'instructor' || currentUser?.role === 'admin';
+  const canBuy = currentUser?.role === 'learner' || (currentUser?.role === 'instructor' && course.instructorId !== currentUser.id);
   const hasPreview = Boolean(getCoursePreviewLesson(course));
   const referralCode = new URLSearchParams(location.search).get('ref')?.trim();
   const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
 
   const start = () => {
-    if (enrolled) {
+    if (currentUser?.role !== 'admin' && currentUser?.emailVerified === false) {
+      navigate('/verify-email');
+    } else if (enrolled) {
       navigate(`/learn/courses/${course.id}`);
     } else if (course.price === 0) {
-      enrollFree(course.id, undefined, referralCode);
-      navigate(`/learn/courses/${course.id}`);
-    } else {
+      const result = enrollFree(course.id, undefined, referralCode);
+      if (result.ok) navigate(`/learn/courses/${course.id}`);
+      else message.info(result.message);
+    } else if (canBuy && currentUser?.status !== 'suspended') {
       navigate(`/checkout/${course.id}${referralQuery}`);
     }
   };
@@ -78,13 +81,13 @@ export function MemberCourseDetailPage() {
             <Typography.Text strong>{formatPrice(course.price)}</Typography.Text>
           )}
           <Space wrap>
-            {canLearn && (
+            {canLearn && (enrolled || course.price === 0) && (
               <Button type="primary" onClick={start}>
                 {enrolled ? 'เรียนต่อ' : course.price === 0 ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'}
               </Button>
             )}
-            {canLearn && !enrolled && course.price > 0 && (
-              <CourseCartButton course={course} referralCode={referralCode} />
+            {canBuy && !enrolled && course.price > 0 && currentUser?.status !== 'suspended' && (
+              <Button type="primary" onClick={start}>ซื้อคอร์ส</Button>
             )}
             {hasPreview && <Link to={`/courses/${course.slug}/preview`}><Button>ทดลองเรียนบทแรก</Button></Link>}
             {enrolled && <AskInstructorButton course={course} />}
@@ -106,6 +109,7 @@ export function MemberCourseDetailPage() {
               description="การลงเรียนในต้นแบบใช้บัญชีผู้เรียน ผ่านเมนูสลับบทบาทด้านบน"
             />
           )}
+          {currentUser?.emailVerified === false && <Alert type="info" showIcon message="ยืนยันอีเมลก่อนลงเรียนหรือซื้อคอร์ส" description={<Link to="/verify-email">เปิดหน้าส่งลิงก์ยืนยันจำลอง</Link>} />}
         </div>
       </div>
       <CourseOutline course={course} />

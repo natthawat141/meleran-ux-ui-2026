@@ -96,6 +96,24 @@
 .mai-practice-options .ant-btn { min-height: 40px; border-radius: 8px; font-family: inherit; font-size: 12px; }
 .mai-response-practice > .mai-practice-feedback { margin: 9px 0 0; color: #a25548; font-size: 12px; }
 .mai-response-practice > .mai-practice-feedback[data-correct='true'] { color: #317552; }
+.mai-practice-notice { padding: 10px 12px; border-left: 3px solid #0066ff; border-radius: 5px; background: #f2f8ff; color: #304a63; }
+.mai-practice-set { display: grid; gap: 12px; padding: 14px; border: 1px solid #dceaf5; border-radius: 12px; background: #f9fcff; }
+.mai-practice-set-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #31475b; font-size: 12px; }
+.mai-practice-set-heading > div { display: grid; gap: 2px; }
+.mai-practice-set-heading > div > span, .mai-practice-set-heading > span { color: #718397; font-size: 11px; }
+.mai-practice-set-question { min-width: 0; padding: 12px; border: 1px solid #e2ebf3; border-radius: 9px; background: #fff; }
+.mai-practice-set-question legend { padding: 0 5px; color: #4f6b82; font-size: 11px; font-weight: 650; }
+.mai-practice-set-question > p { margin: 0 0 9px; color: #364b5d; font-size: 13px; }
+.mai-practice-set-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.mai-practice-set-options .ant-btn { min-height: 40px; height: auto; white-space: normal; font-family: inherit; font-size: 12px; }
+.mai-practice-set-options .ant-btn[data-selected='true'][data-correct='false'] { border-color: #ff3b5c; color: #b4233d; }
+.mai-practice-set-feedback { padding-top: 8px; color: #b4233d; font-size: 12px; }
+.mai-practice-set-feedback[data-correct='true'] { color: #28734f; }
+.mai-practice-set-feedback p { margin: 3px 0 0; color: #526474; }
+.mai-practice-set-result { padding: 10px 12px; border-radius: 8px; background: #edf7ff; color: #0b1f46; font-size: 13px; font-weight: 650; }
+.mai-practice-set-source { margin: 0; color: #81909c; font-size: 10px; line-height: 1.55; }
+.learn-ai-practice-loading { display: flex; align-items: center; gap: 8px; color: #66798b; font-size: 12px; }
+.learn-ai-practice-loading .learn-ai-message-author { flex-basis: 100%; }
 
 .learn-ai-composer-dock { z-index: 2; flex: 0 0 auto; padding: 10px 24px 12px; background: linear-gradient(180deg, rgb(255 255 255 / 0%), #fff 12%); }
 .learn-ai-composer-wrap { position: relative; width: min(100%, 790px); margin: 0 auto; padding: 11px 13px 8px; border: 1px solid #dce7ef; border-radius: 15px; background: #fff; box-shadow: 0 5px 18px rgb(25 66 101 / 6%); }

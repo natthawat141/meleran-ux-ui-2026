@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Form, Input, Space, Typography } from 'antd';
 import { ArrowLeftOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { AuthFrame } from '../components/Shell';
 import { PageTitle } from '../components/common';
 import { useLms } from '../store';
 import { DEMO_ACCOUNTS } from '../data';
+import { verificationResendRemainingMs } from '../lib/email-verification';
 import { Alert as UiAlert, AlertDescription } from '../components/ui/alert';
 import { Button as UiButton } from '../components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '../components/ui/field';
@@ -44,6 +45,10 @@ interface GoogleAuthOptionProps {
 
 function GoogleAuthOption({ label }: GoogleAuthOptionProps) {
   const [notice, setNotice] = useState(false);
+  const [email, setEmail] = useState('');
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const { simulateGoogleAuth } = useLms();
+  const navigate = useNavigate();
   return (
     <>
       <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
@@ -60,13 +65,16 @@ function GoogleAuthOption({ label }: GoogleAuthOptionProps) {
         <GoogleOutlined className="text-base" aria-hidden="true" />
         {label}
       </UiButton>
-      {notice && (
-        <UiAlert className="mt-3">
-          <AlertDescription>
-            Google Login ยังไม่เปิดใช้งานในต้นแบบนี้ เราจะเชื่อมต่อเมื่อเพิ่ม Firebase
-          </AlertDescription>
-        </UiAlert>
-      )}
+      {notice && <div className="mt-3 space-y-2">
+        <Alert type="info" showIcon message="โหมดจำลองสำหรับบัญชี Melearn ที่ Login อยู่" description="ไม่มี Google OAuth จริง ไม่สร้างบัญชีหรือเปลี่ยนบทบาท ต้องใช้อีเมลเดียวกับบัญชีปัจจุบัน และไม่มีการรวมบัญชีอัตโนมัติ" />
+        <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="อีเมลที่ Google ยืนยันแล้ว" aria-label="อีเมล Google จำลอง" />
+        <Button block onClick={() => {
+          const auth = simulateGoogleAuth(email);
+          setResult({ ok: auth.ok, message: auth.message ?? '' });
+          if (auth.ok && auth.user) navigate(auth.user.role === 'admin' ? '/admin' : auth.user.role === 'instructor' ? '/teach' : '/learn');
+        }}>บันทึก Google email ที่ยืนยันแล้ว (จำลอง)</Button>
+        {result && <Alert type={result.ok ? 'success' : 'warning'} showIcon message={result.message} />}
+      </div>}
     </>
   );
 }
@@ -172,6 +180,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const next = new URLSearchParams(location.search).get('next');
   const [error, setError] = useState('');
+  const [verificationUrl, setVerificationUrl] = useState('');
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -189,7 +198,8 @@ export function RegisterPage() {
       setError(result.message || 'สมัครสมาชิกไม่สำเร็จ');
       return;
     }
-    navigate(next || '/learn');
+    if (result.verificationUrl) setVerificationUrl(result.verificationUrl);
+    else navigate(next || '/learn');
   };
 
   return (
@@ -198,6 +208,15 @@ export function RegisterPage() {
       title="สร้างบัญชีผู้เรียน"
       intro="เริ่มเรียนคอร์สฟรีและติดตามความคืบหน้าของคุณ"
     >
+      {verificationUrl ? (
+        <UiAlert className="mb-5">
+          <AlertDescription>
+            <strong>สร้างบัญชีแล้ว แต่ยังไม่ได้ยืนยันอีเมล</strong>
+            <p>ต้นแบบนี้ไม่ส่งอีเมลจริง ใช้ลิงก์จำลองด้านล่างเพื่อทดลองต่อ ลิงก์มีอายุ 24 ชั่วโมงและใช้ได้ครั้งเดียว</p>
+            <Link to={verificationUrl}>เปิดลิงก์ยืนยันจำลอง</Link>
+          </AlertDescription>
+        </UiAlert>
+      ) : <>
       {error && (
         <UiAlert variant="destructive" className="mb-5">
           <AlertDescription>{error}</AlertDescription>
@@ -265,6 +284,7 @@ export function RegisterPage() {
       <div className="auth-switch">
         มีบัญชีแล้ว? <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}>เข้าสู่ระบบ</Link>
       </div>
+      </>}
     </AuthPanel>
   );
 }
@@ -477,21 +497,45 @@ export function DemoAccountPage({ type }: DemoAccountPageProps) {
 }
 
 export function VerifyEmailPage() {
-  return (
-    <AuthPanel
-      title="ยืนยันอีเมลแล้ว"
-      intro="สถานะนี้จำลองเพื่อให้ทดลองเส้นทางบัญชีได้ครบ"
-    >
-      <Alert
-        type="success"
-        showIcon
-        message="อีเมลของคุณได้รับการยืนยันในต้นแบบแล้ว"
-      />
-      <Link to="/login">
-        <Button className="top-space" type="primary" block>
-          ไปหน้าเข้าสู่ระบบ
-        </Button>
-      </Link>
-    </AuthPanel>
-  );
+  const { search } = useLocation();
+  const { currentUser, data, verifyEmail, resendVerificationEmail } = useLms();
+  const token = new URLSearchParams(search).get('token') ?? '';
+  const [verificationResult, setVerificationResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [resendResult, setResendResult] = useState<{ ok: boolean; message: string; url?: string } | null>(null);
+  const [remainingMs, setRemainingMs] = useState(0);
+  const verifiedToken = useRef('');
+  useEffect(() => {
+    if (!token || verifiedToken.current === token) return;
+    verifiedToken.current = token;
+    const result = verifyEmail(token);
+    setVerificationResult({ ok: result.ok, message: result.message ?? (result.ok ? 'ยืนยันอีเมลสำเร็จ' : 'ลิงก์ใช้ไม่ได้') });
+  }, [token, verifyEmail]);
+  useEffect(() => {
+    const refresh = () => {
+      const latest = (data.emailVerifications ?? []).filter((item) => item.userId === currentUser?.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+      setRemainingMs(verificationResendRemainingMs(latest));
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 1000);
+    return () => window.clearInterval(timer);
+  }, [currentUser?.id, data.emailVerifications]);
+  const unverified = currentUser?.emailVerified === false;
+  const resend = () => {
+    const result = resendVerificationEmail();
+    setResendResult({ ok: result.ok, message: result.message ?? '', url: result.verificationUrl });
+  };
+  const title = verificationResult?.ok || currentUser?.emailVerified === true ? 'อีเมลยืนยันแล้ว' : 'ยืนยันอีเมล';
+
+  return <AuthPanel title={title} intro="สถานะบัญชีและลิงก์นี้จำลองใน browser ของต้นแบบ Melearn">
+    {token && verificationResult && <Alert className="bottom-space" type={verificationResult.ok ? 'success' : 'warning'} showIcon message={verificationResult.message} description="ลิงก์ใช้ได้ครั้งเดียว การยืนยันจะไม่สร้างบัญชีใหม่"/>}
+    {unverified && <>
+      <Alert className="bottom-space" type="info" showIcon message="บัญชียังไม่ได้ยืนยันอีเมล" description="เข้าสู่ระบบได้ แต่ต้องยืนยันก่อนลงเรียน แลกรหัส หรือเริ่มเรียน ลิงก์จำลองมีอายุ 24 ชั่วโมง"/>
+      <Button block type="primary" disabled={remainingMs > 0} onClick={resend}>
+        {remainingMs > 0 ? `ส่งลิงก์ใหม่ได้ใน ${Math.ceil(remainingMs / 1000)} วินาที` : 'Resend Verification Email'}
+      </Button>
+    </>}
+    {resendResult && <Alert className="top-space" type={resendResult.ok ? 'info' : 'warning'} showIcon message={resendResult.message} description={resendResult.url ? <><p>ไม่มีการส่งอีเมลจริง ลิงก์นี้สร้างไว้ทดลองในต้นแบบเท่านั้น</p><Link to={resendResult.url}>เปิดลิงก์ยืนยันจำลอง</Link></> : undefined}/>}
+    {!unverified && !verificationResult?.ok && currentUser?.emailVerified !== true && <Alert showIcon type="info" message="เปิดลิงก์ยืนยันจากบัญชีเดิม หรือเข้าสู่ระบบเพื่อขอลิงก์จำลองใหม่"/>}
+    <Link to={unverified ? '/account/profile' : '/login'}><Button className="top-space" block>{unverified ? 'กลับไปบัญชีของฉัน' : 'ไปหน้าเข้าสู่ระบบ'}</Button></Link>
+  </AuthPanel>;
 }

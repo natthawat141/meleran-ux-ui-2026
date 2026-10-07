@@ -168,9 +168,9 @@ export function QuizAttemptPage() {
         subtitle="ตอบทุกข้อก่อนส่ง คำตอบข้อเขียนและภาพงานจะส่งให้ผู้สอนตรวจ"
         actions={
           <div className="quiz-attempt-actions">
-            <Link to={`/learn/ai?courseId=${encodeURIComponent(quiz.courseId)}&attemptId=${encodeURIComponent(attempt.id)}&quizId=${encodeURIComponent(quiz.id)}`}>
+            {course?.aiEnabled === true ? <Link to={`/learn/ai?courseId=${encodeURIComponent(quiz.courseId)}&attemptId=${encodeURIComponent(attempt.id)}&quizId=${encodeURIComponent(quiz.id)}`}>
               <Button icon={<IconSparkles size={16} />}>ถาม Melearn AI</Button>
-            </Link>
+            </Link> : <Button disabled icon={<IconSparkles size={16} />} title="คอร์สนี้ยังไม่ได้เปิดใช้ AI">AI ยังไม่เปิดใช้</Button>}
             <AskInstructorButton course={course} item={courseItem} />
           </div>
         }
@@ -202,12 +202,12 @@ export function QuizAttemptPage() {
             ) : (
               <Title level={4}>{question.prompt}</Title>
             )}
-            <Link
+            {course?.aiEnabled === true ? <Link
               className="quiz-question-ai-link"
               to={`/learn/ai?courseId=${encodeURIComponent(quiz.courseId)}&attemptId=${encodeURIComponent(attempt.id)}&quizId=${encodeURIComponent(quiz.id)}&questionId=${encodeURIComponent(question.id)}`}
             >
               <IconSparkles size={15} /> ถาม AI เพื่อขอคำอธิบายหรือคำใบ้
-            </Link>
+            </Link> : <span className="quiz-question-ai-link" aria-disabled="true">AI ยังไม่เปิดใช้สำหรับคอร์สนี้</span>}
             {question.type === 'choice' ? (
               <Form.Item
                 name={question.id}
