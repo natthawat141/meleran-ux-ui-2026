@@ -3,15 +3,37 @@
 **ข้อมูลหลักที่เจ้าของยืนยัน 6 ต.ค. 2026:** [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.6 กำหนดกติกาธุรกิจ สิทธิ์ และขอบเขตหนึ่งเดือนแรก เอกสารนี้อธิบายวิธีทำต้นแบบ หากข้อความหรือพฤติกรรมเดิมขัดกัน ให้ใช้ฉบับหลัก และระบุส่วนที่โค้ดยังไม่ตรง ห้ามถือว่าต้นแบบพร้อม Production
 
 
-อัปเดต 6 ตุลาคม 2026 ข้อกำหนดสำหรับต่อ UX prototype ปัจจุบัน อ่าน [`UI_SPEC.md`](UI_SPEC.md) ควบคู่ก่อนแก้หน้าจอ
+อัปเดต 7 ตุลาคม 2026 ครอบคลุมข้อเท็จจริงของ UX prototype และทิศทาง Frontend refactor ที่ผู้ใช้ยืนยัน อ่าน [`UI_SPEC.md`](UI_SPEC.md) ควบคู่ก่อนแก้หน้าจอ
 
 ## 1. ข้อเท็จจริงและขอบเขต
 
 - ใช้ React, Vite, TypeScript/TSX, React Router และ browser-local state เวอร์ชันติดตั้งตรวจจาก `package.json` / lockfile
-- Repository นี้ไม่กำหนดว่าจะใช้สแตกนี้เป็น Production ไม่เพิ่ม backend, database, auth gateway หรือ deployment configuration จากชื่อ workspace
+- ผู้ใช้ยืนยันทิศทาง React Frontend refactor ตามข้อ 1.1 แล้ว แต่ repository นี้ยังไม่มี backend Production ไม่อนุมาน backend stack, database, auth gateway หรือ deployment configuration จากชื่อ workspace
 - ใช้ `package.json` ปัจจุบันเป็นฐาน มี `typecheck` และ `build`; regression tests ใช้ native Node ตามคำสั่งใน README ไม่มี lint/test npm script อย่าอ้างว่าคำสั่งเหล่านั้นผ่านถ้าไม่มีการรันจริง
 - อนาคต MCP/CLI/skill ต้องมีงานที่ระบุ scope และ permission model ของตัวเอง ไม่วาง mock tool เป็นบริการจริง
 - Mux Data environment key ใช้ชื่อ `VITE_MUX_ENV_KEY` ใน `.env.local` (มีชื่อเปล่าใน `.env.example`) เป็นค่า client-side สำหรับ analytics ไม่ใช่ Mux API token; ตอนนี้ยังไม่มี Mux SDK/player wiring จึงยังไม่มี tracking
+
+### 1.1 ทิศทาง Frontend ที่ยืนยัน 7 ตุลาคม 2026
+
+การยืนยันนี้เป็น architecture ของ Frontend และแผนงาน ไม่ใช่หลักฐานว่า source ย้ายแล้ว หรืออนุญาตเริ่ม implementation ดูลำดับงานและเกณฑ์รับที่ [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md)
+
+- ใช้สอง React apps ใน repository เดียว: `apps/tutor` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง โฟลเดอร์เหล่านี้เป็นเป้าหมาย ยังไม่ได้สร้าง
+- ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
+- `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
+- แต่ละแอปมี page/route orchestration ของตนเอง ส่วน authoring ที่ใช้ร่วมจริงอยู่ใน `packages/course-authoring` รับข้อมูล draft, capabilities และคำสั่งผ่าน interface ไม่ import router, `useLms()` หรือ layout ของ Tutor/Admin และไม่ hard-code `/teach/...`
+- `packages/ui` เป็น shared UI/design tokens; `packages/api-client` เป็น HTTP/error infrastructure; `packages/contracts` เป็น types ตาม API contract ไม่คัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract
+- Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ย้ายส่วนร่วมเมื่อมีผู้ใช้จริง
+- `App.tsx` ประกอบ providers/router เท่านั้น; route แยก Public/Auth/Learner/Instructor ของ Tutor และพื้นที่ Admin ของอีกแอป ใช้ nested layouts พร้อม boundary สำหรับ loading/error/no-access/not-found ตาม flow
+- Page ดูแล route params/query และประกอบหน้าจอ; feature component ดูแล behavior ของ feature; shared UI ดูแล presentation/interaction ทั่วไป ไม่เรียก API เฉพาะธุรกิจเอง
+- Course, Enrollment, Progress, Payment, AI Conversation และ Certificate เป็น server state ผ่าน TanStack Query; form/editor draft, modal/sidebar และสถานะ UI อยู่ local/client state ตามเจ้าของ ไม่สร้าง global store ข้อมูล backend ซ้ำ
+- AuthProvider ดูแล lifecycle ของ session ไม่รวม users/courses ทั้งระบบ; query cache ต้องแยกหรือเคลียร์เมื่อเปลี่ยนบัญชี ทั้งสองแอปมี cache ของตัวเอง ไม่แชร์ React store ข้ามแอป
+- Component/page ไม่เรียก `fetch` กระจาย ใช้ feature API ผ่าน client กลางที่รับผิดชอบ base URL, วิธีส่ง credentials, timeout/cancellation และ error normalization; payload จาก network ต้องตรวจตาม contract ไม่เชื่อเพียง TypeScript generic
+- Tutor/Admin ใช้กติกา API และ backend เดียวกันได้โดยยังไม่เลือก implementation backend การแยกสอง frontend ไม่บังคับให้แยก backend/ฐานข้อมูลหรือให้ frontend เชื่อม database โดยตรง
+- Tailwind เป็นหลักสำหรับ layout/spacing/responsive; UI ที่ใช้ซ้ำมี shared component/variants อ้าง semantic theme tokens ชุดเดียวกับ CSS และ library providers ตาม [UI_SPEC.md](UI_SPEC.md) ไม่บังคับเขียนทุกอย่างใหม่เป็น Tailwind
+- Instructor เข้า learner flows ของคอร์สคนอื่นได้ตาม Final 1.6; route guards มีไว้สำหรับ UX/navigation เท่านั้น Backend ต้องตรวจ identity, permission, ownership, enrollment และสถานะอีกครั้ง
+- รักษา URL/หน้าตา/พฤติกรรมที่ยังอยู่ใน scope ระหว่างย้ายโครงสร้าง การตัดเพิ่มฟีเจอร์และเปลี่ยน URL เป็นชุดงานแยกที่ต้องได้รับคำสั่งลงมือก่อน; ตัวอย่าง `/blog` หรือ `/account/payments` ไม่ใช่การอนุมัติ route ใหม่หรือ Order history เต็มรูปแบบ
+
+ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source ปัจจุบัน กติกา prototype ที่ระบุ `store.tsx` หรือ Admin ใช้ `/teach/...` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่เป้าหมาย architecture ใหม่
 
 ## 2. แผนที่ code ที่ต้องหาให้ถูก
 
@@ -53,7 +75,7 @@
 - ใบรับรองหน้าบัญชีผู้เรียนกรองเจ้าของเสมอ รวมถึงเมื่อผู้ใช้เป็น Admin รายการรวมของ Admin ใช้ route และ guard แยกตามฉบับหลัก
 - `DirectorySearch` เก็บคำค้นและตัวกรองใน URL ใช้รายการ field ที่ระบุอย่างชัดเจนในการค้น ไม่ค้นจากการ serialize user ทั้งก้อนหรือข้อมูลรหัสผ่าน การเปลี่ยนคำค้น/ตัวกรองเริ่ม pagination ใหม่ และ returnTo ของรายละเอียดจำกัดให้เป็น path รายการภายในที่ตรงกัน
 
-- Page รับ route/context และประกอบหน้าจอ; component ดูแล interaction/การแสดงผลที่เกี่ยวข้อง; action/state อยู่ใน store; style แยกตามบริบท
+- Page รับ route/context และประกอบหน้าจอ; component ดูแล interaction/การแสดงผลที่เกี่ยวข้อง; prototype ปัจจุบันมี action/state ใน store ส่วน slice ที่ refactor แล้วใช้ feature API/query กับ UI state ตามข้อ 1.1; style แยกตามบริบท
 - Component ของ feature เดียวเก็บใกล้ page หรือใน `components/chapter/` ตามโครงสร้างเดิม ย้ายเป็น shared component เมื่อมีการใช้ร่วมกันจริง
 - ไม่รวมทั้งระบบเป็น JSX file เดียวหรือยัด HTML string ที่สร้างหน้าจอเอง ไม่ตั้ง abstractions ขนาดใหญ่เพื่อแก้จุดเล็ก
 - ใช้ functional React components, named exports ตามรอบข้าง แยก JSX ที่เพิ่มใหม่ให้อ่านง่าย ไม่ต่อ component ยาวทั้งหน้าบรรทัดเดียว
@@ -69,7 +91,7 @@
 - Sidebar desktop ของ `WorkspaceShell` เปลี่ยนความกว้าง 258/72px ผ่าน AppShell navbar offsets โดยไม่ซ่อน navbar ทั้งหมด ปุ่มพับอยู่ในแถว “เมนูหลัก” ของ navbar ใช้ `useMediaQuery` แยกโหมดไอคอนจากเมนูเต็มของมือถือ มีชื่อ accessible/tooltip และ logo action ขยายผ่าน click/keyboard; ไม่เปลี่ยน permission หรือรายชื่อเมนูตามการพับ
 - Reuse `ImageUploadField`, rich editor, video/assessment editor, shared titles และ existing controls ก่อนสร้างใหม่
 - shadcn configuration อยู่ที่ `components.json` (`base-nova`, TSX, Base UI); code components อยู่ใน `src/components/ui/` อย่า scaffold ชุดใหม่ทับ component ที่ customize แล้ว
-- Tailwind มีใช้กับ shadcn controls ได้ ไม่ได้อนุญาตให้สร้าง design system อีกชุดจาก utility class ตามใจ ห้าม hard-code สี/ขนาด control ซ้ำทั่ว page
+- ผู้ใช้ยืนยันให้ใช้ Tailwind มากขึ้นสำหรับ layout/spacing/responsive และ styling ของ shared UI ตาม tokens กลาง ไม่สร้าง design system อีกชุดจาก utility class และไม่ hard-code สี/ขนาด control ซ้ำทั่ว page; ในช่วงย้ายให้รักษา Ant Design/Mantine/Base UI ที่ยังใช้และเชื่อม theme ผ่าน adapter
 - สำหรับ animation ใช้ `motion/react` ที่มีอยู่ ไม่ติดตั้ง Framer Motion เพิ่มซ้ำเพื่อ feature เดียวกัน
 - ถ้าจำเป็นต้องเพิ่ม component/library ให้ตรวจของที่มี ก่อนใช้ source/CLI จากผู้พัฒนาอย่างเป็นทางการ ตรวจ compatibility/license และบันทึกเหตุผลกับไฟล์ lock ที่เปลี่ยน ห้าม copy paid block หรือ dependency โดยไม่ตรวจที่มา
 - เลือก icon family เดิมในบริบทนั้น ไม่เพิ่ม package เพื่อไอคอนหนึ่งตัวที่ชุดปัจจุบันมีแล้ว
@@ -83,10 +105,11 @@
 - ใช้ grid/flex, minmax, wrap, gutter และ aspect-ratio สำหรับ layout ไม่ใช้ absolute positioning เพื่อแก้ toolbar ชนกัน Absolute ใช้ได้กับ background/overlay ตามหน้าที่
 - ค่าเริ่มต้น light; dark tokens มีอยู่แล้ว ยังไม่เปิด toggle ไม่อ้างว่าภาพ/editor/public ทั้งระบบรองรับ dark ครบ
 - งานที่เปลี่ยน token กลางต้องเช็กหน้าที่ใช้ร่วมกันอย่างพอประมาณ โดยไม่ขยายเป็น redesign ทุกหน้า
+- เป้าหมายหลัง refactor คือ design tokens ชุดเดียวใน `packages/ui` สำหรับ Tutor/Admin โดย Tailwind theme, CSS variables และ library providers อ้างต้นทางเดียวกัน; ไม่เก็บ hex ซ้ำใน theme.ts, stylesheet และ component variants ส่วน CSS เฉพาะ editor/animation ใช้ได้เมื่อมี owner ชัดและอ้าง tokens
 
 ## 6. State และการบันทึก
 
-- ใช้ `useLms()` และ actions ใน `store.tsx` เป็นแหล่ง state หลักของ prototype ไม่สร้าง localStorage/store ชุดสองสำหรับข้อมูลเดียวกัน
+- ก่อนย้าย slice ใช้ `useLms()` และ actions ใน `store.tsx` เป็นแหล่ง state หลักของ prototype ไม่สร้าง localStorage/store ชุดสองสำหรับข้อมูลเดียวกัน; หลังย้าย slice ให้ใช้ feature query/mutation และ adapter ตามข้อ 1.1 โดยมีเจ้าของข้อมูลเพียงแหล่งเดียว ไม่เขียนสองระบบพร้อมกัน
 - ใช้ local component state สำหรับ draft, selected item, modal, filter และ view mode เท่าที่เหมาะสม การป้อนแต่ละตัวอักษรไม่ควรเปลี่ยนข้อมูลหลักก่อนผู้ใช้บันทึกเมื่อ pattern ของหน้าคือ draft
 - หน้าตรวจงานเก็บเฉพาะ draft คะแนน/feedback ใน `sessionStorage` ตาม user/attempt เพื่อกลับมาต่อในแท็บเดิมได้; ใช้ `gradeAttempt` เดิมเมื่อบันทึกและล้าง draft จากแท็บเมื่อเสร็จ ไม่ใช้ draft เปลี่ยนผลคะแนนหรือ Analytics ล่วงหน้า
 - คิวตรวจเก็บ course/courseId, mode และคำค้น `q` ใน URL; ส่ง `returnTo` ให้หน้าตรวจ และใช้บริบทเดียวกันสำหรับงานก่อนหน้า/ถัดไป โดยคง role scoping และลำดับ FIFO
@@ -106,7 +129,7 @@
 - Route gate ไม่ใช่การตรวจสิทธิ์ฝั่ง API และไม่เอา source ออกจาก bundle; ต้องบังคับ role, ownership และสิทธิ์ข้อมูลใน Backend ก่อน release
 
 - ศึกษา `RolePage` ใน `App.tsx` และ checks ใน actions ปัจจุบัน อย่าเชื่อว่าซ่อนปุ่มแล้วผู้ใช้เข้าหน้านั้นไม่ได้
-- ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้และใช้ `/teach/...` workspace ตาม route เดิมได้
+- ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้ ปัจจุบัน prototype ใช้ `/teach/...` workspace ร่วมกัน แต่เป้าหมาย refactor ให้ Admin มี routes/pages ในแอป Admin โดยใช้ authoring package ร่วม ไม่พึ่งหน้า Tutor
 - Public blog อ่านได้โดยไม่ login แต่ create/edit/delete blog เป็น admin ในรุ่นนี้; blog กับบทอ่านในคอร์สเป็นข้อมูลคนละชนิด
 - Routes ต้องรองรับเปิดตรง refresh, not-found, no-access และ back path ที่ถูก context อย่าผูกสิทธิ์กับการที่เข้ามาผ่านปุ่มเพียงทางเดียว
 - คำขอแก้ UI ไม่อนุญาตขยายสิทธิ์ role เดิมหรือเปลี่ยน business rule เอง ถ้ามี requirement ใหม่ให้ระบุความต่างอย่างชัดเจน

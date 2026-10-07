@@ -10,6 +10,8 @@
 
 Repository นี้เป็น interactive UX prototype ของ Melearn: React + Vite + TypeScript/TSX ยังไม่มี backend Production ข้อมูล บัญชี การจ่ายเงิน และการสลับบทบาทเป็นการจำลองในเบราว์เซอร์
 
+**ทิศทาง Frontend ที่ผู้ใช้ยืนยัน 7 ต.ค. 2026:** เตรียมสอง React apps ใน repository เดียว: Tutor สำหรับ Guest/Learner/Instructor และ Admin แยก ใช้ Feature-first, route boundary, TanStack Query สำหรับ server state, Tailwind สำหรับ layout และ shared UI/theme tokens กลาง แยก `courses` (Catalog/รายละเอียด) จาก `course-authoring` (Editor/Curriculum/Quiz Editor ที่ทั้ง Instructor/Admin ใช้) ดูข้อกำหนดใน [docs/CODE_SPEC.md](docs/CODE_SPEC.md) และ [แผน refactor](docs/FRONTEND_REFACTOR_PLAN_TH.md) ปัจจุบันอนุญาตให้แก้เอกสารและเตรียมแผนเท่านั้น ยังไม่อนุญาต implementation/ตัดเพิ่มฟีเจอร์ การตัดสินใจนี้ไม่กำหนด backend stack, database หรือ deployment
+
 เมื่อเปิด repository แยกจาก workspace ให้อ่านไฟล์นี้ได้โดยไม่ต้องมี `D:\code\elearn-prod` อยู่บนเครื่อง เมื่อทำงานใน workspace ใหญ่ ให้อ่าน `../AI_WORKSPACE_GUIDE_TH.md` ด้วย ห้ามแก้โปรเจกต์ reference อื่นโดยอัตโนมัติ
 
 ## Priority and scope

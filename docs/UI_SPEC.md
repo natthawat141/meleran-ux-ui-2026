@@ -3,7 +3,7 @@
 **ข้อมูลหลักที่เจ้าของยืนยัน 6 ต.ค. 2026:** [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) ฉบับ Final 1.6 กำหนดกติกาธุรกิจ สิทธิ์ และขอบเขตหนึ่งเดือนแรก เอกสารนี้อธิบายวิธีทำต้นแบบ หากข้อความหรือพฤติกรรมเดิมขัดกัน ให้ใช้ฉบับหลัก และระบุส่วนที่โค้ดยังไม่ตรง ห้ามถือว่าต้นแบบพร้อม Production
 
 
-อัปเดต 6 ตุลาคม 2026 ใช้กับ UX prototype ใน repository นี้ คำขอและคำยืนยันล่าสุดของผู้ใช้มีน้ำหนักเหนือสเปกนี้
+อัปเดต 7 ตุลาคม 2026 ใช้กับ UX prototype และทิศทาง UI สำหรับ Frontend refactor คำขอและคำยืนยันล่าสุดของผู้ใช้มีน้ำหนักเหนือสเปกนี้
 
 ## 1. ทิศทางที่ต้องรักษา
 
@@ -37,6 +37,18 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 - Landing ใช้เฉดแบรนด์ที่เข้มขึ้นเฉพาะพื้นที่อ่าน: แถบประกาศ `#d92347` กับข้อความขาว, ปุ่มคอร์สไล่สี `#0066ff` → `#0052cc`, ตัวเลขขั้นตอน/ลิงก์บนฟ้าอ่อน `#0052cc` ส่วนภาพและหัวข้อใหญ่ยังใช้สีแบรนด์เดิม ข้อความปกติต้อง contrast อย่างน้อย 4.5:1 และหัวข้อใหญ่ 3:1; ตรวจจาก computed styles รวมพื้นไล่สีและภาพจริง ไม่ถือว่า build ผ่านคือผ่าน contrast
 - ตัวเลขในตารางเป็นฐานจาก source ไม่ใช่ข้อบังคับว่าแต่ละหน้าใช้เฉดเดียวทุกจุด ถ้าต้องปรับ theme ให้ตรวจ provider และ CSS ของหน้าที่เกี่ยวข้องร่วมกัน
 - Implementation รอบ 5 ต.ค. 2026 ใช้สีแบรนด์กับ Landing `/`: Hero หัวข้อสองสี ภาพนักเรียนและกราฟิกฟ้า–แดง การ์ดข้อความลอย แถบแนะนำปิดได้ ผู้สอนเป็นสไลด์การ์ดใหญ่ บทความเลือกหมวดหมู่ได้ คอร์ส/วิธีเรียน/ทีม/รับข่าวสารใช้การ์ดมนและสีชุดเดียวกัน Footer พื้น navy ใช้โลโก้จริงและฟอนต์เดิม ไม่สร้างรีวิวหรือยอดความสำเร็จสมมติ หน้าอื่นและ `src/theme.ts` ยังใช้ธีมเดิม รอปรับตามงานเฉพาะหน้า
+
+### 2.1 Theme และ shared UI ที่ยืนยัน 7 ตุลาคม 2026
+
+- Tutor และ Admin ใช้ design tokens/shared UI ใน `packages/ui` ร่วมกัน มี layout ต่างกันได้ ยังไม่สร้าง package หรือเปลี่ยน UI ในรอบเอกสารนี้
+- สีแบรนด์ใช้ข้อ 2 เป็นแหล่งอ้างอิงเดียว เป้าหมายคือ tokens กลางตามหน้าที่ เช่น primary/foreground/hover/soft, surface, page background, text/muted, border, focus และ success/warning/danger รวม font/radius/shadow ที่ใช้ร่วม ไม่ทำชุดสีใหม่ซ้ำในแผน refactor
+- Tailwind utilities, CSS เฉพาะส่วน และ theme ของ Ant Design/Mantine/Base UI ต้องอ้าง tokens ต้นทางเดียว การปรับธีมเปลี่ยนชุด tokens แล้ว build ทั้งสองแอป ไม่ไล่แก้ literal ตามหน้า
+- ใช้ Tailwind เป็นหลักสำหรับ layout/spacing/responsive และ style ของ shared component; ใช้ semantic classes เช่น `bg-primary`, `text-primary`, `bg-surface` แทน `bg-blue-600` หรือ hex literal สำหรับสีแบรนด์
+- UI ที่ใช้ซ้ำเรียก shared component เช่น Button/Field/Dialog โดยเลือก variant/size ตามบริบท; ไม่กำหนด hover/focus/disabled/สีซ้ำทุก page ใช้ library เดิมเป็นฐานและรักษาพฤติกรรม/accessibility ไม่เขียน controls ใหม่เลียนแบบทั้งหมด
+- Brand accent กับสถานะ success/warning/danger เป็นคนละความหมาย เปลี่ยน primary ไม่ย้อมสถานะทั้งหมด; เปลี่ยนทั้งชุดธีมต้องตรวจ foreground, hover, focus และ contrast ด้วย
+- CSS Modules หรือ CSS ที่มี namespace ใกล้ component ยังใช้ได้กับ editor, rich content, animation และรูปแบบเฉพาะ หลีกเลี่ยง global overrides และ `!important` ที่สะสม
+- ย้าย tokens/Tailwind ทีละส่วนโดยรักษาหน้าตาและ flow เดิมที่อยู่ใน scope ไม่ถือว่าการยืนยัน Tailwind คืออนุญาต redesign ทุกหน้า เป้าหมายรอบนี้ไม่มีปุ่ม dark-mode toggle ใหม่
+- เส้นทางสร้างคอร์สของ Instructor/Admin ใช้ editor ส่วนร่วม แต่ layout/navigation/สิทธิ์แยกตามแอป; `courses` ดูคอร์ส ส่วน `course-authoring` สร้าง/แก้โครงสร้างและเนื้อหา ตาม [CODE_SPEC.md](CODE_SPEC.md)
 
 ## 3. ฟอนต์และจังหวะการอ่าน
 
