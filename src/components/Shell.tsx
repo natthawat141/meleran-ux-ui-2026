@@ -102,7 +102,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function WorkspaceShell({ children }: { children: React.ReactNode }) {
+export function WorkspaceShell({ children, availableRoles }: { children: React.ReactNode; availableRoles?: Role[] }) {
   const { currentUser, signInDemo, signOut } = useLms();
   const location = useLocation();
   const navigate = useNavigate();
@@ -110,6 +110,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 62em)', false);
   const compact = desktopCollapsed && isDesktop;
+  const roleOptions = availableRoles ?? ['learner', 'instructor', 'admin'];
   const role: Role = (currentUser?.role as Role) ?? 'learner';
   const meta = roleMeta[role] ?? roleMeta.learner;
   const items = roleMenus[role] ?? roleMenus.learner;
@@ -123,6 +124,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
         : activeMenuKey(location.pathname, items);
 
   const toWorkspace = (nextRole: Role) => {
+    if (!roleOptions.includes(nextRole)) return;
     const result = signInDemo(nextRole);
     if (result.ok) navigate(roleMeta[nextRole].home);
   };
@@ -201,21 +203,20 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             </Text>
           </Group>
           <Group gap="md" wrap="nowrap" className="workspace-header-actions">
-            <Select
+            {roleOptions.length > 1 && <Select
               aria-label="ดูตัวอย่างในบทบาท"
               className="role-switch"
               value={role}
               onChange={(value) => value && toWorkspace(value as Role)}
-              data={[
-                { value: 'learner', label: 'ผู้เรียน' },
-                { value: 'instructor', label: 'ผู้สอน' },
-                { value: 'admin', label: 'แอดมิน' },
-              ]}
+              data={roleOptions.map((availableRole) => ({
+                value: availableRole,
+                label: roleMeta[availableRole].label,
+              }))}
               leftSection={<IconAdjustments size={16} />}
               rightSection={<IconChevronDown size={14} />}
               allowDeselect={false}
               searchable={false}
-            />
+            />}
             <WorkspaceNotifications />
             <Menu position="bottom-end" shadow="md" width={210} withinPortal>
               <Menu.Target>
@@ -234,15 +235,15 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 <Menu.Item component={Link} to="/account/profile" leftSection={<IconSettings size={16} />}>
                   บัญชีของฉัน
                 </Menu.Item>
-                <div className="profile-mobile-roles">
+                {roleOptions.length > 1 && <div className="profile-mobile-roles">
                   <Menu.Divider />
                   <Menu.Label>ดูตัวอย่างในบทบาท</Menu.Label>
-                  {Object.entries(roleMeta).map(([key, value]) => (
+                  {roleOptions.map((key) => (
                     <Menu.Item key={key} onClick={() => toWorkspace(key as Role)}>
-                      {value.label}
+                      {roleMeta[key].label}
                     </Menu.Item>
                   ))}
-                </div>
+                </div>}
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
@@ -290,7 +291,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
         <Stack gap={5} className="workspace-nav-links">
           {navLinks}
         </Stack>
-        <div className="workspace-nav-bottom">
+        {role !== 'admin' && <div className="workspace-nav-bottom">
           {compact ? (
             <Tooltip label="กลับไปหน้าคอร์ส" position="right" events={{ hover: true, focus: true, touch: false }}>
               <ActionIcon
@@ -321,7 +322,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
               </Text>
             </>
           )}
-        </div>
+        </div>}
       </AppShell.Navbar>
       <AppShell.Main className="workspace-content">
         <div className="workspace-content-inner">{children}</div>

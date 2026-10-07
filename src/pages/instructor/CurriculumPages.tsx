@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Button, Empty, Form, Input, Popconfirm, Typography, message } from 'antd';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { PageTitle } from '../../components/common';
+import { PageTitle } from '@melearn/ui';
 import type { CourseItemType } from '../../types';
 export { CurriculumPage } from './CurriculumWorkspace';
 

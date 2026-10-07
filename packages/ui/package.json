@@ -1,0 +1,13 @@
+{
+  "name": "@melearn/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@mantine/core": "^9.6.2",
+    "react": "^19.1.0"
+  }
+}

@@ -3,7 +3,7 @@ import { Alert, Avatar, Button, Empty, Progress, Table, Tag, Typography, message
 import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { PageTitle, StatusTag } from '../../components/common';
+import { PageTitle, StatusTag } from '@melearn/ui';
 import { flattenItems } from '../../data';
 import type { Course, User } from '../../types';
 

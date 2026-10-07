@@ -15,7 +15,8 @@ import {
 import { ArrowRightOutlined, BookOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { CourseCard, PageTitle, SectionHeading, StatusTag } from '../../components/common';
+import { CourseCard, SectionHeading } from '../../components/common';
+import { PageTitle, StatusTag } from '@melearn/ui';
 import { flattenItems } from '../../data';
 import defaultCourseCover from '../../assets/generated/course-default-v2.png';
 import { ImageUploadField } from '../../components/ImageUploadField';

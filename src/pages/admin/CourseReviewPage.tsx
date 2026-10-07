@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Alert, Button, Empty, Form, Input, Modal, Space, Table, Typography, message, type TableProps } from 'antd';
 import { Link } from 'react-router-dom';
 import { useLms } from '../../store';
-import { PageTitle, StatusTag } from '../../components/common';
+import { PageTitle, StatusTag } from '@melearn/ui';
 import type { Course } from '../../types';
 
 export function CourseReviewPage() {
@@ -20,7 +20,7 @@ export function CourseReviewPage() {
     } },
     { title: 'สถานะ', key: 'status', render: () => <StatusTag status="pending_review"/> },
     { title: 'การจัดการ', key: 'actions', render: (_, course) => <Space wrap>
-      <Link to={`/teach/courses/${course.id}/preview`}><Button>ดูตัวอย่าง</Button></Link>
+      <Link to={`/admin/courses/${course.id}/preview`}><Button>ดูตัวอย่าง</Button></Link>
       <Button type="primary" onClick={() => {
         const result = reviewCourse(course.id, 'approve');
         if (result.ok) message.success(result.message); else message.error(result.message);

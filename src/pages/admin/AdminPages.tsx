@@ -4,7 +4,8 @@ import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowRightOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { CourseProgress, PageTitle, StatusTag } from '../../components/common';
+import { CourseProgress } from '../../components/common';
+import { PageTitle, StatusTag } from '@melearn/ui';
 import { formatPrice, flattenItems, instructorFor } from '../../data';
 import { DirectorySearch, matchesDirectorySearch, useDirectorySearch } from '../../components/DirectorySearch';
 import type { Course, QuizAttempt, User } from '../../types';
@@ -449,8 +450,8 @@ export function AdminCoursesPage() {
       title: 'จัดการ',
       render: (_, course) => (
         <Space wrap>
-          <Button onClick={() => navigate(`/teach/courses/${course.id}/settings`)}>แก้ไขคอร์ส</Button>
-          <Button onClick={() => navigate(`/teach/courses/${course.id}/curriculum`)}>จัดบทเรียน</Button>
+          <Button onClick={() => navigate(`/admin/courses/${course.id}/settings`)}>แก้ไขคอร์ส</Button>
+          <Button onClick={() => navigate(`/admin/courses/${course.id}/curriculum`)}>จัดบทเรียน</Button>
           <Button type="text" onClick={() => navigate(`/admin/courses/${course.id}`)}>
             รายละเอียด
           </Button>
@@ -474,7 +475,7 @@ export function AdminCoursesPage() {
         subtitle="สร้างคอร์สและจัดการเนื้อหาของผู้สอนทุกคน"
         actions={<Space>
           <Link to="/admin/courses/reviews"><Button>คิวตรวจคอร์ส ({pendingCourseCount})</Button></Link>
-          <Link to="/teach/courses/new"><Button type="primary" icon={<PlusOutlined />}>สร้างคอร์ส</Button></Link>
+          <Link to="/admin/courses/new"><Button type="primary" icon={<PlusOutlined />}>สร้างคอร์ส</Button></Link>
         </Space>}
       />
       <div className="admin-courses-toolbar">
@@ -522,8 +523,8 @@ export function AdminCoursesPage() {
                         <span>{learnerCount} ผู้เรียน</span>
                       </div>
                       <div className="admin-course-card-actions">
-                        <Button onClick={() => navigate(`/teach/courses/${course.id}/settings`)}>แก้ไขคอร์ส</Button>
-                        <Button onClick={() => navigate(`/teach/courses/${course.id}/curriculum`)}>จัดบทเรียน</Button>
+                        <Button onClick={() => navigate(`/admin/courses/${course.id}/settings`)}>แก้ไขคอร์ส</Button>
+                        <Button onClick={() => navigate(`/admin/courses/${course.id}/curriculum`)}>จัดบทเรียน</Button>
                         <Button type="link" onClick={() => navigate(`/admin/courses/${course.id}`)}>
                           รายละเอียด
                         </Button>
@@ -568,7 +569,7 @@ export function AdminCourseDetailPage() {
         subtitle={course.subtitle}
         actions={
           <Space>
-            <Link to={`/teach/courses/${course.id}/preview`}><Button>ดูตัวอย่าง / เผยแพร่</Button></Link>
+            <Link to={`/admin/courses/${course.id}/preview`}><Button>ดูตัวอย่าง / เผยแพร่</Button></Link>
             <Link to="/admin/courses"><Button>กลับรายการ</Button></Link>
           </Space>
         }

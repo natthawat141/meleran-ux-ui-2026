@@ -4,7 +4,7 @@ import { ArrowRightOutlined, ClockCircleOutlined, FileImageOutlined, FileTextOut
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { getReviewQueue, type ReviewQueueItem } from '../../lib/assessment-review';
-import { PageTitle } from '../../components/common';
+import { PageTitle } from '@melearn/ui';
 import { UserAvatar } from '../../components/UserAvatar';
 import './review-queue.css';
 

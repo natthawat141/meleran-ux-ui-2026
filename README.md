@@ -2,7 +2,7 @@
 
 **Approved business scope:** [Melearn Final 1.6](docs/MELEARN_V1_SCOPE.md), based on the owner-reviewed Final 1.5 and the confirmed Stripe/AI-practice additions on 6 October 2026. This is the source of truth for the first month. [Release matrix](docs/FEATURE_RELEASE_MATRIX.md) tracks implementation readiness separately. Stripe course payments are now in scope. Cart/order history, finance and inbox screens remain legacy prototypes outside V1.
 
-React + TypeScript + Ant Design/Mantine prototype. Demo accounts and course data are stored in this browser only.
+React + TypeScript + Ant Design/Mantine prototype. Demo accounts and course data stay in browser storage. Web and Admin are separate origins in local development, so their browser-local demo data does not synchronize.
 
 ## AI / developer instructions
 
@@ -10,7 +10,7 @@ Before changing this prototype, read [AGENTS.md](AGENTS.md), [UI_SPEC.md](docs/U
 
 This is the active UX/UI prototype, not a Production backend. Latest user decisions take precedence over draft specifications.
 
-Run from this directory with `npm install`, then `npm run dev -- --port 5174`.
+Install once with `npm install`. Run `npm run dev:web` for Guest/Learner/Instructor at `http://127.0.0.1:5173/` and `npm run dev:admin` for Admin at `http://127.0.0.1:5174/`. These are separate prototype runtimes, not API-integrated apps.
 
 ## Environment
 
@@ -32,14 +32,16 @@ Set the optional public `VITE_API_BASE_URL` to a same-origin path prefix such as
 
 Development and Preview allow `prototype`, `integration`, and `released`; Staging allows `integration` and `released`; Production allows only `released`. `disabled` is blocked everywhere. First-month scope follows the approved Final 1.6. Items marked Later are outside that scope and have no committed delivery date. Phase numbers are proposed inventory only and do not open routes.
 
-`npm run dev` keeps the existing prototype walkthrough. For a built UX preview:
+`npm run dev` starts the Web app. Build both apps with `npm run build`; outputs are kept separately in `dist/web` and `dist/admin`. To preview each app with Preview feature gates enabled:
 
 ```powershell
-npm.cmd run build -- --mode preview
-npm.cmd run preview -- --port 4173
+npm.cmd run build --workspace @melearn/web -- --mode preview
+npm.cmd run build --workspace @melearn/admin -- --mode preview
+npm.cmd run preview:web
+npm.cmd run preview:admin
 ```
 
-The default `npm run build` creates a Production bundle and hides every current feature route. `npm run build -- --mode staging` also hides current prototypes. `npm run preview` serves the last build and does not change its environment.
+The default `npm run build` creates both Production-mode bundles and hides every current prototype feature route. `npm run preview:web` and `npm run preview:admin` serve the last build and do not change its environment.
 
 An explicit public `VITE_APP_ENV` build setting accepts `development`, `preview`, `staging`, or `production` and overrides the mode. Invalid values default to Production. Rebuild when changing the environment. No deployment settings were changed; any prototype pipeline using the default build must explicitly select Preview. Route gates do not enforce API permissions or remove code from the bundle.
 
@@ -61,11 +63,11 @@ Use Node.js 24 or later for the native TypeScript test entry. On Windows:
 ```powershell
 npm.cmd run typecheck
 npm.cmd run build
-node --test tests/feature-release.test.ts
-node --test tests/payments.test.ts tests/email-verification.test.mjs tests/course-review.test.mjs tests/access-code-redemption.test.ts
-node --test tests/business-reports.test.mjs tests/profile-model.test.mjs tests/instructorAnalytics.test.ts tests/instructor-finance.test.mjs tests/ai-course-command.test.ts
-node --test tests/feature-release.test.ts
+npm.cmd test
+npm.cmd run check:boundaries
 ```
+
+The boundary check prevents cross-app source imports and package-to-app dependencies. The current `@legacy/*` alias is a temporary bridge to the remaining prototype source under `src/`; it does not indicate shared backend state or API readiness.
 
 Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
 

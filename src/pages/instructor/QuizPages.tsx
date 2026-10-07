@@ -5,7 +5,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { RichDocument } from '../../components/chapter/RichTextEditor';
-import { PageTitle, StatusTag } from '../../components/common';
+import { PageTitle, StatusTag } from '@melearn/ui';
 import { WrittenAnswerView, writtenAnswer } from '../../components/WrittenAnswer';
 import { UserAvatar } from '../../components/UserAvatar';
 import { getReviewQueue } from '../../lib/assessment-review';

@@ -9,20 +9,20 @@
 
 - ใช้ React, Vite, TypeScript/TSX, React Router และ browser-local state เวอร์ชันติดตั้งตรวจจาก `package.json` / lockfile
 - ผู้ใช้ยืนยันทิศทาง React Frontend refactor ตามข้อ 1.1 แล้ว แต่ repository นี้ยังไม่มี backend Production ไม่อนุมาน backend stack, database, auth gateway หรือ deployment configuration จากชื่อ workspace
-- ใช้ `package.json` ปัจจุบันเป็นฐาน มี `typecheck` และ `build`; regression tests ใช้ native Node ตามคำสั่งใน README ไม่มี lint/test npm script อย่าอ้างว่าคำสั่งเหล่านั้นผ่านถ้าไม่มีการรันจริง
+- repository ใช้ npm workspaces แยก `apps/web`, `apps/admin` และ `packages/ui`, `packages/api-client`, `packages/contracts`; root scripts ตรวจแต่ละ app กับ legacy source แยกกัน และ regression tests ใช้ native Node อย่าอ้างว่าคำสั่งเหล่านั้นผ่านถ้าไม่มีการรันจริง
 - อนาคต MCP/CLI/skill ต้องมีงานที่ระบุ scope และ permission model ของตัวเอง ไม่วาง mock tool เป็นบริการจริง
 - Mux Data environment key ใช้ชื่อ `VITE_MUX_ENV_KEY` ใน `.env.local` (มีชื่อเปล่าใน `.env.example`) เป็นค่า client-side สำหรับ analytics ไม่ใช่ Mux API token; ตอนนี้ยังไม่มี Mux SDK/player wiring จึงยังไม่มี tracking
 
 ### 1.1 ทิศทาง Frontend ที่ยืนยัน 7 ตุลาคม 2026
 
-การยืนยันนี้เป็น architecture ของ Frontend และแผนงาน ไม่ใช่หลักฐานว่า source ย้ายแล้ว หรืออนุญาตเริ่ม implementation ดูลำดับงานและเกณฑ์รับที่ [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md)
+การยืนยันนี้เป็น architecture ของ Frontend และแผนงาน ไม่ใช่หลักฐานว่า API พร้อม ดูลำดับงานและเกณฑ์รับที่ [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md)
 
-- ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก โฟลเดอร์เหล่านี้เป็นเป้าหมาย ยังไม่ได้สร้าง ไม่เปลี่ยนชื่อ repository/checkout จากชื่อโครงสร้างตัวอย่าง
+- ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก R2b สร้าง workspace/entry/build และ route owners แล้ว; source ปัจจุบันใต้ `src/` ยังเป็น transitional prototype ที่เรียกผ่าน alias `@legacy` และต้องย้ายตาม feature phases
 - ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
 - `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
 - แต่ละแอปมี page/route orchestration ของตนเอง `course-authoring` เป็น feature ที่ยืนยันแล้ว แต่ `packages/course-authoring` เป็น candidate for extraction ไม่ใช่ package บังคับตั้งแต่แรก ให้ R0/R6 ตรวจผู้ใช้ร่วมและ dependencies แล้ว extract เฉพาะส่วนที่มี interface ชัด หาก split apps ต้องใช้ร่วมทันทีให้ตัดสินส่วนขั้นต่ำจากหลักฐานใน R0 ไม่ copy editor ทั้งก้อนเป็นสองชุดหรือ import source ข้ามแอป ส่วนร่วมรับข้อมูล draft/capabilities/คำสั่ง ไม่ผูก `useLms()`, layout หรือ route เฉพาะแอป
-- `packages/ui` เป็น shared UI/design tokens; `packages/api-client` เป็น HTTP/error infrastructure; `packages/contracts` เป็น types ตาม API contract ไม่คัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract
-- Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ย้ายส่วนร่วมเมื่อมีผู้ใช้จริง
+- `packages/ui` เป็น shared UI/design tokens (R2b export `PageTitle` และ `StatusTag` ที่ Web/Admin ใช้จริง); `packages/api-client` เป็น HTTP/error infrastructure; `packages/contracts` เป็น types ตาม API contract ไม่คัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract ตัว export ของ API client/contracts ยังว่างจนผ่าน R4a/R4b
+- Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ระหว่าง migration อนุญาตเฉพาะ alias `@legacy/*` ไปยัง prototype root ที่ระบุในแผน; ลบ alias เมื่อ slice ถูกย้ายแล้ว
 - `App.tsx` ประกอบ providers/router เท่านั้น; route แยก Public/Auth/Learner/Instructor ของ Web และพื้นที่ Admin ของอีกแอป ใช้ nested layouts พร้อม boundary สำหรับ loading/error/no-access/not-found ตาม flow
 - Page ดูแล route params/query และประกอบหน้าจอ; feature component ดูแล behavior ของ feature; shared UI ดูแล presentation/interaction ทั่วไป ไม่เรียก API เฉพาะธุรกิจเอง
 - Course, Enrollment, Progress, Payment, AI Conversation และ Certificate เป็น server state ผ่าน TanStack Query; form/editor draft, modal/sidebar และสถานะ UI อยู่ local/client state ตามเจ้าของ ไม่สร้าง global store ข้อมูล backend ซ้ำ
@@ -36,19 +36,20 @@
 - ลำดับแผนใหม่คือ R0 inventory → R1 scope cleanup → R2 split apps/basic CI → R3 shared UI/router → R4a contract → R4b API/Query → migrate features; cleanup ถอดตามความสามารถ/dependency ไม่ลบตามชื่อโฟลเดอร์ analytics จน grading/learner list หาย
 - แผนมี Containerization และ CI/CD เป็นงานอนาคตพร้อมเกณฑ์ตรวจแยกจาก integration ใช้ build context ที่ monorepo root; shared packages/root lockfile/config เปลี่ยนต้องตรวจ apps ที่ได้รับผล Cloud Run เป็น hosting candidate ยังไม่เลือกปลายทางหรืออนุญาต deploy ดู R11–R13 ในแผน
 
-ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source ปัจจุบัน กติกา prototype ที่ระบุ `store.tsx` หรือ Admin ใช้ `/teach/...` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่เป้าหมาย architecture ใหม่
+ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source prototype ปัจจุบัน; `apps/web`/`apps/admin` มี route owners แยกแล้ว แต่ pages, store, types และ CSS ส่วนใหญ่ยังรอ feature migration กติกา prototype ที่ระบุ `store.tsx` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่ API contract
 
 ## 2. แผนที่ code ที่ต้องหาให้ถูก
 
 | งาน | จุดเริ่มต้น |
 | --- | --- |
-| Entry/providers/font/CSS order | `src/main.tsx` |
-| Routes และ role gate ของ prototype | `src/App.tsx` |
+| Web entry/providers/routes | `apps/web/src/main.tsx`, `apps/web/src/App.tsx` |
+| Admin entry/providers/routes | `apps/admin/src/main.tsx`, `apps/admin/src/App.tsx` |
+| Transitional single-app prototype entry/routes | `src/main.tsx`, `src/App.tsx` (ใช้เทียบ migration เท่านั้น) |
 | Shared shell/navigation/profile | `src/components/Shell.tsx` |
 | Shared profile image/default avatar | `src/components/UserAvatar.tsx`, `user-avatar.css` |
 | Workspace notification menu | `src/components/WorkspaceNotifications.tsx`, `workspace-notifications.css` |
 | Review queue / grading workspace | `src/pages/instructor/LearnerReviewQueuePage.tsx`, `QuizPages.tsx`, `review-queue.css`, `grading-workspace.css` |
-| Shared title/status/control patterns | `src/components/common.tsx` |
+| Shared title/status exports | `packages/ui/src/`; legacy common re-exports from package |
 | Tokens / light-dark foundation | `src/theme.ts` |
 | CSS กลาง / style ที่ปรับธีม | `src/styles.css`, `src/system-theme.css` |
 | Landing/public brand chrome | `src/pages/landing/LandingPage.tsx`, `LandingChrome.tsx`, `landing.css` |

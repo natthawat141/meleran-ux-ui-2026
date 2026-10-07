@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { JSONContent } from '@tiptap/react';
 import { useLms } from '../../store';
 import { blogCoverFor } from '../../data';
-import { PageTitle } from '../../components/common';
+import { PageTitle } from '@melearn/ui';
 import { ImageUploadField } from '../../components/ImageUploadField';
 import { RichDocument, RichTextEditor, textDocument } from '../../components/chapter/RichTextEditor';
 import type { BlogPost } from '../../types';

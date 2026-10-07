@@ -1,27 +1,13 @@
 {
-  "name": "elearning-ux-v2",
-  "private": true,
+  "name": "@melearn/admin",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "npm run dev:web",
-    "dev:web": "npm run dev --workspace @melearn/web",
-    "dev:admin": "npm run dev --workspace @melearn/admin",
-    "build": "npm run build:web && npm run build:admin",
-    "build:web": "npm run build --workspace @melearn/web",
-    "build:admin": "npm run build --workspace @melearn/admin",
-    "preview:web": "npm run preview --workspace @melearn/web",
-    "preview:admin": "npm run preview --workspace @melearn/admin",
-    "typecheck": "npm run typecheck:web && npm run typecheck:admin && npm run typecheck:legacy",
-    "typecheck:web": "npm run typecheck --workspace @melearn/web",
-    "typecheck:admin": "npm run typecheck --workspace @melearn/admin",
-    "typecheck:legacy": "tsc --noEmit",
-    "test": "node --test",
-    "check:boundaries": "node scripts/check-app-boundaries.mjs"
+    "dev": "vite --host 127.0.0.1 --port 5174 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
@@ -29,6 +15,9 @@
     "@fontsource-variable/anuphan": "^5.3.0",
     "@mantine/core": "^9.6.2",
     "@mantine/hooks": "^9.6.2",
+    "@melearn/api-client": "0.1.0",
+    "@melearn/contracts": "0.1.0",
+    "@melearn/ui": "0.1.0",
     "@tabler/icons-react": "^3.48.0",
     "@tiptap/extension-image": "^3.31.3",
     "@tiptap/react": "^3.31.3",

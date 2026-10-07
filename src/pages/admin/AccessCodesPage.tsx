@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Button, Empty, Form, Select, Space, Table, Tag, Typography, message, type TableColumnsType } from 'antd';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { useLms } from '../../store';
-import { PageTitle } from '../../components/common';
+import { PageTitle } from '@melearn/ui';
 import type { RedeemCode } from '../../types';
 import './access-codes.css';
 

@@ -3,29 +3,10 @@ import { Alert as AntAlert, Modal as AntModal, message } from 'antd';
 import { Avatar, Badge, Button, Progress, Stack, Text, Title } from '@mantine/core';
 import { IconBook2, IconFileText, IconInbox, IconPlayerPlay, IconRocket, IconRosetteDiscountCheck } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
+export { PageTitle, type PageTitleProps, StatusTag, type StatusTagProps } from '@melearn/ui';
 import { formatPrice, instructorFor } from '../data';
 import { RichDocument } from './chapter/RichTextEditor';
 import type { Course, LmsData, Role } from '../types';
-
-export interface PageTitleProps {
-  title: React.ReactNode;
-  subtitle?: React.ReactNode;
-  actions?: React.ReactNode;
-  eyebrow?: React.ReactNode;
-}
-
-export function PageTitle({ title, subtitle, actions, eyebrow }: PageTitleProps) {
-  return (
-    <header className="page-title">
-      <div>
-        {eyebrow && <Text className="page-eyebrow">{eyebrow}</Text>}
-        <Title order={1}>{title}</Title>
-        {subtitle && <Text className="page-subtitle">{subtitle}</Text>}
-      </div>
-      {actions && <div className="page-title-actions">{actions}</div>}
-    </header>
-  );
-}
 
 export interface SectionHeadingProps {
   title: React.ReactNode;
@@ -109,30 +90,6 @@ export function ContentTypeIcon({ type, className = '' }: ContentTypeIconProps) 
     quiz: <IconRosetteDiscountCheck size={16} />,
   };
   return <span className={`content-type-icon ${type} ${className}`}>{icons[type] ?? <IconBook2 size={16} />}</span>;
-}
-
-export interface StatusTagProps {
-  status: string;
-}
-
-export function StatusTag({ status }: StatusTagProps) {
-  const values: Record<string, [string, string]> = {
-    published: ['cobalt', 'เผยแพร่แล้ว'],
-    draft: ['gray', 'ฉบับร่าง'],
-    pending_review: ['orange', 'รอตรวจคอร์ส'],
-    pending: ['gray', 'รอตรวจ'],
-    paid: ['cobalt', 'ชำระแล้ว'],
-    failed: ['red', 'ไม่สำเร็จ'],
-    approved: ['cobalt', 'อนุมัติแล้ว'],
-    rejected: ['red', 'ส่งกลับ'],
-    graded: ['cobalt', 'ตรวจแล้ว'],
-  };
-  const [color, label] = values[status] ?? ['gray', status ?? '—'];
-  return (
-    <Badge color={color} variant="light" className="status-tag">
-      {label}
-    </Badge>
-  );
 }
 
 export interface EmptyStateProps {
