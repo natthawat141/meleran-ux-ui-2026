@@ -31,9 +31,6 @@ function MainNavigation({ onNavigate }: { onNavigate?: () => void }) {
       <Link to="/about" onClick={onNavigate}>
         รู้จักเรา
       </Link>
-      <Link to="/become-instructor" onClick={onNavigate}>
-        สำหรับผู้สอน
-      </Link>
     </>
   );
 }
@@ -130,17 +127,6 @@ export function LandingFooter() {
             <Link to="/register">สมัครสมาชิก</Link>
             <a href="/#faq">คำถามที่พบบ่อย</a>
           </nav>
-          <div className="home-footer-teach">
-            <h2>แบ่งปันสิ่งที่คุณรู้</h2>
-            <p>
-              เปลี่ยนประสบการณ์ของคุณ
-              <br />
-              เป็นคอร์สที่คนอื่นได้เรียนรู้
-            </p>
-            <Link to="/become-instructor">
-              รู้จักพื้นที่ผู้สอน <ArrowRightOutlined aria-hidden="true" />
-            </Link>
-          </div>
         </div>
         <div className="home-footer-bottom">
           <span>© {new Date().getFullYear()} melearn</span>

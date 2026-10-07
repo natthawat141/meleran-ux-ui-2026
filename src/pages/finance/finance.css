@@ -1,5 +1,7 @@
 .finance-page {
   display: flex;
+  min-width: 0;
+  width: 100%;
   flex-direction: column;
   gap: 22px;
 }
@@ -39,6 +41,7 @@
 }
 
 .finance-section {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -78,6 +81,8 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 140px;
+  overflow-wrap: anywhere;
 }
 
 .finance-link-control {

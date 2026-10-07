@@ -5,7 +5,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { ContentTypeIcon, PageTitle, StoryParagraphs } from '../../components/common';
 import { flattenItems, instructorFor } from '../../data';
-import { AskInstructorButton } from '../../components/AskInstructorButton';
 import type { ArticleItem, Course, CourseItem, LmsData, VideoItem } from '../../types';
 import { getCoursePreviewLesson } from '../../lib/course-preview';
 
@@ -48,7 +47,6 @@ function LessonSidebar({ course, currentItem, data }: LessonSidebarProps) {
     <aside className="lesson-contents">
       <Text className="page-eyebrow">เนื้อหาคอร์ส</Text>
       <Title level={5}>{course.title}</Title>
-      <AskInstructorButton course={course} item={currentItem} block />
       <Collapse ghost items={chapters} />
     </aside>
   );
@@ -110,7 +108,6 @@ export function LearnerCoursePage() {
           <Text type="secondary">
             ผู้สอน {teacher?.name} · {items.length} รายการเรียนรู้
           </Text>
-          <AskInstructorButton course={course} />
         </div>
       </div>
       <div className="learning-chapter-list">
@@ -122,7 +119,6 @@ export function LearnerCoursePage() {
                 <Title level={4}>{chapter.title}</Title>
                 <Text type="secondary">{chapter.description}</Text>
               </div>
-              <AskInstructorButton course={course} chapter={chapter} />
             </div>
             {chapter.items.map((item) => (
               <Link
