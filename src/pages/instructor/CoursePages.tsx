@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Popconfirm,
   Radio,
   Row,
   Select,
@@ -97,9 +96,11 @@ export function InstructorDashboardPage() {
                     {attempt.submittedAt ? new Date(attempt.submittedAt).toLocaleDateString('th-TH') : '—'}
                   </Text>
                 </div>
-                <Link to={`/teach/attempts/${attempt.id}/grade`}>
-                  <Button>ตรวจคำตอบ</Button>
-                </Link>
+                {currentUser?.role === 'instructor' && (
+                  <Link to={`/teach/attempts/${attempt.id}/grade`}>
+                    <Button>ตรวจคำตอบ</Button>
+                  </Link>
+                )}
               </div>
             );
           })}
@@ -128,7 +129,7 @@ export function InstructorDashboardPage() {
 }
 
 export function InstructorCoursesPage() {
-  const { data, currentUser, removeCourse } = useLms();
+  const { data, currentUser } = useLms();
   const navigate = useNavigate();
   const courses = data.courses.filter(
     (course) => currentUser?.role === 'admin' || course.instructorId === currentUser?.id
@@ -167,18 +168,6 @@ export function InstructorCoursesPage() {
           <Button type="primary" onClick={() => navigate(`/teach/courses/${course.id}/curriculum`)}>
             จัดเนื้อหา
           </Button>
-          <Popconfirm
-            title="ลบคอร์สนี้หรือไม่"
-            description="เนื้อหา แบบทดสอบ ผู้เรียน และใบรับรองจะถูกนำออก ส่วนประวัติการซื้อยังคงอยู่"
-            okText="ลบคอร์ส"
-            cancelText="ยกเลิก"
-            onConfirm={() => {
-              removeCourse(course.id);
-              message.success('ลบคอร์สแล้ว');
-            }}
-          >
-            <Button danger>ลบ</Button>
-          </Popconfirm>
         </Space>
       ),
     },
@@ -224,7 +213,7 @@ interface CourseFormValues {
 
 export function CourseEditorPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, saveCourse, submitCourseForReview, publishCourse, setCourseAiEnabled, currentUser, removeCourse } = useLms();
+  const { data, saveCourse, submitCourseForReview, publishCourse, setCourseAiEnabled, currentUser } = useLms();
   const navigate = useNavigate();
   const course = data.courses.find((item) => item.id === courseId);
   const isNew = !courseId || courseId === 'new';
@@ -458,21 +447,6 @@ export function CourseEditorPage() {
                     ดูตัวอย่างคอร์ส
                   </Button>
                 </Link>
-              )}
-              {!isNew && (
-                <Popconfirm
-                  title="ลบคอร์สนี้หรือไม่"
-                  okText="ลบคอร์ส"
-                  cancelText="ยกเลิก"
-                  onConfirm={() => {
-                    if (course) removeCourse(course.id);
-                    navigate('/teach/courses');
-                  }}
-                >
-                  <Button block danger className="top-space">
-                    ลบคอร์ส
-                  </Button>
-                </Popconfirm>
               )}
             </aside>
           </div>

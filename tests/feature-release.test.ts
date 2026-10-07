@@ -41,7 +41,10 @@ test('feature metadata uses recognized statuses, positive phases, and known rout
     assert.ok(Number.isInteger(feature.phase) && feature.phase > 0, String(feature.phase));
   }
   for (const featureKey of Object.values(ROUTE_FEATURES)) assert.ok(Object.hasOwn(FEATURES, featureKey), featureKey);
-  assert.equal(ROUTE_FEATURES['/invite/:token'], 'instructorOnboarding');
+  assert.equal(ROUTE_FEATURES['/admin/instructors'], 'operations');
+  for (const legacyKey of ['commerce', 'analytics', 'finance', 'inbox', 'instructorOnboarding']) {
+    assert.equal(Object.hasOwn(FEATURES, legacyKey), false, `${legacyKey} is not an active V1 feature`);
+  }
 });
 
 test('retained Stripe, Redeem, and instructor roster routes use their owning prototype features', () => {
@@ -162,4 +165,22 @@ test('feature summary and full route inventory match the code registry', () => {
       .map(({ path, featureKey }) => `${path}=${featureKey}`).sort(),
     Object.entries(ROUTE_FEATURES).map(([path, featureKey]) => `${path}=${featureKey}`).sort(),
   );
+});
+
+test('retired V1 capabilities have no route or runtime entrypoint', () => {
+  const paths = new Set(getAppRoutes().map(({ path }) => path));
+  const retired = [
+    '/courses/:slug/preview', '/become-instructor', '/invite/:token',
+    '/learn/assignments', '/learn/inbox', '/account/cart', '/account/orders', '/account/orders/:orderId',
+    '/teach/finance', '/teach/analytics', '/teach/courses/:courseId/analytics',
+    '/teach/courses/:courseId/analytics/learners/:learnerId', '/teach/assignments', '/teach/inbox',
+    '/admin/business-analytics', '/admin/finance', '/admin/reports/finance', '/admin/analytics',
+    '/admin/analytics/courses/:courseId', '/admin/analytics/courses/:courseId/learners/:learnerId',
+    '/admin/assignments', '/admin/inbox', '/admin/instructors/:id', '/admin/orders', '/admin/orders/:orderId',
+    '/admin/certificates', '/admin/certificates/:certificateId', '/certificates/verify/:code',
+  ];
+  for (const path of retired) {
+    assert.equal(paths.has(path), false, `${path} has no page`);
+    assert.equal(Object.hasOwn(ROUTE_FEATURES, path), false, `${path} has no runtime gate`);
+  }
 });

@@ -28,20 +28,25 @@ export interface ReviewQueueItem extends QuizAttempt {
 
 /** Returns pending written or image answers, ordered oldest first. */
 export function getReviewQueue(data: LmsData, options: ReviewQueueOptions = {}): ReviewQueueItem[] {
-  const { instructorId, role, courseId, quizId, responseMode } = options;
+  const { courseId, quizId, responseMode } = options;
+  const instructorId = options.instructorId?.trim();
+  if (options.role !== 'instructor' || !instructorId) return [];
+
   const courses = data.courses || [];
   const quizzes = data.quizzes || [];
   const attempts = data.attempts || [];
   const users = data.users || [];
 
-  const allowedCourseIds = courses
-    .filter((course) => role === 'admin' || !instructorId || course.instructorId === instructorId)
-    .map((course) => course.id);
+  const ownedCourses = courses.filter((course) => course.instructorId === instructorId);
+  const ownedCoursesById = new Map(ownedCourses.map((course) => [course.id, course]));
+  const quizzesById = new Map(quizzes.map((quiz) => [quiz.id, quiz]));
 
   const filtered = attempts.filter((attempt) => {
     if (attempt.status !== 'submitted') return false;
     if (attempt.essayStatus !== 'pending') return false;
-    if (!allowedCourseIds.includes(attempt.courseId)) return false;
+    const course = ownedCoursesById.get(attempt.courseId);
+    const quiz = quizzesById.get(attempt.quizId);
+    if (!course || !quiz || quiz.courseId !== course.id) return false;
     if (courseId && attempt.courseId !== courseId) return false;
     if (quizId && attempt.quizId !== quizId) return false;
     return true;
@@ -85,9 +90,8 @@ export function getReviewQueue(data: LmsData, options: ReviewQueueOptions = {}):
     };
   });
 
-  if (responseMode && responseMode !== 'all') {
-    return enriched.filter((item) => item.mode === responseMode);
-  }
+  const filteredByMode =
+    responseMode && responseMode !== 'all' ? enriched.filter((item) => item.mode === responseMode) : enriched;
 
-  return enriched.sort((a, b) => new Date(a.submittedAt || 0).getTime() - new Date(b.submittedAt || 0).getTime());
+  return filteredByMode.sort((a, b) => new Date(a.submittedAt || 0).getTime() - new Date(b.submittedAt || 0).getTime());
 }

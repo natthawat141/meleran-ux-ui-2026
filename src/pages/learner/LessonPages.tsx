@@ -6,7 +6,6 @@ import { useLms } from '../../store';
 import { ContentTypeIcon, PageTitle, StoryParagraphs } from '../../components/common';
 import { flattenItems, instructorFor } from '../../data';
 import type { ArticleItem, Course, CourseItem, LmsData, VideoItem } from '../../types';
-import { getCoursePreviewLesson } from '../../lib/course-preview';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -68,7 +67,7 @@ export function LearnerCoursePage() {
         type="warning"
         showIcon
         message="ต้องลงเรียนก่อนจึงจะเปิดเนื้อหาได้"
-        action={<Space><Link to={`/courses/${course.slug}/preview`}>ทดลองดูบทแรก</Link><Link to={`/courses/${course.slug}`}>รายละเอียดและสมัคร</Link></Space>}
+        action={<Space><Link to={`/courses/${course.slug}`}>รายละเอียดและสมัคร</Link></Space>}
       />
     );
   }
@@ -162,8 +161,7 @@ export function VideoLessonPage() {
     return <Empty description="ไม่พบวิดีโอนี้" />;
   }
   const enrolled = data.enrollments.some((entry) => entry.courseId === course.id && entry.userId === currentUser?.id);
-  const previewItem = getCoursePreviewLesson(course)?.item;
-  if (!enrolled && currentUser?.role !== 'admin' && previewItem?.id !== item.id) {
+  if (!enrolled) {
     return <Alert type="warning" showIcon message="บทนี้เปิดหลังสมัครคอร์ส" description={<Link to={`/explore/courses/${course.slug}`}>ดูรายละเอียดและสมัครเรียน</Link>} />;
   }
 
@@ -244,8 +242,7 @@ export function ArticleLessonPage() {
     return <Empty description="ไม่พบบทความนี้" />;
   }
   const enrolled = data.enrollments.some((entry) => entry.courseId === course.id && entry.userId === currentUser?.id);
-  const previewItem = getCoursePreviewLesson(course)?.item;
-  if (!enrolled && currentUser?.role !== 'admin' && previewItem?.id !== item.id) {
+  if (!enrolled) {
     return <Alert type="warning" showIcon message="บทนี้เปิดหลังสมัครคอร์ส" description={<Link to={`/explore/courses/${course.slug}`}>ดูรายละเอียดและสมัครเรียน</Link>} />;
   }
 

@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Form, Input, Space, Typography } from 'antd';
+import { Alert, Button, Form, Input, Typography } from 'antd';
 import { ArrowLeftOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthFrame } from '../components/Shell';
-import { PageTitle } from '../components/common';
 import { useLms } from '../store';
 import { DEMO_ACCOUNTS } from '../data';
 import { verificationResendRemainingMs } from '../lib/email-verification';
@@ -289,143 +288,21 @@ export function RegisterPage() {
   );
 }
 
-interface InstructorApplyFormValues {
-  intro: string;
-}
-
-export function BecomeInstructorPage() {
-  const { currentUser, requestInstructor } = useLms();
-  const [submitted, setSubmitted] = useState(false);
-
-  if (!currentUser) {
-    return (
-      <AuthPanel
-        title="เริ่มต้นเส้นทางผู้สอน"
-        intro="ส่งข้อมูลแนะนำตัวเพื่อให้แอดมินพิจารณา"
-      >
-        <Alert type="info" showIcon message="เข้าสู่ระบบหรือสมัครผู้เรียนก่อนส่งคำขอ" />
-        <Space className="form-space">
-          <Link to="/login">
-            <Button type="primary">เข้าสู่ระบบ</Button>
-          </Link>
-          <Link to="/register">
-            <Button>สมัครบัญชี</Button>
-          </Link>
-        </Space>
-      </AuthPanel>
-    );
-  }
-
-  return (
-    <div className="public-page instructor-apply">
-      <PageTitle
-        title="แบ่งปันความรู้ของคุณ"
-        subtitle="ส่งคำขอเป็นผู้สอน แอดมินจะตรวจข้อมูลก่อนเปิดพื้นที่สร้างคอร์ส"
-      />
-      {submitted ? (
-        <Alert
-          type="success"
-          showIcon
-          message="ส่งคำขอแล้ว"
-          description="คุณจะเห็นสถานะคำขอในพื้นที่บัญชีของคุณหลังจากแอดมินพิจารณา"
-        />
-      ) : (
-        <Form<InstructorApplyFormValues>
-          layout="vertical"
-          className="instructor-apply-form"
-          onFinish={(values) => {
-            requestInstructor(values);
-            setSubmitted(true);
-          }}
-        >
-          <Form.Item
-            label="แนะนำตัวและหัวข้อที่อยากสอน"
-            name="intro"
-            rules={[{ required: true, min: 20, message: 'เขียนอย่างน้อย 20 ตัวอักษร' }]}
-          >
-            <Input.TextArea
-              rows={6}
-              placeholder="เล่าประสบการณ์และกลุ่มผู้เรียนที่คุณอยากช่วย"
-            />
-          </Form.Item>
-          <Button type="primary" htmlType="submit">ส่งคำขอให้แอดมิน</Button>
-        </Form>
-      )}
-    </div>
-  );
-}
-
 interface DemoAccountPageProps {
-  type: 'forgot' | 'reset' | 'invite' | 'verify';
+  type: 'forgot' | 'reset';
 }
 
 export function DemoAccountPage({ type }: DemoAccountPageProps) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const [resetEmail, setResetEmail] = useState('');
-  const { token } = useParams<{ token: string }>();
-  const navigate = useNavigate();
   const location = useLocation();
-  const { data, acceptInstructorInvite, resetPassword } = useLms();
+  const { resetPassword } = useLms();
   const emailFromUrl = new URLSearchParams(location.search).get('email') ?? '';
-  const invitation = data.invitations.find(
-    (item) => item.token === token && item.status === 'pending'
-  );
-
-  const title =
-    type === 'forgot'
-      ? 'ตั้งรหัสผ่านใหม่'
-      : type === 'reset'
-      ? 'กำหนดรหัสผ่านใหม่'
-      : type === 'invite'
-      ? 'รับคำเชิญเป็นผู้สอน'
-      : 'ยืนยันอีเมล';
-
-  const intro =
-    type === 'forgot'
-      ? 'กรอกอีเมล แล้วเราจะแสดงผลการส่งลิงก์จำลอง'
-      : type === 'invite'
-      ? `คำเชิญตัวอย่าง ${token ?? ''} สำหรับบัญชีผู้สอน`
-      : 'ขั้นตอนนี้แสดงสถานะตัวอย่างในต้นแบบ';
-
-  if (type === 'invite') {
-    return (
-      <AuthPanel
-        title={title}
-        intro={
-          invitation
-            ? `คำเชิญสำหรับ ${invitation.email}`
-            : 'ลิงก์คำเชิญนี้ใช้ไม่ได้หรือถูกตอบรับแล้ว'
-        }
-      >
-        {invitation ? (
-          <Form<{ password: string }>
-            layout="vertical"
-            onFinish={(values) => {
-              if (!token) return;
-              const result = acceptInstructorInvite(token, values.password);
-              if (result.ok) navigate('/teach');
-            }}
-          >
-            <Form.Item
-              label="รหัสผ่านใหม่"
-              name="password"
-              rules={[{ required: true, min: 8, message: 'ใช้รหัสผ่านอย่างน้อย 8 ตัวอักษร' }]}
-            >
-              <Input.Password size="large" autoComplete="new-password" />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              รับคำเชิญและเปิดบัญชีผู้สอน
-            </Button>
-          </Form>
-        ) : (
-          <Link to="/">
-            <Button type="primary">กลับหน้าแรก</Button>
-          </Link>
-        )}
-      </AuthPanel>
-    );
-  }
+  const title = type === 'forgot' ? 'ตั้งรหัสผ่านใหม่' : 'กำหนดรหัสผ่านใหม่';
+  const intro = type === 'forgot'
+    ? 'กรอกอีเมล แล้วเราจะแสดงผลการส่งลิงก์จำลอง'
+    : 'ขั้นตอนนี้แสดงสถานะตัวอย่างในต้นแบบ';
 
   return (
     <AuthPanel title={title} intro={intro}>
@@ -437,7 +314,7 @@ export function DemoAccountPage({ type }: DemoAccountPageProps) {
           message={type === 'forgot' ? 'สร้างลิงก์เปลี่ยนรหัสผ่านจำลองแล้ว' : 'เปลี่ยนรหัสผ่านแล้ว'}
           description={
             type === 'forgot' ? (
-              <Link to={`/reset-password?email=${encodeURIComponent(resetEmail)}`}>
+              <Link to={'/reset-password?email=' + encodeURIComponent(resetEmail)}>
                 ไปหน้ากำหนดรหัสผ่าน
               </Link>
             ) : (

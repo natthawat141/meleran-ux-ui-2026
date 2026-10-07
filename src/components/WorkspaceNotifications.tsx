@@ -2,14 +2,19 @@ import React from 'react';
 import { ActionIcon, Indicator, Menu, ScrollArea, Text } from '@mantine/core';
 import { IconBell, IconCircleFilled } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { getNotificationTarget } from '../lib/notification-targets';
 import { useLms } from '../store';
 import './workspace-notifications.css';
 
 export function WorkspaceNotifications() {
   const { data, currentUser, markNotificationRead } = useLms();
   const navigate = useNavigate();
-  const entries = (data.notifications || []).filter((entry) => entry.userId === currentUser?.id);
-  const unreadCount = entries.filter((entry) => !entry.readAt).length;
+  const entries = (data.notifications || []).flatMap((entry) => {
+    if (entry.userId !== currentUser?.id) return [];
+    const target = getNotificationTarget(entry, currentUser, data.courses, data.attempts);
+    return target ? [{ entry, target }] : [];
+  });
+  const unreadCount = entries.filter(({ entry }) => !entry.readAt).length;
   return (
     <Menu position="bottom-end" withinPortal shadow="md" width={340}>
       <Menu.Target>
@@ -28,13 +33,13 @@ export function WorkspaceNotifications() {
         <Menu.Label>แจ้งเตือน{unreadCount ? ` · ยังไม่อ่าน ${unreadCount}` : ''}</Menu.Label>
         {entries.length ? (
           <ScrollArea.Autosize mah={380}>
-            {entries.map((entry) => (
+            {entries.map(({ entry, target }) => (
               <Menu.Item
                 key={entry.id}
                 className="workspace-notification-item"
                 onClick={() => {
                   markNotificationRead(entry.id);
-                  if (entry.href) navigate(entry.href);
+                  navigate(target);
                 }}
                 leftSection={
                   !entry.readAt ? (

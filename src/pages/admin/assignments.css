@@ -1,8 +1,0 @@
-.assignment-owner { display: flex; align-items: center; gap: 12px; }
-.assignment-workspace .page-title,
-.assignment-workspace .directory-search { margin: 0; }
-@media (max-width: 760px) {
-  .admin-assignment-directory .page-title > div:first-child,
-  .assignment-workspace .page-title > div:first-child,
-  .assignment-workspace .page-title-actions { flex: 0 1 auto; }
-}

@@ -8,17 +8,12 @@ export const FEATURES = {
   courseCatalog: { status: 'prototype', phase: 1 },
   learning: { status: 'prototype', phase: 1 },
   profile: { status: 'prototype', phase: 1 },
-  instructorOnboarding: { status: 'prototype', phase: 2 },
   instructorCourses: { status: 'prototype', phase: 2 },
   assessment: { status: 'prototype', phase: 3 },
   certificates: { status: 'prototype', phase: 3 },
   payments: { status: 'prototype', phase: 4 },
   redeem: { status: 'prototype', phase: 4 },
-  commerce: { status: 'prototype', phase: 4 },
   operations: { status: 'prototype', phase: 5 },
-  analytics: { status: 'prototype', phase: 6 },
-  finance: { status: 'prototype', phase: 6 },
-  inbox: { status: 'prototype', phase: 6 },
   blog: { status: 'prototype', phase: 6 },
   aiTeacher: { status: 'prototype', phase: 6 },
 } as const satisfies Record<string, { status: FeatureStatus; phase: number }>;
@@ -32,14 +27,12 @@ export const ROUTE_FEATURES = {
 
   '/login': 'auth',
   '/register': 'auth',
-  '/invite/:token': 'instructorOnboarding',
   '/verify-email': 'auth',
   '/forgot-password': 'auth',
   '/reset-password': 'auth',
 
   '/courses': 'courseCatalog',
   '/courses/:slug': 'courseCatalog',
-  '/courses/:slug/preview': 'courseCatalog',
   '/explore/courses': 'courseCatalog',
   '/explore/courses/:slug': 'courseCatalog',
 
@@ -51,9 +44,7 @@ export const ROUTE_FEATURES = {
 
   '/account/profile': 'profile',
 
-  '/become-instructor': 'instructorOnboarding',
-  '/admin/instructors': 'instructorOnboarding',
-  '/admin/instructors/:id': 'instructorOnboarding',
+  '/admin/instructors': 'operations',
 
   '/teach': 'instructorCourses',
   '/teach/courses': 'instructorCourses',
@@ -72,54 +63,28 @@ export const ROUTE_FEATURES = {
   '/admin/courses/reviews': 'instructorCourses',
   '/admin/courses/:courseId': 'instructorCourses',
 
-  '/learn/assignments': 'assessment',
   '/learn/courses/:courseId/quizzes/:itemId': 'assessment',
   '/learn/quizzes/:quizId': 'assessment',
   '/learn/attempts/:attemptId': 'assessment',
   '/learn/attempts/:attemptId/result': 'assessment',
-  '/teach/assignments': 'assessment',
   '/teach/quizzes/:quizId/attempts': 'assessment',
   '/teach/attempts/:attemptId/grade': 'assessment',
   '/teach/reviews': 'assessment',
-  '/admin/assignments': 'assessment',
 
   '/account/certificates': 'certificates',
   '/account/certificates/:certificateId': 'certificates',
-  '/admin/certificates': 'certificates',
-  '/admin/certificates/:certificateId': 'certificates',
-  '/certificates/verify/:code': 'certificates',
 
   '/learn/redeem': 'redeem',
   '/checkout/:courseId': 'payments',
   '/checkout/:orderId/result': 'payments',
-  '/account/orders': 'commerce',
-  '/account/cart': 'commerce',
-  '/account/orders/:orderId': 'commerce',
-  '/admin/orders': 'commerce',
-  '/admin/orders/:orderId': 'commerce',
   '/admin/access-codes': 'redeem',
 
   '/admin': 'operations',
   '/admin/users': 'operations',
   '/admin/users/:id': 'operations',
 
-  '/teach/analytics': 'analytics',
-  '/teach/courses/:courseId/analytics': 'analytics',
-  '/teach/courses/:courseId/analytics/learners/:learnerId': 'analytics',
   '/teach/courses/:courseId/learners': 'instructorCourses',
   '/teach/learners': 'instructorCourses',
-  '/admin/business-analytics': 'analytics',
-  '/admin/analytics': 'analytics',
-  '/admin/analytics/courses/:courseId': 'analytics',
-  '/admin/analytics/courses/:courseId/learners/:learnerId': 'analytics',
-
-  '/teach/finance': 'finance',
-  '/admin/finance': 'finance',
-  '/admin/reports/finance': 'finance',
-
-  '/learn/inbox': 'inbox',
-  '/teach/inbox': 'inbox',
-  '/admin/inbox': 'inbox',
 
   '/articles': 'blog',
   '/articles/:id': 'blog',

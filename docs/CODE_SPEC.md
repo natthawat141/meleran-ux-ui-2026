@@ -47,8 +47,6 @@
 | Shared shell/navigation/profile | `src/components/Shell.tsx` |
 | Shared profile image/default avatar | `src/components/UserAvatar.tsx`, `user-avatar.css` |
 | Workspace notification menu | `src/components/WorkspaceNotifications.tsx`, `workspace-notifications.css` |
-| Inbox selectors / contact and participant scope | `src/api/inbox.ts` |
-| Inbox and direct conversations | `src/pages/inbox/InboxPage.tsx`, `inbox.css` |
 | Review queue / grading workspace | `src/pages/instructor/LearnerReviewQueuePage.tsx`, `QuizPages.tsx`, `review-queue.css`, `grading-workspace.css` |
 | Shared title/status/control patterns | `src/components/common.tsx` |
 | Tokens / light-dark foundation | `src/theme.ts` |
@@ -61,7 +59,9 @@
 | Chapter workspace จริง | `src/pages/instructor/ChapterWorkspace.tsx`, `chapter-workspace.css` |
 | Video / article / assessment editors | `src/components/chapter/VideoEditor.tsx`, `RichTextEditor.tsx`, `AssessmentEditor.tsx`, `ChapterPreview.tsx` |
 | Admin courses และ card/table toggle | `src/pages/admin/AdminPages.tsx`, `admin-courses.css` |
-| State/actions/persistence | `src/store.tsx` |
+| State/actions/persistence | `src/store.tsx`, `src/lib/prototype-snapshot.ts` (local compatibility ไม่ใช่ API contract) |
+| Prototype Redeem / code lifecycle | `src/lib/redeem-code.ts`, `src/pages/learner/RedeemCourseCodePage.tsx`, `src/pages/admin/AccessCodesPage.tsx` |
+| Stripe checkout/status | `src/api/payments.ts`, `src/pages/learner/PaymentPages.tsx`, `StripePaymentPages.tsx` |
 | Demo seed/helpers/asset mapping | `src/data.ts` |
 | Uploaded profile/cover UI | `src/components/ImageUploadField.tsx` |
 | Written/image response UI | `src/components/WrittenAnswer.tsx` |
@@ -71,11 +71,11 @@
 
 ## 3. โครงสร้างและรูปแบบการเขียน
 
-- `AdminAssignmentsPage` ใน `src/pages/admin/AssignmentPages.tsx` เป็นรายชื่อผู้สอนก่อนเข้า `AssignmentsPage` ด้วย `?instructor=` ตรวจ ID กับผู้สอนจริง กรองงานผ่าน `course.instructorId` ไม่ใช้ `createdBy` เป็นเจ้าของคอร์ส เก็บคำค้นรายชื่อใน `instructorQ` ระหว่างเปิดงาน และใช้ `q`/`course` ค้นงานในขอบเขตผู้สอนนั้น ฟอร์มตรวจ course/quiz ที่สัมพันธ์กันและรักษา `createdBy` เดิมเมื่อแก้ไข
+- R1 ถอน Assignment/Inbox/Cart/Orders/Finance/comparison dashboards/request/invite จาก active source ตาม Final 1.6 แล้ว ดู [ผล R1](R1_SCOPE_CLEANUP_REPORT_TH.md) และ R0 baseline สำหรับ historical implementation; learning-history guards และ learner roster/owner grading ยังอยู่
 
 - คอร์ส public อยู่ `src/pages/public/` และคอร์สสำหรับผู้ล็อกอินอยู่ `src/pages/member/` ผ่าน routes `/courses[/:slug]` และ `/explore/courses[/:slug]` ตามลำดับ ห้ามนำ page เดียวมาใช้สองบริบท รายการโครงสร้างบทที่เป็น presentation ใช้ `CourseOutline` ร่วมได้
 - `PublicCourseEntry` ส่งสมาชิกที่เปิด URL public ไปยัง URL สมาชิกของคอร์สเดียวกัน รายการ/รายละเอียดทั้งสองแบบแสดงเฉพาะคอร์ส published; ไม่ใช้ catalog เปิด draft แทนหน้าจัดการ/preview
-- ใบรับรองหน้าบัญชีผู้เรียนกรองเจ้าของเสมอ รวมถึงเมื่อผู้ใช้เป็น Admin รายการรวมของ Admin ใช้ route และ guard แยกตามฉบับหลัก
+- ใบรับรองหน้าบัญชีผู้เรียนกรองเจ้าของเสมอ รวมถึงเมื่อผู้ใช้เป็น Admin ไม่มี global Admin certificate browser/download-all ใน V1; Admin ดู completion/results เพื่อจัดการตาม scope ไม่เพิ่ม certificate.read_admin
 - `DirectorySearch` เก็บคำค้นและตัวกรองใน URL ใช้รายการ field ที่ระบุอย่างชัดเจนในการค้น ไม่ค้นจากการ serialize user ทั้งก้อนหรือข้อมูลรหัสผ่าน การเปลี่ยนคำค้น/ตัวกรองเริ่ม pagination ใหม่ และ returnTo ของรายละเอียดจำกัดให้เป็น path รายการภายในที่ตรงกัน
 
 - Page รับ route/context และประกอบหน้าจอ; component ดูแล interaction/การแสดงผลที่เกี่ยวข้อง; prototype ปัจจุบันมี action/state ใน store ส่วน slice ที่ refactor แล้วใช้ feature API/query กับ UI state ตามข้อ 1.1; style แยกตามบริบท
@@ -184,10 +184,10 @@ Preview ปกติ: `http://127.0.0.1:5174/` ตรวจ server ที่ร�
 - ใช้ YouTube Link ก่อน Upload Video API ต้องตอบไม่พร้อมและไม่สร้าง upload record ส่วน Mux Data key ที่มีเป็นข้อมูลต้นแบบ ไม่ใช่การเลือกผู้ให้บริการวิดีโอ
 - AI ของต้นแบบยังตอบ mock และเก็บประวัติใน browser ส่วนระบบจริงต้องเก็บคำถาม/คำตอบใน Database บังคับสิทธิ์คอร์ส และนับโควตาที่ server ตามฉบับหลัก ค่า limit อยู่จุดกลางแก้ได้ ไม่ใช้ quota ที่ client เป็นหลักฐาน
 - คอร์สใช้ draft → pending_review → approved → published; แก้ approved ก่อน publish ต้องตรวจใหม่ published แก้เนื้อหาได้ทันที การแก้เฉพาะ AI/Transcript ไม่เปลี่ยนสถานะอนุมัติ
-- Cart/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่ใน source เป็นของต้นแบบเดิม ไม่เพิ่มงานเหล่านี้ในรอบหนึ่งเดือน
+- R1 ถอน Cart/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่จาก active source แล้ว; local fields เดิมอยู่ใน inert legacy snapshot เพื่อรักษาข้อมูล ไม่เปิด selectors/actions ของฟีเจอร์ที่ถอน
 
 ## ขอบเขต Stripe และ AIPractice ที่เพิ่ม
 
-- Registry แยก `payments` (เดือนแรก) จาก `commerce` (Cart/Orders ที่ยังไม่ทำ) ทุกสถานะยัง prototype การมี route checkout ไม่ใช่หลักฐานเชื่อม Stripe จริง
+- Registry ใช้ `payments` สำหรับ Stripe และ `redeem` สำหรับโค้ดให้สิทธิ์; ไม่มี legacy commerce/analytics/finance/inbox/onboarding keys หลัง R1 ทุกสถานะยัง prototype การมี HTTP client/route checkout ไม่ใช่หลักฐานเชื่อม Stripe/backend จริง
 - ระบบจริงใช้ Stripe Session/PaymentEvent ตรวจราคา บัญชี ลายเซ็น Webhook และผลจ่าย ณ server ก่อนสร้างหรือคืน Enrollment เดิม; การให้สิทธิ์ต้องเกิดจาก Webhook ที่ตรวจแล้วเท่านั้น GET สถานะและหน้าผลจ่ายต้องไม่ให้สิทธิ์ ไม่เพิ่ม Order/Cart Domain จากชื่อพารามิเตอร์เก่าใน prototype
 - AIPractice แยกจาก Quiz/QuizAttempt จัดเก็บชุดคำถามและผลในแชต ตรวจ response schema ก่อนคิด Prompt สำเร็จ การตอบและอ่านผลไม่เรียก model หรือนับ Prompt เพิ่ม

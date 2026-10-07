@@ -1,17 +1,15 @@
 import React from 'react';
 import { Alert, Button, Space, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { PageTitle } from '../../components/common';
 import { CourseOutline } from '../../components/CourseOutline';
 import { UserAvatar } from '../../components/UserAvatar';
 import { formatPrice, instructorFor } from '../../data';
-import { getCoursePreviewLesson } from '../../lib/course-preview';
 
 export function PublicCourseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const location = useLocation();
   const navigate = useNavigate();
   const { data, currentUser, enrollFree } = useLms();
   const course = data.courses.find(
@@ -28,13 +26,10 @@ export function PublicCourseDetailPage() {
   }
 
   const teacher = instructorFor(data, course);
-  const hasPreview = Boolean(getCoursePreviewLesson(course));
-  const referralCode = new URLSearchParams(location.search).get('ref')?.trim();
-  const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
   const enrolled = data.enrollments.some(
     (entry) => entry.courseId === course.id && entry.userId === currentUser?.id
   );
-  const login = `/login?next=${encodeURIComponent(`/courses/${course.slug}${referralQuery}`)}`;
+  const login = `/login?next=${encodeURIComponent(`/courses/${course.slug}`)}`;
   const start = () => {
     if (!currentUser) {
       navigate(login);
@@ -43,11 +38,11 @@ export function PublicCourseDetailPage() {
     } else if (enrolled) {
       navigate(`/learn/courses/${course.id}`);
     } else if (course.price === 0) {
-      const result = enrollFree(course.id, undefined, referralCode);
+      const result = enrollFree(course.id);
       if (result.ok) navigate(`/learn/courses/${course.id}`);
       else message.info(result.message);
     } else {
-      navigate(`/checkout/${course.id}${referralQuery}`);
+      navigate(`/checkout/${course.id}`);
     }
   };
 
@@ -77,11 +72,6 @@ export function PublicCourseDetailPage() {
                   : `เข้าสู่ระบบเพื่อ${course.price === 0 ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'}`}{' '}
               <ArrowRightOutlined aria-hidden="true" />
             </Button>
-            {hasPreview && (
-              <Link to={`/courses/${course.slug}/preview`}>
-                <Button size="large">ทดลองเรียนบทแรก</Button>
-              </Link>
-            )}
             <Typography.Text className="detail-price">
               {formatPrice(course.price)}
             </Typography.Text>
@@ -110,11 +100,6 @@ export function PublicCourseDetailPage() {
           <Button block type="primary" onClick={start}>
             {enrolled ? 'เรียนต่อ' : currentUser ? 'เริ่มเรียน' : 'เข้าสู่ระบบเพื่อเริ่มเรียน'}
           </Button>
-          {hasPreview && (
-            <Link to={`/courses/${course.slug}/preview`}>
-              <Button block className="top-space">ทดลองเรียนบทแรก</Button>
-            </Link>
-          )}
         </aside>
       </div>
     </div>

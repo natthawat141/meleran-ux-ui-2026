@@ -2,48 +2,29 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { message } from 'antd';
 import { createId, DEMO_ACCOUNTS, flattenItems, initialData, seedCourseCoverReplacements } from './data';
 import defaultCourseCover from './assets/generated/course-default-v2.png';
-import { canAccessInboxConversation, getInboxContacts, getInboxLessonContext, inboxPathForRole } from './api/inbox';
-import { MAX_INBOX_ATTACHMENT_BYTES, MAX_INBOX_ATTACHMENTS, MAX_INBOX_TOTAL_ATTACHMENT_BYTES } from './api/inboxAttachments';
-import { mergeInboxDemo } from './mocks/inbox';
 import { certificateRecipient, snapshotLegacyCertificateNames, validateProfile } from './lib/profile-model';
-import { cashCodeShareAmounts, commitCashCodeRedemption, normalizeAccessCode, quoteAccessCode } from './lib/access-code-utils';
-import { assignmentHasHistory, assignmentIncludesLearner, assignmentSaveIssue, canManageCourse, contentRemovalIssue } from './lib/learning-history';
+import { canManageCourse, contentRemovalIssue } from './lib/learning-history';
+import { normalizeRedeemCode, preparePrototypeRedeem } from './lib/redeem-code';
+import { normalizePrototypeSnapshot } from './lib/prototype-snapshot';
 import { EMAIL_VERIFICATION_RESEND_COOLDOWN_MS, EMAIL_VERIFICATION_TTL_MS, verificationResendAvailable, verificationResendRemainingMs, verificationTokenState } from './lib/email-verification';
 import { canEditCourse, canPublishCourse, canReviewCourse, canSubmitCourse, coursePublicationIssue, invalidateCourseReview } from './lib/course-review';
 import { preserveCourseAiMetadata, preserveVideoTranscripts, saveVideoTranscript as saveVideoTranscriptRecord, setCourseAiEnabled as setCourseAiEnabledRecord } from './lib/ai-course-support';
 import type {
   ActionResult,
-  AccessCode,
-  AccessCodeKind,
-  CreateAccessCodeInput,
-  CreateAccessCodeResult,
-  CreateReferralLinkResult,
-  InstructorPayoutResult,
-  InstructorPayout,
-  ReferralLink,
-  CartItem,
-  PriceAlertEmail,
-  Assignment,
   BlogPost,
   Certificate,
   Chapter,
-  ComparisonSet,
   Course,
   CourseItem,
-  Enrollment,
   EmailVerification,
-  InboxConversation,
-  InboxMessage,
   LmsContextType,
   LmsData,
-  Order,
+  Notification,
   Quiz,
   QuizAnswerValue,
   QuizAttempt,
   ReorderResult,
   Role,
-  SendInboxMessageArgs,
-  SendInboxMessageResult,
   SaveTranscriptResult,
   User,
   WorkspaceSaveResult,
@@ -53,27 +34,30 @@ const STORAGE_KEY = 'stay-elearn-ux-v2';
 const LEGACY_DEFAULT_COVER = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85';
 const LmsContext = createContext<LmsContextType | null>(null);
 
-interface AppNotification {
-  id: string;
-  userId?: string;
-  type: string;
-  title: string;
-  description: string;
-  href?: string;
-  conversationId?: string;
-  createdAt?: string;
-  readAt?: string | null;
-}
-
-interface StoredLmsData extends Partial<LmsData> {
-  notifications?: AppNotification[];
-}
+type AppNotification = Notification;
+type StoredLmsData = LmsData;
 
 function addNotification(data: StoredLmsData, notification: AppNotification) {
   if (!notification.userId) return;
   if (!Array.isArray(data.notifications)) data.notifications = [];
   if (data.notifications.some((entry) => entry.id === notification.id)) return;
   data.notifications.unshift({ ...notification, createdAt: new Date().toISOString(), readAt: null });
+}
+
+function canLearnCourse(user: User | null, course: Course | undefined, data: LmsData): boolean {
+  if (!user || !course || (user.role !== 'learner' && user.role !== 'instructor')) return false;
+  if (user.status === 'suspended' || user.status === 'pending' || user.status === 'invited' || user.emailVerified === false) return false;
+  if (course.instructorId === user.id) return false;
+  return data.enrollments.some((entry) => entry.courseId === course.id && entry.userId === user.id);
+}
+
+function canJoinFreeCourse(user: User | null, course: Course | undefined): boolean {
+  return Boolean(
+    user && course &&
+    (user.role === 'learner' || user.role === 'instructor') &&
+    user.status !== 'suspended' && user.status !== 'pending' && user.status !== 'invited' &&
+    user.emailVerified !== false && course.instructorId !== user.id
+  );
 }
 
 function normalizeBlogCover(cover?: string): string | undefined {
@@ -85,8 +69,7 @@ function normalizeBlogCover(cover?: string): string | undefined {
   return trimmed;
 }
 
-function normalizeBlogPosts(posts?: unknown): BlogPost[] {
-  if (!Array.isArray(posts)) return structuredClone(initialData.blogPosts);
+function normalizeBlogPosts(posts: BlogPost[]): BlogPost[] {
   return posts.map((post) => {
     const cover = normalizeBlogCover(post.cover);
     const next: BlogPost = { ...post, coverKey: post.coverKey || 'writing' };
@@ -97,21 +80,21 @@ function normalizeBlogPosts(posts?: unknown): BlogPost[] {
 }
 
 function loadData(): LmsData & { notifications?: AppNotification[] } {
+  let stored: string | null = null;
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      const courses: Course[] = Array.isArray(parsed.courses)
-        ? parsed.courses.map((course: Course) => {
-            if (course.cover === LEGACY_DEFAULT_COVER || course.cover?.includes('course-default-v1')) {
-              return { ...course, cover: defaultCourseCover };
-            }
-            const replacement = seedCourseCoverReplacements[course.id];
-            return replacement && (course.cover === replacement.from || course.cover?.includes(replacement.previousGenerated))
-              ? { ...course, cover: replacement.to }
-              : course;
-          })
-        : structuredClone(initialData.courses);
+      const parsed: unknown = JSON.parse(stored);
+      const normalized = normalizePrototypeSnapshot(parsed, initialData, new Date().toISOString());
+      const courses: Course[] = normalized.courses.map((course) => {
+        if (course.cover === LEGACY_DEFAULT_COVER || course.cover?.includes('course-default-v1')) {
+          return { ...course, cover: defaultCourseCover };
+        }
+        const replacement = seedCourseCoverReplacements[course.id];
+        return replacement && (course.cover === replacement.from || course.cover?.includes(replacement.previousGenerated))
+          ? { ...course, cover: replacement.to }
+          : course;
+      });
       courses.forEach((course) => {
         course.aiEnabled = course.aiEnabled === true;
         course.chapters.forEach((chapter) =>
@@ -120,82 +103,24 @@ function loadData(): LmsData & { notifications?: AppNotification[] } {
           })
         );
       });
-      const assignments: Assignment[] =
-        Array.isArray(parsed.assignments) && parsed.assignments.length
-          ? parsed.assignments.map((assignment: Assignment & { learnerIds?: unknown }) => 'learnerIds' in assignment && Array.isArray(assignment.learnerIds) ? { ...assignment, stage: assignment.stage ?? 'practice', assigneeType: 'specific', assigneeIds: assignment.learnerIds.filter((id: unknown): id is string => typeof id === 'string') } : assignment)
-          : structuredClone(initialData.assignments || []);
-      const comparisonSets: ComparisonSet[] =
-        Array.isArray(parsed.comparisonSets) && parsed.comparisonSets.length
-          ? parsed.comparisonSets
-          : structuredClone(initialData.comparisonSets || []);
-      const attempts: QuizAttempt[] = Array.isArray(parsed.attempts) ? parsed.attempts : [];
-      (initialData.attempts || []).forEach((a) => {
-        if (!attempts.some((item) => item.id === a.id)) attempts.push(a);
-      });
-      const quizzes: Quiz[] = Array.isArray(parsed.quizzes) ? parsed.quizzes : structuredClone(initialData.quizzes || []);
-      (initialData.quizzes || []).forEach((q) => {
-        if (!quizzes.some((item) => item.id === q.id)) quizzes.push(q);
-      });
-      const users: User[] = Array.isArray(parsed.users) ? parsed.users : structuredClone(initialData.users || []);
-      users.forEach((user) => {
-        if (user.role !== 'instructor') return;
-        const sample = initialData.users.find((entry) => entry.id === user.id);
-        user.baseSharePercent = Number.isFinite(Number(user.baseSharePercent)) ? Number(user.baseSharePercent) : Number(sample?.baseSharePercent ?? 70);
-        user.referralSharePercent = Number.isFinite(Number(user.referralSharePercent)) ? Number(user.referralSharePercent) : Number(sample?.referralSharePercent ?? 85);
-      });
-      (initialData.users || []).forEach((u) => {
-        if (!users.some((item) => item.id === u.id)) users.push(u);
-      });
-      const enrollments: Enrollment[] = Array.isArray(parsed.enrollments)
-        ? parsed.enrollments
-        : structuredClone(initialData.enrollments || []);
-      const financeEnrollmentIds = new Set(['enroll-focus-direct', 'enroll-focus-referral', 'enroll-data-direct', 'enroll-data-referral']);
-      (initialData.enrollments || []).filter((entry) => !financeEnrollmentIds.has(entry.id)).forEach((e) => {
-        if (!enrollments.some((item) => item.id === e.id)) enrollments.push(e);
-      });
-      const orders: Order[] = Array.isArray(parsed.orders) ? parsed.orders : structuredClone(initialData.orders);
-      const cartItems: CartItem[] = Array.isArray(parsed.cartItems) ? parsed.cartItems : [];
-      const mockPriceEmails: PriceAlertEmail[] = Array.isArray(parsed.mockPriceEmails) ? parsed.mockPriceEmails : [];
-      const accessCodes: AccessCode[] = Array.isArray(parsed.accessCodes) ? parsed.accessCodes : [];
-      const referralLinks: ReferralLink[] = Array.isArray(parsed.referralLinks) ? parsed.referralLinks : structuredClone(initialData.referralLinks);
-      const instructorPayouts: InstructorPayout[] = Array.isArray(parsed.instructorPayouts) ? parsed.instructorPayouts : [];
-      if (!parsed.financeDemoSeedVersion && !orders.some((order) => order.status === 'paid')) {
-        initialData.orders.forEach((order) => { if (!orders.some((item) => item.id === order.id)) orders.push(structuredClone(order)); });
-        initialData.enrollments.forEach((entry) => {
-          if (!enrollments.some((item) => item.courseId === entry.courseId && item.userId === entry.userId)) enrollments.push(structuredClone(entry));
-        });
-        initialData.referralLinks.forEach((link) => { if (!referralLinks.some((item) => item.code === link.code)) referralLinks.push(structuredClone(link)); });
-      }
-      return mergeInboxDemo({
-        ...initialData,
-        ...parsed,
+      const users = normalized.users;
+      const next: LmsData & { notifications?: AppNotification[] } = {
+        ...normalized,
         courses,
-        blogPosts: normalizeBlogPosts(parsed.blogPosts),
-        assignments,
-        comparisonSets,
-        attempts,
-        quizzes,
-        users,
-        certificates: snapshotLegacyCertificateNames(Array.isArray(parsed.certificates) ? parsed.certificates : initialData.certificates, users),
-        enrollments,
-        orders,
-        cartItems,
-        mockPriceEmails,
-        accessCodes,
-        referralLinks,
-        instructorPayouts,
-        financeDemoSeedVersion: initialData.financeDemoSeedVersion,
-        inboxDemoVersion: parsed.inboxDemoVersion || 0,
-        inboxConversations: Array.isArray(parsed.inboxConversations) ? parsed.inboxConversations : [],
-        inboxMessages: Array.isArray(parsed.inboxMessages) ? parsed.inboxMessages : [],
-      }) as LmsData & { notifications?: AppNotification[] };
+        blogPosts: normalizeBlogPosts(normalized.blogPosts),
+        certificates: snapshotLegacyCertificateNames(normalized.certificates, users),
+      };
+      return next;
     }
   } catch {
-    /* Start with the sample data if storage is unavailable or invalid. */
+    // Keep unreadable stored content losslessly instead of overwriting it with fixtures.
+    if (stored !== null) return normalizePrototypeSnapshot({
+      legacyPrototype: { collections: { unreadableStoredSnapshot: stored } },
+    }, initialData, new Date().toISOString());
   }
   const initial = structuredClone(initialData);
   initial.courses.forEach((course) => { course.aiEnabled = false; });
-  return initial as LmsData & { notifications?: AppNotification[] };
+  return initial;
 }
 
 function awardCertificate(data: LmsData, courseId: string, userId: string): LmsData {
@@ -497,20 +422,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         Object.assign(record, preserveCourseAiMetadata(existing, record));
         Object.assign(record, preserveVideoTranscripts(existing, record));
         if (!record.cover) record.cover = defaultCourseCover;
-      const previousPrice = Number(existing?.price);
-      const nextPrice = Number(record.price);
-      if (existing?.status === 'published' && record.status === 'published' && Number.isFinite(previousPrice) && Number.isFinite(nextPrice) && previousPrice > nextPrice) {
-        next.cartItems ??= [];
-        next.mockPriceEmails ??= [];
-        const now = new Date().toISOString();
-        const watchers = next.cartItems.filter((entry) => entry.courseId === id && entry.priceAlertEnabled && !next.enrollments.some((enrollment) => enrollment.courseId === id && enrollment.userId === entry.userId) && !next.orders.some((order) => order.courseId === id && order.userId === entry.userId && order.status === 'paid'));
-        watchers.forEach((entry) => {
-          const recipient = next.users.find((user) => user.id === entry.userId);
-          if (!recipient?.email) return;
-          next.mockPriceEmails.unshift({ id: createId('price-email'), userId: entry.userId, courseId: existing.id, courseTitle: record.title, to: recipient.email, previousPrice, newPrice: nextPrice, createdAt: now, status: 'mock-sent' });
-        });
-      }
-
         if (existing) {
           next.courses = next.courses.map((course) => (course.id === id ? record : course));
         } else {
@@ -601,26 +512,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     setData(next);
     return { ok: true, message: result.message, updatedAt, updatedBy: currentUser?.id };
   }, [currentUser?.id, currentUser?.role, data, setData]);
-
-  const removeCourse = useCallback(
-    (courseId: string) => {
-      const course = data.courses.find((entry) => entry.id === courseId);
-      if (!course || !canEditCourse(currentUser, course)) return;
-      update((next) => {
-        next.courses = next.courses.filter((course) => course.id !== courseId);
-        next.quizzes = next.quizzes.filter((quiz) => quiz.courseId !== courseId);
-        next.attempts = next.attempts.filter((attempt) => attempt.courseId !== courseId);
-        next.enrollments = next.enrollments.filter((item) => item.courseId !== courseId);
-        next.certificates = next.certificates.filter((item) => item.courseId !== courseId);
-        next.cartItems = next.cartItems.filter((item) => item.courseId !== courseId);
-        Object.keys(next.progress)
-          .filter((key) => key.startsWith(`${courseId}:`))
-          .forEach((key) => delete next.progress[key]);
-        return next;
-      });
-    },
-    [currentUser, data.courses, update]
-  );
 
   const saveChapter = useCallback(
     (courseId: string, values: Partial<Chapter>, chapterId?: string) => {
@@ -730,8 +621,7 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
         const hasProgress = Object.values(data.progress[`${courseId}:${old.id}`] || {}).some(Boolean);
         const oldQuizId = 'quizId' in old ? old.quizId : undefined;
         const hasAttempts = oldQuizId && data.attempts.some((attempt) => attempt.quizId === oldQuizId);
-        const hasAssignments = oldQuizId && (data.assignments || []).some((assignment) => assignment.quizId === oldQuizId);
-        if (!replacement && (hasProgress || hasAttempts || hasAssignments)) {
+        if (!replacement && (hasProgress || hasAttempts)) {
           return { ok: false, message: 'นำรายการที่มีประวัติเรียนหรือคำตอบออกไม่ได้' };
         }
         if (
@@ -905,7 +795,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     const course = data.courses.find((entry) => entry.id === quiz?.courseId);
     if (!quiz || !course || !canManageCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ลบแบบฝึกหัดนี้' };
     if (data.attempts.some((attempt) => attempt.quizId === quizId)) return { ok: false, message: 'แบบฝึกหัดนี้มีประวัติคำตอบแล้ว จึงลบไม่ได้' };
-    if ((data.assignments || []).some((assignment) => assignment.quizId === quizId)) return { ok: false, message: 'แบบฝึกหัดนี้ถูกมอบหมายแล้ว กรุณาจัดการงานมอบหมายก่อนลบ' };
     const items = course.chapters.flatMap((chapter) => chapter.items).filter((item) => 'quizId' in item && item.quizId === quizId);
     const issue = contentRemovalIssue(data, currentUser, course.id, items);
     if (issue) return { ok: false, message: issue };
@@ -917,251 +806,133 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     return commitLearningChange(next);
   }, [currentUser, data, commitLearningChange]);
 
-  const enrollFree = useCallback(
-    (courseId: string, userId = currentUser?.id, referralCode: string | null = null): ActionResult => {
-      if (!currentUser || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return { ok: false, message: 'ยืนยันอีเมลก่อนลงเรียน' };
-      if (userId !== currentUser.id) return { ok: false, message: 'ลงเรียนได้เฉพาะบัญชีที่เข้าสู่ระบบ' };
-      const course = data.courses.find((entry) => entry.id === courseId);
-      if (!course || course.status !== 'published' || course.price > 0) return { ok: false, message: 'คอร์สนี้ไม่พร้อมลงเรียนฟรี' };
-      if (data.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
-      update((next) => {
-        const course = next.courses.find((entry) => entry.id === courseId);
-        if (!userId || !course || course.price > 0 || course.status !== 'published' || next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === userId)) {
-          return next;
-        }
-        const link = next.referralLinks.find((entry) => entry.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && entry.courseId === course.id && entry.instructorId === course.instructorId);
-        next.enrollments.push({ id: createId('enroll'), courseId, userId, createdAt: new Date().toISOString(),
-          ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
-        return next;
-      });
-      return { ok: true };
-    },
-    [currentUser, data.courses, data.enrollments, update]
-  );
-
-  const simulatePayment = useCallback((courseId: string, outcome: 'paid' | 'failed', referralCode: string | null = null, rawAccessCode = ''): string | null => {
-    const course = data.courses.find((item) => item.id === courseId);
-    if (!course || !currentUser || (currentUser.role !== 'admin' && currentUser.emailVerified === false) || course.status !== 'published') return null;
-    const submittedCode = data.accessCodes.find((item) => normalizeAccessCode(item.code) === normalizeAccessCode(rawAccessCode));
-    const quote = quoteAccessCode({ accessCodes: data.accessCodes, courseId, coursePrice: course.price, userId: currentUser.id, enrollments: data.enrollments, code: rawAccessCode });
-    if (!quote.ok) return null;
-    if (submittedCode?.kind === 'cash') {
-      if (redeemingCodesRef.current.has(submittedCode.id)) return null;
-      redeemingCodesRef.current.add(submittedCode.id);
+  const enrollFree = useCallback((courseId: string): ActionResult => {
+    const course = data.courses.find((entry) => entry.id === courseId);
+    if (!currentUser || !canJoinFreeCourse(currentUser, course)) return { ok: false, message: 'บัญชีนี้ลงเรียนคอร์สนี้ไม่ได้' };
+    if (!course || course.status !== 'published' || course.price > 0) return { ok: false, message: 'คอร์สนี้ไม่พร้อมลงเรียนฟรี' };
+    if (data.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) {
+      return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
     }
-    const orderId = createId('order');
-    update((next) => {
-      const nextCourse = next.courses.find((item) => item.id === courseId);
-      const nextQuote = quoteAccessCode({ accessCodes: next.accessCodes, courseId, coursePrice: nextCourse?.price ?? 0, userId: currentUser.id, enrollments: next.enrollments, code: rawAccessCode });
-      if (!nextCourse || !nextQuote.ok) return next;
-      const accessCode = nextQuote.code;
-      const isAccessGranted = nextQuote.source === 'cash_code' || nextQuote.source === 'free_code';
-      const finalStatus: 'paid' | 'failed' = isAccessGranted ? 'paid' : outcome;
-      const instructor = next.users.find((user) => user.id === nextCourse.instructorId);
-      const link = next.referralLinks.find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === nextCourse.id && item.instructorId === nextCourse.instructorId);
-      const sharePercent = Number(link ? instructor?.referralSharePercent ?? 85 : instructor?.baseSharePercent ?? 70);
-      const amount = nextQuote.amount;
-      const { instructorShareAmount, platformShareAmount } = cashCodeShareAmounts(amount, sharePercent);
-      const method = nextQuote.source === 'cash_code' ? 'เงินสดผ่านโค้ด' : nextQuote.source === 'free_code' ? 'โค้ดเรียนฟรี' : 'บัตรจำลอง';
-      const order: Order = {
-        id: orderId,
-        courseId,
-        userId: currentUser.id,
-        amount,
-        listPrice: nextQuote.listPrice,
-        discountAmount: nextQuote.discountAmount,
-        status: finalStatus,
-        method,
-        source: nextQuote.source,
-        ...(accessCode ? { accessCodeId: accessCode.id, accessCode: accessCode.code, accessCodeKind: accessCode.kind } : {}),
-        createdAt: new Date().toISOString(),
-        instructorId: nextCourse.instructorId,
-        ...(finalStatus === 'paid' ? {
-          instructorSharePercent: sharePercent,
-          instructorShareAmount,
-          platformShareAmount,
-          payoutStatus: amount > 0 ? 'pending' : 'not_applicable',
-        } : {}),
-        ...(link ? { referralCode: link.code, referralLinkId: link.id } : {}),
-      };
-      if (accessCode?.kind === 'cash' && finalStatus === 'paid') {
-        const transition = commitCashCodeRedemption({ accessCodes: next.accessCodes, orders: next.orders, enrollments: next.enrollments, accessCodeId: accessCode.id, userId: currentUser.id, order, redeemedAt: order.createdAt });
-        if (!transition) return next;
-        next.accessCodes = transition.accessCodes;
-        next.orders = transition.orders;
-        next.enrollments = transition.enrollments;
-      } else {
-        next.orders.unshift(order);
-      }
-      if (finalStatus === 'paid') {
-        if (accessCode && accessCode.kind !== 'cash') next.accessCodes = next.accessCodes.map((item) => {
-          if (item.id !== accessCode.id) return item;
-          return { ...item, usedCount: item.usedCount + 1, lastUsedAt: order.createdAt };
-        });
-        next.cartItems = next.cartItems.filter((entry) => entry.courseId !== courseId || entry.userId !== currentUser.id);
-        if (!next.enrollments.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) {
-          next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), ...(link ? { referralCode: link.code, referralLinkId: link.id, referralInstructorId: link.instructorId } : {}) });
-        }
-      }
-      return next;
-    });
-    return orderId;
-  }, [currentUser, data.accessCodes, data.courses, data.enrollments, update]);
+    const next = structuredClone(data);
+    next.enrollments.push({ id: createId('enroll'), courseId, userId: currentUser.id, createdAt: new Date().toISOString() });
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
 
-  const createAccessCode = useCallback((values: CreateAccessCodeInput): CreateAccessCodeResult => {
-    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่ออกโค้ดได้' };
-    const course = data.courses.find((item) => item.id === values.courseId && item.status === 'published' && Number(item.price) > 0);
+  const redeemCourseCode = useCallback((rawCode: string) => {
+    const transition = preparePrototypeRedeem({
+      codes: data.redeemCodes,
+      enrollments: data.enrollments,
+      courses: data.courses,
+      user: currentUser,
+      rawCode,
+      now: new Date().toISOString(),
+      enrollmentId: createId('enroll'),
+    });
+    if (!transition.result.ok || !transition.redeemCode || !transition.enrollment) return transition.result;
+    if (transition.result.alreadyEnrolled) return transition.result;
+    if (redeemingCodesRef.current.has(transition.redeemCode.id)) {
+      return { ok: false as const, message: 'กำลังยืนยันรหัสนี้อยู่ กรุณารอสักครู่' };
+    }
+
+    redeemingCodesRef.current.add(transition.redeemCode.id);
+    const next = structuredClone(data);
+    next.redeemCodes = next.redeemCodes.map((entry) =>
+      entry.id === transition.redeemCode?.id ? transition.redeemCode : entry
+    );
+    next.enrollments.push(transition.enrollment);
+    const result = commitLearningChange(next);
+    if (!result.ok) {
+      redeemingCodesRef.current.delete(transition.redeemCode.id);
+      return { ok: false as const, message: result.message ?? 'บันทึกการแลกรหัสไม่ได้' };
+    }
+    return transition.result;
+  }, [currentUser, data, commitLearningChange]);
+
+  const createRedeemCode = useCallback((courseId: string) => {
+    if (currentUser?.role !== 'admin' || currentUser.status === 'suspended') {
+      return { ok: false, message: 'เฉพาะแอดมินที่ใช้งานได้เท่านั้นจึงออกโค้ดได้' };
+    }
+    const course = data.courses.find((item) => item.id === courseId && item.status === 'published' && item.price > 0);
     if (!course) return { ok: false, message: 'เลือกคอร์สที่เผยแพร่และมีราคามากกว่าศูนย์' };
-    const kind: AccessCodeKind = values.kind;
-    const code = normalizeAccessCode(values.code || `MELEARN-${createId('code').replace(/^code-/, '').slice(0, 6)}`);
-    if (!['percent', 'fixed', 'free', 'cash'].includes(kind)) return { ok: false, message: 'เลือกประเภทโค้ดให้ถูกต้อง' };
-    if (!/^[A-Z0-9-]{4,24}$/.test(code)) return { ok: false, message: 'โค้ดต้องมี 4–24 ตัว ใช้ได้เฉพาะ A–Z, 0–9 และขีดกลาง' };
-    if (data.accessCodes.some((item) => normalizeAccessCode(item.code) === code)) return { ok: false, message: 'มีโค้ดนี้อยู่แล้ว กรุณาใช้รหัสอื่น' };
-    const value = Number(values.value);
-    const receivedAmount = Number(values.receivedAmount);
-    if (kind === 'percent' && (!Number.isFinite(value) || value <= 0 || value > 100)) return { ok: false, message: 'ส่วนลดต้องอยู่ระหว่าง 1–100%' };
-    if (kind === 'fixed' && (!Number.isFinite(value) || value <= 0 || value > Number(course.price))) return { ok: false, message: 'ส่วนลดต้องมากกว่าศูนย์และไม่เกินราคาคอร์ส' };
-    if (kind === 'cash' && (!Number.isFinite(receivedAmount) || receivedAmount <= 0 || receivedAmount > Number(course.price))) return { ok: false, message: 'ยอดรับเงินสดต้องมากกว่าศูนย์และไม่เกินราคาคอร์ส' };
-    const maxUses = kind === 'cash' ? 1 : values.maxUses ?? null;
-    if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1)) return { ok: false, message: 'จำนวนครั้งที่ใช้ต้องเป็นจำนวนเต็มอย่างน้อย 1' };
-    const expiryDate = values.expiresAt ? new Date(`${values.expiresAt}T23:59:59`) : null;
-    if (expiryDate && (!Number.isFinite(expiryDate.getTime()) || expiryDate.getTime() < Date.now())) return { ok: false, message: 'วันหมดอายุต้องเป็นวันนี้หรือวันหลังจากนี้' };
-    const accessCode: AccessCode = {
-      id: createId('access-code'), code, courseId: course.id, kind,
-      ...(kind === 'percent' || kind === 'fixed' ? { value } : {}),
-      ...(kind === 'cash' ? { receivedAmount } : {}),
-      maxUses, usedCount: 0, status: 'active', createdAt: new Date().toISOString(), createdBy: currentUser.id,
-      ...(expiryDate ? { expiresAt: expiryDate.toISOString() } : {}),
+
+    let code = '';
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const candidate = normalizeRedeemCode(`MELEARN-${createId('code').replace(/^code-/, '').slice(0, 8)}`);
+      if (!data.redeemCodes.some((item) => normalizeRedeemCode(item.code) === candidate)) {
+        code = candidate;
+        break;
+      }
+    }
+    if (!code) return { ok: false, message: 'สร้างรหัสที่ไม่ซ้ำไม่ได้ กรุณาลองอีกครั้ง' };
+
+    const redeemCode = {
+      id: createId('redeem-code'),
+      code,
+      courseId: course.id,
+      status: 'unused' as const,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser.id,
     };
-    update((next) => { next.accessCodes.unshift(accessCode); return next; });
-    return { ok: true, accessCode };
-  }, [currentUser, data.accessCodes, data.courses, update]);
+    const next = structuredClone(data);
+    next.redeemCodes.unshift(redeemCode);
+    const result = commitLearningChange(next);
+    return result.ok ? { ok: true, redeemCode } : { ok: false, message: result.message };
+  }, [currentUser, data, commitLearningChange]);
 
-  const setAccessCodeStatus = useCallback((accessCodeId: string, status: 'active' | 'inactive'): ActionResult => {
-    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่จัดการโค้ดได้' };
-    if (!data.accessCodes.some((item) => item.id === accessCodeId)) return { ok: false, message: 'ไม่พบโค้ดนี้' };
-    update((next) => { next.accessCodes = next.accessCodes.map((item) => item.id === accessCodeId ? { ...item, status } : item); return next; });
-    return { ok: true };
-  }, [currentUser, data.accessCodes, update]);
-
-  const addCourseToCart = useCallback((courseId: string, referralCode: string | null = null): ActionResult & { alreadyAdded?: boolean } => {
-    const course = data.courses.find((item) => item.id === courseId && item.status === 'published');
-    if (!currentUser || !['learner', 'admin'].includes(currentUser.role)) return { ok: false, message: 'เข้าสู่ระบบในฐานะผู้เรียนก่อนเพิ่มคอร์ส' };
-    if (currentUser.role !== 'admin' && currentUser.emailVerified === false) return { ok: false, message: 'ยืนยันอีเมลก่อนเริ่มซื้อคอร์ส' };
-    if (!course || course.price <= 0) return { ok: false, message: 'คอร์สนี้ไม่ต้องใช้ตะกร้า' };
-    if (data.enrollments.some((item) => item.courseId === courseId && item.userId === currentUser.id) || data.orders.some((item) => item.courseId === courseId && item.userId === currentUser.id && item.status === 'paid')) return { ok: false, message: 'คุณมีคอร์สนี้อยู่แล้ว' };
-    if (data.cartItems.some((item) => item.courseId === courseId && item.userId === currentUser.id)) return { ok: true, alreadyAdded: true };
-    const referral = data.referralLinks.find((item) => item.code.toLowerCase() === String(referralCode ?? '').toLowerCase() && item.courseId === course.id && item.instructorId === course.instructorId);
-    update((next) => { next.cartItems.push({ id: createId('cart'), courseId, userId: currentUser.id, createdAt: new Date().toISOString(), priceAlertEnabled: false, ...(referral ? { referralCode: referral.code } : {}) }); return next; });
-    return { ok: true };
-  }, [currentUser, data.courses, data.enrollments, data.orders, data.cartItems, data.referralLinks, update]);
-
-  const removeCourseFromCart = useCallback((cartItemId: string): boolean => {
-    if (!currentUser || !data.cartItems.some((entry) => entry.id === cartItemId && entry.userId === currentUser.id)) return false;
-    update((next) => {
-      next.cartItems = next.cartItems.filter((entry) => entry.id !== cartItemId);
-      return next;
-    });
-    return true;
-  }, [currentUser, data.cartItems, update]);
-
-  const setCoursePriceAlert = useCallback((courseId: string, enabled: boolean): boolean => {
-    if (!currentUser || !data.cartItems.some((entry) => entry.courseId === courseId && entry.userId === currentUser.id)) return false;
-    update((next) => {
-      next.cartItems = next.cartItems.map((entry) => {
-        if (entry.courseId !== courseId || entry.userId !== currentUser.id) return entry;
-        return { ...entry, priceAlertEnabled: Boolean(enabled) };
-      });
-      return next;
-    });
-    return true;
-  }, [currentUser, data.cartItems, update]);
-
-  const createReferralLink = useCallback((courseId: string): CreateReferralLinkResult => {
-    const course = data.courses.find((item) => item.id === courseId);
-    if (currentUser?.role !== 'instructor' || !course || course.instructorId !== currentUser.id || course.status !== 'published') return { ok: false, message: 'สร้างลิงก์ได้เฉพาะคอร์สที่เผยแพร่ของคุณ' };
-    const link: ReferralLink = { id: createId('ref'), code: createId('code').replace(/^code-/, '').toUpperCase(), instructorId: currentUser.id, courseId, createdAt: new Date().toISOString() };
-    update((next) => { next.referralLinks ??= []; next.referralLinks.unshift(link); return next; });
-    return { ok: true, link };
-  }, [currentUser, data.courses, update]);
-
-  const saveInstructorCommission = useCallback((userId: string, baseSharePercent: number, referralSharePercent: number): ActionResult => {
-    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่กำหนดสัดส่วนได้' };
-    const base = Number(baseSharePercent);
-    const referral = Number(referralSharePercent);
-    const instructor = data.users.find((user) => user.id === userId && user.role === 'instructor');
-    if (!instructor) return { ok: false, message: 'ไม่พบผู้สอน' };
-    if (!Number.isFinite(base) || !Number.isFinite(referral) || base < 0 || base > 100 || referral <= base || referral > 100) return { ok: false, message: 'สัดส่วนลิงก์แนะนำต้องสูงกว่าสัดส่วนปกติ และทั้งคู่ต้องไม่เกิน 100%' };
-    update((next) => { next.users = next.users.map((user) => user.id === userId ? { ...user, baseSharePercent: base, referralSharePercent: referral } : user); return next; });
-    return { ok: true };
-  }, [currentUser, data.users, update]);
-
-  const markInstructorPayout = useCallback((instructorId: string): InstructorPayoutResult => {
-    if (currentUser?.role !== 'admin') return { ok: false, message: 'เฉพาะแอดมินเท่านั้นที่ยืนยันยอดโอนได้' };
-    const eligible = data.orders.filter((order) => {
-      const course = data.courses.find((item) => item.id === order.courseId);
-      return order.status === 'paid' && Number(order.amount || 0) > 0 && order.payoutStatus !== 'transferred' && (order.instructorId ?? course?.instructorId) === instructorId;
-    });
-    if (!eligible.length) return { ok: false, message: 'ไม่มียอดรอโอนสำหรับผู้สอนคนนี้' };
-    const teacher = data.users.find((user) => user.id === instructorId);
-    const amount = Math.round(eligible.reduce((sum, order) => {
-      const course = data.courses.find((item) => item.id === order.courseId);
-      const rate = Number(order.instructorSharePercent ?? (order.referralLinkId ? teacher?.referralSharePercent : teacher?.baseSharePercent) ?? 70);
-      return sum + Number(order.instructorShareAmount ?? (Number(order.amount) * rate / 100));
-    }, 0) * 100) / 100;
-    const payout: InstructorPayout = { id: createId('payout'), instructorId, orderIds: eligible.map((order) => order.id), amount, orderCount: eligible.length, createdAt: new Date().toISOString() };
-    const orderIds = new Set(payout.orderIds);
-    update((next) => {
-      next.orders = next.orders.map((order) => orderIds.has(order.id) ? { ...order, payoutStatus: 'transferred', payoutId: payout.id, paidOutAt: payout.createdAt } : order);
-      next.instructorPayouts ??= [];
-      next.instructorPayouts.unshift(payout);
-      return next;
-    });
-    return { ok: true, payout };
-  }, [currentUser, data.courses, data.orders, data.users, update]);
-
+  const revokeRedeemCode = useCallback((redeemCodeId: string): ActionResult => {
+    if (currentUser?.role !== 'admin' || currentUser.status === 'suspended') {
+      return { ok: false, message: 'เฉพาะแอดมินที่ใช้งานได้เท่านั้นจึงยกเลิกรหัสได้' };
+    }
+    const code = data.redeemCodes.find((item) => item.id === redeemCodeId);
+    if (!code) return { ok: false, message: 'ไม่พบรหัสแลกคอร์สนี้' };
+    if (code.status !== 'unused') return { ok: false, message: 'ยกเลิกได้เฉพาะรหัสที่ยังไม่ถูกใช้' };
+    const next = structuredClone(data);
+    next.redeemCodes = next.redeemCodes.map((item) =>
+      item.id === redeemCodeId
+        ? { ...item, status: 'revoked', revokedBy: currentUser.id, revokedAt: new Date().toISOString() }
+        : item
+    );
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
   const markContentDone = useCallback(
     (courseId: string, itemId: string) => {
-      if (!currentUser?.id || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return;
+      const course = data.courses.find((entry) => entry.id === courseId);
+      if (!currentUser?.id || !canLearnCourse(currentUser, course, data) || !flattenItems(course).some((item) => item.id === itemId)) return;
       update((next) => {
         const key = `${courseId}:${itemId}`;
         next.progress[key] = { ...(next.progress[key] ?? {}), [currentUser.id]: true };
         return awardCertificate(next, courseId, currentUser.id);
       });
     },
-    [currentUser?.id, update]
+    [currentUser, data, update]
   );
 
-  const startAttempt = useCallback((quiz: Quiz, assignmentId: string | null = null): string | null => {
-    if (!currentUser || !data.quizzes.some((entry) => entry.id === quiz.id && entry.courseId === quiz.courseId)) return null;
-    if (currentUser.role !== 'admin' && currentUser.emailVerified === false) return null;
-    const enrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === currentUser.id);
-    if (currentUser.role !== 'admin' && (currentUser.role !== 'learner' || !enrolled)) return null;
-    if (assignmentId) {
-      const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
-      if (currentUser.role !== 'learner' || !assignment || assignment.status === 'cancelled' || assignment.quizId !== quiz.id || !assignmentIncludesLearner(assignment, currentUser.id) || !enrolled) return null;
-      if (data.attempts.some((attempt) => attempt.assignmentId === assignmentId && attempt.userId === currentUser.id && attempt.essayStatus === 'pending')) return null;
-    }
-    const draft = data.attempts.find((entry) => entry.quizId === quiz.id && entry.userId === currentUser.id && (entry.assignmentId ?? null) === assignmentId && entry.status === 'in_progress');
+  const startAttempt = useCallback((quiz: Quiz): string | null => {
+    const course = data.courses.find((entry) => entry.id === quiz.courseId);
+    if (!currentUser || !canLearnCourse(currentUser, course, data) || !data.quizzes.some((entry) => entry.id === quiz.id && entry.courseId === quiz.courseId)) return null;
+    const draft = data.attempts.find((entry) => entry.quizId === quiz.id && entry.userId === currentUser.id && entry.status === 'in_progress');
     if (draft) return draft.id;
     const id = createId('attempt');
     const next = structuredClone(data);
-    next.attempts.unshift({ id, quizId: quiz.id, courseId: quiz.courseId, assignmentId, quizSnapshot: structuredClone(quiz), userId: currentUser.id, answers: {}, essayStatus: 'none', passed: null, status: 'in_progress', startedAt: new Date().toISOString() });
+    next.attempts.unshift({ id, quizId: quiz.id, courseId: quiz.courseId, quizSnapshot: structuredClone(quiz), userId: currentUser.id, answers: {}, essayStatus: 'none', passed: null, status: 'in_progress', startedAt: new Date().toISOString() });
     return commitLearningChange(next).ok ? id : null;
   }, [currentUser, data, commitLearningChange]);
 
   const saveAttemptDraft = useCallback((attemptId: string, answers: Record<string, QuizAnswerValue>) => {
-    if (!currentUser || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return;
+    const attempt = data.attempts.find((entry) => entry.id === attemptId);
+    const course = data.courses.find((entry) => entry.id === attempt?.courseId);
+    if (!currentUser || !attempt || attempt.userId !== currentUser.id || !canLearnCourse(currentUser, course, data)) return;
     update((next) => {
-      next.attempts = next.attempts.map((attempt) => attempt.id === attemptId && attempt.userId === currentUser?.id && attempt.status === 'in_progress' ? { ...attempt, answers: structuredClone(answers) } : attempt);
+      next.attempts = next.attempts.map((entry) => entry.id === attemptId && entry.status === 'in_progress' ? { ...entry, answers: structuredClone(answers) } : entry);
       return next;
     });
-  }, [currentUser?.id, update]);
+  }, [currentUser, data, update]);
 
   const submitAttempt = useCallback(
     (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string): string | null => {
       let attemptId = existingAttemptId ?? createId('attempt');
-      if (!currentUser?.id || (currentUser.role !== 'admin' && currentUser.emailVerified === false)) return null;
+      const course = data.courses.find((entry) => entry.id === quiz.courseId);
+      if (!currentUser || !canLearnCourse(currentUser, course, data) || !data.quizzes.some((entry) => entry.id === quiz.id && entry.courseId === quiz.courseId)) return null;
       const existingAttempt = data.attempts.find((entry) => entry.id === existingAttemptId);
       if (existingAttemptId && (!existingAttempt || existingAttempt.userId !== currentUser.id || existingAttempt.status !== 'in_progress' || existingAttempt.quizId !== quiz.id)) return null;
       quiz = existingAttempt?.quizSnapshot ?? quiz;
@@ -1235,14 +1006,14 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       });
       return attemptId;
     },
-    [currentUser, data.attempts, update]
+    [currentUser, data, update]
   );
 
   const gradeAttempt = useCallback((attemptId: string, { score, feedback }: { score: number; feedback?: string }): ActionResult => {
     const source = data.attempts.find((entry) => entry.id === attemptId);
     const quiz = source?.quizSnapshot ?? data.quizzes.find((entry) => entry.id === source?.quizId);
     const course = data.courses.find((entry) => entry.id === source?.courseId);
-    if (!source || !quiz || !canManageCourse(currentUser, course) || source.status !== 'submitted' || source.essayStatus !== 'pending') return { ok: false, message: 'ไม่มีสิทธิ์ตรวจคำตอบนี้ หรือรายการถูกตรวจไปแล้ว' };
+    if (!source || !quiz || currentUser?.role !== 'instructor' || currentUser.status === 'suspended' || course?.instructorId !== currentUser.id || source.status !== 'submitted' || source.essayStatus !== 'pending') return { ok: false, message: 'ไม่มีสิทธิ์ตรวจคำตอบนี้ หรือรายการถูกตรวจไปแล้ว' };
     const questions = quiz.questions.filter((question) => question.type === 'essay');
     const essayMax = questions.reduce((sum, question) => sum + Number(question.points || 1), 0);
     if (!questions.length || !Number.isFinite(score) || score < 0 || score > essayMax) return { ok: false, message: 'กรอกคะแนนในช่วงที่กำหนด' };
@@ -1261,126 +1032,20 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     return commitLearningChange(next);
   }, [currentUser, data, commitLearningChange]);
 
-  const requestInstructor = useCallback(
-    (values: { name?: string; email?: string; intro: string }) => {
-      update((next) => {
-        next.instructorRequests.unshift({
-          id: createId('req'),
-          userId: currentUser?.id,
-          userName: currentUser?.name ?? values.name ?? '',
-          email: currentUser?.email ?? values.email ?? '',
-          intro: values.intro,
-          status: 'pending',
-          createdAt: new Date().toISOString(),
-        });
-        return next;
-      });
-    },
-    [currentUser, update]
-  );
-
-  const reviewInstructorRequest = useCallback(
-    (requestId: string, decision: 'approved' | 'rejected', note = '') => {
-      update((next) => {
-        const request = next.instructorRequests.find((item) => item.id === requestId);
-        if (!request) return next;
-        next.instructorRequests = next.instructorRequests.map((item) =>
-          item.id === requestId ? { ...item, status: decision, reviewNote: note } : item
-        );
-        if (decision === 'approved') {
-          const existing = next.users.find((item) => item.id === request.userId || item.email === request.email);
-          if (existing) {
-            next.users = next.users.map((item) => (item.id === existing.id ? { ...item, role: 'instructor', status: 'active' } : item));
-          } else {
-            next.users.push({
-              id: createId('u'),
-              name: request.userName,
-              email: request.email,
-              password: 'Teach123!',
-              role: 'instructor',
-              bio: request.intro,
-              status: 'active',
-            });
-          }
-        }
-        return next;
-      });
-    },
-    [update]
-  );
-
-  const createInstructorInvite = useCallback(
-    ({ name, email }: { name: string; email: string }): string => {
-      const token = createId('invite');
-      update((next) => {
-        const user = next.users.find((item) => item.email.toLowerCase() === email.trim().toLowerCase());
-        if (user) {
-          next.invitations.unshift({
-            id: createId('inv'),
-            token,
-            userId: user.id,
-            name: user.name,
-            email: user.email,
-            status: 'pending',
-            createdAt: new Date().toISOString(),
-          });
-        } else {
-          const newUser: User = {
-            id: createId('u'),
-            name: name.trim(),
-            email: email.trim(),
-            password: '',
-            role: 'instructor',
-            bio: '',
-            status: 'invited',
-          };
-          next.users.push(newUser);
-          next.invitations.unshift({
-            id: createId('inv'),
-            token,
-            userId: newUser.id,
-            name: newUser.name,
-            email: newUser.email,
-            status: 'pending',
-            createdAt: new Date().toISOString(),
-          });
-        }
-        return next;
-      });
-      return token;
-    },
-    [update]
-  );
-
-  const acceptInstructorInvite = useCallback(
-    (token: string, password?: string): ActionResult => {
-      let result: ActionResult = { ok: false, message: 'ไม่พบคำเชิญนี้' };
-      update((next) => {
-        const invite = next.invitations.find((item) => item.token === token && item.status === 'pending');
-        if (!invite) return next;
-        next.invitations = next.invitations.map((item) => (item.id === invite.id ? { ...item, status: 'accepted' } : item));
-        next.users = next.users.map((item) =>
-          item.id === invite.userId ? { ...item, role: 'instructor', status: 'active', password: password || item.password } : item
-        );
-        next.currentUserId = invite.userId ?? null;
-        result = { ok: true, user: next.users.find((item) => item.id === invite.userId) };
-        return next;
-      });
-      return result;
-    },
-    [update]
-  );
-
-  const changeUserRole = useCallback(
-    (userId: string, role: Role) => {
-      update((next) => {
-        next.users = next.users.map((item) => (item.id === userId ? { ...item, role } : item));
-        return next;
-      });
-    },
-    [update]
-  );
-
+  const assignInstructorRole = useCallback((userId: string): ActionResult => {
+    if (currentUser?.role !== 'admin' || currentUser.status === 'suspended') {
+      return { ok: false, message: 'เฉพาะแอดมินที่ใช้งานได้เท่านั้นจึงกำหนดบทบาทผู้สอนได้' };
+    }
+    const target = data.users.find((user) => user.id === userId);
+    if (!target) return { ok: false, message: 'ไม่พบบัญชีผู้ใช้เดิม' };
+    if (target.role === 'instructor') return { ok: true, message: 'บัญชีนี้เป็นผู้สอนอยู่แล้ว' };
+    if (target.role !== 'learner' || target.status === 'suspended' || target.status === 'pending' || target.status === 'invited' || target.emailVerified === false) {
+      return { ok: false, message: 'กำหนดบทบาทผู้สอนได้เฉพาะบัญชีผู้เรียนที่ใช้งานและยืนยันอีเมลแล้ว' };
+    }
+    const next = structuredClone(data);
+    next.users = next.users.map((user) => user.id === userId ? { ...user, role: 'instructor' } : user);
+    return commitLearningChange(next);
+  }, [currentUser, data, commitLearningChange]);
   const updateProfile = useCallback(
     (values: import('./lib/profile-model').ProfileValues): ActionResult => {
       if (!currentUser) return { ok: false, message: 'ไม่พบบัญชีผู้ใช้' };
@@ -1416,49 +1081,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
     [data.users, update]
   );
 
-  const saveAssignment = useCallback((values: Partial<Assignment>, assignmentId?: string): ActionResult & { assignment?: Assignment } => {
-    const issue = assignmentSaveIssue(data, currentUser, values, assignmentId);
-    if (issue) return { ok: false, message: issue };
-    const existing = (data.assignments || []).find((entry) => entry.id === assignmentId);
-    const course = data.courses.find((entry) => entry.id === values.courseId)!;
-    const now = new Date().toISOString();
-    const assignment: Assignment = {
-      ...existing, ...values, id: existing?.id ?? createId('assign'),
-      courseId: course.id, quizId: values.quizId!, title: values.title!.trim(),
-      stage: values.stage ?? existing?.stage ?? 'practice',
-      assigneeType: values.assigneeType!,
-      assigneeIds: [...new Set(values.assigneeIds ?? [])],
-      status: existing?.status ?? 'active',
-      createdBy: existing?.createdBy ?? currentUser!.id,
-      createdAt: existing?.createdAt ?? now, updatedAt: now,
-    };
-    const next = structuredClone(data);
-    next.assignments = existing ? (next.assignments || []).map((entry) => entry.id === assignment.id ? assignment : entry) : [assignment, ...(next.assignments || [])];
-    const recipients = assignment.assigneeType === 'all_enrolled' ? next.enrollments.filter((entry) => entry.courseId === course.id).map((entry) => entry.userId) : assignment.assigneeIds || [];
-    [...new Set(recipients)].forEach((userId) => addNotification(next, { id: createId('notification'), userId, type: existing ? 'assignment_updated' : 'assignment_created', title: existing ? 'งานมอบหมายมีการเปลี่ยนแปลง' : 'คุณได้รับงานมอบหมายใหม่', description: assignment.title, href: '/learn/assignments' }));
-    const result = commitLearningChange(next);
-    return result.ok ? { ok: true, assignment } : result;
-  }, [currentUser, data, commitLearningChange]);
-
-  const removeAssignment = useCallback((assignmentId: string): ActionResult => {
-    const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
-    const course = data.courses.find((entry) => entry.id === assignment?.courseId);
-    if (!assignment || !canManageCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ลบงานนี้' };
-    if (assignmentHasHistory(data, assignment)) return { ok: false, message: 'งานนี้มีประวัติคำตอบแล้ว กรุณายกเลิกแทนการลบ' };
-    const next = structuredClone(data);
-    next.assignments = (next.assignments || []).filter((entry) => entry.id !== assignmentId);
-    return commitLearningChange(next);
-  }, [currentUser, data, commitLearningChange]);
-
-  const cancelAssignment = useCallback((assignmentId: string): ActionResult => {
-    const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
-    const course = data.courses.find((entry) => entry.id === assignment?.courseId);
-    if (!assignment || !canManageCourse(currentUser, course)) return { ok: false, message: 'ไม่มีสิทธิ์ยกเลิกงานนี้' };
-    const next = structuredClone(data);
-    next.assignments = (next.assignments || []).map((entry) => entry.id === assignmentId ? { ...entry, status: 'cancelled', updatedAt: new Date().toISOString() } : entry);
-    return commitLearningChange(next);
-  }, [currentUser, data, commitLearningChange]);
-
   const markNotificationRead = useCallback(
     (notificationId: string) => {
       update((next) => {
@@ -1471,165 +1093,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       });
     },
     [currentUser?.id, update]
-  );
-
-  const sendInboxMessage = useCallback(
-    ({
-      conversationId,
-      recipientId,
-      courseId,
-      itemId,
-      chapterId,
-      text,
-      attachments = [],
-    }: SendInboxMessageArgs): SendInboxMessageResult => {
-      const body = typeof text === 'string' ? text.trim() : '';
-      if (body.length > 3000) return { ok: false, message: 'ข้อความยาวได้ไม่เกิน 3,000 ตัวอักษร' };
-      if (!Array.isArray(attachments)) return { ok: false, message: 'ไฟล์แนบไม่ถูกต้อง กรุณาเลือกไฟล์ใหม่' };
-      if (!body && !attachments.length) return { ok: false, message: 'พิมพ์ข้อความหรือแนบไฟล์ก่อนส่ง' };
-      if (attachments.some((attachment) => !attachment || typeof attachment !== 'object')) {
-        return { ok: false, message: 'ไฟล์แนบไม่ถูกต้อง กรุณาเลือกไฟล์ใหม่' };
-      }
-      const allowedAttachmentTypes = new Set(['image/webp', 'video/mp4', 'video/webm']);
-      const attachmentBytes = attachments.reduce((sum, attachment) => sum + attachment.size, 0);
-      if (attachments.length > MAX_INBOX_ATTACHMENTS || attachmentBytes > MAX_INBOX_TOTAL_ATTACHMENT_BYTES) {
-        return { ok: false, message: 'แนบไฟล์ได้ไม่เกิน 3 ไฟล์ และขนาดรวมไม่เกิน 8 MB' };
-      }
-      if (attachments.some((attachment) =>
-        !attachment || typeof attachment.name !== 'string' ||
-        !allowedAttachmentTypes.has(attachment.contentType) ||
-        !Number.isFinite(attachment.size) || attachment.size <= 0 || attachment.size > MAX_INBOX_ATTACHMENT_BYTES ||
-        typeof attachment.url !== 'string' ||
-        attachment.url.length > Math.ceil(MAX_INBOX_ATTACHMENT_BYTES / 3) * 4 + 128 ||
-        !new RegExp(`^data:${attachment.contentType};base64,[A-Za-z0-9+/]*={0,2}$`).test(attachment.url)
-      )) return { ok: false, message: 'ชนิดหรือขนาดไฟล์แนบไม่ถูกต้อง กรุณาเลือกไฟล์ใหม่' };
-      if (!currentUser) return { ok: false, message: 'กรุณาเข้าสู่ระบบก่อนส่งข้อความ' };
-      let conversation = (data.inboxConversations || []).find((entry) => entry.id === conversationId);
-      if (conversationId && !canAccessInboxConversation(data, conversation!, currentUser)) {
-        return { ok: false, message: 'คุณไม่มีสิทธิ์ส่งข้อความในการสนทนานี้' };
-      }
-      if (!conversation) {
-        const contact = getInboxContacts(data, currentUser).find(
-          (entry) => entry.user.id === recipientId && (entry.course?.id || null) === (courseId || null)
-        );
-        if (!contact) return { ok: false, message: 'เลือกผู้สอนในคอร์สที่คุณเรียนหรือแอดมินที่ติดต่อได้' };
-        conversation = (data.inboxConversations || []).find((entry) => entry.id === contact.key) || {
-          id: contact.key,
-          participantIds: [currentUser.id, contact.user.id],
-          courseId: contact.course?.id || null,
-          createdAt: new Date().toISOString(),
-        };
-      }
-      if (!canAccessInboxConversation(data, conversation, currentUser)) {
-        return { ok: false, message: 'คุณไม่มีสิทธิ์ส่งข้อความในการสนทนานี้' };
-      }
-      const context =
-        itemId || chapterId
-          ? getInboxLessonContext(data, currentUser, conversation.courseId || undefined, itemId, chapterId)
-          : undefined;
-      if ((itemId || chapterId) && !context) {
-        return { ok: false, message: 'ไม่พบบทเรียนที่ต้องการถาม กรุณาเปิดจากหน้าเรียนอีกครั้ง' };
-      }
-      const recipient = data.users.find(
-        (entry) => conversation!.participantIds.includes(entry.id) && entry.id !== currentUser.id
-      );
-      if (!recipient || recipient.status !== 'active') {
-        return { ok: false, message: 'บัญชีผู้รับยังไม่พร้อมรับข้อความ' };
-      }
-      const inboxMessage: InboxMessage = {
-        id: createId('message'),
-        conversationId: conversation.id,
-        senderId: currentUser.id,
-        body,
-        ...(attachments.length && {
-          attachments: attachments.map((attachment) => ({ ...attachment, id: createId('attachment') })),
-        }),
-        ...(context && { context }),
-        createdAt: new Date().toISOString(),
-        readBy: [currentUser.id],
-      };
-      const append = (next: StoredLmsData) => {
-        const existing = (next.inboxConversations || []).find((entry) => entry.id === conversation!.id);
-        if (existing && !canAccessInboxConversation(next as LmsData, existing, currentUser)) return next;
-        if (!Array.isArray(next.inboxConversations)) next.inboxConversations = [];
-        if (!existing) next.inboxConversations.push(conversation!);
-        if (!Array.isArray(next.inboxMessages)) next.inboxMessages = [];
-        next.inboxMessages.push(inboxMessage);
-        addNotification(next, {
-          id: `inbox-message:${inboxMessage.id}`,
-          userId: recipient.id,
-          type: 'inbox_message',
-          conversationId: conversation!.id,
-          title: `ข้อความใหม่จาก ${currentUser.name}`,
-          description: body
-            ? body.length > 100 ? `${body.slice(0, 100)}…` : body
-            : attachments.length === 1
-              ? attachments[0].contentType.startsWith('image/') ? 'แนบรูปภาพ' : 'แนบวิดีโอ'
-              : `แนบไฟล์ ${attachments.length} รายการ`,
-          href: `${inboxPathForRole(recipient.role)}?thread=${encodeURIComponent(conversation!.id)}`,
-        });
-        return next;
-      };
-      // Check browser persistence before clearing the composer's draft.
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(append(structuredClone(data))));
-      } catch {
-        return { ok: false, message: 'บันทึกข้อความหรือไฟล์แนบไม่ได้ ข้อความและไฟล์ยังอยู่ กรุณาลองลดขนาดไฟล์' };
-      }
-      update((next) => append(next) as LmsData & { notifications?: AppNotification[] });
-      return { ok: true, conversationId: conversation.id };
-    },
-    [data, currentUser, update]
-  );
-
-  const markInboxConversationRead = useCallback(
-    (conversationId: string) => {
-      update((next) => {
-        const conversation = (next.inboxConversations || []).find((entry) => entry.id === conversationId);
-        if (!conversation || !canAccessInboxConversation(next, conversation, currentUser)) return next;
-        next.inboxMessages = (next.inboxMessages || []).map((entry) =>
-          entry.conversationId === conversationId && (!currentUser || !entry.readBy?.includes(currentUser.id))
-            ? { ...entry, readBy: [...(entry.readBy || []), ...(currentUser ? [currentUser.id] : [])] }
-            : entry
-        );
-        next.notifications = (next.notifications || []).map((entry) =>
-          entry.conversationId === conversationId && entry.userId === currentUser?.id && !entry.readAt
-            ? { ...entry, readAt: new Date().toISOString() }
-            : entry
-        );
-        return next;
-      });
-    },
-    [currentUser, update]
-  );
-
-  const saveComparisonSet = useCallback(
-    (values: Partial<ComparisonSet>, comparisonSetId?: string): string => {
-      const resultId = comparisonSetId ?? createId('comp');
-      update((next) => {
-        const existing = (next.comparisonSets || []).find((item) => item.id === comparisonSetId);
-        const set: ComparisonSet = {
-          id: resultId,
-          title: values.title ?? existing?.title ?? '',
-          courseId: values.courseId ?? existing?.courseId ?? '',
-          preQuizId: values.preQuizId ?? existing?.preQuizId ?? '',
-          postQuizId: values.postQuizId ?? existing?.postQuizId ?? '',
-          description: values.description ?? existing?.description,
-          createdAt: existing?.createdAt || new Date().toISOString(),
-          ...existing,
-          ...values,
-        };
-        if (!next.comparisonSets) next.comparisonSets = [];
-        if (existing) {
-          next.comparisonSets = next.comparisonSets.map((item) => (item.id === comparisonSetId ? set : item));
-        } else {
-          next.comparisonSets.push(set);
-        }
-        return next;
-      });
-      return resultId;
-    },
-    [update]
   );
 
   const value = useMemo<LmsContextType>(
@@ -1652,7 +1115,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       publishCourse,
       setCourseAiEnabled,
       saveVideoTranscript,
-      removeCourse,
       saveChapter,
       saveChapterWorkspace,
       reorderCurriculum,
@@ -1662,34 +1124,18 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       saveQuiz,
       removeQuiz,
       enrollFree,
-      simulatePayment,
-      createAccessCode,
-      setAccessCodeStatus,
-      addCourseToCart,
-      removeCourseFromCart,
-      setCoursePriceAlert,
-      createReferralLink,
-      saveInstructorCommission,
-      markInstructorPayout,
+      redeemCourseCode,
+      createRedeemCode,
+      revokeRedeemCode,
       markContentDone,
       startAttempt,
       saveAttemptDraft,
       submitAttempt,
       gradeAttempt,
-      requestInstructor,
-      reviewInstructorRequest,
-      createInstructorInvite,
-      acceptInstructorInvite,
-      changeUserRole,
+      assignInstructorRole,
       updateProfile,
       resetPassword,
-      saveAssignment,
-      removeAssignment,
-      cancelAssignment,
-      saveComparisonSet,
       markNotificationRead,
-      sendInboxMessage,
-      markInboxConversationRead,
     }),
     [
       data,
@@ -1710,7 +1156,6 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       publishCourse,
       setCourseAiEnabled,
       saveVideoTranscript,
-      removeCourse,
       saveChapter,
       saveChapterWorkspace,
       reorderCurriculum,
@@ -1720,34 +1165,18 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
       saveQuiz,
       removeQuiz,
       enrollFree,
-      simulatePayment,
-      createAccessCode,
-      setAccessCodeStatus,
-      addCourseToCart,
-      removeCourseFromCart,
-      setCoursePriceAlert,
-      createReferralLink,
-      saveInstructorCommission,
-      markInstructorPayout,
+      redeemCourseCode,
+      createRedeemCode,
+      revokeRedeemCode,
       markContentDone,
       startAttempt,
       saveAttemptDraft,
       submitAttempt,
       gradeAttempt,
-      requestInstructor,
-      reviewInstructorRequest,
-      createInstructorInvite,
-      acceptInstructorInvite,
-      changeUserRole,
+      assignInstructorRole,
       updateProfile,
       resetPassword,
-      saveAssignment,
-      removeAssignment,
-      cancelAssignment,
-      saveComparisonSet,
       markNotificationRead,
-      sendInboxMessage,
-      markInboxConversationRead,
     ]
   );
 

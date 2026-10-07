@@ -11,8 +11,9 @@
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
-| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | Web/Admin สองแอป; inventory → scope cleanup → split → contract → migrate; shared UI/tokens, authoring package ตามหลักฐาน และงาน Containerization/CI-CD พร้อมเกณฑ์รับ; ยังไม่เริ่ม implementation |
-| [R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md) | ผล R0/Lead review: inventory 89 routes, KEEP/ADAPT/REMOVE, state/packages/authoring boundaries, baseline 51 tests และ execution plan; รอ approve ก่อน R1 |
+| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | Web/Admin สองแอป; inventory → scope cleanup → split → contract → migrate; shared UI/tokens, authoring package ตามหลักฐาน และงาน Containerization/CI-CD พร้อมเกณฑ์รับ; R1 ผ่านแล้ว; ขั้นถัดไป R2a |
+| [R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md) | ผล R0/Lead review: inventory 89 routes, KEEP/ADAPT/REMOVE, state/packages/authoring boundaries, baseline 51 tests และ execution plan; R1 ผ่านแล้ว; inventory เดิมอ้าง source baseline |
+| [R1_SCOPE_CLEANUP_REPORT_TH.md](R1_SCOPE_CLEANUP_REPORT_TH.md) | ผล scope cleanup, retained routes, legacy snapshot compatibility และหลักฐานการตรวจ |
 | [R0 workflow ใน .codex](../.codex/workflows/r0-inventory.md) | วิธี Lead dispatch สี่ Luna xhigh inventory roles, common evidence format, read-only boundary, baseline/review/report และ approval ก่อน implementation |
 | [BUSINESS_ANALYTICS_UI_SPEC.md](BUSINESS_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [INSTRUCTOR_ANALYTICS_UI_SPEC.md](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
@@ -25,7 +26,7 @@
 
 อ่านฉบับหลักก่อน UI/CODE spec ซึ่งใช้รักษาแบรนด์และวิธีทำต้นแบบ การอนุมัติธุรกิจไม่เท่ากับ backend พร้อมหรือเลือกสแตกแล้ว
 
-ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก R0 สำรวจและตรวจ baseline แล้ว ปัจจุบันยังเป็น source ของแอปเดียวและอนุญาตเฉพาะ inventory/เอกสาร/แผน ไม่เริ่มย้ายโค้ดหรือเปลี่ยนฟีเจอร์จากการอนุมัติแผนเพียงอย่างเดียว
+ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก R0 สำรวจและตรวจ baseline แล้ว ผู้ใช้อนุมัติให้ทำต่อแล้ว R1 scope cleanup ผ่านตรวจและบันทึก checkpoint; ปัจจุบันยังเป็น source แอปเดียว รอ R2a/R2b แยก authoring boundary และ workspace
 
 ใช้ชื่อเป้าหมาย `apps/web` และ `apps/admin` รองรับ build/deploy แยกกัน มี basic CI หลัง split apps และชุด Containerization/CI-CD ช่วงเตรียมส่งมอบ Cloud Run ยังเป็น candidate โครงสร้างตัวอย่างไม่ใช่คำสั่งเปลี่ยนชื่อ checkout หรือ repository
 

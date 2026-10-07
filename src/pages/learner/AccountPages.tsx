@@ -1,9 +1,9 @@
 import React from 'react';
-import { Alert, Button, Empty, Popconfirm, Table, Typography, message, type TableProps } from 'antd';
+import { Button, Empty, Popconfirm, Table, Typography, message, type TableProps } from 'antd';
 import { PrinterOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { PageTitle, RolePill } from '../../components/common';
+import { PageTitle } from '../../components/common';
 import { flattenItems } from '../../data';
 import type { Certificate } from '../../types';
 import { ProfileSettings } from './ProfileSettings';
@@ -96,25 +96,17 @@ export function CertificatesPage() {
 
 export function CertificateDetailPage() {
   const { certificateId } = useParams<{ certificateId: string }>();
-  const location = useLocation();
   const { data, currentUser } = useLms();
   const currentUserId = currentUser?.id ?? '';
-  const isAdminView =
-    currentUser?.role === 'admin' && location.pathname.startsWith('/admin/certificates/');
   const cert = data.certificates.find(
-    (item) => item.id === certificateId || item.code === certificateId
+    (item) => (item.id === certificateId || item.code === certificateId) && item.userId === currentUserId
   );
 
-  if (!cert || (!isAdminView && cert.userId !== currentUserId)) {
+  if (!cert) {
     return <Empty description="ยังไม่มีใบรับรองนี้" />;
   }
 
-  const requestedReturn = new URLSearchParams(location.search).get('returnTo');
-  const back = isAdminView
-    ? /^\/admin\/certificates(?:\?|$)/.test(requestedReturn || '')
-      ? requestedReturn!
-      : '/admin/certificates'
-    : '/account/certificates';
+  const back = '/account/certificates';
   const user = data.users.find((item) => item.id === cert.userId);
   const course = data.courses.find((item) => item.id === cert.courseId);
   const teacher = data.users.find((item) => item.id === course?.instructorId);
@@ -148,48 +140,10 @@ export function CertificateDetailPage() {
           </div>
         </div>
         <div className="certificate-code">
-          รหัสตรวจสอบ {cert.code} · <Link to={`/certificates/verify/${cert.code}`}>ตรวจสอบใบรับรอง</Link>
+          รหัสใบรับรอง {cert.code}
         </div>
       </article>
     </>
-  );
-}
-
-export function VerifyCertificatePage() {
-  const { code = '' } = useParams<{ code: string }>();
-  const { data } = useLms();
-  const cert = data.certificates.find(
-    (item) => item.code.toLowerCase() === code.toLowerCase()
-  );
-  const user = data.users.find((item) => item.id === cert?.userId);
-  const course = data.courses.find((item) => item.id === cert?.courseId);
-
-  return (
-    <div className="public-page verify-page">
-      <PageTitle
-        title="ตรวจสอบใบรับรอง"
-        subtitle="ผลตรวจจากข้อมูลที่บันทึกอยู่ในเบราว์เซอร์นี้"
-      />
-      {cert ? (
-        <Alert
-          type="success"
-          showIcon
-          message="พบใบรับรองในข้อมูลตัวอย่าง"
-          description={
-            <span>
-              {cert.recipientName ?? user?.name} · {course?.title} · รหัส {cert.code}
-            </span>
-          }
-        />
-      ) : (
-        <Alert
-          type="error"
-          showIcon
-          message="ไม่พบรหัสใบรับรองนี้"
-          description="ข้อมูลการตรวจเป็นข้อมูลเดโมในอุปกรณ์นี้"
-        />
-      )}
-    </div>
   );
 }
 

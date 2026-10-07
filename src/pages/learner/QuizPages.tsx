@@ -2,12 +2,11 @@ import React, { useEffect } from 'react';
 import { Alert, Button, Empty, Form, Radio, Result, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, ClockCircleOutlined, SendOutlined } from '@ant-design/icons';
 import { IconSparkles } from '@tabler/icons-react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { RichDocument } from '../../components/chapter/RichTextEditor';
 import { PageTitle } from '../../components/common';
 import { answerIsComplete, WrittenAnswerInput, WrittenAnswerView } from '../../components/WrittenAnswer';
-import { assignmentIncludesLearner } from '../../lib/learning-history';
 import type { QuizAnswerValue } from '../../types';
 import './quiz-ai-entry.css';
 
@@ -17,17 +16,13 @@ export function QuizIntroPage() {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
   const { data, currentUser, startAttempt } = useLms();
-  const [search] = useSearchParams();
-  const assignmentId = search.get('assignmentId');
-  const assignment = (data.assignments || []).find((entry) => entry.id === assignmentId);
   const quiz = data.quizzes.find((item) => item.id === quizId);
 
   if (!quiz) return <Empty description="ไม่พบแบบทดสอบ" />;
 
-  if (assignmentId && (!assignment || assignment.status === 'cancelled' || assignment.quizId !== quiz.id || !assignmentIncludesLearner(assignment, currentUser?.id ?? ''))) return <Alert type="error" showIcon message="งานนี้ไม่ได้มอบหมายให้คุณหรือถูกยกเลิกแล้ว" />;
   const course = data.courses.find((item) => item.id === quiz.courseId);
   const enrolled = data.enrollments.some((entry) => entry.courseId === quiz.courseId && entry.userId === currentUser?.id);
-  if (course && !enrolled && currentUser?.role !== 'admin') {
+  if (course && !enrolled) {
     return <Alert type="warning" showIcon message="แบบทดสอบเปิดหลังสมัครคอร์ส" action={<Link to={`/explore/courses/${course.slug}`}><Button size="small">ดูรายละเอียดและสมัคร</Button></Link>} />;
   }
   const courseItem = course?.chapters
@@ -37,7 +32,7 @@ export function QuizIntroPage() {
     (attempt) =>
       attempt.quizId === quiz.id &&
       attempt.userId === data.currentUserId &&
-      (attempt.assignmentId ?? null) === assignmentId &&
+
       attempt.status === 'submitted'
   );
 
@@ -46,10 +41,10 @@ export function QuizIntroPage() {
       (attempt) =>
         attempt.quizId === quiz.id &&
         attempt.userId === data.currentUserId &&
-        (attempt.assignmentId ?? null) === assignmentId &&
+
         attempt.status === 'in_progress'
     );
-    const id = draft?.id ?? startAttempt(quiz, assignmentId);
+    const id = draft?.id ?? startAttempt(quiz);
     if (id) navigate(`/learn/attempts/${id}`);
   };
 
@@ -60,8 +55,7 @@ export function QuizIntroPage() {
       </Link>
       <div className="quiz-intro-panel">
         <Tag color="processing">แบบทดสอบ</Tag>
-        <Title>{assignment?.title ?? quiz.title}</Title>
-        {assignment?.instructions && <Paragraph>{assignment.instructions}</Paragraph>}
+        <Title>{quiz.title}</Title>
         <Paragraph>
           ทบทวนสิ่งที่ได้เรียนรู้ในบทนี้ ส่งคำตอบเมื่อพร้อม
           ผู้สอนจะตรวจคำตอบข้อเขียนและแจ้งผลในระบบ
@@ -105,7 +99,7 @@ export function QuizIntroPage() {
             }
           />
         )}
-        <Button className="top-space" type="primary" size="large" onClick={start} disabled={Boolean(assignmentId && latest?.essayStatus === 'pending')}>
+        <Button className="top-space" type="primary" size="large" onClick={start}>
           {latest ? 'ทำแบบทดสอบอีกครั้ง' : 'เริ่มทำแบบทดสอบ'}
         </Button>
       </div>

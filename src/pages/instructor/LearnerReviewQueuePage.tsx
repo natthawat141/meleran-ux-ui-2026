@@ -19,13 +19,17 @@ export function LearnerReviewQueuePage() {
   const modeFilter = searchParams.get('mode') || 'all';
   const searchText = searchParams.get('q') || '';
 
+  if (currentUser?.role !== 'instructor') {
+    return <Empty description="คิวตรวจงานเปิดสำหรับผู้สอนเจ้าของคอร์ส" />;
+  }
+
   const courses = (data.courses || []).filter(
-    (c) => currentUser?.role === 'admin' || c.instructorId === currentUser?.id
+    (course) => course.instructorId === currentUser.id
   );
 
   const queueItems = getReviewQueue(data, {
     instructorId: currentUser?.id,
-    role: currentUser?.role,
+    role: currentUser.role,
     courseId: courseFilter !== 'all' ? courseFilter : undefined,
   });
 
@@ -124,9 +128,6 @@ export function LearnerReviewQueuePage() {
         eyebrow="คิวตรวจงานส่วนกลาง"
         title="งานรอตรวจของผู้เรียน"
         subtitle="ตรวจข้อเขียนและรูปภาพที่ส่งมาจากทุกแบบฝึกหัด เรียงตามลำดับเวลาที่ส่งก่อน"
-        actions={
-          <Button onClick={() => navigate('/teach/analytics')}>ดูภาพรวม Analytics</Button>
-        }
       />
 
       <div className="review-queue-filter-bar">
@@ -143,7 +144,7 @@ export function LearnerReviewQueuePage() {
             className="review-course-filter"
             aria-label="กรองตามคอร์ส"
             options={[
-              { value: 'all', label: currentUser?.role === 'admin' ? 'ทุกคอร์ส' : 'ทุกคอร์สของฉัน' },
+              { value: 'all', label: 'ทุกคอร์สของฉัน' },
               ...courses.map((c) => ({ value: c.id, label: c.title })),
             ]}
           />

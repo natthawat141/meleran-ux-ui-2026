@@ -1,17 +1,15 @@
 import React from 'react';
 import { Alert, Button, Empty, Space, Tag, Typography, message } from 'antd';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { CourseProgress, PageTitle } from '../../components/common';
 import { CourseOutline } from '../../components/CourseOutline';
 import { UserAvatar } from '../../components/UserAvatar';
 import { formatPrice, instructorFor } from '../../data';
 import './catalog.css';
-import { getCoursePreviewLesson } from '../../lib/course-preview';
 
 export function MemberCourseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const location = useLocation();
   const navigate = useNavigate();
   const { data, currentUser, enrollFree } = useLms();
   const course = data.courses.find(
@@ -33,9 +31,6 @@ export function MemberCourseDetailPage() {
   );
   const canLearn = currentUser?.role === 'learner' || currentUser?.role === 'instructor' || currentUser?.role === 'admin';
   const canBuy = currentUser?.role === 'learner' || (currentUser?.role === 'instructor' && course.instructorId !== currentUser.id);
-  const hasPreview = Boolean(getCoursePreviewLesson(course));
-  const referralCode = new URLSearchParams(location.search).get('ref')?.trim();
-  const referralQuery = referralCode ? `?ref=${encodeURIComponent(referralCode)}` : '';
 
   const start = () => {
     if (currentUser?.role !== 'admin' && currentUser?.emailVerified === false) {
@@ -43,11 +38,11 @@ export function MemberCourseDetailPage() {
     } else if (enrolled) {
       navigate(`/learn/courses/${course.id}`);
     } else if (course.price === 0) {
-      const result = enrollFree(course.id, undefined, referralCode);
+      const result = enrollFree(course.id);
       if (result.ok) navigate(`/learn/courses/${course.id}`);
       else message.info(result.message);
     } else if (canBuy && currentUser?.status !== 'suspended') {
-      navigate(`/checkout/${course.id}${referralQuery}`);
+      navigate(`/checkout/${course.id}`);
     }
   };
 
@@ -88,7 +83,6 @@ export function MemberCourseDetailPage() {
             {canBuy && !enrolled && course.price > 0 && currentUser?.status !== 'suspended' && (
               <Button type="primary" onClick={start}>ซื้อคอร์ส</Button>
             )}
-            {hasPreview && <Link to={`/courses/${course.slug}/preview`}><Button>ทดลองเรียนบทแรก</Button></Link>}
             {currentUser?.role === 'admin' && (
               <Link to={`/admin/courses/${course.id}`}>
                 <Button>จัดการคอร์ส</Button>

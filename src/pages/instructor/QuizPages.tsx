@@ -9,6 +9,7 @@ import { PageTitle, StatusTag } from '../../components/common';
 import { WrittenAnswerView, writtenAnswer } from '../../components/WrittenAnswer';
 import { UserAvatar } from '../../components/UserAvatar';
 import { getReviewQueue } from '../../lib/assessment-review';
+import { getGradingReturnTo } from '../../lib/grading-navigation';
 import type { Quiz, QuizAttempt } from '../../types';
 import './grading-workspace.css';
 
@@ -88,10 +89,13 @@ export { QuizEditorPage } from './QuizEditorPage';
 
 export function QuizAttemptsPage() {
   const { quizId } = useParams<{ quizId?: string }>();
-  const { data } = useLms();
+  const { data, currentUser } = useLms();
   const quiz = data.quizzes.find((item) => item.id === quizId);
   const attempts = data.attempts.filter((attempt) => attempt.quizId === quizId && attempt.status === 'submitted');
   if (!quiz) return <Empty description="ไม่พบแบบทดสอบ" />;
+  const isInstructorOwner =
+    currentUser?.role === 'instructor' &&
+    data.courses.some((course) => course.id === quiz.courseId && course.instructorId === currentUser.id);
 
   const columns: TableProps<QuizAttempt>['columns'] = [
     {
@@ -116,12 +120,14 @@ export function QuizAttemptsPage() {
     {
       title: '',
       render: (_, attempt) =>
-        attempt.essayStatus === 'pending' ? (
+        attempt.essayStatus === 'pending' && isInstructorOwner ? (
           <Link to={`/teach/attempts/${attempt.id}/grade`}>
             <Button type="primary">ตรวจข้อเขียน</Button>
           </Link>
         ) : (
-          <Text type="secondary">{attempt.finalPercent ?? attempt.percent}%</Text>
+          <Text type="secondary">
+            {attempt.essayStatus === 'pending' ? 'รอผู้สอนตรวจ' : `${attempt.finalPercent ?? attempt.percent}%`}
+          </Text>
         ),
     },
   ];
@@ -150,8 +156,11 @@ export function GradeEssayPage() {
   const navigate = useNavigate();
   const attempt = data.attempts.find((item) => item.id === attemptId);
   const quiz = attempt?.quizSnapshot ?? data.quizzes.find((item) => item.id === attempt?.quizId);
-  const returnTo = search.get('returnTo') || `/teach/quizzes/${quiz?.id}/attempts`;
-  if (!attempt || !quiz || (currentUser?.role !== 'admin' && data.courses.find((entry) => entry.id === attempt.courseId)?.instructorId !== currentUser?.id)) return <Empty description="ไม่พบคำตอบนี้" />;
+  const returnTo = getGradingReturnTo(search.get('returnTo'), quiz?.id);
+  const ownsCourse =
+    currentUser?.role === 'instructor' &&
+    data.courses.some((course) => course.id === attempt?.courseId && course.instructorId === currentUser.id);
+  if (!attempt || !quiz || !ownsCourse) return <Empty description="ไม่พบคำตอบนี้" />;
   if (attempt.essayStatus !== 'pending')
     return (
       <Alert

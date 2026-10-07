@@ -19,8 +19,6 @@ export interface User extends ProfileDetails {
   status?: 'active' | 'suspended' | 'pending' | 'invited';
   /** False is set only for accounts created through the self-service email flow. Missing means a legacy/admin account. */
   emailVerified?: boolean;
-  baseSharePercent?: number;
-  referralSharePercent?: number;
 }
 
 export interface DemoAccount {
@@ -156,8 +154,6 @@ export interface Quiz {
   chapterId?: string;
   title: string;
   passPercent: number;
-  assessmentStage?: 'pre_test' | 'practice' | 'post_test';
-  comparisonSetId?: string;
   questions: Question[];
 }
 
@@ -177,7 +173,6 @@ export type QuizAnswerValue = number | string | AttemptAnswerEssay | unknown;
 
 export interface QuizAttempt {
   id: string;
-  assignmentId?: string | null;
   quizSnapshot?: Quiz;
   startedAt?: string;
   quizId: string;
@@ -204,111 +199,36 @@ export interface Enrollment {
   courseId: string;
   userId: string;
   createdAt: string;
-  referralLinkId?: string;
-  referralCode?: string;
-  referralInstructorId?: string;
 }
 
-export interface Order {
-  id: string;
-  courseId: string;
-  userId: string;
-  amount: number;
-  listPrice?: number;
-  discountAmount?: number;
-  status: 'pending' | 'paid' | 'failed' | 'cancelled';
-  method?: string;
-  source?: 'payment' | 'cash_code' | 'free_code';
-  accessCodeId?: string;
-  accessCode?: string;
-  accessCodeKind?: AccessCodeKind;
-  createdAt: string;
-  instructorId?: string;
-  instructorSharePercent?: number;
-  instructorShareAmount?: number;
-  platformShareAmount?: number;
-  referralLinkId?: string;
-  referralCode?: string;
-  payoutStatus?: 'pending' | 'transferred' | 'not_applicable';
-  payoutId?: string;
-  paidOutAt?: string;
-  demoFinance?: boolean;
-}
+export type RedeemCodeStatus = 'unused' | 'used' | 'revoked';
 
-export type AccessCodeKind = 'percent' | 'fixed' | 'free' | 'cash';
-
-export interface AccessCode {
+export interface RedeemCode {
   id: string;
   code: string;
   courseId: string;
-  kind: AccessCodeKind;
-  value?: number;
-  userId?: string;
-  receivedAmount?: number;
-  maxUses: number | null;
-  usedCount: number;
-  status: 'active' | 'inactive';
+  status: RedeemCodeStatus;
   createdAt: string;
   createdBy: string;
-  expiresAt?: string;
-  lastUsedAt?: string;
+  usedByUserId?: string;
+  usedAt?: string;
+  enrollmentId?: string;
+  revokedBy?: string;
+  revokedAt?: string;
 }
 
-export interface CreateAccessCodeInput {
-  courseId: string;
-  kind: AccessCodeKind;
-  code?: string;
-  value?: number | null;
-  userId?: string;
-  receivedAmount?: number | null;
-  maxUses?: number | null;
-  expiresAt?: string;
+export interface CreateRedeemCodeResult extends ActionResult {
+  redeemCode?: RedeemCode;
 }
 
-export interface CreateAccessCodeResult extends ActionResult {
-  accessCode?: AccessCode;
-}
+export type RedeemCourseCodeResult =
+  | { ok: true; enrollmentId: string; redeemCodeId: string; alreadyEnrolled: boolean }
+  | { ok: false; message: string };
 
-export interface CartItem {
-  id: string;
-  userId: string;
-  courseId: string;
-  createdAt: string;
-  priceAlertEnabled: boolean;
-  referralCode?: string;
+export interface LegacyPrototypeSnapshot {
+  /** Raw retired collections kept only so older browser data and result links remain recoverable. */
+  collections: Record<string, unknown>;
 }
-
-export interface PriceAlertEmail {
-  id: string;
-  userId: string;
-  to: string;
-  courseId: string;
-  courseTitle: string;
-  previousPrice: number;
-  newPrice: number;
-  createdAt: string;
-  status: 'mock-sent';
-}
-
-export interface ReferralLink {
-  id: string;
-  code: string;
-  courseId: string;
-  instructorId: string;
-  createdAt: string;
-}
-
-export interface InstructorPayout {
-  id: string;
-  instructorId: string;
-  amount: number;
-  orderCount: number;
-  orderIds: string[];
-  createdAt: string;
-}
-
-export type CreateReferralLinkResult = { ok: true; link: ReferralLink } | { ok: false; message: string };
-export type InstructorPayoutResult = { ok: true; payout: InstructorPayout } | { ok: false; message: string };
 
 export interface Certificate {
   id: string;
@@ -317,103 +237,6 @@ export interface Certificate {
   userId: string;
   issuedAt: string;
   recipientName?: string;
-}
-
-export interface InstructorRequest {
-  id: string;
-  userId?: string;
-  userName: string;
-  email: string;
-  intro: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: string;
-  reviewNote?: string;
-}
-
-export interface InstructorInvite {
-  id: string;
-  token: string;
-  userId?: string;
-  name: string;
-  email: string;
-  status: 'pending' | 'accepted' | 'expired';
-  createdAt: string;
-}
-
-export interface Assignment {
-  id: string;
-  status?: 'active' | 'cancelled';
-  instructions?: string;
-  chapterId?: string;
-  courseId: string;
-  quizId: string;
-  title: string;
-  stage: 'pre_test' | 'practice' | 'post_test';
-  assigneeType: 'all_enrolled' | 'specific';
-  assigneeIds?: string[];
-  dueDate?: string | null;
-  createdBy?: string;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export interface ComparisonSet {
-  id: string;
-  title: string;
-  courseId: string;
-  preQuizId: string;
-  postQuizId: string;
-  description?: string;
-  createdAt: string;
-}
-
-export interface InboxMessage {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  recipientId?: string;
-  body: string;
-  createdAt: string;
-  readAt?: string | null;
-  readBy?: string[];
-  context?: InboxSubjectContext;
-  isDemo?: boolean;
-  attachments?: InboxAttachment[];
-}
-
-export interface InboxAttachment {
-  id: string;
-  name: string;
-  contentType: 'image/webp' | 'video/mp4' | 'video/webm';
-  size: number;
-  url: string;
-}
-
-export interface InboxAttachmentInput extends Omit<InboxAttachment, 'id'> {}
-
-export interface InboxSubjectContext {
-  courseId?: string;
-  courseTitle?: string;
-  chapterId?: string;
-  chapterTitle?: string;
-  itemId?: string;
-  itemTitle?: string;
-  itemType?: string;
-}
-
-export interface InboxConversation {
-  id: string;
-  type?: 'course_inquiry' | 'support';
-  courseId?: string | null;
-  participantIds: string[];
-  assignedAdminId?: string | null;
-  subject?: string;
-  context?: InboxSubjectContext;
-  status?: 'open' | 'closed';
-  lastMessageAt?: string;
-  unreadCount?: Record<string, number> | number;
-  createdAt?: string;
-  isDemo?: boolean;
 }
 
 export interface LmsData {
@@ -425,22 +248,10 @@ export interface LmsData {
   quizzes: Quiz[];
   attempts: QuizAttempt[];
   enrollments: Enrollment[];
-  orders: Order[];
-  accessCodes: AccessCode[];
-  cartItems: CartItem[];
-  mockPriceEmails: PriceAlertEmail[];
-  referralLinks: ReferralLink[];
-  instructorPayouts: InstructorPayout[];
-  financeDemoSeedVersion?: string;
+  redeemCodes: RedeemCode[];
   certificates: Certificate[];
-  instructorRequests: InstructorRequest[];
-  invitations: InstructorInvite[];
-  assignments?: Assignment[];
-  comparisonSets?: ComparisonSet[];
-  inboxConversations?: InboxConversation[];
-  inboxMessages?: InboxMessage[];
+  legacyPrototype?: LegacyPrototypeSnapshot;
   progress: Record<string, Record<string, boolean>>;
-  inboxDemoVersion?: number;
   notifications?: Notification[];
 }
 
@@ -451,7 +262,6 @@ export interface Notification {
   title: string;
   description: string;
   href?: string;
-  conversationId?: string;
   createdAt?: string;
   readAt?: string | null;
 }
@@ -478,20 +288,6 @@ export interface WorkspaceSaveResult {
   message?: string;
 }
 
-export interface SendInboxMessageArgs {
-  conversationId?: string;
-  recipientId?: string;
-  courseId?: string;
-  itemId?: string;
-  chapterId?: string;
-  text: string;
-  attachments?: InboxAttachmentInput[];
-}
-
-export interface SendInboxMessageResult extends ActionResult {
-  conversationId?: string;
-}
-
 export interface LmsContextType {
   data: LmsData;
   currentUser: User | null;
@@ -511,7 +307,6 @@ export interface LmsContextType {
   publishCourse: (courseId: string) => ActionResult;
   setCourseAiEnabled: (courseId: string, enabled: boolean) => ActionResult;
   saveVideoTranscript: (courseId: string, chapterId: string, videoId: string, transcript: string) => SaveTranscriptResult;
-  removeCourse: (courseId: string) => void;
   saveChapter: (courseId: string, chapter: Partial<Chapter>, chapterId?: string) => void;
   saveChapterWorkspace: (courseId: string, chapter: Chapter, quizzes: Quiz[], baseline: string) => WorkspaceSaveResult;
   reorderCurriculum: (courseId: string, chapterId: string | null | undefined, orderedIds: string[]) => ReorderResult;
@@ -520,55 +315,19 @@ export interface LmsContextType {
   removeItem: (courseId: string, chapterId: string, itemId: string) => ActionResult;
   saveQuiz: (values: Partial<Quiz>, quizId?: string) => string | null;
   removeQuiz: (quizId: string) => ActionResult;
-  enrollFree: (courseId: string, userId?: string, referralCode?: string | null) => ActionResult;
-  simulatePayment: (courseId: string, outcome: 'paid' | 'failed', referralCode?: string | null, accessCode?: string) => string | null;
-  createAccessCode: (values: CreateAccessCodeInput) => CreateAccessCodeResult;
-  setAccessCodeStatus: (accessCodeId: string, status: 'active' | 'inactive') => ActionResult;
-  addCourseToCart: (courseId: string, referralCode?: string | null) => ActionResult & { alreadyAdded?: boolean };
-  removeCourseFromCart: (cartItemId: string) => boolean;
-  setCoursePriceAlert: (courseId: string, enabled: boolean) => boolean;
-  createReferralLink: (courseId: string) => CreateReferralLinkResult;
-  saveInstructorCommission: (userId: string, base: number, referral: number) => ActionResult;
-  markInstructorPayout: (instructorId: string) => InstructorPayoutResult;
+  enrollFree: (courseId: string) => ActionResult;
+  redeemCourseCode: (code: string) => RedeemCourseCodeResult;
+  createRedeemCode: (courseId: string) => CreateRedeemCodeResult;
+  revokeRedeemCode: (redeemCodeId: string) => ActionResult;
   markContentDone: (courseId: string, itemId: string) => void;
-  startAttempt: (quiz: Quiz, assignmentId?: string | null) => string | null;
+  startAttempt: (quiz: Quiz) => string | null;
   saveAttemptDraft: (attemptId: string, answers: Record<string, QuizAnswerValue>) => void;
   submitAttempt: (quiz: Quiz, answers: Record<string, QuizAnswerValue>, existingAttemptId?: string) => string | null;
   gradeAttempt: (attemptId: string, grading: { score: number; feedback?: string }) => ActionResult;
-  requestInstructor: (values: { name?: string; email?: string; intro: string }) => void;
-  reviewInstructorRequest: (requestId: string, decision: 'approved' | 'rejected', note?: string) => void;
-  createInstructorInvite: (invite: { name: string; email: string }) => string;
-  acceptInstructorInvite: (token: string, password?: string) => ActionResult;
-  changeUserRole: (userId: string, role: Role) => void;
+  assignInstructorRole: (userId: string) => ActionResult;
   updateProfile: (values: ProfileValues) => ActionResult;
   resetPassword: (email: string, password?: string) => ActionResult;
-  saveAssignment: (values: Partial<Assignment>, assignmentId?: string) => ActionResult & { assignment?: Assignment };
-  removeAssignment: (assignmentId: string) => ActionResult;
-  cancelAssignment: (assignmentId: string) => ActionResult;
-  saveComparisonSet: (values: Partial<ComparisonSet>, comparisonSetId?: string) => string;
   markNotificationRead: (notificationId: string) => void;
-  sendInboxMessage: (args: SendInboxMessageArgs) => SendInboxMessageResult;
-  markInboxConversationRead: (conversationId: string) => void;
 }
 
-export type {
-  ReviewQueueOptions,
-  ReviewQueueItem,
-  CourseAnalyticsRow,
-  InstructorAnalyticsResult,
-  LearnerAnalyticsRow,
-  AssessmentSummaryRow,
-  CourseAnalyticsResult,
-  LearnerTimelineEvent,
-  LearnerAssessmentRecord,
-  LearnerCourseAnalyticsResult,
-  PairedLearnerResult,
-  PrePostComparisonResult,
-} from '../api/analytics';
-
-export type CourseAssessmentRow = import('../api/analytics').AssessmentSummaryRow;
-export type CourseLearnerRow = import('../api/analytics').LearnerAnalyticsRow;
-export type LearnerAssessmentItem = import('../api/analytics').LearnerAssessmentRecord;
-export type PrePostLearnerResult = import('../api/analytics').PairedLearnerResult;
-export type AnalyticsCourseRow = import('../api/analytics').CourseAnalyticsRow;
-export type ReviewQueueEntry = import('../api/analytics').ReviewQueueItem;
+export type { ReviewQueueOptions, ReviewQueueItem } from '../lib/assessment-review';

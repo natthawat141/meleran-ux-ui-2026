@@ -32,9 +32,35 @@
 
 ผล browser นี้เป็น Admin navigation เท่านั้น ไม่ใช่ learner/instructor lifecycle, mobile/visual acceptance ครบทุกหน้า หรือ live API/Stripe/backend integration
 
-## R1b/R1c — งานที่กำลังตามต่อ
+## R1b/R1c — Functional cleanup และ compatibility
 
-ถอน out-of-scope capabilities/permission gaps ตาม R0 matrix แล้วจัด state/actions/fixtures/loader และ Redeem compatibility ที่ไม่สร้าง Order/share โดยตรวจว่า stored attempts/enrollments/certificates/used codes ยังอยู่ ปิดช่อง reseed legacy data และคง learning-history guards ก่อน checkpoint ชุดถัดไป
+- ถอน 28 routes จาก baseline 89 เหลือ 61 routes/59 feature paths และ 13 feature keys; ถอน 44 tracked files ของ legacy capability/fixtures/tests; ถอน Cart/Orders เต็ม, Inbox, Finance/share/referral, analytics/comparison, Assignment แยก, instructor requests/invites, Guest lesson preview, public certificate verification และ Admin global certificate browser พร้อม source/CSS/tests ของ capability ที่เลิกใช้
+- Admin directory ยังคง `/admin/instructors` โดยแยกจาก requests/invites; เพิ่มบทบาท Instructor ให้บัญชี Learner เดิมที่เข้าเงื่อนไขผ่าน action เฉพาะ ไม่เปิดการเปลี่ยน role แบบอิสระ
+- ถอน destructive course deletion; คง course authoring, management preview, roster/progress/result และ owner certificate URL ที่อยู่ใน scope UI ของ retained flows ไม่มี redesign
+- Admin ไม่มี grading entry/action; Instructor ตรวจได้เฉพาะ submitted/pending ของคอร์สตน; helper ตรวจ quiz/course relationship; notification destinations และ grading returnTo จำกัด retained local routes
+- Learner/Instructor learning writes ต้องมี Enrollment และเงื่อนไขบัญชี; ถอด first-lesson public bypass; Instructor ยังเรียนคอร์สของผู้อื่นได้ตามสิทธิ์
+- `redeemCodes` มี unused/used/revoked ใช้ครั้งเดียว ไม่มี expiry สำหรับโค้ดใหม่; Redeem transition เพิ่ม Enrollment ไม่สร้าง Order/share; legacy cash codes map โดยหลักฐานการใช้ ส่วน discount codes ไม่สร้างสิทธิ์
+- คง `/checkout/:orderId/result?channel=redeem` ผ่าน read-only adapter ของรายการเดิม: แสดงสิทธิ์เฉพาะ Enrollment ที่มีอยู่แล้ว ไม่ให้สิทธิ์จาก paid order เพียงอย่างเดียว; URL retained ไม่เปลี่ยน ส่วน 28 URL ที่ถอดเข้า Not Found ไม่มี redirect ไปความสามารถใหม่
+- loader ไม่เติม fixture rows ใน saved snapshot; เก็บ retired collections/metadata เช่น assignmentId ที่ผูกกับ attempt ใน `legacyPrototype.collections` แบบ inert; คง answers/scores/IDs/enrollments/certificates/progress/used codes ที่อ่านได้
+- malformed rows/progress หรือ saved root ที่อ่านไม่ได้ถูกเก็บใน rejectedSnapshotFields/unreadableStoredSnapshot ไม่ใช้เป็น active state และไม่ reseed sample data แทน; round-trip tests ตรวจ idempotency การเก็บข้อมูลนี้เป็น local compatibility ไม่ใช่ API DTO
+- ถอด unused assignment fixture และ comparison seed metadata; historical R0 source links ใช้ Git baseline `19ec7aa3389a14dd79328a1c8e8285c24f171865` เพื่อยังอ่านหลักฐานของไฟล์ที่ถอนแล้วได้
+
+### ผลตรวจ R1b/R1c
+
+| Check | ผล |
+| --- | --- |
+| `npm.cmd run typecheck` | PASS |
+| `node --test tests/*.test.ts tests/*.test.mjs` | PASS 53/53 รวม migration/history/redeem/route ownership/notification/grading checks |
+| `npm.cmd run build` | PASS Vite 7.3.6 ใน 33.91s; index JS 2,585.06kB/gzip797.35kB; library use-client warnings และ chunk >500KB ยังมี |
+| Browser Admin | dashboard/nav ไม่มี legacy entries; access codes แสดงรหัสเดิมที่ใช้แล้ว; `/teach/reviews` Unauthorized; `/account/cart` Not Found |
+| Browser Instructor | คิวตรวจแสดง 3 งานของเจ้าของคอร์ส เรียงตามเวลาส่ง; `/learn/redeem` เปิดได้ |
+| Session/data | ทดสอบสลับบทบาทตัวอย่าง Admin → Instructor → Admin และยืนยันคืน session เดิม; ไม่ grade/create/revoke/redeem/pay/reset ข้อมูลผ่าน browser |
+| Console | Ant Alert message deprecation warning เดิม; ไม่พบ runtime exception ในหน้าที่ตรวจ |
+| Git | R1a checkpoint `e1a97e3abe84bcff0d404666d359b8af21a80e84` push แล้ว; R1b/R1c เป็น checkpoint ถัดไปบน branch เดิม |
+
+### สิ่งที่ยังต้องทำตาม phase ถัดไป
+
+R1 เป็น scope cleanup ของต้นแบบ ไม่ใช่ Final 1.6 implementation ครบหรือ API readiness: แอปยังรวม Web/Admin, server state ยังอยู่ local store, permission/score/progress/payment/quota ต้องย้ายไป backend ตาม contract; grading thresholds/media completion/highest score/AI quota/auth flows ตรวจและปรับใน phases ที่กำหนด ไม่อนุมานว่า tests/build ทำให้พร้อม production ไม่มี live Stripe/backend acceptance หรือ mobile/visual regression ครบทุกหน้า ขั้นถัดไป R2a พิสูจน์ controlled authoring core interface ก่อน R2b split workspace
 
 ## Rollback
 

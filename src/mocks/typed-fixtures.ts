@@ -1,6 +1,5 @@
 import analytics from './analytics.json';
-import assignments from './assignments.json';
-import type { Assignment, ComparisonSet, Enrollment, Question, Quiz, QuizAttempt, User } from '../types';
+import type { Enrollment, Question, Quiz, QuizAttempt, User } from '../types';
 
 // JSON imports retain their inferred structure. Only string discriminants need
 // narrowing; check their actual values rather than asserting the entire fixture.
@@ -18,7 +17,6 @@ export const fixtureUsers: User[] = analytics.users.map((user) => ({
 
 export const fixtureQuizzes: Quiz[] = analytics.quizzes.map((quiz) => ({
   ...quiz,
-  assessmentStage: fixtureLiteral(quiz.assessmentStage, ['pre_test', 'practice', 'post_test']),
   questions: quiz.questions.map((question): Question => {
     if (question.type === 'choice') {
       if (question.options === undefined || question.answer === undefined) {
@@ -43,11 +41,4 @@ export const fixtureAttempts: QuizAttempt[] = analytics.attempts.map((attempt) =
   status: fixtureLiteral(attempt.status, ['in_progress', 'draft', 'submitted']),
 }));
 
-export const fixtureAssignments: Assignment[] = assignments.assignments.map((assignment) => ({
-  ...assignment,
-  stage: fixtureLiteral(assignment.stage, ['pre_test', 'practice', 'post_test']),
-  assigneeType: fixtureLiteral(assignment.assigneeType, ['all_enrolled', 'specific']),
-}));
-
-export const fixtureEnrollments: Enrollment[] = analytics.enrollments;
-export const fixtureComparisonSets: ComparisonSet[] = analytics.comparisonSets;
+export const fixtureEnrollments: Enrollment[] = analytics.enrollments.map((enrollment) => enrollment);

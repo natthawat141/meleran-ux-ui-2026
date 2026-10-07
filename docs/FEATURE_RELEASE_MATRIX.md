@@ -1,360 +1,116 @@
 # Feature Release Matrix — Melearn
 
-อัปเดต 7 ตุลาคม 2026 · ขอบเขต `elearning-ux-v2` · ตรวจจาก route และ source จริง
+อัปเดต 7 ตุลาคม 2026 · หลัง R1 scope cleanup บน `refactor/v1-api-ready`
 
-เอกสารนี้เป็นหน้าเดียวสำหรับดูว่าแต่ละ feature อยู่เฟสใด มีหลักฐานพร้อมระดับไหน และยังขาดอะไร ส่วน [config](../src/config/features.ts) เป็นแหล่งที่โค้ดอ่านเพื่อเปิด route ตาม environment ไม่สร้าง Dashboard, CMS, database feature flags หรือ deployment management เพิ่ม
+ยึด [Final 1.6](MELEARN_V1_SCOPE.md) และ [execution plan](FRONTEND_REFACTOR_PLAN_TH.md) ส่วน [config](../src/config/features.ts) กำหนด runtime gates ตาม environment การอนุมัติ scope ไม่ใช่ backend readiness ทุก feature ยัง `prototype`; default production ปิด prototype routes การตรวจ build ผ่านไม่เปลี่ยนเป็น integration/released
 
-**แอปนี้ยังเป็น interactive prototype ไม่ใช่ Production backend** มี 89 route ใน `App.tsx`: 87 route ที่ผูก feature และ 2 route ระบบ (`/403`, `*`) ทุก feature เริ่มเป็น `prototype` ไม่มี feature ที่อ้างว่า `integration` หรือ `released` เพียงเพราะคลิกหน้าเว็บได้หรือ build ผ่าน
+R1a แยก Payment/Redeem/roster ออกจาก legacy gates แล้ว R1b/R1c ถอน Cart/Orders/Finance/Inbox/Assignment/comparison dashboards/request/invite/public full lesson preview/public certificate verification/global Admin certificate viewer และ Admin grading ก่อน deep refactor รายงานผลและข้อจำกัดอยู่ใน [R1 report](R1_SCOPE_CLEANUP_REPORT_TH.md)
 
-## น้ำหนักของข้อมูล
-
-**สำหรับ refactor ที่ยืนยัน 7 ต.ค. 2026:** ใช้ [Final 1.6](MELEARN_V1_SCOPE.md) เป็น scope และ [แผน Frontend](FRONTEND_REFACTOR_PLAN_TH.md) เป็นลำดับงานใหม่ ตาราง feature keys/route/runtime ด้านล่างเป็น inventory ของ source/config เดิม ข้อความ Business Rule และ Phase ที่ยังอ้าง V3 หรือฟีเจอร์นอก scope เป็นประวัติต้นแบบ ไม่ใช่ decision ที่ยังต้องถามซ้ำหรือสิทธิ์ให้เปิดใช้ ในชุดย้าย feature ต้องปรับ matrix/config/tests พร้อมกัน โดยรอบเอกสารนี้ยังไม่เปลี่ยน runtime หรือ route ใด
-
-- คำยืนยันตรงจากเจ้าของล่าสุดมีน้ำหนักเหนือเอกสารร่างและพฤติกรรมต้นแบบ
-- ตารางนี้แยก UI, Business Rule, Backend, Runtime และหลักฐานการตรวจ จึงไม่ใช้สถานะเดียวแทนทุกเรื่อง
-- Phase เป็น **ข้อเสนอลำดับส่งมอบ** ไม่ใช่การอนุมัติขอบเขต วันส่งงาน หรือสแตก และไม่มีผลเปิด route
-- Runtime และการผูก route ต้องตรง [`FEATURES` / `ROUTE_FEATURES`](../src/config/features.ts) tests จะตรวจความสอดคล้องกับตารางนี้เมื่อแก้ code
-- R1a แยกเจ้าของ route ที่เก็บไว้เป็น `payments` (Stripe), `redeem` (รหัสให้สิทธิ์) และ `instructorCourses` (รายชื่อผู้เรียนของผู้สอน); `commerce`/`analytics` ยังรองรับ route ต้นแบบเก่าที่รอ functional cleanup โดยยังไม่ลบ route หรือเปลี่ยน guard ในรอบนี้
-- Staging / Production ในตารางหมายถึง **ความพร้อมที่ผ่านการตรวจรับ** ไม่ใช่ข้อกล่าวอ้างว่าไม่มีเว็บไซต์ที่ deploy ไว้ ปัจจุบันไม่มีหลักฐาน backend/integration/release acceptance สำหรับ feature เหล่านี้
-
-กติกาที่เจ้าของยืนยันในการทบทวน 5 ต.ค. 2026: Instructor ซื้อคอร์สคนอื่นได้, ซื้อคอร์สตนเองไม่ได้เพราะมีสิทธิ์ดู, Admin ซื้อไม่ได้เพราะดูคอร์สทั้งหมดได้, Instructor เผยแพร่คอร์สตนเองได้หลัง Admin อนุมัติ **ยืนยันกติกาแล้วไม่ได้แปลว่า implementation เสร็จ**
-
-[Inbox permission spec](INBOX_PERMISSION_SPEC.md) มีขอบเขตผลิตภัณฑ์ที่เจ้าของยืนยัน 1 ต.ค. 2026 อยู่แล้ว แต่รายละเอียดและ implementation ยังมีช่องว่าง ไม่ย้อนสถานะกติกานั้นเป็น TBD ทั้งหมด และไม่ตีความว่าสิทธิ์ดูคอร์สของ Admin ให้อ่านข้อมูลส่วนตัวหรือแชตทั้งหมดได้
+Source ยังเป็นแอปเดียวและ browser-local prototype; monorepo split/Query/contracts/server integration เป็นงานลำดับถัดไป Runtime status ต้องมีหลักฐานตรง revision ก่อนเลื่อน ตาม CODE_SPEC ไม่เปิดทุกอย่างเพื่อให้ demo ทำงานใน production
 
 ## ภาพรวม feature
 
-UI = Prototype หมายถึงมีหน้า/interaction ใน source ยังไม่ใช่การรับรองว่าทุก flow หรือทุกหน้าผ่าน UX acceptance; Demo หมายถึงมีส่วนจำลองหรือ placeholder ชัดเจน
-
-Business Rule = Reviewing (ต้องทบทวน), Partial (มีบางกติกายืนยันแล้ว แต่ยังไม่ครบ), Approved scope (ยืนยันขอบเขตที่ลิงก์อ้างอิง; รายละเอียดคงค้างยังต้องตอบ) ไม่มีการเขียน Approved ทั้ง feature จากตัวอย่างในแชต
-
-Backend = None หมายถึงยังไม่มี Production API/persistence/auth/enforcement สำหรับ feature ใน repo นี้ แม้มีไฟล์ชื่อ `src/api/` ซึ่งเป็น local selectors/read-models; Static หมายถึงเนื้อหาเว็บบางส่วนไม่ต้องใช้ backend แต่ยังต้องตรวจรับสำหรับ release
+Phase เป็น metadata ลำดับส่งมอบที่ source ใช้ ไม่ใช่เลข R0–R13 หรือกำหนดวัน UI Prototype หมายถึงมี implementation ไม่ใช่ผ่าน flow/visual acceptance ทั้งหมด Business scope ยืนยัน Final 1.6 แล้ว แต่กติกา server/transport/contracts ของ implementation ต้องตกลงร่วม backend
 
 | Feature key | Feature | Phase (เสนอ) | UI | Business Rule | Backend | Runtime | Staging | Production |
 | --- | --- | ---: | --- | --- | --- | --- | --- | --- |
-| `publicSite` | Landing / About / ประวัติผู้สอน | 1 | Prototype; Landing มีทิศทาง UX ที่ยืนยัน | Partial: UX บางส่วนยืนยัน; ข้อมูล/ขอบเขต release ยังต้องตรวจ | Static + ข้อมูลผู้สอนจำลอง | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `auth` | Login / Register / Email / Password recovery | 1 | Prototype + Demo verification/email | Reviewing: session, verification, reset token, suspension | None; บัญชีใน browser | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `courseCatalog` | Public/Member catalog / detail / lesson preview | 1 | Prototype | Reviewing: visibility, preview, availability | None; course fixtures | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `learning` | My courses / Free Enrollment / Video / Article / Progress | 1 | Prototype | Partial: Instructor เรียนคอร์สคนอื่นได้; access/completion ยังต้องทบทวน | None; browser enrollment/progress | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `profile` | บัญชีและรูปโปรไฟล์ | 1 | Prototype | Reviewing: field/privacy/update policies | None; browser account/upload | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `instructorOnboarding` | ขอ/เชิญผู้สอน / Admin พิจารณา | 2 | Prototype + Demo invite | Partial: UX รับสิทธิ์ผ่าน Admin; กฎ provisioning ยังต้องทบทวน | None; browser requests/invites | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `instructorCourses` | Authoring / บทและเนื้อหา / Quiz definition / Admin review / รายชื่อผู้เรียน | 2 | Prototype; approval gate ยังขาด | Partial: Publish หลัง Admin อนุมัติยืนยันแล้ว; revision และข้อมูลผลผู้เรียนยังต้องตรวจ | None; browser course mutations/read-model | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `assessment` | Quiz attempt / งานมอบหมาย / ตรวจข้อเขียน / ผลคะแนน | 3 | Prototype | Partial: Instructor เรียนคอร์สอื่น; attempt/grading/completion ยังทบทวน | None; client scoring/snapshot | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `certificates` | ออก/แสดง/ตรวจสอบใบรับรอง | 3 | Prototype | Reviewing: eligibility, issue/revoke/reissue, verification privacy | None; browser certificates | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `payments` | Stripe checkout / หน้าผลชำระเงิน | 4 | Prototype; checkout ยังจำลอง | Partial: Backend ยืนยันสิทธิ์จาก Stripe Webhook; edge cases/recovery ยังต้องทำ | None; simulated payment, no Webhook fulfillment | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `redeem` | Redeem / ออกและจัดการรหัสให้สิทธิ์ | 4 | Prototype; code flow ยังจำลอง | Partial: รหัส one-use/no-expiry และสถานะ Unused/Used/Revoked; policy ยืนยันใน scope | None; browser-local codes/enrollment | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `commerce` | Legacy Cart / Orders / ส่วนลด (รอ functional cleanup) | 4 | Prototype เดิม; routes ยังอยู่ | Out of V1 scope; route cleanup ยังไม่ทำใน R1a | None; browser cart/orders | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `operations` | Admin overview / ผู้ใช้และข้อมูลบัญชี | 5 | Prototype | Reviewing: operator scopes, audit, suspension/recovery | None; browser admin actions | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `analytics` | Dashboard ผลการเรียนและรายงานธุรกิจ | 6 | Prototype | Reviewing: metrics, source events, privacy/PII; dashboard/comparison ไม่อยู่ V1 | None; local read-model + synthetic fixtures | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `finance` | รายได้ผู้สอน / ส่วนแบ่ง / รายงานและยอดโอน | 6 | Prototype | Reviewing: ledger, share/refund/fee/settlement | None; demo finance calculations | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `inbox` | ข้อความ Learner / Instructor / Admin | 6 | Prototype | Approved scope: [กติกา Inbox](INBOX_PERMISSION_SPEC.md); รายละเอียดคงค้างยังเปิด | None; browser participants/messages | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `blog` | อ่านบทความ / Admin เขียนและแก้ | 6 | Prototype | Partial: UX ให้ Admin เขียน; publishing/content policy ยังทบทวน | None; browser articles | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `aiTeacher` | Melearn AI / ประวัติแชต / บริบทคอร์ส | 6 | Demo; ยังไม่เชื่อม AI จริง | Reviewing: scope, retrieval/access, data policy | None; demo responses/local history | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `publicSite` | Landing / About / ประวัติผู้สอน | 1 | Prototype | Final 1.6 | Static + ข้อมูลจำลอง | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `auth` | Login / Register / Verify / Reset | 1 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `courseCatalog` | Catalog และรายละเอียด Published | 1 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `learning` | Enroll / My courses / Lesson / Resume | 1 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `profile` | บัญชีส่วนตัว | 1 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `instructorCourses` | สร้าง/แก้คอร์ส / Review / รายชื่อผู้เรียน | 2 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `assessment` | Quiz / Attempts / ตรวจคำตอบเจ้าของคอร์ส | 3 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `certificates` | ใบรับรองของบัญชีตนเอง | 3 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `payments` | Stripe Checkout / อ่านสถานะ Payment | 4 | Prototype | Final 1.6 | Client HTTP มีแล้ว; backend/webhook ไม่ได้พิสูจน์ | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `redeem` | Redeem / ออกและยกเลิกรหัสแลกคอร์ส | 4 | Prototype | Final 1.6 | Prototype adapter ใน browser; ไม่ใช่ server atomicity | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `operations` | Admin users / Instructor directory / Course management | 5 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `blog` | Published Blog / Admin editor | 6 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `aiTeacher` | Melearn AI / AIPractice / Transcript | 6 | Prototype | Final 1.6 | Mock/local history; model/DB/quota ยังไม่เชื่อม | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 
-Phase 6 ของ Blog เป็นตำแหน่ง Later ที่เสนอเพื่อจัด inventory ไม่ใช่ scope ที่เจ้าของอนุมัติ กรณีต้องเปิดก่อนให้ย้ายตาม business review ไม่ต้องเปลี่ยน Phase ของ feature อื่น
+## ความสามารถที่ไม่มี route แยก
 
-## Phase ที่ใช้อ้างอิง
+- Free Enrollment อยู่ใน course detail; Instructor เรียนคอร์สอื่นได้เมื่อเข้าเงื่อนไขบัญชี/enrollment เจ้าของ/Admin ใช้ management preview และไม่สร้างผลเรียน
+- Admin เพิ่ม Instructor ให้ User เดิมผ่าน user detail; real create-user/auth/Resend/Google ยังต้องทำใน R5
+- ai_enabled/Transcript อยู่ใน authoring เฉพาะ Admin; AIPractice แยกจาก Quiz/progress/certificate
+- การอ่าน Payment status ไม่ fulfill; Stripe Webhook/backend เป็นผู้ให้สิทธิ์จริง
+- Retired local collections อยู่ใน inert compatibility snapshot เพื่อรักษาประวัติ ไม่ใช่ feature ที่เปิดใช้งานหรือ API contract
+- Course edit/Quiz definition, >70% exact score, completion/certificate snapshots, YouTube และ Query integration ยังต้องปรับใน R6–R9 ตามรายงาน R0 ไม่อ้างว่า R1 ทำครบแล้ว
 
-อ้างอิงข้อเสนอในเอกสารฉบับเต็ม Melearn Phase 0 V3 ที่ส่งให้เจ้าของทบทวน 5 ต.ค. 2026 ยังไม่ถือว่าอนุมัติแล้วทั้งหมด ตัวอย่างจากแชตก่อนหน้าใช้ Quiz Phase 2 / Commerce Phase 3 จึงใช้ลำดับ V3 ต่อไปนี้อย่างชัดเจน ไม่รวมสองเลขเป็นกติกาเดียว:
+## Runtime environments
 
-| Phase | เส้นทางส่งมอบที่เสนอ | ข้อพึ่งพาสำคัญ |
-| --- | --- | --- |
-| 0 | ตกลง business rules / permissions / states / API และ technical plan | เจ้าของตอบ decision ที่กระทบ slice แรก |
-| 1 | Register → Login → Browse free published course → Enroll → Learn → Save/Resume progress | auth/session, availability, access/progress จริง |
-| 2 | Instructor provision ขั้นต่ำ → Draft → เนื้อหา/Quiz definition → Admin approve → Instructor publish | ขั้น Admin review ต้องมาพร้อม authoring; ไม่รอ Phase 5 |
-| 3 | Attempt → Submit → Auto/manual grading → Completion → Certificate ตาม scope ที่รับ | snapshot ที่เริ่ม attempt, grading audit, eligibility |
-| 4 | Cart/Checkout → Order/Payment → Verified confirmation → Enrollment | support/recovery/reconciliation ขั้นต่ำต้องมาพร้อมเงิน |
-| 5 | Operations ครบตามขอบเขตที่รับ | user management, audit, refund/certificate lifecycle; งาน dependency บางส่วนทำมาก่อน |
-| 6 / Later | Analytics / Finance / Inbox / AI / Blog ตามลำดับที่เลือก | events/ledger/server permissions/data policy ที่ตกลง |
-
-Quiz definition อยู่ `instructorCourses` Phase 2; การทำข้อสอบและตรวจผลอยู่ `assessment` Phase 3 ไม่ใช่การเปิดทั้ง assessment ใน Phase 2 ขั้น Admin instructor provisioning และ review ขั้นต่ำอยู่ Phase 2 แม้ operations ฉบับเต็มอยู่ Phase 5
-
-## ความสามารถที่ไม่ได้มี route แยก
-
-| ความสามารถ | Feature ที่รับผิดชอบ | หลักฐานและงานที่ยังขาด |
-| --- | --- | --- |
-| Login / Register | `auth` | [AuthPages](../src/pages/AuthPages.tsx) เรียก [store](../src/store.tsx); ต้องแทน demo credentials/browser users ด้วย auth/session จริง |
-| Verify email / Forgot / Reset | `auth` | มีหน้า แต่ VerifyEmail ระบุจำลอง; reset ยังไม่ใช่ token/email service Production |
-| Free Enrollment | `learning` | `enrollFree` ใน store ถูกเรียกจาก course detail; ไม่มี `/enroll` route; ต้องตรวจ identity, published/free state, duplicate และ entitlement ที่ server |
-| ซื้อคอร์สผ่าน Stripe / ดูผลชำระเงิน | `payments` | action อยู่ในหน้า catalog/detail ด้วย; backend ต้องสร้าง Checkout Session และให้สิทธิ์หลังยืนยัน Webhook เท่านั้น; role เดิมยังต้องปรับตามกฎบัญชี |
-| Redeem / ออกและจัดการรหัสให้สิทธิ์ | `redeem` | แยกจากส่วนลด; ใช้รหัสครั้งเดียว ไม่มีวันหมดอายุ และสถานะ Unused/Used/Revoked; ต้องย้ายจาก Order/share/browser-local ไป Enrollment ที่ backend |
-| Cart / Order history / ส่วนลด | `commerce` | legacy prototype นอก V1; routes และ UI ยังอยู่จนถึง functional cleanup |
-| Save/Resume progress | `learning` | state อยู่ใน browser ไม่ใช่ persistence ข้ามอุปกรณ์ |
-| Publish Course | `instructorCourses` | [CoursePreviewPage](../src/pages/instructor/InsightPages.tsx) ยังเปลี่ยน `status: published` โดยตรง ต้องมี Admin approval/version gate |
-| Quiz start/submit | `assessment` | store มี attempt snapshot แล้ว แต่ยังเป็น client-controlled และ startAttempt กัน Instructor ออกจาก learner attempt |
-| ใบรับรองอัตโนมัติ | `certificates` | ปุ่ม/route ใบรับรองถูก gate แต่ side effect ใน learning/scoring ต้องตรวจตามนโยบายเมื่อเริ่ม release |
-| ส่งข้อความจากบทเรียน | `inbox` | ปุ่มถามผู้สอนและ notification อยู่ในหน้า learning ด้วย; route gate ไม่บังคับ participant/access/API |
-| Newsletter / Google login / AI replies | feature ของหน้าที่แสดง | หน้า/ปุ่มไม่ได้เป็นหลักฐานว่าบริการภายนอกต่อแล้ว ต้องระบุการเชื่อมจริงและสถานะ error |
-
-**ขอบเขตโค้ดรอบนี้เป็น route gate** การเปิดฟีเจอร์หนึ่งไม่ได้ปิด/เปิดทุกปุ่มหรือ side effect ที่ฝังอยู่ในอีกฟีเจอร์โดยอัตโนมัติ ก่อนย้าย catalog/learning/auth เป็น released ต้องตรวจ inline actions และ dependencies เหล่านี้ด้วย อย่า release กลุ่มใหญ่ที่ยังมี prototype action ปะปน หากส่งมอบเพียงบางส่วนให้แยก feature key ของส่วนนั้นก่อน
-
-## สถานะ runtime และ environment
-
-| Runtime | ความหมาย | Development / Preview | Staging | Production |
-| --- | --- | --- | --- | --- |
-| `prototype` | UI/flow จำลอง ยังไม่เชื่อมระบบจริงครบ | เปิด | ปิด | ปิด |
-| `integration` | เริ่มต่อ API/persistence จริง และมี integration evidence | เปิด | เปิด | ปิด |
-| `released` | ผ่าน business/technical/staging acceptance ของ scope ที่เปิด | เปิด | เปิด | เปิด |
-| `disabled` | ปิดไว้ทุก environment | ปิด | ปิด | ปิด |
-
-ไม่มี status ชื่อ Business Approved ใน config เพราะการอนุมัติธุรกิจไม่เท่ากับ backend พร้อม ใช้คอลัมน์ Business Rule และหลักฐานในเอกสารนี้
-
-[`FeatureRoute`](../src/components/FeatureRoute.tsx) ตรวจ environment ก่อน render child จึงไม่เรียก role gate หรือ redirect ไป Login สำหรับ feature ที่ปิด แต่แสดง NotFoundPage เดิม เมื่อ feature เปิดจึงใช้ role/ownership guard เดิมตามปกติ กติกานี้ไม่ขยายสิทธิ์ Instructor/Admin และไม่ได้แก้ช่องว่าง business rules ใน store
-
-ตั้ง environment ที่ build ผ่าน `VITE_APP_ENV` เฉพาะ `development`, `preview`, `staging`, `production` ถ้าไม่มีค่า: dev server = development; mode preview = preview; mode staging = staging; non-dev mode อื่นรวม production/ค่าที่ไม่รู้จัก = production หากใส่ explicit value ผิด = production (ปิดไว้ก่อน) ไม่อ่าน query string หรือ localStorage เป็นตัวเปิด feature
-
-`VITE_APP_ENV` เป็น public build setting ไม่ใช่ secret ไม่สามารถเปลี่ยนจาก query string หรือเปลี่ยน config ที่ server หลังส่ง bundle แล้ว ต้อง rebuild หากจะเปลี่ยน environment การใช้ `VITE_APP_ENV` override ตั้งใจเปิด Preview ได้ จึงต้องตรวจค่าของงาน build ก่อนเผยแพร่ ไม่ถือว่า route gate ทดแทน CI/CD หรือ server permissions
-
-```powershell
-# Local walkthrough: เปิด prototypes เหมือนเดิม
-npm.cmd run dev -- --port 5174
-
-# Bundle สำหรับ UX preview: ยังไม่มีฟีเจอร์ Production
-npm.cmd run build -- --mode preview
-npm.cmd run preview -- --port 4173
-
-# Bundle สำหรับ Staging: integration + released
-npm.cmd run build -- --mode staging
-
-# Default Production bundle: released เท่านั้น
-npm.cmd run build
-```
-
-`npm run preview` เป็นเพียง server ที่เสิร์ฟ bundle ที่ build ไว้ **ไม่เปลี่ยน bundle จาก Production ให้เป็น Preview** ต้อง build ด้วย mode preview ก่อน เมื่อไม่มี released feature Production/Staging จะแสดง 404 สำหรับทุก feature route ตามที่ตั้งใจ โดย `/403` และ fallback `*` ยังแสดงหน้าระบบเดิม
-
-รอบนี้ไม่แก้ค่า build บน Cloudflare/GitHub/บริการภายนอก และไม่สั่ง deploy ถ้ามี pipeline ที่ใช้ `npm run build` เพื่อแสดง Prototype ต้องตั้ง mode preview ในงาน pipeline นั้นโดยเจาะจง การตรวจ source/build ครั้งนี้ไม่ใช่การยืนยันสถานะ pipeline หรือเว็บไซต์ที่ deploy อยู่จริง
-
-Route gate ไม่ป้องกันการอ่าน bundle ไม่เอา code ออกจาก bundle และไม่ใช่ security boundary ของ API Backend ต้องตรวจ identity, role, ownership, access, state และข้อมูลส่วนตัวทุก operation
+Development/preview เปิด prototype; staging ต้อง integration/released; production ต้อง released Invalid environment/status fail closed ระบบ fallback `/403` และ `*` ไม่ผูก feature guards ใช้เพื่อแสดง error/not-found
 
 ## Inventory จาก App.tsx
 
-ตารางนี้ครอบคลุมทุก route ที่มีใน [App.tsx](../src/App.tsx) รูปแบบ `:id` / `:slug` คือ parameter ไม่ใช่ URL ตัวอย่างที่ควรใส่ตรง ๆ คอลัมน์ Guard เป็น **พฤติกรรม route เดิม** ไม่ใช่ permission Production ที่รับรองแล้ว `learner/admin` บนหน้าผู้เรียนจึงเป็นช่องว่างที่ยังต้องปรับตามกติกา Instructor เรียนคอร์สอื่น
+มี 61 route declarations: 59 feature routes และ 2 system fallbacks URLs ของ retained routes คงเดิม Removed URLs จบ not-found และไม่มีเนื้อหา/action เดิม; Admin /teach authoring migration ไป own app ยังทำใน R2
 
-### publicSite
+| Route | Feature key | Current UX guard/layout |
+| --- | --- | --- |
+| `/` | `publicSite` | Public / page layout |
+| `/about` | `publicSite` | Public / page layout |
+| `/courses` | `courseCatalog` | Guest Public / member redirect |
+| `/courses/:slug` | `courseCatalog` | Guest Public / member redirect |
+| `/explore/courses` | `courseCatalog` | บัญชีทุกบทบาท |
+| `/explore/courses/:slug` | `courseCatalog` | บัญชีทุกบทบาท |
+| `/articles` | `blog` | Public / page layout |
+| `/articles/:id` | `blog` | Public / page layout |
+| `/instructors/:id` | `publicSite` | Public / page layout |
+| `/login` | `auth` | Public / page layout |
+| `/register` | `auth` | Public / page layout |
+| `/verify-email` | `auth` | Public / page layout |
+| `/forgot-password` | `auth` | Public / page layout |
+| `/reset-password` | `auth` | Public / page layout |
+| `/learn` | `learning` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/courses` | `learning` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/redeem` | `redeem` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/ai` | `aiTeacher` | บัญชีทุกบทบาท / standalone AI |
+| `/learn/courses/:courseId` | `learning` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/courses/:courseId/videos/:itemId` | `learning` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/courses/:courseId/articles/:itemId` | `learning` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/courses/:courseId/quizzes/:itemId` | `assessment` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/quizzes/:quizId` | `assessment` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/attempts/:attemptId` | `assessment` | Learner / Instructor ตามสิทธิ์ |
+| `/learn/attempts/:attemptId/result` | `assessment` | Learner / Instructor ตามสิทธิ์ |
+| `/checkout/:courseId` | `payments` | Learner / Instructor ตามสิทธิ์ |
+| `/checkout/:orderId/result` | `payments` | Learner / Instructor ตามสิทธิ์ |
+| `/account/certificates` | `certificates` | บัญชีทุกบทบาท / self data |
+| `/account/certificates/:certificateId` | `certificates` | บัญชีทุกบทบาท / self data |
+| `/account/profile` | `profile` | บัญชีทุกบทบาท |
+| `/teach` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/reviews` | `assessment` | Instructor เจ้าของคอร์ส |
+| `/teach/courses` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/new` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/settings` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/curriculum` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/chapters/:chapterId` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/videos/:itemId` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/articles/:itemId` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/quizzes` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/quizzes` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/quizzes/:quizId` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/quizzes/:quizId/attempts` | `assessment` | Instructor owner / Admin manage |
+| `/teach/attempts/:attemptId/grade` | `assessment` | Instructor เจ้าของคอร์ส |
+| `/teach/courses/:courseId/preview` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/courses/:courseId/learners` | `instructorCourses` | Instructor owner / Admin manage |
+| `/teach/learners` | `instructorCourses` | Instructor owner / Admin manage |
+| `/admin` | `operations` | Admin |
+| `/admin/articles` | `blog` | Admin |
+| `/admin/articles/new` | `blog` | Admin |
+| `/admin/articles/:id/edit` | `blog` | Admin |
+| `/admin/users` | `operations` | Admin |
+| `/admin/users/:id` | `operations` | Admin |
+| `/admin/instructors` | `operations` | Admin |
+| `/admin/courses` | `instructorCourses` | Admin |
+| `/admin/courses/reviews` | `instructorCourses` | Admin |
+| `/admin/courses/:courseId` | `instructorCourses` | Admin |
+| `/admin/access-codes` | `redeem` | Admin |
+| `/403` | — | Public / page layout |
+| `*` | — | Public / page layout |
 
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/` | `publicSite` | `LandingPage` | Public entry |
-| `/about` | `publicSite` | `AboutPage` | Public entry |
-| `/instructors/:id` | `publicSite` | `InstructorProfilePage` | Public entry |
-
-### auth
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/login` | `auth` | `LoginPage` | Public entry |
-| `/register` | `auth` | `RegisterPage` | Public entry |
-| `/verify-email` | `auth` | `VerifyEmailPage` | Public entry |
-| `/forgot-password` | `auth` | `DemoAccountPage` | Public entry |
-| `/reset-password` | `auth` | `DemoAccountPage` | Public entry |
-
-### courseCatalog
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/courses` | `courseCatalog` | `PublicCourseEntry` | Public entry |
-| `/courses/:slug` | `courseCatalog` | `PublicCourseEntry` | Public entry |
-| `/courses/:slug/preview` | `courseCatalog` | `CourseLessonPreviewPage` | Public entry |
-| `/explore/courses` | `courseCatalog` | `MemberCatalogPage` | learner / instructor / admin |
-| `/explore/courses/:slug` | `courseCatalog` | `MemberCourseDetailPage` | learner / instructor / admin |
-
-### learning
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/learn` | `learning` | `LearnerDashboardPage` | learner / admin |
-| `/learn/courses` | `learning` | `MyCoursesPage` | learner / admin |
-| `/learn/courses/:courseId` | `learning` | `LearnerCoursePage` | learner / admin |
-| `/learn/courses/:courseId/videos/:itemId` | `learning` | `VideoLessonPage` | learner / admin |
-| `/learn/courses/:courseId/articles/:itemId` | `learning` | `ArticleLessonPage` | learner / admin |
-
-### profile
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/account/profile` | `profile` | `ProfilePage` | learner / instructor / admin |
-
-### instructorOnboarding
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/become-instructor` | `instructorOnboarding` | `BecomeInstructorPage` | Public entry |
-| `/invite/:token` | `instructorOnboarding` | `DemoAccountPage` | Public entry |
-| `/admin/instructors` | `instructorOnboarding` | `AdminInstructorRequestsPage` | admin |
-| `/admin/instructors/:id` | `instructorOnboarding` | `AdminInstructorRequestDetailPage` | admin |
-
-### instructorCourses
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/teach` | `instructorCourses` | `InstructorDashboardPage` | instructor / admin + ownership |
-| `/teach/courses` | `instructorCourses` | `InstructorCoursesPage` | instructor / admin + ownership |
-| `/teach/courses/new` | `instructorCourses` | `CourseEditorPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId` | `instructorCourses` | `InstructorCourseOverviewPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/settings` | `instructorCourses` | `CourseEditorPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/curriculum` | `instructorCourses` | `CurriculumPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/chapters/:chapterId` | `instructorCourses` | `ChapterEditorPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/videos/:itemId` | `instructorCourses` | `ContentEditorPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/articles/:itemId` | `instructorCourses` | `ContentEditorPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/quizzes` | `instructorCourses` | `QuizManagerPage` | instructor / admin + ownership |
-| `/teach/quizzes` | `instructorCourses` | `QuizManagerPage` | instructor / admin + ownership |
-| `/teach/quizzes/:quizId` | `instructorCourses` | `QuizEditorPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/preview` | `instructorCourses` | `CoursePreviewPage` | instructor / admin + ownership |
-| `/admin/courses` | `instructorCourses` | `AdminCoursesPage` | admin |
-| `/admin/courses/reviews` | `instructorCourses` | `CourseReviewPage` | admin |
-| `/admin/courses/:courseId` | `instructorCourses` | `AdminCourseDetailPage` | admin |
-| `/teach/courses/:courseId/learners` | `instructorCourses` | `InstructorLearnersPage` | instructor / admin + ownership |
-| `/teach/learners` | `instructorCourses` | `InstructorLearnersPage` | instructor / admin + ownership |
-
-### assessment
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/learn/assignments` | `assessment` | `AssignmentsPage` | learner / admin |
-| `/learn/courses/:courseId/quizzes/:itemId` | `assessment` | `RedirectCourseQuiz` | learner / admin |
-| `/learn/quizzes/:quizId` | `assessment` | `QuizIntroPage` | learner / admin |
-| `/learn/attempts/:attemptId` | `assessment` | `QuizAttemptPage` | learner / admin |
-| `/learn/attempts/:attemptId/result` | `assessment` | `QuizResultPage` | learner / admin |
-| `/teach/assignments` | `assessment` | `AssignmentsPage` | instructor / admin + ownership |
-| `/teach/reviews` | `assessment` | `LearnerReviewQueuePage` | instructor / admin + ownership |
-| `/teach/quizzes/:quizId/attempts` | `assessment` | `QuizAttemptsPage` | instructor / admin + ownership |
-| `/teach/attempts/:attemptId/grade` | `assessment` | `GradeEssayPage` | instructor / admin + ownership |
-| `/admin/assignments` | `assessment` | `AdminAssignmentsPage` | admin |
-
-### certificates
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/account/certificates` | `certificates` | `CertificatesPage` | learner / admin |
-| `/account/certificates/:certificateId` | `certificates` | `CertificateDetailPage` | learner / admin |
-| `/admin/certificates` | `certificates` | `AdminCertificatesPage` | admin |
-| `/admin/certificates/:certificateId` | `certificates` | `CertificateDetailPage` | admin |
-| `/certificates/verify/:code` | `certificates` | `VerifyCertificatePage` | Public entry |
-
-### payments
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/checkout/:courseId` | `payments` | `CheckoutPage` | learner / admin |
-| `/checkout/:orderId/result` | `payments` | `CheckoutResultPage` | learner / admin |
-
-### redeem
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/learn/redeem` | `redeem` | `RedeemCourseCodePage` | learner / admin |
-| `/admin/access-codes` | `redeem` | `AccessCodesPage` | admin |
-
-### commerce
-
-Legacy Cart/Orders/discount routes remain in the prototype pending the functional cleanup slice.
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/account/orders` | `commerce` | `OrdersPage` | learner / admin |
-| `/account/cart` | `commerce` | `CartPage` | learner / admin |
-| `/account/orders/:orderId` | `commerce` | `OrderDetailPage` | learner / admin |
-| `/admin/orders` | `commerce` | `AdminOrdersPage` | admin |
-| `/admin/orders/:orderId` | `commerce` | `OrderDetailPage` | admin |
-
-### operations
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/admin` | `operations` | `AdminDashboardPage` | admin |
-| `/admin/users` | `operations` | `AdminUsersPage` | admin |
-| `/admin/users/:id` | `operations` | `AdminUserDetailPage` | admin |
-
-### analytics
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/teach/analytics` | `analytics` | `InstructorAnalyticsRoute` | instructor / admin + ownership |
-| `/teach/courses/:courseId/analytics` | `analytics` | `CourseAnalyticsPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/analytics/learners/:learnerId` | `analytics` | `LearnerAnalyticsPage` | instructor / admin + ownership |
-| `/admin/business-analytics` | `analytics` | `AdminBusinessAnalyticsPage` | admin |
-| `/admin/analytics` | `analytics` | `AnalyticsPage` | admin |
-| `/admin/analytics/courses/:courseId` | `analytics` | `CourseAnalyticsPage` | admin |
-| `/admin/analytics/courses/:courseId/learners/:learnerId` | `analytics` | `LearnerAnalyticsPage` | admin |
-
-### finance
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/teach/finance` | `finance` | `InstructorFinancePage` | instructor / admin + ownership |
-| `/admin/finance` | `finance` | `AdminInstructorFinancePage` | admin |
-| `/admin/reports/finance` | `finance` | `AdminFinanceReportPage` | admin |
-
-### inbox
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/learn/inbox` | `inbox` | `InboxPage` | learner / admin |
-| `/teach/inbox` | `inbox` | `InboxPage` | instructor / admin + ownership |
-| `/admin/inbox` | `inbox` | `InboxPage` | admin |
-
-### blog
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/articles` | `blog` | `BlogIndexPage` | Public entry |
-| `/articles/:id` | `blog` | `BlogArticlePage` | Public entry |
-| `/admin/articles` | `blog` | `AdminBlogPage` | admin |
-| `/admin/articles/new` | `blog` | `AdminBlogEditorPage` | admin |
-| `/admin/articles/:id/edit` | `blog` | `AdminBlogEditorPage` | admin |
-
-### aiTeacher
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/learn/ai` | `aiTeacher` | `LearnerAiPage` | learner / admin |
-
-### System fallbacks
-
-| Route | Feature key | Component | Guard เดิม |
-| --- | --- | --- | --- |
-| `/403` | — | `NoAccessPage` | Public entry; ไม่ผูก feature |
-| `*` | — | `NotFoundPage` | Public entry; ไม่ผูก feature |
+UX guards ไม่ใช่ security enforcement Backend ต้องตรวจ identity/permissions/enrollment/ownership ใหม่ทุก request ไม่ใช้ browser role/IDs เป็นหลักฐาน
 
 ## วิธีเปลี่ยนสถานะและตรวจรับ
 
-1. เจ้าของยืนยัน business rules เฉพาะ scope มีวัน ผู้ยืนยัน และลิงก์ requirement/decision อย่าย้าย status จากจำนวนหน้าที่ทำเสร็จ
-2. Dev ทำ API/persistence/server permission/error/recovery ตาม scope แก้ `FEATURES` เป็น integration เมื่อมีหลักฐานการต่อระบบจริง และอัปเดตตาราง/ช่องว่าง/route ใน PR เดียวกัน
-3. ผ่าน typecheck/build และ tests ที่ตรงกฎ พร้อม browser/API flow และ staging evidence ไม่ใช้ build ผ่านแทน auth/payment/access enforcement
-4. เปลี่ยน released เมื่อ scope ทั้งกลุ่มและ dependencies ผ่านตามข้อรับงาน ถ้าได้เพียงบาง route ให้แยก feature key ห้ามเปิด prototype อื่นในกลุ่มตามไปด้วย
-5. ผู้ดูแลตรวจ environment/build configuration ก่อน release; deployment และเปิดเงินจริงต้องได้รับคำสั่งเจาะจง การ push ไม่ได้ยืนยันว่า deploy เสร็จ
-6. หากพบปัญหา ใช้ disabled เพื่อปิด route ทุก environment ใน build ถัดไป พร้อมบันทึกเหตุผล ไม่อ้างว่าเป็น runtime kill switch หรือ rollback ข้อมูล
-
-หลักฐานต่อ feature ที่ควรเพิ่มเมื่อเริ่มพัฒนาจริง: owner, requirement/decision ที่รับแล้ว, PR/commit, API/test results, staging environment และวันที่ตรวจ, accepted scope, known gaps และ release/rollback record ขณะนี้ยังไม่ได้กำหนดชื่อผู้รับผิดชอบหรือวันส่งแทนเจ้าของ
-
-เมื่อลงมือจริงใช้ GitHub Projects บริหารงานได้: Backlog → UI Prototype → Business Approved → Development → Integration → Staging → Released card เชื่อมมายัง section ของ feature นี้และ PR ที่เกี่ยวข้อง ตารางนี้อธิบายความพร้อม; board อธิบายงานที่กำลังทำ; config กำหนดว่า code เปิด route อะไร ไม่ต้องสร้าง dashboard อีกชุด รอบนี้ไม่ได้สร้างหรือแก้ Project บน GitHub
-
-## จุดเริ่มต้นงานถัดไป
-
-เริ่มทบทวน Phase 1: auth/session, course visibility/preview, free enrollment, learning access และ progress/completion ก่อนให้ Dev implement ไม่ถือว่า Login/Register/Catalog/Free Enrollment Approved เพราะปรากฏเช่นนั้นในตัวอย่างแชต จากนั้นทำ slice ที่ต่อ API และเก็บข้อมูลจริงผ่านอุปกรณ์/บัญชีต่างกันได้
-
-ข้อกำหนดที่ยืนยันแล้วแต่ source ยังไม่ครบและต้องติดตาม: Instructor เรียน/ซื้อคอร์สอื่น, owner ไม่ซื้อคอร์สตัวเอง, Admin ไม่ซื้อ, publish ต้องผ่าน approval, quiz snapshot/server authority, private inbox permissions และ entitlement recovery หลังเงินยืนยัน รอบนี้ไม่ได้แก้กฎหรือ backend เหล่านี้
-
-## แหล่งหลักฐาน
-
-ผลตรวจรอบนี้ (5 ต.ค. 2026):
-
-- `npm.cmd run typecheck` ผ่าน; `node --test tests/feature-release.test.ts` ผ่าน 5 tests รวม policy ทุก status/environment, fallback environment, registry, wrapper ของทุก route และความสอดคล้องของเอกสาร
-- Build แบบ Production, Preview และ Staging ผ่าน มี warning จาก `use client` ของ dependencies และขนาด bundle ซึ่งไม่ได้แก้ในงานนี้
-- ตรวจ AST ของ element ใน route ก่อน/หลังเพิ่ม wrapper: ทั้ง 89 route รักษาลำดับและ element/role guard เดิม
-- Browser Local ที่ `127.0.0.1:5174`: Login เปิดได้ และบัญชี Admin เดิมยังเปิด `/learn` ได้ตาม guard เดิม ไม่ reset หรือเปลี่ยนบัญชีในการตรวจ
-- Browser Preview bundle: `/login` เปิดได้; `/learn` สำหรับผู้ไม่ล็อกอินส่งไป `/login?next=%2Flearn`
-- Browser Staging bundle: `/login` และ `/learn` แสดง 404 ก่อน role guard
-- Browser Production bundle: `/login`, `/learn`, `/admin/finance` แสดง 404 ก่อน role guard
-- ตรวจลิงก์เอกสารและ whitespace ผ่าน การตรวจนี้ไม่ใช่การทดสอบ backend, การตรวจทุกหน้า/อุปกรณ์, การรับ UX ทั้งระบบ หรือการตรวจเว็บไซต์ที่ deploy อยู่
-
-- [AGENTS](../AGENTS.md), [UI spec](UI_SPEC.md), [Code spec](CODE_SPEC.md): ขอบเขต prototype และข้อกำหนดการทำงาน
-- [App.tsx](../src/App.tsx): route/role guard ที่ inventory อ้างอิง
-- [features.ts](../src/config/features.ts), [FeatureRoute.tsx](../src/components/FeatureRoute.tsx): registry และ environment gate ที่โค้ดใช้จริง
-- [store.tsx](../src/store.tsx), [AuthPages](../src/pages/AuthPages.tsx), [CommercePages](../src/pages/learner/CommercePages.tsx): browser-local accounts/enrollment/payment/attempts
-- [Course preview/publish](../src/pages/instructor/InsightPages.tsx): approval gap ที่ตรวจจาก source
-- [Analytics read-model](../src/api/analytics.ts), [Business reporting](../src/api/businessAnalytics.ts), [Synthetic fixtures](../src/mocks/businessAnalytics.ts): local calculations ไม่ใช่ Production API
-- [Inbox permission spec](INBOX_PERMISSION_SPEC.md), [Inbox API selectors](../src/api/inbox.ts): ขอบเขตที่ยืนยันและ implementation gaps
-- [AI page](../src/pages/learner/LearnerAiPage.tsx): demo responses/local history
-- [Feature release tests](../tests/feature-release.test.ts): environment/status policy, route coverage และความสอดคล้องของ registry/เอกสาร
-
-เอกสารนี้เป็น snapshot จาก source ในรอบงาน 5 ต.ค. 2026 และต้องอัปเดตไปกับการเปลี่ยน route/status ใน PR เดียวกัน ไม่อนุมาน backend, stack, provider, deadline หรือ approval เพิ่มจากแหล่งตัวอย่าง
+ปรับ status เฉพาะเมื่อมีหลักฐานของ flow/API และ runtime artifact ตรง revision; ตรวจ typecheck/native regressions/build/browser ตามส่วนที่เปลี่ยน อัปเดต matrix/config/tests พร้อมกัน ไม่ถือว่า mock tests หรือ build ผ่านเท่ากับ backend readiness และไม่ deploy จาก checkpoint โดยอัตโนมัติ

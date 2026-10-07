@@ -4,7 +4,7 @@
 
 ปรับแผนตาม [ผล R0 Inventory และ Lead Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md): inventory ครบ 89 routes, แยก retained dependencies ก่อน scope cleanup, เตรียม authoring interface ก่อน split apps และแยก functional acceptance ออกจาก structural migration
 
-สถานะ: **ผู้ใช้ approve ให้ทำต่อแล้ว; R0 เสร็จ และ R1 เริ่ม implementation เป็นชุดที่ตรวจได้** ดู [ผล R1](R1_SCOPE_CLEANUP_REPORT_TH.md); ยังไม่ deploy/merge main ขอบเขตธุรกิจยึด [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6; architecture/code ยึด [CODE_SPEC.md](CODE_SPEC.md) ข้อ 1.1; แบรนด์/shared UI ยึด [UI_SPEC.md](UI_SPEC.md) ไม่สร้างสเปกสีอีกชุด
+สถานะ: **ผู้ใช้ approve ให้ทำต่อแล้ว; R0 และ R1 เสร็จพร้อม checkpoint; ขั้นถัดไป R2a authoring boundary** ดู [ผล R1](R1_SCOPE_CLEANUP_REPORT_TH.md); ยังไม่ deploy/merge main ขอบเขตธุรกิจยึด [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6; architecture/code ยึด [CODE_SPEC.md](CODE_SPEC.md) ข้อ 1.1; แบรนด์/shared UI ยึด [UI_SPEC.md](UI_SPEC.md) ไม่สร้างสเปกสีอีกชุด
 
 ## 1. ผลลัพธ์ที่ต้องการและสิ่งที่ยังไม่สรุป
 
@@ -94,7 +94,7 @@ Apps import packages ได้; packages ไม่ import apps; ไม่ให�
 
 รายการที่จะถอดใน R1 ก่อนย้ายโครงสร้าง: Cart/Order history เต็ม, Inbox/ถามผู้สอน, Finance/ส่วนแบ่ง/จ่ายเงิน/Refund flow, Business Analytics/Big Data, Referral, ขอเป็นผู้สอน/คำเชิญ, ผู้สอนร่วม, Archive, Assignment แยก, LINE login, AI Knowledge Dashboard/ถอดเสียงอัตโนมัติ/หน้า Admin ดูคำถามคนอื่น และ Release Dashboard ตามบท 8 การยังไม่ทำไม่ใช่การตั้งนโยบายธุรกิจใหม่
 
-R1 ถอนตามความสามารถและ import/action dependencies ไม่ลบไฟล์จากชื่อ analytics/commerce อย่างเดียว ผล R0 เพิ่มการถอด Admin grading, Guest full lesson preview, public certificate verification และ standalone Admin global certificate browser ตาม permission ที่ scope ยืนยัน; owner/Admin management preview กับ learner results ยังอยู่ และหยุด destructive course deletion ที่ทำประวัติหาย ตัวอย่าง `src/pages/instructor/QuizPages.tsx` และ `src/pages/instructor/LearnerReviewQueuePage.tsx` ยังใช้ `getReviewQueue` จาก `src/api/analytics.ts` ซึ่งเป็นส่วนตรวจคำตอบที่ต้องรักษาไว้ เช่นเดียวกับ Payment API และ Redeem ที่อยู่ใกล้ Commerce เดิม ต้องแยก retained helpers ออกก่อนถอนเจ้าของที่ไม่ใช้
+R1 ถอนตามความสามารถและ import/action dependencies ไม่ลบไฟล์จากชื่อ analytics/commerce อย่างเดียว ผล R0 เพิ่มการถอด Admin grading, Guest full lesson preview, public certificate verification และ standalone Admin global certificate browser ตาม permission ที่ scope ยืนยัน; owner/Admin management preview กับ learner results ยังอยู่ และหยุด destructive course deletion ที่ทำประวัติหาย ตัวอย่าง `src/pages/instructor/QuizPages.tsx` และ `src/pages/instructor/LearnerReviewQueuePage.tsx` ใน baseline R0 ใช้ `getReviewQueue` จาก `src/api/analytics.ts`; หลัง R1 ใช้ `src/lib/assessment-review.ts` ซึ่งเป็นส่วนตรวจคำตอบที่ต้องรักษาไว้ เช่นเดียวกับ Payment API และ Redeem ที่อยู่ใกล้ Commerce เดิม R1a แยก retained helpers แล้วและ R1b/R1c ถอนเจ้าของที่ไม่ใช้
 
 Upload Video/Mux/Bunny ยังไม่เปิด ใช้ YouTube Link; UI upload อาจอยู่ได้แต่ต้องแสดงยังไม่พร้อมและไม่เก็บไฟล์จริง ภาพปก/ภาพคำตอบเป็นอีกขอบเขต ไม่ถอดรวมไปด้วย
 
@@ -111,7 +111,7 @@ Upload Video/Mux/Bunny ยังไม่เปิด ใช้ YouTube Link; UI
 
 ## 6. แบ่งงานและเกณฑ์ตรวจรับ
 
-R0 สำรวจ/ตรวจ baseline เสร็จแล้ว ผู้ใช้สั่งให้ทำต่อวันที่ 7 ต.ค. 2026; R1a ผ่าน checks และกำลังทำ R1b/R1c ต่อ ชุด functional changes ต้องระบุ before/after และ acceptance ของ flow ที่จะเปลี่ยนตาม matrix/risks ของ R0 ก่อนเริ่ม ไม่ถือว่าการรับรายงานนี้อนุญาตตัดเพิ่มฟีเจอร์ทันที
+R0 สำรวจ/ตรวจ baseline เสร็จแล้ว ผู้ใช้สั่งให้ทำต่อวันที่ 7 ต.ค. 2026; R1a/R1b/R1c ผ่าน checks และบันทึก checkpoint แล้ว ชุด functional changes ต้องระบุ before/after และ acceptance ของ flow ที่จะเปลี่ยนตาม matrix/risks ของ R0 ก่อนเริ่ม ไม่ถือว่าการรับรายงานนี้อนุญาตตัดเพิ่มฟีเจอร์ทันที
 
 | ชุด | งาน / ข้อพึ่งพา | เกณฑ์รับ |
 | --- | --- | --- |
