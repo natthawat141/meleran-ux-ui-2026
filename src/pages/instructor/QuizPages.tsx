@@ -8,7 +8,7 @@ import { RichDocument } from '../../components/chapter/RichTextEditor';
 import { PageTitle, StatusTag } from '../../components/common';
 import { WrittenAnswerView, writtenAnswer } from '../../components/WrittenAnswer';
 import { UserAvatar } from '../../components/UserAvatar';
-import { getReviewQueue } from '../../api/analytics';
+import { getReviewQueue } from '../../lib/assessment-review';
 import type { Quiz, QuizAttempt } from '../../types';
 import './grading-workspace.css';
 

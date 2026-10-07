@@ -21,7 +21,9 @@ import { LoginPage, RegisterPage, BecomeInstructorPage, DemoAccountPage, VerifyE
 import { LearnerDashboardPage, MyCoursesPage } from './pages/learner/DashboardPages';
 import { LearnerCoursePage, VideoLessonPage, ArticleLessonPage } from './pages/learner/LessonPages';
 import { QuizIntroPage, QuizAttemptPage, QuizResultPage } from './pages/learner/QuizPages';
-import { CheckoutPage, CheckoutResultPage, OrdersPage, OrderDetailPage, RedeemCourseCodePage } from './pages/learner/CommercePages';
+import { OrdersPage, OrderDetailPage } from './pages/learner/CommercePages';
+import { RedeemCourseCodePage } from './pages/learner/RedeemCourseCodePage';
+import { CheckoutPage, CheckoutResultPage } from './pages/learner/PaymentPages';
 import { CartPage } from './pages/learner/CartPage';
 import { InstructorFinancePage } from './pages/instructor/InstructorFinancePage';
 import { AdminInstructorFinancePage } from './pages/admin/AdminInstructorFinancePage';

@@ -164,15 +164,6 @@
   padding: 24px;
 }
 
-.review-queue-filter-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
 .review-age-badge {
   display: inline-flex;
   align-items: center;

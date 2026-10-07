@@ -14,6 +14,7 @@
 - ตารางนี้แยก UI, Business Rule, Backend, Runtime และหลักฐานการตรวจ จึงไม่ใช้สถานะเดียวแทนทุกเรื่อง
 - Phase เป็น **ข้อเสนอลำดับส่งมอบ** ไม่ใช่การอนุมัติขอบเขต วันส่งงาน หรือสแตก และไม่มีผลเปิด route
 - Runtime และการผูก route ต้องตรง [`FEATURES` / `ROUTE_FEATURES`](../src/config/features.ts) tests จะตรวจความสอดคล้องกับตารางนี้เมื่อแก้ code
+- R1a แยกเจ้าของ route ที่เก็บไว้เป็น `payments` (Stripe), `redeem` (รหัสให้สิทธิ์) และ `instructorCourses` (รายชื่อผู้เรียนของผู้สอน); `commerce`/`analytics` ยังรองรับ route ต้นแบบเก่าที่รอ functional cleanup โดยยังไม่ลบ route หรือเปลี่ยน guard ในรอบนี้
 - Staging / Production ในตารางหมายถึง **ความพร้อมที่ผ่านการตรวจรับ** ไม่ใช่ข้อกล่าวอ้างว่าไม่มีเว็บไซต์ที่ deploy ไว้ ปัจจุบันไม่มีหลักฐาน backend/integration/release acceptance สำหรับ feature เหล่านี้
 
 กติกาที่เจ้าของยืนยันในการทบทวน 5 ต.ค. 2026: Instructor ซื้อคอร์สคนอื่นได้, ซื้อคอร์สตนเองไม่ได้เพราะมีสิทธิ์ดู, Admin ซื้อไม่ได้เพราะดูคอร์สทั้งหมดได้, Instructor เผยแพร่คอร์สตนเองได้หลัง Admin อนุมัติ **ยืนยันกติกาแล้วไม่ได้แปลว่า implementation เสร็จ**
@@ -36,12 +37,14 @@ Backend = None หมายถึงยังไม่มี Production API/pers
 | `learning` | My courses / Free Enrollment / Video / Article / Progress | 1 | Prototype | Partial: Instructor เรียนคอร์สคนอื่นได้; access/completion ยังต้องทบทวน | None; browser enrollment/progress | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `profile` | บัญชีและรูปโปรไฟล์ | 1 | Prototype | Reviewing: field/privacy/update policies | None; browser account/upload | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `instructorOnboarding` | ขอ/เชิญผู้สอน / Admin พิจารณา | 2 | Prototype + Demo invite | Partial: UX รับสิทธิ์ผ่าน Admin; กฎ provisioning ยังต้องทบทวน | None; browser requests/invites | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `instructorCourses` | Authoring / บทและเนื้อหา / Quiz definition / Admin review | 2 | Prototype; approval gate ยังขาด | Partial: Publish หลัง Admin อนุมัติยืนยันแล้ว; revision ยังเปิด | None; browser course mutations | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `instructorCourses` | Authoring / บทและเนื้อหา / Quiz definition / Admin review / รายชื่อผู้เรียน | 2 | Prototype; approval gate ยังขาด | Partial: Publish หลัง Admin อนุมัติยืนยันแล้ว; revision และข้อมูลผลผู้เรียนยังต้องตรวจ | None; browser course mutations/read-model | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `assessment` | Quiz attempt / งานมอบหมาย / ตรวจข้อเขียน / ผลคะแนน | 3 | Prototype | Partial: Instructor เรียนคอร์สอื่น; attempt/grading/completion ยังทบทวน | None; client scoring/snapshot | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `certificates` | ออก/แสดง/ตรวจสอบใบรับรอง | 3 | Prototype | Reviewing: eligibility, issue/revoke/reissue, verification privacy | None; browser certificates | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `commerce` | Cart / Checkout / Orders / ส่วนลดและรหัสแลกคอร์ส | 4 | Prototype; payment จำลอง | Partial: กติกาผู้ซื้อยืนยัน; payment/refund/code policy ยังเปิด | None; simulated payment/orders | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `payments` | Stripe checkout / หน้าผลชำระเงิน | 4 | Prototype; checkout ยังจำลอง | Partial: Backend ยืนยันสิทธิ์จาก Stripe Webhook; edge cases/recovery ยังต้องทำ | None; simulated payment, no Webhook fulfillment | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `redeem` | Redeem / ออกและจัดการรหัสให้สิทธิ์ | 4 | Prototype; code flow ยังจำลอง | Partial: รหัส one-use/no-expiry และสถานะ Unused/Used/Revoked; policy ยืนยันใน scope | None; browser-local codes/enrollment | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `commerce` | Legacy Cart / Orders / ส่วนลด (รอ functional cleanup) | 4 | Prototype เดิม; routes ยังอยู่ | Out of V1 scope; route cleanup ยังไม่ทำใน R1a | None; browser cart/orders | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `operations` | Admin overview / ผู้ใช้และข้อมูลบัญชี | 5 | Prototype | Reviewing: operator scopes, audit, suspension/recovery | None; browser admin actions | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `analytics` | ผลการเรียน / รายงานธุรกิจ / รายชื่อผู้เรียน | 6 | Prototype | Reviewing: metrics, source events, privacy/PII | None; local read-model + synthetic fixtures | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `analytics` | Dashboard ผลการเรียนและรายงานธุรกิจ | 6 | Prototype | Reviewing: metrics, source events, privacy/PII; dashboard/comparison ไม่อยู่ V1 | None; local read-model + synthetic fixtures | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `finance` | รายได้ผู้สอน / ส่วนแบ่ง / รายงานและยอดโอน | 6 | Prototype | Reviewing: ledger, share/refund/fee/settlement | None; demo finance calculations | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `inbox` | ข้อความ Learner / Instructor / Admin | 6 | Prototype | Approved scope: [กติกา Inbox](INBOX_PERMISSION_SPEC.md); รายละเอียดคงค้างยังเปิด | None; browser participants/messages | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `blog` | อ่านบทความ / Admin เขียนและแก้ | 6 | Prototype | Partial: UX ให้ Admin เขียน; publishing/content policy ยังทบทวน | None; browser articles | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
@@ -72,7 +75,9 @@ Quiz definition อยู่ `instructorCourses` Phase 2; การทำข้�
 | Login / Register | `auth` | [AuthPages](../src/pages/AuthPages.tsx) เรียก [store](../src/store.tsx); ต้องแทน demo credentials/browser users ด้วย auth/session จริง |
 | Verify email / Forgot / Reset | `auth` | มีหน้า แต่ VerifyEmail ระบุจำลอง; reset ยังไม่ใช่ token/email service Production |
 | Free Enrollment | `learning` | `enrollFree` ใน store ถูกเรียกจาก course detail; ไม่มี `/enroll` route; ต้องตรวจ identity, published/free state, duplicate และ entitlement ที่ server |
-| ซื้อคอร์ส / เพิ่มตะกร้า | `commerce` | action อยู่ในหน้า catalog/detail ด้วย; role เดิมยังอนุญาต learner/admin และกัน Instructor ต้องปรับตามกฎใหม่ก่อน release |
+| ซื้อคอร์สผ่าน Stripe / ดูผลชำระเงิน | `payments` | action อยู่ในหน้า catalog/detail ด้วย; backend ต้องสร้าง Checkout Session และให้สิทธิ์หลังยืนยัน Webhook เท่านั้น; role เดิมยังต้องปรับตามกฎบัญชี |
+| Redeem / ออกและจัดการรหัสให้สิทธิ์ | `redeem` | แยกจากส่วนลด; ใช้รหัสครั้งเดียว ไม่มีวันหมดอายุ และสถานะ Unused/Used/Revoked; ต้องย้ายจาก Order/share/browser-local ไป Enrollment ที่ backend |
+| Cart / Order history / ส่วนลด | `commerce` | legacy prototype นอก V1; routes และ UI ยังอยู่จนถึง functional cleanup |
 | Save/Resume progress | `learning` | state อยู่ใน browser ไม่ใช่ persistence ข้ามอุปกรณ์ |
 | Publish Course | `instructorCourses` | [CoursePreviewPage](../src/pages/instructor/InsightPages.tsx) ยังเปลี่ยน `status: published` โดยตรง ต้องมี Admin approval/version gate |
 | Quiz start/submit | `assessment` | store มี attempt snapshot แล้ว แต่ยังเป็น client-controlled และ startAttempt กัน Instructor ออกจาก learner attempt |
@@ -197,6 +202,8 @@ Route gate ไม่ป้องกันการอ่าน bundle ไม่�
 | `/admin/courses` | `instructorCourses` | `AdminCoursesPage` | admin |
 | `/admin/courses/reviews` | `instructorCourses` | `CourseReviewPage` | admin |
 | `/admin/courses/:courseId` | `instructorCourses` | `AdminCourseDetailPage` | admin |
+| `/teach/courses/:courseId/learners` | `instructorCourses` | `InstructorLearnersPage` | instructor / admin + ownership |
+| `/teach/learners` | `instructorCourses` | `InstructorLearnersPage` | instructor / admin + ownership |
 
 ### assessment
 
@@ -223,19 +230,31 @@ Route gate ไม่ป้องกันการอ่าน bundle ไม่�
 | `/admin/certificates/:certificateId` | `certificates` | `CertificateDetailPage` | admin |
 | `/certificates/verify/:code` | `certificates` | `VerifyCertificatePage` | Public entry |
 
-### commerce
+### payments
 
 | Route | Feature key | Component | Guard เดิม |
 | --- | --- | --- | --- |
-| `/learn/redeem` | `commerce` | `RedeemCourseCodePage` | learner / admin |
-| `/checkout/:courseId` | `commerce` | `CheckoutPage` | learner / admin |
-| `/checkout/:orderId/result` | `commerce` | `CheckoutResultPage` | learner / admin |
+| `/checkout/:courseId` | `payments` | `CheckoutPage` | learner / admin |
+| `/checkout/:orderId/result` | `payments` | `CheckoutResultPage` | learner / admin |
+
+### redeem
+
+| Route | Feature key | Component | Guard เดิม |
+| --- | --- | --- | --- |
+| `/learn/redeem` | `redeem` | `RedeemCourseCodePage` | learner / admin |
+| `/admin/access-codes` | `redeem` | `AccessCodesPage` | admin |
+
+### commerce
+
+Legacy Cart/Orders/discount routes remain in the prototype pending the functional cleanup slice.
+
+| Route | Feature key | Component | Guard เดิม |
+| --- | --- | --- | --- |
 | `/account/orders` | `commerce` | `OrdersPage` | learner / admin |
 | `/account/cart` | `commerce` | `CartPage` | learner / admin |
 | `/account/orders/:orderId` | `commerce` | `OrderDetailPage` | learner / admin |
 | `/admin/orders` | `commerce` | `AdminOrdersPage` | admin |
 | `/admin/orders/:orderId` | `commerce` | `OrderDetailPage` | admin |
-| `/admin/access-codes` | `commerce` | `AccessCodesPage` | admin |
 
 ### operations
 
@@ -252,8 +271,6 @@ Route gate ไม่ป้องกันการอ่าน bundle ไม่�
 | `/teach/analytics` | `analytics` | `InstructorAnalyticsRoute` | instructor / admin + ownership |
 | `/teach/courses/:courseId/analytics` | `analytics` | `CourseAnalyticsPage` | instructor / admin + ownership |
 | `/teach/courses/:courseId/analytics/learners/:learnerId` | `analytics` | `LearnerAnalyticsPage` | instructor / admin + ownership |
-| `/teach/courses/:courseId/learners` | `analytics` | `InstructorLearnersPage` | instructor / admin + ownership |
-| `/teach/learners` | `analytics` | `InstructorLearnersPage` | instructor / admin + ownership |
 | `/admin/business-analytics` | `analytics` | `AdminBusinessAnalyticsPage` | admin |
 | `/admin/analytics` | `analytics` | `AnalyticsPage` | admin |
 | `/admin/analytics/courses/:courseId` | `analytics` | `CourseAnalyticsPage` | admin |

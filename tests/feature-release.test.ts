@@ -44,6 +44,22 @@ test('feature metadata uses recognized statuses, positive phases, and known rout
   assert.equal(ROUTE_FEATURES['/invite/:token'], 'instructorOnboarding');
 });
 
+test('retained Stripe, Redeem, and instructor roster routes use their owning prototype features', () => {
+  const retainedRouteOwners = [
+    ['/checkout/:courseId', 'payments'],
+    ['/checkout/:orderId/result', 'payments'],
+    ['/learn/redeem', 'redeem'],
+    ['/admin/access-codes', 'redeem'],
+    ['/teach/courses/:courseId/learners', 'instructorCourses'],
+    ['/teach/learners', 'instructorCourses'],
+  ] as const satisfies readonly (readonly [keyof typeof ROUTE_FEATURES, keyof typeof FEATURES])[];
+
+  for (const [path, featureKey] of retainedRouteOwners) {
+    assert.equal(ROUTE_FEATURES[path], featureKey, `${path} belongs to ${featureKey}`);
+    assert.equal(FEATURES[featureKey].status, 'prototype', `${featureKey} remains prototype`);
+  }
+});
+
 type AppRoute = { path: string; openingTag: string };
 
 function getAppRoutes(): AppRoute[] {
@@ -116,10 +132,14 @@ test('feature summary and full route inventory match the code registry', () => {
     assert.ok(key, `feature summary key: ${line}`);
     assert.ok(Number.isInteger(phase) && phase > 0, `positive integer phase for ${key}`);
     assert.ok(status, `recognized runtime status for ${key}`);
-    return { key, phase, status };
+    return { key, name: cells[1] ?? '', phase, status };
   });
   assert.equal(new Set(summary.map(({ key }) => key)).size, summary.length, 'feature summary keys are unique');
   assert.deepEqual(summary.map(({ key }) => key).sort(), Object.keys(FEATURES).sort());
+  const summaryNames = new Map(summary.map(({ key, name }) => [key, name]));
+  assert.match(summaryNames.get('payments') ?? '', /Stripe|ชำระเงิน/i, 'payments summary describes Stripe checkout');
+  assert.match(summaryNames.get('redeem') ?? '', /Redeem|รหัสแลก/i, 'redeem summary describes code redemption');
+  assert.match(summaryNames.get('instructorCourses') ?? '', /รายชื่อผู้เรียน|ผู้เรียน/i, 'instructorCourses summary includes the learner roster');
   for (const { key, phase, status } of summary) {
     assert.equal(phase, FEATURES[key as keyof typeof FEATURES].phase, `${key} proposed phase`);
     assert.equal(status, FEATURES[key as keyof typeof FEATURES].status, `${key} runtime status`);

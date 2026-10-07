@@ -1,23 +1,25 @@
 /**
- * Central Read-Model and Selectors for Learner Analytics, Reviews Queue, and Pre/Post Assessment
+ * Central Read-Model and Selectors for Learner Analytics and Pre/Post Assessment
  * Derived from the historical LEARNER-ANALYTICS-UI-SPEC.md (archive references in docs/GIT_CONSOLIDATION_20261004.md):
  * - Single source of truth for formulas and metrics
  * - Paired difference calculated on matched n only
  * - Pending essay excluded from final score calculations
  */
 
+import { getReviewQueue, type ReviewQueueItem, type ReviewQueueOptions } from '../lib/assessment-review';
 import type {
   ComparisonSet,
   Course,
   Enrollment,
   LmsData,
-  Question,
   Quiz,
   QuizAttempt,
   Role,
   User,
 } from '../types';
 import { buildPairedAssessmentRows, getFinalScorePercent as getCanonicalFinalScorePercent } from './assessmentComparison';
+
+export { getReviewQueue, type ReviewQueueItem, type ReviewQueueOptions };
 
 export function calculateAverage(numbers: (number | null | undefined)[]): number {
   if (!numbers || !numbers.length) return 0;
@@ -39,98 +41,6 @@ export function calculateMedian(numbers: (number | null | undefined)[]): number 
 
 export function getFinalScorePercent(attempt?: QuizAttempt | null): number | null {
   return getCanonicalFinalScorePercent(attempt);
-}
-
-export interface ReviewQueueOptions {
-  instructorId?: string;
-  role?: Role;
-  courseId?: string;
-  quizId?: string;
-  responseMode?: 'all' | 'text' | 'image' | string;
-}
-
-export interface ReviewQueueItem extends QuizAttempt {
-  course?: Course;
-  quiz?: Quiz;
-  learner?: User;
-  essayQuestions: Question[];
-  mode: 'text' | 'image';
-  ageDays: number;
-  ageText: string;
-}
-
-/**
- * Filter review queue items with pending essays/images
- */
-export function getReviewQueue(data: LmsData, options: ReviewQueueOptions = {}): ReviewQueueItem[] {
-  const { instructorId, role, courseId, quizId, responseMode } = options;
-  const courses = data.courses || [];
-  const quizzes = data.quizzes || [];
-  const attempts = data.attempts || [];
-  const users = data.users || [];
-
-  // Scoping: instructor sees only their courses, admin sees all
-  const allowedCourseIds = courses
-    .filter((c) => role === 'admin' || !instructorId || c.instructorId === instructorId)
-    .map((c) => c.id);
-
-  const filtered = attempts.filter((att) => {
-    if (att.status !== 'submitted') return false;
-    if (att.essayStatus !== 'pending') return false;
-    if (!allowedCourseIds.includes(att.courseId)) return false;
-    if (courseId && att.courseId !== courseId) return false;
-    if (quizId && att.quizId !== quizId) return false;
-    return true;
-  });
-
-  const enriched: ReviewQueueItem[] = filtered.map((att) => {
-    const course = courses.find((c) => c.id === att.courseId);
-    const quiz = quizzes.find((q) => q.id === att.quizId);
-    const learner = users.find((u) => u.id === att.userId);
-    const essayQuestions = (quiz?.questions || []).filter((q) => q.type === 'essay');
-
-    // Determine submission mode based on answers
-    let mode: 'text' | 'image' = 'text';
-    const hasImage = Object.values(att.answers || {}).some(
-      (ans: unknown) => {
-        if (typeof ans === 'object' && ans !== null) {
-          const answerObj = ans as { image?: string; images?: unknown[] };
-          if (answerObj.image || (Array.isArray(answerObj.images) && answerObj.images.length > 0)) {
-            return true;
-          }
-        }
-        return typeof ans === 'string' && ans.startsWith('data:image');
-      }
-    );
-    if (hasImage) mode = 'image';
-
-    const submittedDate = att.submittedAt ? new Date(att.submittedAt) : new Date();
-    const ageDays = Math.max(0, Math.floor((Date.now() - submittedDate.getTime()) / (1000 * 60 * 60 * 24)));
-    const ageHours = Math.max(0, Math.floor((Date.now() - submittedDate.getTime()) / (1000 * 60 * 60)));
-
-    let ageText = 'เพิ่งส่งมา';
-    if (ageDays >= 1) ageText = `${ageDays} วันที่แล้ว`;
-    else if (ageHours >= 1) ageText = `${ageHours} ชั่วโมงที่แล้ว`;
-
-    return {
-      ...att,
-      course,
-      quiz,
-      learner,
-      essayQuestions,
-      mode,
-      ageDays,
-      ageText,
-    };
-  });
-
-  // Filter by responseMode if specified
-  if (responseMode && responseMode !== 'all') {
-    return enriched.filter((item) => item.mode === responseMode);
-  }
-
-  // Sort oldest first (FIFO for grading queue)
-  return enriched.sort((a, b) => new Date(a.submittedAt || 0).getTime() - new Date(b.submittedAt || 0).getTime());
 }
 
 export interface CourseAnalyticsRow {

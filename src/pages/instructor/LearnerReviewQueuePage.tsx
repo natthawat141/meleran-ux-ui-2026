@@ -3,10 +3,9 @@ import { Button, Empty, Input, Select, Space, Table, Tag, Typography, type Table
 import { ArrowRightOutlined, ClockCircleOutlined, FileImageOutlined, FileTextOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { getReviewQueue, type ReviewQueueItem } from '../../api/analytics';
+import { getReviewQueue, type ReviewQueueItem } from '../../lib/assessment-review';
 import { PageTitle } from '../../components/common';
 import { UserAvatar } from '../../components/UserAvatar';
-import '../analytics/analytics.css';
 import './review-queue.css';
 
 const { Text } = Typography;
@@ -120,7 +119,7 @@ export function LearnerReviewQueuePage() {
   ];
 
   return (
-    <div className="analytics-container review-queue">
+    <div className="review-queue">
       <PageTitle
         eyebrow="คิวตรวจงานส่วนกลาง"
         title="งานรอตรวจของผู้เรียน"

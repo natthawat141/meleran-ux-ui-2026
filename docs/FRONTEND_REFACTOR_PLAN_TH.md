@@ -4,7 +4,7 @@
 
 ปรับแผนตาม [ผล R0 Inventory และ Lead Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md): inventory ครบ 89 routes, แยก retained dependencies ก่อน scope cleanup, เตรียม authoring interface ก่อน split apps และแยก functional acceptance ออกจาก structural migration
 
-สถานะ: **R0 สำรวจและตรวจ baseline แล้ว; R1 เป็นต้นไปยังรอผู้ใช้ approve execution plan** ยังไม่แก้ source/config/dependencies หรือเพิ่ม/ตัดฟีเจอร์ในรอบนี้ ขอบเขตธุรกิจยึด [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6; architecture/code ยึด [CODE_SPEC.md](CODE_SPEC.md) ข้อ 1.1; แบรนด์/shared UI ยึด [UI_SPEC.md](UI_SPEC.md) ไม่สร้างสเปกสีอีกชุด
+สถานะ: **ผู้ใช้ approve ให้ทำต่อแล้ว; R0 เสร็จ และ R1 เริ่ม implementation เป็นชุดที่ตรวจได้** ดู [ผล R1](R1_SCOPE_CLEANUP_REPORT_TH.md); ยังไม่ deploy/merge main ขอบเขตธุรกิจยึด [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6; architecture/code ยึด [CODE_SPEC.md](CODE_SPEC.md) ข้อ 1.1; แบรนด์/shared UI ยึด [UI_SPEC.md](UI_SPEC.md) ไม่สร้างสเปกสีอีกชุด
 
 ## 1. ผลลัพธ์ที่ต้องการและสิ่งที่ยังไม่สรุป
 
@@ -111,7 +111,7 @@ Upload Video/Mux/Bunny ยังไม่เปิด ใช้ YouTube Link; UI
 
 ## 6. แบ่งงานและเกณฑ์ตรวจรับ
 
-R0 สำรวจ/ตรวจ baseline เสร็จแล้ว ชุด R1 เป็นต้นไปยังไม่เริ่ม implementation ชุด functional changes ต้องระบุ before/after และ acceptance ของ flow ที่จะเปลี่ยนตาม matrix/risks ของ R0 ก่อนเริ่ม ไม่ถือว่าการรับรายงานนี้อนุญาตตัดเพิ่มฟีเจอร์ทันที
+R0 สำรวจ/ตรวจ baseline เสร็จแล้ว ผู้ใช้สั่งให้ทำต่อวันที่ 7 ต.ค. 2026; R1a ผ่าน checks และกำลังทำ R1b/R1c ต่อ ชุด functional changes ต้องระบุ before/after และ acceptance ของ flow ที่จะเปลี่ยนตาม matrix/risks ของ R0 ก่อนเริ่ม ไม่ถือว่าการรับรายงานนี้อนุญาตตัดเพิ่มฟีเจอร์ทันที
 
 | ชุด | งาน / ข้อพึ่งพา | เกณฑ์รับ |
 | --- | --- | --- |
@@ -173,4 +173,4 @@ Structural batch ย้าย ownership/import/router/state boundary โดย�
 
 รอบ R0 นี้ส่งมอบ [Inventory และ Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md), แผนฉบับที่ปรับตามหลักฐาน และลิงก์ใน docs/README ผลสำรวจไม่เปลี่ยน scope Final 1.6, UI_SPEC/CODE_SPEC หรือ source/config/lockfile; source mismatch กับคำบรรยาย payments registry ใน CODE_SPEC ถูกบันทึกไว้ให้ R1 แก้ source/matrix ตามเจ้าของ capability
 
-งานถัดไปคือผู้ใช้ review/approve matrix, R1a–c functional changes/data preservation, R2a authoring gate และ route migration proposals ตามรายงาน R0 ก่อนเริ่ม R1 ไม่ถามกติกา Final 1.6 ที่ยืนยันแล้วซ้ำ; technical decisions ที่ยังเปิดตัดสินก่อน phase ที่พึ่งพา ไม่ต้องเลือก backend/hosting เพื่อให้ R1 เดินได้
+ผู้ใช้ให้ทำต่อตามแผนหลัง R0 แล้ว งานปัจจุบันคือ R1a–c functional changes/data preservation และจากนั้น R2a authoring gate/route migration ledger ตามรายงาน R0 ไม่ถามกติกา Final 1.6 ที่ยืนยันแล้วซ้ำ; technical decisions ที่ยังเปิดตัดสินก่อน phase ที่พึ่งพา ไม่ต้องเลือก backend/hosting เพื่อให้ R1 เดินได้
