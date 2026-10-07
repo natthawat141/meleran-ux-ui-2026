@@ -2,9 +2,9 @@
 
 วันที่ 7 ตุลาคม 2026 · branch งาน `refactor/v1-api-ready`
 
-ปรับแผนตามการทบทวนครั้งที่สอง: ใช้ `apps/web`, cleanup หลัง inventory, authoring package ตามหลักฐาน, แยก Contract/Query และเพิ่ม Containerization/CI-CD โดยมี basic CI ตั้งแต่ split apps
+ปรับแผนตาม [ผล R0 Inventory และ Lead Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md): inventory ครบ 89 routes, แยก retained dependencies ก่อน scope cleanup, เตรียม authoring interface ก่อน split apps และแยก functional acceptance ออกจาก structural migration
 
-สถานะ: ผู้ใช้ยืนยันทิศทาง Frontend และให้ปรับเอกสาร/เตรียมแผนแล้ว **ยังไม่เริ่ม implementation ไม่ตัดหรือเพิ่มฟีเจอร์ในรอบนี้** เมื่อมีคำสั่งลงมือจึงเริ่มชุดที่ระบุ ขอบเขตธุรกิจยึด [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6; architecture/code ยึด [CODE_SPEC.md](CODE_SPEC.md) ข้อ 1.1; แบรนด์/shared UI ยึด [UI_SPEC.md](UI_SPEC.md) ไม่สร้างสเปกสีอีกชุด
+สถานะ: **R0 สำรวจและตรวจ baseline แล้ว; R1 เป็นต้นไปยังรอผู้ใช้ approve execution plan** ยังไม่แก้ source/config/dependencies หรือเพิ่ม/ตัดฟีเจอร์ในรอบนี้ ขอบเขตธุรกิจยึด [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) Final 1.6; architecture/code ยึด [CODE_SPEC.md](CODE_SPEC.md) ข้อ 1.1; แบรนด์/shared UI ยึด [UI_SPEC.md](UI_SPEC.md) ไม่สร้างสเปกสีอีกชุด
 
 ## 1. ผลลัพธ์ที่ต้องการและสิ่งที่ยังไม่สรุป
 
@@ -13,16 +13,16 @@
 - `courses` ดู Catalog/รายละเอียด; `course-authoring` เป็น feature สร้าง/แก้คอร์ส รวม Curriculum/Quiz Editor ที่ยืนยันแล้ว ส่วน `packages/course-authoring` เป็น candidate for extraction เมื่อ R0/R6 พิสูจน์การใช้ร่วมและ dependency boundary ไม่ import หน้าอีกแอปหรือคัดลอก editor ทั้งก้อน
 - TanStack Query ดูแลข้อมูลจาก API; Tailwind ดูแล layout/spacing/responsive; shared UI และ library providers อ่าน theme tokens ชุดเดียว
 - API contract และข้อผิดพลาดตกลงร่วมกับ backend ต่อ flow ก่อนทำ hooks ของ flow นั้น ไม่เอา mock schema/localStorage เป็นข้อกำหนด server และไม่รอ freeze ทุก endpoint พร้อมกัน
-- ลำดับคือ inventory → scope cleanup → split apps → shared UI/router → contract → API/Query → migrate features; รักษาหน้าตา/flow ที่ยังอยู่ใน scope และตรวจ/ย้อนแต่ละชุดได้ ไม่เสียเวลาย้ายฟีเจอร์ที่ตกลงว่าจะถอน
+- ลำดับคือ inventory → retained-dependency prep → scope cleanup → authoring boundary → split apps → shared UI/router → contract → API/Query → migrate features; รักษาหน้าตา/flow ที่ยังอยู่ใน scope และตรวจ/ย้อนแต่ละชุดได้ ไม่เสียเวลาย้ายฟีเจอร์ที่ตกลงว่าจะถอน
 - เริ่ม basic CI หลัง split apps; เพิ่ม Containerization และ deployment pipeline ช่วงเตรียมส่งมอบ โดยเก็บงาน Integration/Acceptance แยกไว้
 
 Backend language/framework, database, วิธี session/credentials, hosting/domains และ media provider นอก YouTube ยังไม่สรุป การมี Containerization/CI-CD ในแผนไม่ใช่การเลือกปลายทางหรืออนุญาต deploy/ย้ายข้อมูลจริง Cloud Run เป็น hosting candidate สำหรับ Web/Admin services แยก ไม่ใช่ข้อกำหนดที่เลือกแล้ว
 
 ## 2. จุดอ้างอิง Git และข้อเท็จจริงปัจจุบัน
 
-ตรวจ checkout และ remote วันที่ 7 ต.ค. 2026 ก่อนงานเอกสารนี้: working tree สะอาด; `main`, `prototype`, tag `prototype-2026-10-07` (peeled commit) และจุดเริ่ม `refactor/v1-api-ready` ตรงกับ `fa491b46aebe6beaa408ba30ab92b28fd478d8fd` การ commit แผนจะทำให้ refactor branch เดินต่อ ส่วน main/prototype/tag คงจุดอ้างอิงเดิม
+ตรวจ checkout และ remote วันที่ 7 ต.ค. 2026: source baseline ของ R0 คือ `19ec7aa3389a14dd79328a1c8e8285c24f171865` บน `refactor/v1-api-ready`; working tree/index สะอาดก่อนสำรวจ ส่วน local/remote `main`, `prototype`, tag `prototype-2026-10-07` (peeled commit) คงที่ `fa491b46aebe6beaa408ba30ab92b28fd478d8fd` การ commit รายงาน/แผนเดินต่อเฉพาะ refactor branch
 
-จุดอ้างอิงนี้รักษา source เดิม ไม่ใช่หลักฐานว่า prototype ผ่าน Final 1.6 หรือ backend พร้อม ยังไม่ได้รัน baseline typecheck/build/browser flows สำหรับเริ่มย้ายจริงในรอบเอกสารนี้
+R0 ตรวจ `npm.cmd run typecheck`, native tests 51/51 และ `npm.cmd run build` ผ่าน พร้อม browser navigation ของ session Admin ที่มีอยู่โดยไม่ทำ mutation มี build warnings และยังไม่ได้ตรวจ learner/instructor lifecycle, mobile/visual acceptance หรือ API/server integration รายละเอียดและข้อจำกัดอยู่ในรายงาน R0 §10 ผลนี้ไม่ใช่หลักฐานว่า prototype ผ่าน Final 1.6 หรือ backend พร้อม
 
 | ส่วนปัจจุบัน | หลักฐาน/ปัญหาที่ต้องแยก |
 | --- | --- |
@@ -36,7 +36,7 @@ Backend language/framework, database, วิธี session/credentials, hosting/
 | `src/theme.ts`, `src/shadcn.css`, `src/styles.css`, `src/system-theme.css`, `src/workspace-responsive.css` | Tokens/providers/overrides หลายแหล่ง ต้องรวม owner และตรวจ cascade |
 | `src/config/features.ts`, `docs/FEATURE_RELEASE_MATRIX.md`, `tests/` | Feature/runtime/route inventory ต้องปรับพร้อม source/test ของชุดนั้น ไม่เปิด released จากการย้ายไฟล์ |
 
-ตารางนี้เป็นจุดเริ่มสำรวจ ไม่ใช่รายการทุกไฟล์ ก่อนลงมือแต่ละชุดต้องตรวจ source/branch/dirty work อีกครั้ง
+ตารางนี้เป็นภาพรวม; รายงาน R0 §§3–7 และ 13 มี matrix, route ครบทุก declaration, state, active implementation และ CSS/authoring consumer chains ก่อนลงมือแต่ละชุดต้องตรวจ source/branch/dirty work อีกครั้ง
 
 ## 3. โครงสร้างเป้าหมาย
 
@@ -65,7 +65,7 @@ docs/
 
 โครงสร้างนี้เป็นส่วนที่ freeze แล้วสำหรับ Frontend เป้าหมาย ไม่ใช่คำสั่ง rename repository/checkout เป็น `melearn-tutor` โฟลเดอร์และ build ยังไม่ได้สร้าง
 
-`packages/course-authoring` อยู่นอกโครงสร้างบังคับ: R0 บันทึกส่วน Instructor/Admin ที่ใช้ร่วมและ dependencies; R6 ยืนยัน interface แล้ว extract เมื่อมีหลักฐานจริง หากจำเป็นต้องแชร์ตั้งแต่ R2 ให้ตัดสินเฉพาะส่วนขั้นต่ำจาก R0 ห้าม import source ข้าม apps, copy editor ทั้งก้อน หรือซ่อน business editor ใน `packages/ui` เพื่อหลบ boundary ส่วนร่วมต้องไม่ผูกกับ shell, store หรือ route เฉพาะแอป
+`packages/course-authoring` อยู่นอกโครงสร้างบังคับ: R0 ยืนยันแล้วว่า Admin และ Instructor ใช้หน้า editor เดียวกันจริง แต่ page ยังผูก useLms/router/storage R2a ต้องพิสูจน์ controlled editor core interface ก่อน split หากต้อง extract ให้รับ draft/callbacks/capabilities/ID factory จาก host และไม่มี app/store/seed imports; host เป็นเจ้าของ save/dirty/conflict/navigation และ Admin Transcript แยกจาก learning draft R6 ทบทวน boundary หลังต่อ API ห้าม import ข้าม apps, copy editor ทั้งก้อน หรือซ่อน business editor ใน packages/ui เพื่อหลบ boundary
 
 ภายใน feature มี `api/`, `hooks/`, `pages/`, `components/` และ types เท่าที่มีงานใช้จริง ไม่แยกไฟล์เล็กทุกฟังก์ชันเป็นข้อบังคับ เป้าหมายคือตาม bug/flow ได้ในเจ้าของ feature เดียว
 
@@ -80,11 +80,11 @@ Apps import packages ได้; packages ไม่ import apps; ไม่ให�
 | `blog` | อ่านบทความ Published | Admin สร้าง/แก้/เผยแพร่ Blog; rich-content renderer ใช้ร่วมได้ |
 | `learning` | My courses, Enroll ฟรี, Lesson, Progress, Resume; Instructor เรียนคอร์สคนอื่นได้ | Preview เพื่อจัดการไม่สร้าง Enrollment/Progress จริง |
 | `course-authoring` | Pages ของผู้สอนสำหรับคอร์สตนเอง | Pages ของ Admin สร้าง/แก้แทน ระบุ Instructor หนึ่งคน; editor/curriculum/quiz definition เป็น candidate for shared extraction ตาม R0/R6 |
-| `assessment` | ทำ Quiz/ผล/คะแนนสูงสุด; ผู้สอนดูและตรวจคำตอบในขอบเขตคอร์ส | สิทธิ์จัดการ/ตรวจของ Admin ตาม scope; การทำแบบฝึกหัดกับการนิยาม Quiz เป็นคนละหน้าที่ |
-| `certificate` | ดู/ดาวน์โหลดใบรับรองของตน | หน้าดูแลตามสิทธิ์ใน scope ไม่เพิ่ม flow revoke/reissue เอง |
+| `assessment` | ทำ Quiz/ผล/คะแนนสูงสุด; ผู้สอนดูและตรวจคำตอบในขอบเขตคอร์ส | Admin ดูรายชื่อ/ผลตามงานจัดการ; Instructor เจ้าของเป็นผู้ตรวจข้อเขียน/ภาพตาม quiz.grade; ห้ามยก Admin grading จาก prototype ไปใช้; การทำแบบฝึกหัดกับการนิยาม Quiz เป็นคนละหน้าที่ |
+| `certificate` | ดู/ดาวน์โหลดใบรับรองของตน | คงสถานะ completion ในงานจัดการ; ไม่มี permission เปิด/download ใบทุกคน ไม่ย้าย standalone global certificate browser หรือเพิ่ม revoke/reissue เอง |
 | `payment` | Stripe ซื้อรายคอร์สและหน้าผล/รอ/error | ดูข้อมูล Payment ผิดปกติขั้นต่ำ ไม่มี Finance/Refund dashboard |
 | `redeem` | ใช้โค้ดรับสิทธิ์ | Admin ออกโค้ด ดูผู้ใช้ ยกเลิกเฉพาะ Unused; แยกจาก discount code |
-| `ai` | Chat/history/search/rename/delete/AIPractice | ตั้ง `ai_enabled` และ Transcript ต่อ Video; ไม่มีหน้าอ่านแชตบัญชีอื่น |
+| `ai` | Chat/history/search/rename/delete/AIPractice | ตั้ง `ai_enabled` และ Transcript ต่อ Video; Admin มีแชตของตนใน app ของตน; ไม่มีหน้าอ่านแชตบัญชีอื่น |
 | `instructor` | Workspace overview/navigation และรายชื่อผู้เรียนของคอร์สตน | ไม่เป็นก้อนรวม editor/learning/payment ซ้ำ; Admin เพิ่มบทบาทผ่านงาน `users` |
 | `users`, `course-review`, `codes` | ไม่มีหน้าปฏิบัติการ Admin ใน Web | Admin สร้างบัญชี/เพิ่มผู้สอน, ตรวจอนุมัติ/ส่งกลับ/เผยแพร่, จัดการโค้ด |
 
@@ -94,7 +94,7 @@ Apps import packages ได้; packages ไม่ import apps; ไม่ให�
 
 รายการที่จะถอดใน R1 ก่อนย้ายโครงสร้าง: Cart/Order history เต็ม, Inbox/ถามผู้สอน, Finance/ส่วนแบ่ง/จ่ายเงิน/Refund flow, Business Analytics/Big Data, Referral, ขอเป็นผู้สอน/คำเชิญ, ผู้สอนร่วม, Archive, Assignment แยก, LINE login, AI Knowledge Dashboard/ถอดเสียงอัตโนมัติ/หน้า Admin ดูคำถามคนอื่น และ Release Dashboard ตามบท 8 การยังไม่ทำไม่ใช่การตั้งนโยบายธุรกิจใหม่
 
-R1 ถอนตามความสามารถและ import/action dependencies ไม่ลบไฟล์จากชื่อ analytics/commerce อย่างเดียว ตัวอย่าง `src/pages/instructor/QuizPages.tsx` และ `src/pages/instructor/LearnerReviewQueuePage.tsx` ยังใช้ `getReviewQueue` จาก `src/api/analytics.ts` ซึ่งเป็นส่วนตรวจคำตอบที่ต้องรักษาไว้ เช่นเดียวกับ Payment API และ Redeem ที่อยู่ใกล้ Commerce เดิม ต้องแยก retained helpers ออกก่อนถอนเจ้าของที่ไม่ใช้
+R1 ถอนตามความสามารถและ import/action dependencies ไม่ลบไฟล์จากชื่อ analytics/commerce อย่างเดียว ผล R0 เพิ่มการถอด Admin grading, Guest full lesson preview, public certificate verification และ standalone Admin global certificate browser ตาม permission ที่ scope ยืนยัน; owner/Admin management preview กับ learner results ยังอยู่ และหยุด destructive course deletion ที่ทำประวัติหาย ตัวอย่าง `src/pages/instructor/QuizPages.tsx` และ `src/pages/instructor/LearnerReviewQueuePage.tsx` ยังใช้ `getReviewQueue` จาก `src/api/analytics.ts` ซึ่งเป็นส่วนตรวจคำตอบที่ต้องรักษาไว้ เช่นเดียวกับ Payment API และ Redeem ที่อยู่ใกล้ Commerce เดิม ต้องแยก retained helpers ออกก่อนถอนเจ้าของที่ไม่ใช้
 
 Upload Video/Mux/Bunny ยังไม่เปิด ใช้ YouTube Link; UI upload อาจอยู่ได้แต่ต้องแสดงยังไม่พร้อมและไม่เก็บไฟล์จริง ภาพปก/ภาพคำตอบเป็นอีกขอบเขต ไม่ถอดรวมไปด้วย
 
@@ -111,33 +111,36 @@ Upload Video/Mux/Bunny ยังไม่เปิด ใช้ YouTube Link; UI
 
 ## 6. แบ่งงานและเกณฑ์ตรวจรับ
 
-ทุกชุดในตารางยังไม่เริ่ม implementation ชุด R0 เริ่มสำรวจ/ตรวจ baseline เมื่อได้รับคำสั่ง ชุด functional changes ต้องระบุ flow ที่จะเปลี่ยนก่อนเริ่ม ไม่ถือว่าแผนนี้อนุญาตตัดเพิ่มฟีเจอร์ทันที
+R0 สำรวจ/ตรวจ baseline เสร็จแล้ว ชุด R1 เป็นต้นไปยังไม่เริ่ม implementation ชุด functional changes ต้องระบุ before/after และ acceptance ของ flow ที่จะเปลี่ยนตาม matrix/risks ของ R0 ก่อนเริ่ม ไม่ถือว่าการรับรายงานนี้อนุญาตตัดเพิ่มฟีเจอร์ทันที
 
 | ชุด | งาน / ข้อพึ่งพา | เกณฑ์รับ |
 | --- | --- | --- |
-| R0 — Inventory/baseline | ทำ route→page→component→CSS→store action map, keep/adapt/remove, dependencies และ API gaps; บันทึก authoring reuse candidates และตรวจ Git/tests ตั้งต้น | ระบุ retained dependencies ของฟีเจอร์ที่จะถอน; typecheck/build/critical flow baseline พร้อมผลจริงและข้อจำกัด; ไม่อ้าง shared package หรือ backend readiness ก่อนมีหลักฐาน |
-| R1 — Scope cleanup | หลัง R0 ถอดฟีเจอร์นอก scope ตามบท 8 ก่อน refactor; ถอน routes/navigation/actions/side effects/styles/dependencies/tests ที่ไม่ใช้ และแยก retained helpers ที่จำเป็น | ฟีเจอร์ที่ถอนไม่มีทางเข้าหรือ side effect; grading/learner list/Payment/Redeem ยังทำงาน; matrix/config/tests สอดคล้อง; ไม่ reset browser data, prototype/tag คงเดิม |
-| R2 — Workspace Web/Admin + basic CI | หลัง R1 จัด workspace/build/TypeScript aliases/scripts สำหรับสอง apps และ packages; ถ้าต้องแชร์ authoring ทันทีใช้ผล R0 กำหนดส่วนขั้นต่ำ; เริ่ม CI typecheck/test/build แยก | สอง entry/build เปิดได้; Web ไม่โหลด Admin pages; ไม่มี cross-app imports หรือ copy ทั้งแอป; CI รัน checks ที่มีจริงพร้อมรายงานผล ไม่ deploy |
+| R0 — Inventory/baseline (เสร็จ) | [รายงาน R0](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md): 89 routes/87 feature mappings, keep/adapt/remove, state/API gaps, authoring reuse และ theme consumer chains | typecheck/build/native tests 51 ผ่าน; Admin browser navigation ตรวจแล้วพร้อมข้อจำกัด; ส่งแผนให้เจ้าของ approve ก่อน source changes |
+| R1a — Retained dependency prep | หลัง approve R0 แยก grading helper/CSS, roster gates, Payment/Redeem wrappers และ history guards ขั้นต่ำก่อนถอนเจ้าของเดิม | retained routes/helpers ทำงาน; registry/matrix/tests แยก payment/redeem/roster จาก commerce/analytics ที่จะถอน ไม่ตั้ง released จากการย้าย |
+| R1b — Functional scope cleanup | ถอน out-of-scope nav/routes/actions รวม permission gaps ที่ R0 ระบุ; Admin instructor directory แยก requests/invites | capability ที่ถอนไม่มีทางเข้า; owner grading/learner list/Payment/Redeem/management preview ยังอยู่; removed URLs มี migration behavior ไม่มี restricted data |
+| R1c — State/loader cleanup | ถอน legacy actions/seed/loader/side effects/styles/dependencies; Redeem adapter ขั้นต่ำไม่สร้าง Order/share ก่อนถอน simulatePayment; ปรับ tests ของ capability ที่ถอน | reopen demo เดิมไม่ reseed legacy; used codes ไม่กลับ Unused; attempts/enrollment/certificate เดิมไม่ถูกลบ; ไม่ reset browser data; prototype/tag คงเดิม |
+| R2a — Authoring boundary + migration ledger | หลัง R1 เตรียม controlled editor interface, host-owned draft/save/Transcript/navigation; เลือก workspace tool และ Web/Admin route compatibility รวม Admin own account/AI | package interface gate ตาม R0 §5.2; no store/data/router imports ใน core; old path/role→target/params/query/hash/rollback มี owner; ไม่ copy pages ทั้งก้อน |
+| R2b — Workspace Web/Admin + basic CI | สอง entry/build/aliases/scripts และ shared package public exports; เริ่ม CI typecheck/test/build และ dependency-direction checks | สอง runtime เปิด retained preview flows ได้; Web ไม่ import Admin source และกลับกัน; checks แยกมีผลจริง ไม่ deploy; ข้าม origin ต้องมี shared test API/mock service ก่อนอ้าง consistency |
 | R3 — Shared UI/tokens + router | หลัง R2 รวม token source/theme adapters และ shared variants/Tailwind ทีละส่วน; แยก route modules/layouts/guards ให้ App เล็ก | primary/hover/focus/disabled ทั้งสองแอปอ้างต้นทางเดียว; contrast/keyboard/responsive กับ deep link/refresh/back/no-access ผ่าน; Instructor เข้า learner flows ตามสิทธิ์; คง demo session boundary ชั่วคราวได้ |
 | R4a — API Contract ต่อ flow | ใช้ scope และผล R0 ตกลงกับ backend: DTO/enums/request/response/errors, credentials/permissions, states, pagination และ idempotency ตาม flow ที่เกี่ยวข้อง; อนุมัติ contract ก่อน hooks ของ flow นั้น | มีตัวอย่าง success/error และผู้รับผิดชอบสัญญาร่วม; prototype schema ไม่กลายเป็น contract โดยอัตโนมัติ; ระบุ version/change policy และสิ่งที่ยังไม่ตัดสิน; ไม่รอ freeze ทุก endpoint พร้อมกัน |
 | R4b — API client/Query foundation | หลัง R2 และ contract ของ slice ผ่าน R4a จัด HTTP/error infrastructure, query keys/mutations/invalidation/account cache และ mock adapter; เลือก session transport ก่อน auth จริง | Payload validation/loading/error/cancel ทำงานตาม contract; mock/real แยกชัด; เปลี่ยนบัญชีไม่รั่ว cache; reuse Payment validation เดิม; hooks ไม่กำหนด contract ย้อนกลับ |
 | R5 — Public/auth/account/blog | หลัง R3/R4b และ R4a ของแต่ละ flow ย้าย Catalog/public content, Auth/Profile, Blog read/Admin write เป็นชุดย่อย | หน้าที่เก็บไว้ยังครบ public/member ต่างบริบท; Blog Published/Admin write แยก; API ยังไม่พร้อมไม่ใช้ fake success; ไม่ย้ายฟีเจอร์ที่ถอนใน R1 กลับมา |
 | R6 — Course authoring/review | หลัง R3/R4b และ contracts ที่เกี่ยวข้อง แยก pages/editor/curriculum/chapter/content/Quiz definition กับ Admin review; ตัดสิน shared extraction ตาม evidence R0 และ dependency จริง | มีบันทึก extract/ไม่ extract พร้อมเหตุผล; ไม่มี cross-app imports/copy editor ทั้งก้อน; owner/Admin manage, draft/save/preview/ordering ไม่เสีย; YouTube/รูป/rich text ใช้ได้; Preview ไม่สร้างผลเรียน |
-| R7 — Learning/assessment/certificate | หลัง R4b และ contracts auth/course/assessment ย้าย Enroll→Learn→Attempt→Grade→Complete→Certificate โดยไม่ต้องรอ editor ทั้งหมดถ้า contract พร้อม | ความสัมพันธ์/snapshots/คะแนนสูงสุด >70%/รอตรวจ/Progress/ใบเดิมตรงบท 2 และ 9; Instructor เรียนคอร์สอื่นได้; server evidence แยกจาก mock |
-| R8 — Payment/redeem | หลัง R4b และ contracts auth/course/enrollment/payment/redeem ย้าย client/หน้าผล/โค้ด แยกสอง features | Success page อ่านสถานะ ไม่ fulfill; pending/error/already-enrolled ถูกต้อง; Redeem แยกส่วนลด; concurrency/idempotency ตรวจ server เมื่อพร้อม |
-| R9 — AI/Transcript/AIPractice | หลัง R4b และ contracts auth/enrollment/AI ย้าย UI/history/API boundary กับ Admin Transcript controls | บริบทตามสิทธิ์; history/rename/delete/draft ไม่เสีย; AIPractice ไม่เปลี่ยน Progress; 20 Prompt สำเร็จ/วันไทยต้องมี server evidence |
+| R7 — Learning/assessment/certificate | หลัง R4b และ contracts auth/course/assessment ย้าย Enroll→Learn→Attempt→Grade→Complete→Certificate โดยไม่ต้องรอ editor ทั้งหมดถ้า contract พร้อม | คะแนนจริง >70% โดยไม่ปัด, highest completed graded attempt, pending/no early certificate, enrollment/completion/certificate snapshots และ Resume ตรงบท 2/9; Instructor เรียนคอร์สอื่นได้; grading จำกัด owner; server evidence แยกจาก mock |
+| R8 — Payment/redeem | หลัง R4b และ contracts auth/course/enrollment/payment/redeem ย้าย client/หน้าผล/โค้ด แยกสอง features | Success page อ่านสถานะ ไม่ fulfill; Enrollment query อ่าน server หลัง webhook ไม่เติม local rights; pending/error/already-enrolled ถูกต้อง; Redeem one-use/no-expiry/Unused–Used–Revoked ไม่มี Order/share/discount; concurrency/idempotency ตรวจ server |
+| R9 — AI/Transcript/AIPractice | หลัง R4b และ contracts auth/enrollment/AI ย้าย UI/history/API boundary กับ Admin Transcript controls | บริบทตามสิทธิ์และ Admin own AI; history/rename/delete/unsent draft ไม่เสีย; AIPractice ไม่ส่งเฉลยก่อนตอบ/ไม่เปลี่ยน Progress; 20 Prompt สำเร็จ/วันไทยและ duplicate request ต้องมี server evidence |
 | R10 — Integration ของ flows | หลัง migrations ของ flow ที่เกี่ยวข้อง ตรวจสองแอปกับ API จริงตามบท 9 และตามเก็บ dead code ของ retained slices ที่ถูกแทนแล้ว | Persistence ข้าม session/device, server permissions/ownership/enrollment, Stripe webhook และ AI จริงมีหลักฐาน; ไม่มี mock fallback ใน flow ที่ประกาศพร้อม; ไม่แทนงานนี้ด้วย build image |
 | R11 — Containerization | หลัง R2 เมื่อ build/runtime configuration ของ apps ชัด ทำ Dockerfiles แยก ใช้ monorepo-root context และ production static serving; หลัง R10 เพิ่ม smoke กับ API ที่พร้อม | Images build แยก reproducibly, health/assets/SPA deep links ผ่าน; ไม่ใช้ Vite dev/preview server เป็น production server; public API config ถูกต้อง ไม่มี secrets ฝัง bundle |
 | R12 — CI/CD เตรียมส่งมอบ | ต่อจาก basic CI ใน R2 และ images R11 เพิ่ม dependency-aware path filtering, artifact/image promotion, environment configuration และ rollback; เลือก hosting ก่อนจัด CD เฉพาะบริการ | app-only เปลี่ยนตรวจ app นั้น; shared packages/root lockfile/config เปลี่ยนตรวจ dependents; pipeline/สิทธิ์ deploy แยก Web/Admin; Cloud Run services แยกเฉพาะเมื่อเลือกและอนุญาตเปิดจริง |
 | R13 — Final acceptance/เตรียม main | หลัง R10 และตรวจ packaging/pipeline ที่เปลี่ยนใน R11/R12 ตรวจ artifact ของทั้งสองแอปตาม scope พร้อมข้อจำกัด ก่อนรวม main | Typecheck/build/regressions ที่จำเป็นกับ browser/API flows และ runtime artifact ผ่าน; หลักฐานชี้ revision เดียวกัน; main เป็น Final 1.6 ไม่อ้าง Production พร้อมจาก CI/health อย่างเดียว |
 
-ลำดับคือข้อพึ่งพา ไม่ใช่กำหนดวันส่ง R3 ต้องแตกชุด tokens/UI/router ที่ตรวจแยกได้ และ R5–R9 แตกเป็น commit ตาม flow; R4a ของ flow ถัดไปเตรียมได้ระหว่าง migrate flow ที่ตกลงแล้ว R11/R12 เตรียม build/CI ได้หลัง split โดยไม่ต้องรอ backend ทั้งหมด แต่ final acceptance ของ API ต้องรอหลักฐานจริง ไม่มีการมอบหมาย agent/เขียนโค้ดพร้อมกันในรอบเอกสารนี้
+ลำดับคือข้อพึ่งพา ไม่ใช่กำหนดวันส่ง R3 ต้องแตกชุด tokens/UI/router ที่ตรวจแยกได้ และ R5–R9 แตกเป็น commit ตาม flow; R4a ของ flow ถัดไปเตรียมได้ระหว่าง migrate flow ที่ตกลงแล้ว R11/R12 เตรียม build/CI ได้หลัง split โดยไม่ต้องรอ backend ทั้งหมด แต่ final acceptance ของ API ต้องรอหลักฐานจริง R0 ใช้ Luna xhigh สำรวจแบบ read-only สี่บทบาทแล้ว; ไม่มีการมอบหมาย implementation หรือเขียน source ในรอบนี้
 
 ### 6.1 Contract freeze และ authoring extraction
 
 - R4a ส่งมอบ DTO/enums, request/response success/error, field visibility, permission/state และตัวอย่างให้ mock/test ใช้ร่วมกัน ยืนยันต่อ flow กับ backend ก่อน R4b/hooks ของ flow นั้น หาก backend ยังไม่รับให้ระบุเป็น draft แทนคำว่า frozen
 - Contract เปลี่ยนต้องอัปเดต version/consumers/fixtures/validation/tests ของ slice พร้อมกัน ไม่แก้ server response เพื่อเอาใจ hook โดยไม่มี review; frontend ขึ้นรูป UX ด้วย draft adapter ได้ แต่ไม่อ้างว่า integrate แล้ว
-- R0/R6 บันทึก authoring components ที่ทั้งสองแอปใช้, dependencies, props/callbacks และ draft ownership ก่อนตัดสิน extraction แยก feature ownership ไว้เสมอ ไม่ยก permission/API/navigation ของสองแอปมารวมเพราะหน้าตาเหมือนกัน
+- R0 บันทึก reuse แล้ว; R2a ตรวจ components/dependencies/props/callbacks/draft ownership เป็น interface gate ก่อน extraction ที่จำเป็นต่อ split และ R6 ทบทวนหลัง integrate แยก feature ownership ไว้เสมอ ไม่ยก permission/API/navigation ของสองแอปมารวมเพราะหน้าตาเหมือนกัน
 
 ### 6.2 Containerization และ CI/CD future work
 
@@ -168,6 +171,6 @@ Structural batch ย้าย ownership/import/router/state boundary โดย�
 
 ## 9. สิ่งส่งมอบของรอบนี้และงานถัดไป
 
-รอบนี้ส่งมอบการตัดสินใจ Frontend ใน CODE_SPEC, กติกา shared tokens/Tailwind ใน UI_SPEC, แผนฉบับนี้ และลิงก์เริ่มงานใน AGENTS/README/feature matrix ไม่เปลี่ยน scope ธุรกิจ Final 1.6 และไม่แก้ source/config/lockfile
+รอบ R0 นี้ส่งมอบ [Inventory และ Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md), แผนฉบับที่ปรับตามหลักฐาน และลิงก์ใน docs/README ผลสำรวจไม่เปลี่ยน scope Final 1.6, UI_SPEC/CODE_SPEC หรือ source/config/lockfile; source mismatch กับคำบรรยาย payments registry ใน CODE_SPEC ถูกบันทึกไว้ให้ R1 แก้ source/matrix ตามเจ้าของ capability
 
-งานถัดไปตามแผนคือ R0: inventory ราย route/feature, retained dependencies, authoring reuse candidates และ baseline verification เพื่อกำหนดไฟล์ R1 scope cleanup ก่อน R2 split apps ต้องมีคำสั่งลงมือจากผู้ใช้ก่อน implementation
+งานถัดไปคือผู้ใช้ review/approve matrix, R1a–c functional changes/data preservation, R2a authoring gate และ route migration proposals ตามรายงาน R0 ก่อนเริ่ม R1 ไม่ถามกติกา Final 1.6 ที่ยืนยันแล้วซ้ำ; technical decisions ที่ยังเปิดตัดสินก่อน phase ที่พึ่งพา ไม่ต้องเลือก backend/hosting เพื่อให้ R1 เดินได้
