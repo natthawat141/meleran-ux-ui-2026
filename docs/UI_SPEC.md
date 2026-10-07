@@ -40,7 +40,7 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 
 ### 2.1 Theme และ shared UI ที่ยืนยัน 7 ตุลาคม 2026
 
-- Tutor และ Admin ใช้ design tokens/shared UI ใน `packages/ui` ร่วมกัน มี layout ต่างกันได้ ยังไม่สร้าง package หรือเปลี่ยน UI ในรอบเอกสารนี้
+- Web และ Admin ใช้ design tokens/shared UI ใน `packages/ui` ร่วมกัน มี layout ต่างกันได้ ยังไม่สร้าง package หรือเปลี่ยน UI ในรอบเอกสารนี้
 - สีแบรนด์ใช้ข้อ 2 เป็นแหล่งอ้างอิงเดียว เป้าหมายคือ tokens กลางตามหน้าที่ เช่น primary/foreground/hover/soft, surface, page background, text/muted, border, focus และ success/warning/danger รวม font/radius/shadow ที่ใช้ร่วม ไม่ทำชุดสีใหม่ซ้ำในแผน refactor
 - Tailwind utilities, CSS เฉพาะส่วน และ theme ของ Ant Design/Mantine/Base UI ต้องอ้าง tokens ต้นทางเดียว การปรับธีมเปลี่ยนชุด tokens แล้ว build ทั้งสองแอป ไม่ไล่แก้ literal ตามหน้า
 - ใช้ Tailwind เป็นหลักสำหรับ layout/spacing/responsive และ style ของ shared component; ใช้ semantic classes เช่น `bg-primary`, `text-primary`, `bg-surface` แทน `bg-blue-600` หรือ hex literal สำหรับสีแบรนด์
@@ -48,7 +48,7 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 - Brand accent กับสถานะ success/warning/danger เป็นคนละความหมาย เปลี่ยน primary ไม่ย้อมสถานะทั้งหมด; เปลี่ยนทั้งชุดธีมต้องตรวจ foreground, hover, focus และ contrast ด้วย
 - CSS Modules หรือ CSS ที่มี namespace ใกล้ component ยังใช้ได้กับ editor, rich content, animation และรูปแบบเฉพาะ หลีกเลี่ยง global overrides และ `!important` ที่สะสม
 - ย้าย tokens/Tailwind ทีละส่วนโดยรักษาหน้าตาและ flow เดิมที่อยู่ใน scope ไม่ถือว่าการยืนยัน Tailwind คืออนุญาต redesign ทุกหน้า เป้าหมายรอบนี้ไม่มีปุ่ม dark-mode toggle ใหม่
-- เส้นทางสร้างคอร์สของ Instructor/Admin ใช้ editor ส่วนร่วม แต่ layout/navigation/สิทธิ์แยกตามแอป; `courses` ดูคอร์ส ส่วน `course-authoring` สร้าง/แก้โครงสร้างและเนื้อหา ตาม [CODE_SPEC.md](CODE_SPEC.md)
+- เส้นทางสร้างคอร์สของ Instructor/Admin แยก layout/navigation/สิทธิ์ตามแอป; `courses` ดูคอร์ส ส่วน `course-authoring` สร้าง/แก้โครงสร้างและเนื้อหา การ extract editor เป็น shared package ทำเมื่อพิสูจน์การใช้ร่วม/ขอบเขต dependency ตาม [CODE_SPEC.md](CODE_SPEC.md) ไม่เป็น package บังคับตั้งแต่แรก
 
 ## 3. ฟอนต์และจังหวะการอ่าน
 

@@ -17,21 +17,24 @@
 
 การยืนยันนี้เป็น architecture ของ Frontend และแผนงาน ไม่ใช่หลักฐานว่า source ย้ายแล้ว หรืออนุญาตเริ่ม implementation ดูลำดับงานและเกณฑ์รับที่ [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md)
 
-- ใช้สอง React apps ใน repository เดียว: `apps/tutor` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง โฟลเดอร์เหล่านี้เป็นเป้าหมาย ยังไม่ได้สร้าง
+- ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก โฟลเดอร์เหล่านี้เป็นเป้าหมาย ยังไม่ได้สร้าง ไม่เปลี่ยนชื่อ repository/checkout จากชื่อโครงสร้างตัวอย่าง
 - ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
 - `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
-- แต่ละแอปมี page/route orchestration ของตนเอง ส่วน authoring ที่ใช้ร่วมจริงอยู่ใน `packages/course-authoring` รับข้อมูล draft, capabilities และคำสั่งผ่าน interface ไม่ import router, `useLms()` หรือ layout ของ Tutor/Admin และไม่ hard-code `/teach/...`
+- แต่ละแอปมี page/route orchestration ของตนเอง `course-authoring` เป็น feature ที่ยืนยันแล้ว แต่ `packages/course-authoring` เป็น candidate for extraction ไม่ใช่ package บังคับตั้งแต่แรก ให้ R0/R6 ตรวจผู้ใช้ร่วมและ dependencies แล้ว extract เฉพาะส่วนที่มี interface ชัด หาก split apps ต้องใช้ร่วมทันทีให้ตัดสินส่วนขั้นต่ำจากหลักฐานใน R0 ไม่ copy editor ทั้งก้อนเป็นสองชุดหรือ import source ข้ามแอป ส่วนร่วมรับข้อมูล draft/capabilities/คำสั่ง ไม่ผูก `useLms()`, layout หรือ route เฉพาะแอป
 - `packages/ui` เป็น shared UI/design tokens; `packages/api-client` เป็น HTTP/error infrastructure; `packages/contracts` เป็น types ตาม API contract ไม่คัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract
 - Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ย้ายส่วนร่วมเมื่อมีผู้ใช้จริง
-- `App.tsx` ประกอบ providers/router เท่านั้น; route แยก Public/Auth/Learner/Instructor ของ Tutor และพื้นที่ Admin ของอีกแอป ใช้ nested layouts พร้อม boundary สำหรับ loading/error/no-access/not-found ตาม flow
+- `App.tsx` ประกอบ providers/router เท่านั้น; route แยก Public/Auth/Learner/Instructor ของ Web และพื้นที่ Admin ของอีกแอป ใช้ nested layouts พร้อม boundary สำหรับ loading/error/no-access/not-found ตาม flow
 - Page ดูแล route params/query และประกอบหน้าจอ; feature component ดูแล behavior ของ feature; shared UI ดูแล presentation/interaction ทั่วไป ไม่เรียก API เฉพาะธุรกิจเอง
 - Course, Enrollment, Progress, Payment, AI Conversation และ Certificate เป็น server state ผ่าน TanStack Query; form/editor draft, modal/sidebar และสถานะ UI อยู่ local/client state ตามเจ้าของ ไม่สร้าง global store ข้อมูล backend ซ้ำ
 - AuthProvider ดูแล lifecycle ของ session ไม่รวม users/courses ทั้งระบบ; query cache ต้องแยกหรือเคลียร์เมื่อเปลี่ยนบัญชี ทั้งสองแอปมี cache ของตัวเอง ไม่แชร์ React store ข้ามแอป
 - Component/page ไม่เรียก `fetch` กระจาย ใช้ feature API ผ่าน client กลางที่รับผิดชอบ base URL, วิธีส่ง credentials, timeout/cancellation และ error normalization; payload จาก network ต้องตรวจตาม contract ไม่เชื่อเพียง TypeScript generic
-- Tutor/Admin ใช้กติกา API และ backend เดียวกันได้โดยยังไม่เลือก implementation backend การแยกสอง frontend ไม่บังคับให้แยก backend/ฐานข้อมูลหรือให้ frontend เชื่อม database โดยตรง
+- ตกลง API Contract ต่อ flow ก่อนทำ query hooks ของ flow นั้น: DTO, enums, request/response, error codes, credentials/permissions และสถานะที่คืนร่วมกับ backend ไม่ให้ contract เปลี่ยนตาม hook ที่เขียนล่วงหน้า ไม่ต้องรอ freeze ทุก endpoint ทั้งระบบพร้อมกัน
+- Web/Admin ใช้กติกา API และ backend เดียวกันได้โดยยังไม่เลือก implementation backend การแยกสอง frontend ไม่บังคับให้แยก backend/ฐานข้อมูลหรือให้ frontend เชื่อม database โดยตรง
 - Tailwind เป็นหลักสำหรับ layout/spacing/responsive; UI ที่ใช้ซ้ำมี shared component/variants อ้าง semantic theme tokens ชุดเดียวกับ CSS และ library providers ตาม [UI_SPEC.md](UI_SPEC.md) ไม่บังคับเขียนทุกอย่างใหม่เป็น Tailwind
 - Instructor เข้า learner flows ของคอร์สคนอื่นได้ตาม Final 1.6; route guards มีไว้สำหรับ UX/navigation เท่านั้น Backend ต้องตรวจ identity, permission, ownership, enrollment และสถานะอีกครั้ง
 - รักษา URL/หน้าตา/พฤติกรรมที่ยังอยู่ใน scope ระหว่างย้ายโครงสร้าง การตัดเพิ่มฟีเจอร์และเปลี่ยน URL เป็นชุดงานแยกที่ต้องได้รับคำสั่งลงมือก่อน; ตัวอย่าง `/blog` หรือ `/account/payments` ไม่ใช่การอนุมัติ route ใหม่หรือ Order history เต็มรูปแบบ
+- ลำดับแผนใหม่คือ R0 inventory → R1 scope cleanup → R2 split apps/basic CI → R3 shared UI/router → R4a contract → R4b API/Query → migrate features; cleanup ถอดตามความสามารถ/dependency ไม่ลบตามชื่อโฟลเดอร์ analytics จน grading/learner list หาย
+- แผนมี Containerization และ CI/CD เป็นงานอนาคตพร้อมเกณฑ์ตรวจแยกจาก integration ใช้ build context ที่ monorepo root; shared packages/root lockfile/config เปลี่ยนต้องตรวจ apps ที่ได้รับผล Cloud Run เป็น hosting candidate ยังไม่เลือกปลายทางหรืออนุญาต deploy ดู R11–R13 ในแผน
 
 ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source ปัจจุบัน กติกา prototype ที่ระบุ `store.tsx` หรือ Admin ใช้ `/teach/...` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่เป้าหมาย architecture ใหม่
 
@@ -105,7 +108,7 @@
 - ใช้ grid/flex, minmax, wrap, gutter และ aspect-ratio สำหรับ layout ไม่ใช้ absolute positioning เพื่อแก้ toolbar ชนกัน Absolute ใช้ได้กับ background/overlay ตามหน้าที่
 - ค่าเริ่มต้น light; dark tokens มีอยู่แล้ว ยังไม่เปิด toggle ไม่อ้างว่าภาพ/editor/public ทั้งระบบรองรับ dark ครบ
 - งานที่เปลี่ยน token กลางต้องเช็กหน้าที่ใช้ร่วมกันอย่างพอประมาณ โดยไม่ขยายเป็น redesign ทุกหน้า
-- เป้าหมายหลัง refactor คือ design tokens ชุดเดียวใน `packages/ui` สำหรับ Tutor/Admin โดย Tailwind theme, CSS variables และ library providers อ้างต้นทางเดียวกัน; ไม่เก็บ hex ซ้ำใน theme.ts, stylesheet และ component variants ส่วน CSS เฉพาะ editor/animation ใช้ได้เมื่อมี owner ชัดและอ้าง tokens
+- เป้าหมายหลัง refactor คือ design tokens ชุดเดียวใน `packages/ui` สำหรับ Web/Admin โดย Tailwind theme, CSS variables และ library providers อ้างต้นทางเดียวกัน; ไม่เก็บ hex ซ้ำใน theme.ts, stylesheet และ component variants ส่วน CSS เฉพาะ editor/animation ใช้ได้เมื่อมี owner ชัดและอ้าง tokens
 
 ## 6. State และการบันทึก
 
@@ -129,7 +132,7 @@
 - Route gate ไม่ใช่การตรวจสิทธิ์ฝั่ง API และไม่เอา source ออกจาก bundle; ต้องบังคับ role, ownership และสิทธิ์ข้อมูลใน Backend ก่อน release
 
 - ศึกษา `RolePage` ใน `App.tsx` และ checks ใน actions ปัจจุบัน อย่าเชื่อว่าซ่อนปุ่มแล้วผู้ใช้เข้าหน้านั้นไม่ได้
-- ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้ ปัจจุบัน prototype ใช้ `/teach/...` workspace ร่วมกัน แต่เป้าหมาย refactor ให้ Admin มี routes/pages ในแอป Admin โดยใช้ authoring package ร่วม ไม่พึ่งหน้า Tutor
+- ผู้สอนจัดการเฉพาะคอร์สตนเอง; admin จัดการคอร์สผู้อื่นได้ ปัจจุบัน prototype ใช้ `/teach/...` workspace ร่วมกัน แต่เป้าหมาย refactor ให้ Admin มี routes/pages ในแอป Admin ไม่พึ่งหน้า Web; การ extract authoring package ตัดสินจากหลักฐานตามข้อ 1.1
 - Public blog อ่านได้โดยไม่ login แต่ create/edit/delete blog เป็น admin ในรุ่นนี้; blog กับบทอ่านในคอร์สเป็นข้อมูลคนละชนิด
 - Routes ต้องรองรับเปิดตรง refresh, not-found, no-access และ back path ที่ถูก context อย่าผูกสิทธิ์กับการที่เข้ามาผ่านปุ่มเพียงทางเดียว
 - คำขอแก้ UI ไม่อนุญาตขยายสิทธิ์ role เดิมหรือเปลี่ยน business rule เอง ถ้ามี requirement ใหม่ให้ระบุความต่างอย่างชัดเจน

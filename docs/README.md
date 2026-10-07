@@ -11,7 +11,7 @@
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
-| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | ทิศทาง Frontend ที่ยืนยัน: Tutor/Admin สองแอป, feature ownership, shared authoring/UI/tokens และแผน refactor เป็นชุดพร้อมเกณฑ์รับ; ยังไม่เริ่ม implementation |
+| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | Web/Admin สองแอป; inventory → scope cleanup → split → contract → migrate; shared UI/tokens, authoring package ตามหลักฐาน และงาน Containerization/CI-CD พร้อมเกณฑ์รับ; ยังไม่เริ่ม implementation |
 | [BUSINESS_ANALYTICS_UI_SPEC.md](BUSINESS_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [INSTRUCTOR_ANALYTICS_UI_SPEC.md](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [BUSINESS_ANALYTICS_DATA_SPEC.md](BUSINESS_ANALYTICS_DATA_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
@@ -24,6 +24,8 @@
 อ่านฉบับหลักก่อน UI/CODE spec ซึ่งใช้รักษาแบรนด์และวิธีทำต้นแบบ การอนุมัติธุรกิจไม่เท่ากับ backend พร้อมหรือเลือกสแตกแล้ว
 
 ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก ปัจจุบันยังเป็น source ของแอปเดียวและอนุญาตเฉพาะเอกสาร/แผน ไม่เริ่มย้ายโค้ดหรือเปลี่ยนฟีเจอร์จากการอนุมัติแผนเพียงอย่างเดียว
+
+ใช้ชื่อเป้าหมาย `apps/web` และ `apps/admin` รองรับ build/deploy แยกกัน มี basic CI หลัง split apps และชุด Containerization/CI-CD ช่วงเตรียมส่งมอบ Cloud Run ยังเป็น candidate โครงสร้างตัวอย่างไม่ใช่คำสั่งเปลี่ยนชื่อ checkout หรือ repository
 
 Stripe Checkout ซื้อคอร์สแล้วได้สิทธิ์และ AI สร้างชุดฝึกในแชตอยู่ในรอบแรกแล้ว ส่วน Inbox, Finance, Orders/Cart แบบเต็ม และ analytics แบบใหญ่ยังไม่ทำ เอกสารเก็บประวัติไม่ใช่งานที่ต้องทำให้ครบ
 
