@@ -16,6 +16,8 @@ Repository นี้เป็น interactive UX prototype ของ Melearn: Rea
 
 ## Priority and scope
 
+- งาน R0 Inventory/Architecture Review ใช้ [workflow](.codex/workflows/r0-inventory.md) และสี่บทบาทใน `.codex/agents/` ที่ผู้ใช้ยืนยัน: GPT-6 Luna xhigh เก็บข้อเท็จจริงแบบ read-only สูงสุดสาม subagents พร้อมกัน Lead ตรวจหลักฐานและตัดสิน architecture เอง การตั้ง config ยังไม่ใช่เริ่ม R0 และต้องได้ approval ของ execution plan ก่อน R1 implementation
+
 - อ่าน [กติกาคุยแบบและมอบหมายงานโค้ด](docs/AI_DELEGATION_POLICY_TH.md): คุยและตกลงแบบก่อนเมื่อผู้ใช้ขอ งานโค้ดง่าย ๆ ให้ subagent GPT-6 Luna ลงมือ โดย agent หลักกำหนดสเปกและตรวจงาน
 - คำสั่งล่าสุดและคำยืนยันเฉพาะของผู้ใช้เป็นทิศทางหลัก สเปกนี้รักษาสิ่งที่ตกลงแล้ว ไม่ได้ล็อกทุกหน้าตลอดไป
 - ตรวจ route และ source ปัจจุบันก่อนแก้ เก็บ flow ที่ผู้ใช้รับแล้ว และทำหน้าที่ผู้ใช้ระบุให้ครบ

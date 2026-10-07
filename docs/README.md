@@ -12,6 +12,7 @@
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
 | [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | Web/Admin สองแอป; inventory → scope cleanup → split → contract → migrate; shared UI/tokens, authoring package ตามหลักฐาน และงาน Containerization/CI-CD พร้อมเกณฑ์รับ; ยังไม่เริ่ม implementation |
+| [R0 workflow ใน .codex](../.codex/workflows/r0-inventory.md) | วิธี Lead dispatch สี่ Luna xhigh inventory roles, common evidence format, read-only boundary, baseline/review/report และ approval ก่อน implementation |
 | [BUSINESS_ANALYTICS_UI_SPEC.md](BUSINESS_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [INSTRUCTOR_ANALYTICS_UI_SPEC.md](INSTRUCTOR_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
 | [BUSINESS_ANALYTICS_DATA_SPEC.md](BUSINESS_ANALYTICS_DATA_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
