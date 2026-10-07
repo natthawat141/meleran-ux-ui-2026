@@ -5,7 +5,6 @@ import { IconSparkles } from '@tabler/icons-react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { RichDocument } from '../../components/chapter/RichTextEditor';
-import { AskInstructorButton } from '../../components/AskInstructorButton';
 import { PageTitle } from '../../components/common';
 import { answerIsComplete, WrittenAnswerInput, WrittenAnswerView } from '../../components/WrittenAnswer';
 import { assignmentIncludesLearner } from '../../lib/learning-history';
@@ -60,7 +59,6 @@ export function QuizIntroPage() {
         <ArrowLeftOutlined /> {course?.title}
       </Link>
       <div className="quiz-intro-panel">
-        <AskInstructorButton course={course} item={courseItem} />
         <Tag color="processing">แบบทดสอบ</Tag>
         <Title>{assignment?.title ?? quiz.title}</Title>
         {assignment?.instructions && <Paragraph>{assignment.instructions}</Paragraph>}
@@ -171,7 +169,6 @@ export function QuizAttemptPage() {
             <Link to={`/learn/ai?courseId=${encodeURIComponent(quiz.courseId)}&attemptId=${encodeURIComponent(attempt.id)}&quizId=${encodeURIComponent(quiz.id)}`}>
               <Button icon={<IconSparkles size={16} />}>ถาม Melearn AI</Button>
             </Link>
-            <AskInstructorButton course={course} item={courseItem} />
           </div>
         }
       />

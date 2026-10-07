@@ -5,7 +5,6 @@ import { useLms } from '../../store';
 import { CourseProgress, PageTitle } from '../../components/common';
 import { CourseCartButton } from '../../components/CourseCartButton';
 import { CourseOutline } from '../../components/CourseOutline';
-import { AskInstructorButton } from '../../components/AskInstructorButton';
 import { UserAvatar } from '../../components/UserAvatar';
 import { formatPrice, instructorFor } from '../../data';
 import './catalog.css';
@@ -90,7 +89,6 @@ export function MemberCourseDetailPage() {
               <CourseCartButton course={course} referralCode={referralCode} />
             )}
             {hasPreview && <Link to={`/courses/${course.slug}/preview`}><Button>ทดลองเรียนบทแรก</Button></Link>}
-            {enrolled && <AskInstructorButton course={course} />}
             {currentUser?.role === 'admin' && (
               <Link to={`/admin/courses/${course.id}`}>
                 <Button>จัดการคอร์ส</Button>

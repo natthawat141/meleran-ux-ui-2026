@@ -200,7 +200,7 @@ export function AdminUsersPage() {
         rowKey="id"
         columns={columns}
         dataSource={users}
-        scroll={{ x: 700 }}
+        scroll={{ x: 900 }}
         pagination={{ pageSize: 10 }}
         locale={{ emptyText: 'ไม่พบผู้ใช้ที่ตรงกับคำค้นและตัวกรอง' }}
       />

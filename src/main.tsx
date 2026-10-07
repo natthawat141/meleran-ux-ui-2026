@@ -12,6 +12,7 @@ import '@fontsource-variable/anuphan';
 import './shadcn.css';
 import './styles.css';
 import './system-theme.css';
+import './workspace-responsive.css';
 
 const theme = {
   cssVar: { prefix: 'ant' },

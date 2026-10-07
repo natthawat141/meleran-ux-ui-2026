@@ -1,4 +1,5 @@
-.admin-users-toolbar { display: grid; grid-template-columns: minmax(240px, 1fr) 160px 170px auto; align-items: center; gap: 12px; margin: 4px 0 16px; }
+.admin-users-toolbar { display: grid; grid-template-columns: minmax(0, 260px) auto; justify-content: start; align-items: center; gap: 12px; margin: 4px 0 16px; }
+.admin-users-toolbar > .ant-select { width: 100%; min-width: 0; }
 .admin-user-cell { display: flex; min-width: 250px; align-items: center; gap: 11px; }
 .admin-user-cell .table-course-name { min-width: 0; }
 .admin-user-cell .table-course-name strong, .admin-user-cell .table-course-name .ant-typography { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
