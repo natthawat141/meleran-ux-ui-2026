@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readAppRouteInventory } from './lib/app-route-inventory.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const appNames = ['web', 'admin'];
@@ -64,11 +65,11 @@ for (const packageName of packageNames) {
   }
 }
 
-const webRoutes = readFileSync(path.join(root, 'apps', 'web', 'src', 'App.tsx'), 'utf8');
-const adminRoutes = readFileSync(path.join(root, 'apps', 'admin', 'src', 'App.tsx'), 'utf8');
-assert.match(webRoutes, /path="\/teach\/courses/);
-assert.doesNotMatch(webRoutes, /path="\/admin(?:\/|"|:)/);
-assert.match(adminRoutes, /path="\/admin/);
-assert.match(adminRoutes, /Allowlisted migration paths/);
+const webRoutes = readAppRouteInventory(root, 'web');
+const adminRoutes = readAppRouteInventory(root, 'admin');
+assert.ok(webRoutes.some((route) => route.path.startsWith('/teach/courses')));
+assert.ok(!webRoutes.some((route) => route.path === '/admin' || route.path.startsWith('/admin/')));
+assert.ok(adminRoutes.some((route) => route.path === '/admin'));
+assert.ok(adminRoutes.some((route) => route.path === '/teach/*' && route.element === '<LegacyAdminRedirect />'));
 
 console.log('App/package dependency direction and route ownership checks passed.');
