@@ -2,7 +2,13 @@
 export type AiContentBlock =
   | { type: 'text'; text: string }
   | { type: 'math'; latex: string }
-  | { type: 'practice'; prompt: string; options: string[]; correctOption: number; explanation: string };
+  | { type: 'practice'; prompt: string; options: string[]; correctOption: number; explanation: string }
+  | {
+    type: 'practice_set'; id: string; topic: string; sourceLabel: string;
+    questions: { id: string; prompt: string; options: string[]; correctOption: number; explanation: string }[];
+    answers: (number | null)[];
+  }
+  | { type: 'practice_notice'; id: string; message: string };
 
 export interface AiContext {
   courseId?: string;
@@ -40,6 +46,23 @@ function isBlock(value: unknown): value is AiContentBlock {
   if (!isRecord(value)) return false;
   if (value.type === 'text') return typeof value.text === 'string';
   if (value.type === 'math') return typeof value.latex === 'string';
+  if (value.type === 'practice_notice') return typeof value.id === 'string' && typeof value.message === 'string';
+  if (value.type === 'practice_set') {
+    if (typeof value.id !== 'string' || typeof value.topic !== 'string' || typeof value.sourceLabel !== 'string'
+      || !Array.isArray(value.questions) || !value.questions.length || !Array.isArray(value.answers)
+      || value.answers.length !== value.questions.length) return false;
+    const questions = value.questions;
+    const answers = value.answers;
+    return questions.every((question) => isRecord(question) && typeof question.id === 'string'
+      && typeof question.prompt === 'string' && Array.isArray(question.options) && question.options.length >= 2
+      && question.options.every((option) => typeof option === 'string')
+      && typeof question.correctOption === 'number' && Number.isInteger(question.correctOption)
+      && question.correctOption >= 0 && question.correctOption < question.options.length
+      && typeof question.explanation === 'string')
+      && answers.every((answer, index) => answer === null || (typeof answer === 'number'
+        && Number.isInteger(answer) && answer >= 0 && isRecord(questions[index])
+        && Array.isArray(questions[index].options) && answer < questions[index].options.length));
+  }
   if (value.type !== 'practice') return false;
   return typeof value.prompt === 'string' && Array.isArray(value.options)
     && value.options.length > 0 && value.options.every((option) => typeof option === 'string')

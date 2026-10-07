@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { Button, Drawer, Input, Modal, Typography, type GetRef } from 'antd';
+import { Button, Drawer, Input, Modal, Spin, Typography, type GetRef } from 'antd';
 import { ActionIcon, Menu, NavLink, Stack, Text as MantineText, Tooltip } from '@mantine/core';
 import {
   IconArrowLeft, IconArrowUp, IconArrowUpRight, IconBook2, IconBulb,
@@ -10,6 +10,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import logo from '../../assets/melearn-ui/logo.PNG';
 import { useLms } from '../../store';
 import { aiKnowledgeCounts, canUseCourseAi } from '../../lib/ai-course-support';
+import { isAiPracticeCommand, requestAiPracticeMock } from '../../api/ai-practice-mock';
 import { AiResponse } from './AiResponse';
 import { findCourseCommand, removeCourseCommand } from './ai-course-command';
 import {
@@ -21,6 +22,7 @@ import './learner-ai.css';
 const { Text } = Typography;
 const prompts = [
   { text: AI_MATH_DEMO_PROMPT, icon: <IconMathFunction size={17} aria-hidden="true" /> },
+  { text: 'สร้างแบบฝึกหัดเรื่องเศษส่วน 5 ข้อ', icon: <IconNotes size={17} aria-hidden="true" /> },
   { text: 'ช่วยสรุปบทเรียนที่กำลังเรียน', icon: <IconNotes size={17} aria-hidden="true" /> },
   { text: 'ขอคำใบ้แบบฝึกหัดข้อนี้', icon: <IconBulb size={17} aria-hidden="true" /> },
 ];
@@ -110,6 +112,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   const [searchOpen, setSearchOpen] = useState(false);
   const [composing, setComposing] = useState(false);
   const [storageWarning, setStorageWarning] = useState(false);
+  const [pendingPractice, setPendingPractice] = useState<Record<string, string>>({});
   const [disabledCourseId, setDisabledCourseId] = useState<string | null>(null);
   const [renameThreadId, setRenameThreadId] = useState<string | null>(null);
   const [renameTitle, setRenameTitle] = useState('');
@@ -130,6 +133,7 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   const activeKnowledgeCounts = activeCourse ? aiKnowledgeCounts(activeCourse) : undefined;
   const commandKey = `${activeId}:${active?.draft}:${composerCaret}`;
   const courseCommand = composerFocused && !composing && dismissedCommand !== commandKey
+    && !isAiPracticeCommand(active?.draft ?? '')
     ? findCourseCommand(active?.draft ?? '', composerCaret)
     : null;
   const matchingCourses = courseCommand
@@ -162,8 +166,8 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
   }, [courses, activeId, threads]);
 
   useEffect(() => {
-    if (active?.messages.length) scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [active?.id, active?.messages.length]);
+    if (active?.messages.length || pendingPractice[activeId]) scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [active?.id, active?.messages.length, pendingPractice, activeId]);
 
   const visibleThreads = useMemo(() => {
     const term = search.trim().toLocaleLowerCase();
@@ -175,6 +179,28 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
 
   const updateActive = (updater: (thread: AiThread) => AiThread) => {
     setThreads((current) => current.map((thread) => thread.id === activeId ? updater(thread) : thread));
+  };
+
+  const updateThread = (threadId: string, updater: (thread: AiThread) => AiThread) => {
+    setThreads((current) => current.map((thread) => thread.id === threadId ? updater(thread) : thread));
+  };
+
+  const answerPractice = (messageId: string, blockId: string, questionId: string, answer: number) => {
+    updateActive((thread) => ({
+      ...thread,
+      updatedAt: new Date().toISOString(),
+      messages: thread.messages.map((message) => message.id !== messageId ? message : {
+        ...message,
+        blocks: message.blocks.map((block) => {
+          if (block.type !== 'practice_set' || block.id !== blockId) return block;
+          const questionIndex = block.questions.findIndex((question) => question.id === questionId);
+          if (questionIndex < 0 || answer < 0 || answer >= block.questions[questionIndex].options.length) return block;
+          const answers = [...block.answers];
+          answers[questionIndex] = answer;
+          return { ...block, answers };
+        }),
+      }),
+    }));
   };
 
   const newChat = () => {
@@ -221,6 +247,43 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
     if (!active || !text) return;
     const now = new Date().toISOString();
     const userMessage: AiMessage = { id: crypto.randomUUID(), role: 'user', blocks: [{ type: 'text', text }], createdAt: now };
+    if (isAiPracticeCommand(text)) {
+      if (pendingPractice[active.id]) return;
+      const threadId = active.id;
+      const currentContext = validateContext(active.context);
+      updateThread(threadId, (thread) => ({
+        ...thread,
+        title: thread.titleEdited || thread.messages.length ? thread.title : makeTitle(text),
+        updatedAt: now,
+        draft: '',
+        context: currentContext,
+        messages: [...thread.messages, userMessage],
+      }));
+      setPendingPractice((current) => ({ ...current, [threadId]: userMessage.id }));
+      void requestAiPracticeMock(text).then((result) => {
+        const assistantMessage: AiMessage = {
+          id: crypto.randomUUID(), role: 'assistant',
+          blocks: [result.ok ? result.practice : result.block],
+          createdAt: new Date().toISOString(),
+        };
+        updateThread(threadId, (thread) => ({ ...thread, updatedAt: assistantMessage.createdAt, messages: [...thread.messages, assistantMessage] }));
+      }).catch(() => {
+        const assistantMessage: AiMessage = {
+          id: crypto.randomUUID(), role: 'assistant',
+          blocks: [{ type: 'practice_notice', id: crypto.randomUUID(), message: 'ชุดข้อมูลตัวอย่างโหลดไม่สำเร็จ ลองส่งคำสั่งอีกครั้งได้' }],
+          createdAt: new Date().toISOString(),
+        };
+        updateThread(threadId, (thread) => ({ ...thread, updatedAt: assistantMessage.createdAt, messages: [...thread.messages, assistantMessage] }));
+      }).finally(() => {
+        setPendingPractice((current) => {
+          if (current[threadId] !== userMessage.id) return current;
+          const next = { ...current };
+          delete next[threadId];
+          return next;
+        });
+      });
+      return;
+    }
     const assistantMessage: AiMessage = {
       id: crypto.randomUUID(), role: 'assistant', blocks: getDemoResponse(text, activeContext), createdAt: now,
     };
@@ -377,10 +440,17 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
                   {message.role === 'assistant' && <span className="learn-ai-message-mark"><IconMessageChatbot size={17} aria-hidden="true" /></span>}
                   <div className="learn-ai-message-body">
                     <Text className="learn-ai-message-author">{message.role === 'user' ? 'คุณ' : 'ผู้ช่วยการเรียน'}</Text>
-                    <AiResponse blocks={message.blocks} />
+                    <AiResponse blocks={message.blocks} onPracticeAnswer={(questionId, answer) => {
+                      const block = message.blocks.find((entry) => entry.type === 'practice_set');
+                      if (block?.type === 'practice_set') answerPractice(message.id, block.id, questionId, answer);
+                    }} />
                   </div>
                 </article>
               ))}
+              {pendingPractice[active.id] && <article className="learn-ai-message assistant" role="status">
+                <span className="learn-ai-message-mark"><IconMessageChatbot size={17} aria-hidden="true" /></span>
+                <div className="learn-ai-message-body learn-ai-practice-loading"><Text className="learn-ai-message-author">ผู้ช่วยการเรียน</Text><Spin size="small" /><span>กำลังโหลดชุดฝึกจากข้อมูล JSON ตัวอย่าง…</span></div>
+              </article>}
             </div>
           ) : (
             <div className="learn-ai-welcome">
@@ -450,9 +520,9 @@ function LearnerAiWorkspace({ userId, query }: { userId: string; query: string }
               placeholder={activeContext.questionLabel ? 'ถามเกี่ยวกับข้อนี้ หรือพิมพ์ / เลือกคอร์ส…' : 'ถามเกี่ยวกับบทเรียน หรือพิมพ์ / เลือกคอร์ส…'}
               autoSize={{ minRows: 2, maxRows: 5 }}
             />
-            <div className="learn-ai-composer-actions"><Text id="learn-ai-composer-hint"><span className="learn-ai-keyboard-hint">Enter ส่ง · </span>/ เลือกคอร์ส</Text><Button type="primary" aria-label="ส่งคำถาม" icon={<IconArrowUp size={17} />} onClick={() => sendMessage()} disabled={!active?.draft.trim() || Boolean(courseCommand)} /></div>
+            <div className="learn-ai-composer-actions"><Text id="learn-ai-composer-hint"><span className="learn-ai-keyboard-hint">Enter ส่ง · </span>{pendingPractice[activeId] ? 'กำลังโหลดแบบฝึกหัด' : '/ เลือกคอร์ส'}</Text><Button type="primary" aria-label="ส่งคำถาม" icon={<IconArrowUp size={17} />} onClick={() => sendMessage()} disabled={!active?.draft.trim() || Boolean(courseCommand) || Boolean(pendingPractice[activeId])} /></div>
           </div>
-          <div className="learn-ai-demo-note"><IconInfoCircle size={14} aria-hidden="true" /><span>โหมดตัวอย่าง · ยังไม่เชื่อมต่อ AI จริง</span></div>
+          <div className="learn-ai-demo-note"><IconInfoCircle size={14} aria-hidden="true" /><span>โหมดตัวอย่าง · ยังไม่เชื่อมต่อ AI จริง · แบบฝึกหัดใช้ JSON mock API</span></div>
           {storageWarning && <div className="learn-ai-storage-warning" role="status">บันทึกประวัติแชตในอุปกรณ์นี้ไม่สำเร็จ</div>}
         </div>
       </section>
