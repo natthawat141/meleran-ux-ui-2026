@@ -282,3 +282,48 @@ FB3 ถูกปฏิเสธเพราะคอร์สไม่ฟรี:
 ใช้ gate เดียวกับ [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md): Backend owner และ revision ที่ระบุได้ พร้อม DTO/OpenAPI ตัวอย่าง success/error ที่รันกับ server ได้, ผลตรวจ permission/field visibility/state, validation/pagination/idempotency และ fixtures ที่ผูกกับ revision จากนั้นจึงย้าย DTO ที่ยืนยันแล้วเข้า `packages/contracts` ทีละ flow และเริ่ม R4b-flow (Query hooks) โดยไม่เปลี่ยนตามเอกสารนี้ล่วงหน้า
 
 เอกสารนี้ไม่ยืนยัน Backend, session, Stripe, Resend หรือ Google OAuth ที่ใช้งานได้จริง และไม่ใช้เป็นหลักฐานปิด R10/R13
+
+## 8. สถานะ Provisional Web Course Catalog API Mock (FB1–FB2, read-only)
+
+ทำเฉพาะ `GET /courses` และ `GET /courses/{id}` ของ Web สาธารณะ ไม่มี Enroll, Auth, Admin, Instructor, payment
+
+### 8.1 อะไรเป็น mock / อะไรเป็น draft / อะไรรอ Backend
+
+| ส่วน | สถานะ | ที่อยู่ |
+| --- | --- | --- |
+| Fixtures คอร์ส 3 Published + 3 ที่ไม่ใช่ Published (มีข้อมูลลับติดป้าย SECRET เพื่อทดสอบรั่ว) | **Mock** ข้อมูลสมมติทั้งหมด | `apps/web/src/features/courses/api/provisional-mock/catalog-fixtures.ts` |
+| Fetcher จำลอง server (`createProvisionalCatalogFetcher`) | **Mock** ใช้ได้เฉพาะ environment `development`/`test`, GET เท่านั้น, ตอบ header `x-melearn-mock: provisional-catalog`, ไม่ถูก import จาก runtime ของแอป (มี test คุม) | `provisional-mock/catalog-fetcher.ts` |
+| Type + decoder ของ response | **Draft** (อยู่ใน feature ของ Web ไม่ใช่ `packages/contracts`) | `catalog-provisional-contract.ts` |
+| `createCatalogApi(http)` (`listCourses`, `getCourse`) | **Draft** ใช้ `HttpClient` เดียวกับ API จริง จึงสลับ base URL ได้โดยไม่แก้ผู้เรียก; `getCourse` คืน `null` เฉพาะ 404 | `catalog-api.ts` |
+| Path, query, field, error envelope, pagination, Money | **Draft/[ข้อเสนอ]** ตาม §2 และ §4 | เอกสารนี้ |
+| Public field visibility, ลำดับ, ขนาดหน้า, สถานะที่เปิดสาธารณะ, semantics ของ cursor | **รอ Backend** | §8.3 |
+
+ไม่มีการย้าย DTO เข้า `packages/contracts` และ ไม่มี fallback: เมื่อ API ล้มเหลว (network, timeout, 5xx, non-JSON, payload ผิดรูป) `createCatalogApi` โยน error ออกไปให้หน้าแสดงสถานะ error ไม่เปลี่ยนไปใช้ mock
+
+### 8.2 สมมติฐานที่ใช้เฉพาะใน mock (ไม่ใช่ข้อเท็จจริงของ Backend)
+
+- เปิดสาธารณะเฉพาะ `status = published` ที่มี `published_at`; ไม่มี Preview ผู้เขียน
+- ผลรายการเรียง `published_at` ใหม่ก่อน แล้ว `id`; `limit` 1–50 (ค่าเริ่มต้น 20) และนอกช่วงตอบ `422` (ไม่ clamp)
+- query ที่รู้จัก: `q, category, level, price_type, limit, cursor`; พารามิเตอร์อื่นหรือซ้ำตอบ `422 validation_failed`
+- cursor เป็น opaque string (mock ใช้ `o:<offset>` ซึ่ง client ห้ามพึ่งรูปแบบ)
+- ค้นหาคอร์สด้วย `id` เท่านั้น ไม่รองรับ slug
+- คอร์สที่ไม่มี, Draft, Pending หรือ Approved ตอบ `404 not_found` รูปเดียวกัน ไม่บอกว่ามีอยู่
+- detail เปิด outline เฉพาะ `id`, `title`, `type` ของบท/รายการ ไม่มีเนื้อหา, video URL, เฉลย, หมายเหตุรีวิวภายใน
+- สกุลเงิน `THB`, `amount_minor` เป็นจำนวนเต็มไม่ติดลบ, คอร์สฟรีเป็น `amount_minor: 0`; ค่า category/level เป็นคำสมมติ
+
+### 8.3 ต้องให้ Backend ยืนยัน
+
+1. คอร์สสถานะใดเปิดใน `GET /courses` สาธารณะ และมีเงื่อนไขวันที่/Visibility อื่นหรือไม่?
+2. Field ใดเปิดสาธารณะใน summary/detail และ `instructor` เปิดอะไรได้บ้าง (ชื่อแสดง, รูป, bio)?
+3. Outline สาธารณะเปิดถึงระดับไหน และชื่อบทเรียนของคอร์สที่ยังไม่ซื้อเปิดได้หรือไม่?
+4. ใช้ `id` หรือ `slug` ใน path และ slug เปลี่ยนได้หรือไม่ (redirect/404)?
+5. รูปแบบ pagination จริง (cursor vs page), ขนาดสูงสุด, ลำดับ default และการ clamp กับ `422` เมื่อ `limit` เกิน
+6. Filter ที่มีจริง (category/level/price_type/q) และค่าที่อนุญาต; ค้นหาตัวอักษรไทยทำอย่างไร
+7. สกุลเงินที่รองรับและรูปแบบ Money; ราคาโปรโมชัน/ส่วนลดอยู่ที่นี่หรือไม่?
+8. 404 ของคอร์สที่ไม่ Published ต้องเหมือนไม่มีอยู่จริงหรือไม่ และ `request_id` ใน error เป็นรูปแบบใด?
+9. Cache/ETag/`Cache-Control` ของ endpoint สาธารณะ
+10. Field timestamp (`published_at`, `updated_at`) ใช้ UTC ISO 8601 ตรงตามที่ decoder คาดหรือไม่?
+
+### 8.4 การตรวจที่ทำแล้ว
+
+`tests/web-catalog-api-mock.test.mjs` 12 tests ครอบคลุม: รายการมีเฉพาะ Published, detail ได้ Published เท่านั้น, ไม่มี/ไม่ใช่ Published ตอบ 404 เหมือนกัน, ไม่มีข้อมูล SECRET หรือ field ต้องห้ามใน raw body, pagination/filter, query ที่ไม่รู้จัก, environment guard, ความล้มเหลวไม่ fallback ไปใช้ mock, decoder เข้มและตัด field ที่ไม่รู้จัก, การยกเลิก request, ปฏิเสธ method ที่ไม่ใช่ GET, และ source guard ว่าโค้ดแอปไม่ import mock และ `packages/contracts` ยังไม่มี DTO ร่าง ผลนี้พิสูจน์ว่า mock และ decoder ภายในสอดคล้องกัน ไม่ใช่ว่า Backend จริงจะตอบตามนี้
