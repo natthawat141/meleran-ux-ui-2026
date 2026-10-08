@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ConfigProvider, type ThemeConfig } from 'antd';
-import { designTokens } from '@melearn/ui';
+import { designTokens, landingTheme } from '@melearn/ui';
+export { landingTheme } from '@melearn/ui';
 import { useLms } from '../../store';
 import { LandingHeader, LandingFooter } from './LandingChrome';
 import { CourseCollection } from './CourseCollection';
@@ -15,39 +16,6 @@ import './landing.css';
 import './landing-hero.css';
 import './landing-vivid.css';
 import './landing-collections.css';
-
-export const landingTheme: ThemeConfig = {
-  inherit: false,
-  token: {
-    colorPrimary: designTokens.colorModes.light.colorPrimary,
-    colorInfo: designTokens.colorModes.light.colorInfo,
-    colorText: designTokens.landing.default.colorText,
-    colorTextSecondary: designTokens.landing.default.colorTextSecondary,
-    colorBgContainer: designTokens.colorModes.light.colorBgContainer,
-    colorBorder: designTokens.landing.default.colorBorder,
-    colorFillAlter: designTokens.landing.default.colorFillAlter,
-    fontFamily: designTokens.fontFamily,
-    fontSize: designTokens.landing.default.fontSize,
-    borderRadius: designTokens.landing.default.borderRadius,
-    controlHeight: designTokens.landing.default.controlHeight,
-  },
-  components: {
-    Button: {
-      primaryShadow: designTokens.landing.legacy.buttonPrimaryShadow,
-      defaultShadow: designTokens.landing.legacy.buttonDefaultShadow,
-      fontWeight: designTokens.landing.legacy.buttonFontWeight,
-    },
-    Tabs: {
-      horizontalItemGutter: designTokens.landing.default.tabsGutter,
-      titleFontSize: designTokens.landing.default.tabsTitleFontSize,
-    },
-    Collapse: {
-      headerBg: designTokens.colorModes.light.colorBgContainer,
-      contentBg: designTokens.colorModes.light.colorBgContainer,
-      headerPadding: designTokens.landing.default.collapseHeaderPadding,
-    },
-  },
-};
 
 // Scope the new palette to the landing route; public pages keep their existing theme.
 const homePageTheme: ThemeConfig = {
