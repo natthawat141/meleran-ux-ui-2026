@@ -39,6 +39,8 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ตัวจำลอง Stripe (`api.stripe`: `completed`, `asyncSucceeded`, `asyncFailed`, `expired`, `sign`, `failNextFulfilment`) ใช้ใน test เพื่อส่ง webhook ที่เซ็นแล้ว; ไม่มี Stripe จริง
 
+สำหรับ browser QA ใน `development` เท่านั้น มี `POST dev/mock-stripe/payments/:id/complete` ฝั่ง Web: ตรวจว่าเป็นผู้ซื้อเจ้าของ Payment ที่ยัง pending/processing แล้วสร้าง signed mock event และส่งผ่าน Stripe webhook handler ปกติ; Admin ใช้ไม่ได้. Route นี้ไม่ถูกติดตั้งใน `test` และ mock API ปฏิเสธการสร้างใน `production`; มันไม่ใช่ route หรือ contract สำหรับ Backend จริง.
+
 บัญชีและข้อมูลตัวอย่างอยู่ใน `tools/provisional-api/seed.ts` (รหัสผ่านสมมติเดียวกันทุกบัญชี) ห้ามนำไปใช้เป็นข้อมูลจริง
 
 ## 3. กติกาธุรกิจที่ mock บังคับ (จาก Scope Final 1.6)
@@ -98,7 +100,7 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ## 7. สิ่งที่ตรวจแล้ว
 
-ชุดเต็ม `node --test` ผ่าน 166 tests (ไฟล์ mock: auth 18, boundary 4, integration 8, learning 8, payments 7, authoring 6, ai 6, catalog 12, dev server 3)
+ณ 8 ตุลาคม 2026 ชุดเต็ม `npm.cmd test` ผ่าน 175/175 tests. Tests ของ provisional API ครอบ auth, boundaries, integration, learning, payments, authoring, AI, catalog และ dev server; จำนวน test เปลี่ยนได้ตามการพัฒนา ให้ใช้ผลคำสั่งล่าสุดเป็นหลัก
 
 - integration คุมการทำงานข้าม flow: คอร์สฟรี (enroll → เรียน → ผ่านควิซ → จบครั้งเดียว → ใบรับรองเดียว), attempt สูงสุดตัดสิน, คอร์สเสียเงิน (checkout ไม่ให้สิทธิ์, webhook เท่านั้น), redeem ไม่รั่วและมีผู้ชนะเดียว, response ฝั่งผู้เรียนไม่มีเฉลย/หมายเหตุ/transcript, authoring→catalog (สาธารณะหลัง Admin publish เท่านั้น), AI quota/transcript, blog
 - boundary คุม: environment guard, ไม่มี reference จาก `apps/`/`packages/`, ไม่มี `Math.random`/`Date.now`/`process.env`/network ใน mock, `@melearn/api-client` ไม่รู้จัก mock
@@ -110,14 +112,16 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 `vite dev` ของ Web/Admin ใช้ dev server `tools/provisional-api/dev-server.ts` ที่ `127.0.0.1:8787` ผ่าน Vite proxy `/mock-api`. Auth `/auth/login`, `/me`, `/auth/logout` ใช้ cookie แยก app; Web Landing/Catalog/detail และ free Enrollment อ่าน mock. Web R7 routes อ่าน enrollments, lessons, progress/resume, quiz attempts/results, Instructor grading และ certificates. Web R8 เพิ่มหน้า Checkout/status/Redeem; Admin เพิ่ม lookup Payment แบบอ่านอย่างเดียวทีละ ID และจัดการ redeem codes. R9 เพิ่ม Web AI conversations/history/course context/usage/AIPractice และ Admin ตั้งค่า AI support/แก้ transcript. Query cache แยกต่อ app และเคลียร์เมื่อ sign in/out.
 
+Browser smoke ที่ทำ 8 ต.ค. ยืนยัน Web free-enrollment → lesson progress → quiz/essay grading → completion/certificate และ Web paid Checkout → signed mock webhook → entitlement; Admin ค้น Payment ที่สร้างจาก Web และเห็น fulfillment/event. หน้า `/courses/:slug` คง URL เดิมและ resolve ไป detail ด้วย course id ผ่าน public list เพราะ draft API detail รับ id เท่านั้น.
+
 Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](R4B_FLOW_B_CATALOG_TH.md)
 
 ยังไม่ได้ทำหรือยังไม่ยืนยัน:
 
 - `/explore`, register/verification/reset, Admin business APIs และ Course Authoring ยังเป็น local/demo flows
-- หน้า Payment เป็น provisional flow: สร้างรายการและอ่าน status ได้ แต่ mock ไม่มี Stripe Checkout จริง จึงไม่ redirect ไป `checkout_url`; มีเพียง signed-webhook simulator ใน tests และไม่มีการให้สิทธิ์จาก success URL
+- หน้า Payment เป็น provisional flow: สร้างรายการและอ่าน status ได้ แต่ mock ไม่มี Stripe Checkout จริง จึงไม่ redirect ไป `checkout_url`; มี dev-only signed-event simulator สำหรับทดสอบ UI และไม่มีการให้สิทธิ์จาก success URL
 - Redeem codes/Enrollment/Payment/AI history/transcript อยู่ใน memory ของ mock; restart แล้วหาย และไม่มี API persistence ข้ามอุปกรณ์
 - AI ตอบด้วยข้อความ deterministic mock; ไม่มี model/provider จริง แม้ mock ทดสอบ quota, request dedupe, history ownership และ answer-key withholding
 - ยังไม่มี DTO ใน `packages/contracts` (รอ Backend freeze); TanStack Query ใช้เฉพาะ server-like state ที่ย้ายแล้ว
 - Dev session เป็นการจำลองใน memory; server restart ล้างบัญชี/Enrollment/Progress/Attempt/Certificate และไม่ยืนยัน persistence ข้ามอุปกรณ์
-- R10 ทำได้เพียง automated integration กับ provisional API; ไม่มี Backend/OpenAPI, database, Stripe signing config หรือ AI provider จึงยังพิสูจน์ server permissions/persistence/operations และปิด R10/R13 ไม่ได้
+- R10 ทำได้เพียง automated และ authenticated browser integration บาง journey กับ provisional API; ไม่มี Backend/OpenAPI, database, Stripe signing config หรือ AI provider จึงยังพิสูจน์ server permissions/persistence/operations และปิด R10/R13 ไม่ได้

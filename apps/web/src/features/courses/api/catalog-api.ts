@@ -100,3 +100,19 @@ export function createCatalogApi(http: HttpClient): CatalogApi {
     },
   };
 }
+
+/** Keeps existing /courses/:slug links working while the draft detail endpoint remains id-only. */
+export async function getCourseByRouteKey(api: Pick<CatalogApi, 'getCourse' | 'listCourses'>, routeKey: string, options: CatalogRequestOptions = {}) {
+  const direct = await api.getCourse(routeKey, options);
+  if (direct) return direct;
+
+  let cursor: string | undefined;
+  do {
+    const page = await api.listCourses({ limit: 50, ...(cursor ? { cursor } : {}) }, options);
+    const match = page.items.find((course) => course.slug === routeKey);
+    if (match) return api.getCourse(match.id, options);
+    cursor = page.next_cursor ?? undefined;
+  } while (cursor);
+
+  return null;
+}

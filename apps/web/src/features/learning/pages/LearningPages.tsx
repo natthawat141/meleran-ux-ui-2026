@@ -24,7 +24,7 @@ export function MyCoursesPage() {
   const session = useAuthSession();
   if (query.isPending || query.isError) return <div className="public-page"><PageTitle eyebrow="พื้นที่ผู้เรียน" title="คอร์สของฉัน" /><QueryState loading={query.isPending} error={query.isError} retry={() => void query.refetch()} /></div>;
   return <div className="public-page">
-    <PageTitle eyebrow="พื้นที่ผู้เรียน" title="คอร์สของฉัน" subtitle={`ยินดีต้อนรับ ${session.user?.display_name ?? 'ผู้เรียน'} · ข้อมูลมาจาก API จำลอง`} actions={<Link to="/explore/courses"><Button type="primary">สำรวจคอร์ส</Button></Link>} />
+    <PageTitle eyebrow="พื้นที่ผู้เรียน" title="คอร์สของฉัน" subtitle={`ยินดีต้อนรับ ${session.user?.display_name ?? 'ผู้เรียน'} · ข้อมูลมาจาก API จำลอง`} actions={<Link to="/courses"><Button type="primary">สำรวจคอร์ส</Button></Link>} />
     {query.data.length === 0 ? <Empty description="ยังไม่มีคอร์สที่ลงเรียน"><Link to="/courses"><Button type="primary">เลือกคอร์สแรก</Button></Link></Empty> :
       <List grid={{ gutter: 20, xs: 1, sm: 2, xl: 3 }} dataSource={query.data} renderItem={(entry) => <List.Item><Card hoverable cover={safeCatalogCoverUrl(entry.course.cover_url) ? <img src={safeCatalogCoverUrl(entry.course.cover_url)!} alt="" /> : undefined}>
         <Typography.Text type="secondary">{entry.course.category} · {entry.course.level}</Typography.Text><Typography.Title level={4}>{entry.course.title}</Typography.Title>

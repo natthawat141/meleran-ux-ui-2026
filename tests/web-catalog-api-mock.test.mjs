@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { createHttpClient, HttpClientError } from '@melearn/api-client';
-import { createCatalogApi } from '../apps/web/src/features/courses/api/catalog-api.ts';
+import { createCatalogApi, getCourseByRouteKey } from '../apps/web/src/features/courses/api/catalog-api.ts';
 import { decodeCourseDetail, decodeCoursePage } from '../apps/web/src/features/courses/api/catalog-provisional-contract.ts';
 import { createProvisionalApi, mockRestrictedKeys, mockSecretMarkers, seedCourses as provisionalCatalogRecords } from '../tools/provisional-api/index.ts';
 
@@ -55,6 +55,22 @@ test('returns Published course detail with outline titles only', async () => {
   assert.deepEqual(detail.outline[0].items.map((item) => item.type), ['video', 'article', 'quiz']);
   assert.deepEqual(Object.keys(detail.outline[0].items[0]).sort(), ['id', 'title', 'type']);
   assert.deepEqual((await api.getCourse('crs_mock_002')).outline[1], { id: 'chp_mock_002_2', title: 'บทว่าง (ยังไม่มีเนื้อหา)', items: [] });
+});
+
+test('resolves existing course slug routes through the public list without changing the id-only detail API', async () => {
+  const { api, calls } = setup();
+  const byId = await getCourseByRouteKey(api, 'crs_mock_001');
+  assert.equal(byId.id, 'crs_mock_001');
+  assert.deepEqual(calls, [`${basePath}/courses/crs_mock_001`]);
+
+  calls.length = 0;
+  const bySlug = await getCourseByRouteKey(api, 'mock-online-course-basics');
+  assert.equal(bySlug.id, 'crs_mock_001');
+  assert.deepEqual(calls, [
+    `${basePath}/courses/mock-online-course-basics`,
+    `${basePath}/courses?limit=50`,
+    `${basePath}/courses/crs_mock_001`,
+  ]);
 });
 
 test('never puts drafts, review notes, video links or answer keys in raw response bodies', async () => {

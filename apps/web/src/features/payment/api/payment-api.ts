@@ -17,6 +17,12 @@ export interface PaymentView {
 export interface CheckoutResult { payment_id: string; checkout_url: string; already_enrolled?: false }
 export interface RedeemResult { already_enrolled: boolean; enrollment: { id: string; course_id: string; source: string; access: string; granted_at: string } }
 
+function decodeWebhookReceipt(value: unknown): { received: true } {
+  const row = object(value);
+  if (row.received !== true) throw new TypeError('Invalid provisional webhook receipt');
+  return { received: true };
+}
+
 function decodePayment(value: unknown): PaymentView {
   const row = object(value);
   const statuses = ['pending', 'processing', 'succeeded', 'failed', 'cancelled', 'expired'];
@@ -48,5 +54,6 @@ function decodeRedeem(value: unknown): RedeemResult {
 export const paymentApi = {
   checkout: (courseId: string, requestId: string) => http.request('me/payments/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ course_id: courseId, request_id: requestId }), decoder: decodeCheckout }),
   status: (paymentId: string, signal?: AbortSignal) => http.request(`me/payments/${encodeURIComponent(paymentId)}`, { method: 'GET', signal, decoder: decodePayment }),
+  simulateStripeCompletion: (paymentId: string) => http.request(`dev/mock-stripe/payments/${encodeURIComponent(paymentId)}/complete`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', decoder: decodeWebhookReceipt }),
   redeem: (code: string) => http.request('me/redeem', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code }), decoder: decodeRedeem }),
 };

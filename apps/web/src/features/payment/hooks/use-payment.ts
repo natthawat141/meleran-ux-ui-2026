@@ -15,6 +15,17 @@ export function useStartPayment() {
   } });
 }
 
+export function useSimulateStripeCompletion(paymentId: string) {
+  const client = useQueryClient();
+  return useMutation({ mutationFn: () => paymentApi.simulateStripeCompletion(paymentId), onSuccess: async () => {
+    await Promise.all([
+      client.invalidateQueries({ queryKey: ['payment', paymentId] }),
+      client.invalidateQueries({ queryKey: ['learning'] }),
+      client.invalidateQueries({ queryKey: ['enrollments'] }),
+    ]);
+  } });
+}
+
 export function useRedeemCourseCode() {
   const client = useQueryClient();
   return useMutation({ mutationFn: paymentApi.redeem, onSuccess: async () => {

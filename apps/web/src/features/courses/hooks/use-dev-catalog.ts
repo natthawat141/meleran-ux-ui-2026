@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { devCatalogApi } from '../api/dev-catalog-client.ts';
+import { getCourseByRouteKey } from '../api/catalog-api.ts';
 import { catalogLoadErrorText } from '../api/catalog-display.ts';
 import type { CatalogListQuery } from '../api/catalog-api.ts';
 import type { ProvisionalCourseDetail, ProvisionalCourseSummary } from '../api/catalog-provisional-contract.ts';
@@ -63,7 +64,7 @@ export function useDevCatalogCategories(reloadToken: number): string[] {
 }
 
 export function useDevCatalogCourse(courseId: string, reloadToken: number): DevCatalogCourseState {
-  const query = useQuery({ queryKey: ['catalog', 'detail', courseId, reloadToken], queryFn: ({ signal }) => devCatalogApi.getCourse(courseId, { signal }), enabled: Boolean(courseId) });
+  const query = useQuery({ queryKey: ['catalog', 'detail', courseId, reloadToken], queryFn: ({ signal }) => getCourseByRouteKey(devCatalogApi, courseId, { signal }), enabled: Boolean(courseId) });
   if (!courseId || query.data === null) return { status: 'missing' };
   if (query.isPending) return { status: 'loading' };
   if (query.isError) return { status: 'error', message: catalogLoadErrorText(query.error) ?? 'โหลดคอร์สไม่สำเร็จ' };

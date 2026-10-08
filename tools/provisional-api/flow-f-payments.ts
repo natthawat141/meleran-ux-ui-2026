@@ -11,7 +11,7 @@ import { iso, nextId } from './db.ts';
 import { findEnrollment, grantEnrollment, isPublished, toEnrollment } from './domain.ts';
 import {
   ApiError, created, notFound, ok, paginate, queryProblems, readObject, rejectUnknownFields,
-  requireEligible, requireRole, requiredString, validationFailed,
+  requireEligible, requireRole, requireUser, requiredString, validationFailed,
 } from './http.ts';
 import type { FieldError, MockConfig, RequestContext, Route } from './http.ts';
 
@@ -201,24 +201,7 @@ export const paymentRoutes: Route[] = [
   },
   {
     method: 'POST', path: 'webhooks/stripe',
-    handler: (context) => {
-      const expected = signature(context.config.stripeWebhookSignature, context.rawBody);
-      if (context.headers.get('stripe-signature') !== expected) throw new ApiError(400, 'invalid_signature', 'ลายเซ็นไม่ถูกต้อง');
-      const body = context.body;
-      if (body === null || typeof body !== 'object' || Array.isArray(body)) throw new ApiError(422, 'validation_failed', 'ข้อมูลที่ส่งไม่ถูกต้อง');
-      const event = body as { id?: unknown; type?: unknown; data?: unknown };
-      if (typeof event.id !== 'string' || typeof event.type !== 'string' || event.data === null || typeof event.data !== 'object' || Array.isArray(event.data)) {
-        throw new ApiError(422, 'validation_failed', 'ข้อมูลที่ส่งไม่ถูกต้อง');
-      }
-      const data = event.data as Record<string, unknown>;
-      const paymentId = data.payment_id;
-      const sessionId = data.checkout_session_id;
-      const payment = typeof paymentId === 'string' ? context.db.payments.get(paymentId) : undefined;
-      if (!payment || sessionId !== payment.checkout_session_id) throw new ApiError(400, 'event_mismatch', 'เหตุการณ์ไม่ตรงกับรายการชำระเงิน');
-      if (payment.events.some((candidate) => candidate.event_id === event.id && candidate.processed_at)) return ok({ received: true, duplicate: true });
-      processWebhook(context, payment, { id: event.id, type: event.type, data });
-      return ok({ received: true });
-    },
+    handler: receiveStripeWebhook,
   },
   {
     method: 'GET', path: 'admin/payments/:id',
@@ -316,6 +299,25 @@ export const paymentRoutes: Route[] = [
   },
 ];
 
+function receiveStripeWebhook(context: RequestContext) {
+  const expected = signature(context.config.stripeWebhookSignature, context.rawBody);
+  if (context.headers.get('stripe-signature') !== expected) throw new ApiError(400, 'invalid_signature', 'ลายเซ็นไม่ถูกต้อง');
+  const body = context.body;
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) throw new ApiError(422, 'validation_failed', 'ข้อมูลที่ส่งไม่ถูกต้อง');
+  const event = body as { id?: unknown; type?: unknown; data?: unknown };
+  if (typeof event.id !== 'string' || typeof event.type !== 'string' || event.data === null || typeof event.data !== 'object' || Array.isArray(event.data)) {
+    throw new ApiError(422, 'validation_failed', 'ข้อมูลที่ส่งไม่ถูกต้อง');
+  }
+  const data = event.data as Record<string, unknown>;
+  const paymentId = data.payment_id;
+  const sessionId = data.checkout_session_id;
+  const payment = typeof paymentId === 'string' ? context.db.payments.get(paymentId) : undefined;
+  if (!payment || sessionId !== payment.checkout_session_id) throw new ApiError(400, 'event_mismatch', 'เหตุการณ์ไม่ตรงกับรายการชำระเงิน');
+  if (payment.events.some((candidate) => candidate.event_id === event.id && candidate.processed_at)) return ok({ received: true, duplicate: true });
+  processWebhook(context, payment, { id: event.id, type: event.type, data });
+  return ok({ received: true });
+}
+
 export function createStripeSimulator(db: Db, clock: Clock, config: MockConfig) {
   void clock;
   const state = stateFor(db);
@@ -336,4 +338,24 @@ export function createStripeSimulator(db: Db, clock: Clock, config: MockConfig) 
     expired: (paymentId: string, options: { eventId?: string } = {}) => build(paymentId, 'checkout.session.expired', options),
     failNextFulfilment: () => { state.failNext = true; },
   };
+}
+
+/** Development-only buyer control that submits a correctly signed simulator event through the normal webhook handler. */
+export function createDevStripeSimulationRoutes(stripe: ReturnType<typeof createStripeSimulator>): Route[] {
+  return [{
+    method: 'POST', path: 'dev/mock-stripe/payments/:id/complete',
+    handler: (context) => {
+      const user = requireUser(context);
+      if (context.audience !== 'web' || user.roles.includes('admin')) throw new ApiError(403, 'forbidden', 'บัญชีนี้จำลองการชำระเงินไม่ได้');
+      const payment = context.db.payments.get(context.params.id);
+      if (!payment || payment.user_id !== user.id) throw notFound();
+      if (payment.status !== 'pending' && payment.status !== 'processing') {
+        throw new ApiError(409, 'invalid_state', 'จำลองการชำระเงินได้เฉพาะรายการที่กำลังรอผล');
+      }
+      const event = stripe.completed(payment.id);
+      const headers = new Headers(context.headers);
+      headers.set('stripe-signature', event.headers['stripe-signature']);
+      return receiveStripeWebhook({ ...context, headers, rawBody: event.body, body: JSON.parse(event.body) });
+    },
+  }];
 }

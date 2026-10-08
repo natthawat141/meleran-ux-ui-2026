@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { accounts, createBrowser, createWorld } from './support/provisional-api.mjs';
+import { accounts, createBrowser, createWorld, basePath } from './support/provisional-api.mjs';
+import { createProvisionalApi } from '../tools/provisional-api/server.ts';
 
 async function loggedIn(world, identifier = accounts.learner, options) {
   const browser = createBrowser(world.api);
@@ -19,6 +20,37 @@ test('checkout rejects client-owned payment fields and snapshots the course pric
   assert.equal(result.status, 201);
   assert.equal(world.db.payments.get(result.body.payment_id).amount.amount_minor, 99000);
   assert.deepEqual(world.api.unexpectedErrors, []);
+});
+
+test('development Stripe simulator completes only the buyer-owned pending payment and is absent in test mode', async () => {
+  const api = createProvisionalApi({ environment: 'development', basePath });
+  const learner = createBrowser(api);
+  await learner.login(accounts.learner);
+  const checkout = await learner.post('me/payments/checkout', { course_id: 'crs_mock_002', request_id: 'dev-simulator' });
+  const paymentId = checkout.body.payment_id;
+  assert.equal((await learner.get('learn/courses/crs_mock_002')).status, 403);
+
+  const complete = await learner.post(`dev/mock-stripe/payments/${paymentId}/complete`, {});
+  assert.deepEqual([complete.status, complete.body.received], [200, true]);
+  const status = await learner.get(`me/payments/${paymentId}`);
+  assert.deepEqual([status.body.status, status.body.fulfillment_status, status.body.enrollment.source], ['succeeded', 'granted', 'stripe']);
+  const admin = createBrowser(api);
+  await admin.login(accounts.admin, { audience: 'admin' });
+  const inspected = await admin.get(`admin/payments/${paymentId}`);
+  assert.equal(inspected.body.events.at(-1).outcome, 'fulfilled');
+  assert.equal((await learner.post(`dev/mock-stripe/payments/${paymentId}/complete`, {})).status, 409, 'a completed payment cannot be simulated twice');
+
+  const other = createBrowser(api);
+  await other.login(accounts.adminCreatedLearner);
+  assert.equal((await other.post(`dev/mock-stripe/payments/${paymentId}/complete`, {})).status, 404, 'other learners cannot complete a payment they do not own');
+  assert.equal((await admin.post(`dev/mock-stripe/payments/${paymentId}/complete`, {})).status, 403, 'Admin cannot act as the buyer');
+
+  const testWorld = createWorld();
+  const testLearner = testWorld.browser();
+  await testLearner.login(accounts.learner);
+  const testCheckout = await testLearner.post('me/payments/checkout', { course_id: 'crs_mock_002', request_id: 'no-dev-route' });
+  assert.equal((await testLearner.post(`dev/mock-stripe/payments/${testCheckout.body.payment_id}/complete`, {})).status, 404, 'dev simulator route is not registered in test API routes');
+  assert.throws(() => createProvisionalApi({ environment: 'production', basePath }), /only be created in the development or test environment/);
 });
 
 test('free courses cannot start Stripe checkout or receive sale redeem codes', async () => {

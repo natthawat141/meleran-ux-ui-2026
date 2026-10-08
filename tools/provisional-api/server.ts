@@ -21,7 +21,7 @@ import { catalogRoutes } from './flow-b-catalog.ts';
 import { learningRoutes } from './flow-c-learning.ts';
 import { assessmentRoutes } from './flow-d-assessment.ts';
 import { authoringRoutes } from './flow-e-authoring.ts';
-import { paymentRoutes, createStripeSimulator } from './flow-f-payments.ts';
+import { paymentRoutes, createStripeSimulator, createDevStripeSimulationRoutes } from './flow-f-payments.ts';
 import { aiRoutes } from './flow-g-ai.ts';
 import { blogRoutes } from './flow-h-blog.ts';
 
@@ -88,6 +88,8 @@ export function createProvisionalApi(options: ProvisionalApiOptions): Provisiona
   if ((options.seed ?? 'default') === 'default') seedDefaultData(db);
   const unexpectedErrors: unknown[] = [];
   let requestCounter = 0;
+  const stripe = createStripeSimulator(db, clock, config);
+  const routes = options.environment === 'development' ? [...allRoutes, ...createDevStripeSimulationRoutes(stripe)] : allRoutes;
 
   const errorBody = (error: ApiError, requestId: string) => ({
     error: { code: error.code, message: error.message, request_id: requestId, ...(error.details ? { details: error.details } : {}) },
@@ -110,7 +112,7 @@ export function createProvisionalApi(options: ProvisionalApiOptions): Provisiona
       let params: Record<string, string> | null = null;
       let matched: Route | undefined;
       let pathMatched = false;
-      for (const route of allRoutes) {
+      for (const route of routes) {
         const candidate = matchPath(route.path, segments);
         if (!candidate) continue;
         pathMatched = true;
@@ -177,7 +179,7 @@ export function createProvisionalApi(options: ProvisionalApiOptions): Provisiona
     return fetcher as typeof fetch;
   };
 
-  return { createFetcher, db, clock, config, outbox: db.outbox, unexpectedErrors, stripe: createStripeSimulator(db, clock, config) };
+  return { createFetcher, db, clock, config, outbox: db.outbox, unexpectedErrors, stripe };
 }
 
 /** Minimal cookie-jar behaviour: `name=value`, and `Max-Age=0` or an empty value clears the cookie. */

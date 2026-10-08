@@ -4,7 +4,7 @@
 
 ## สถานะ
 
-R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStack Query hooks สำหรับ provisional in-memory API ใน `vite dev`; R10 เดินได้เป็น automated mock integration เท่านั้นและยังปิดไม่ได้เพราะไม่มี Backend/OpenAPI. ทุก feature ยังเป็น `prototype`; production build ใช้ implementation เดิมและไม่เรียก mock. ไม่มีการประกาศว่า R4a contract frozen, Backend พร้อม หรือ Production ใช้งานได้.
+R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStack Query hooks สำหรับ provisional in-memory API ใน `vite dev`; ตรวจ authenticated R7 learning/quiz/grading/certificate และ R8 checkout→webhook mock จาก Browser แล้ว. R10 เดินได้เป็น automated และ browser mock integration บาง journey แต่ยังปิดไม่ได้เพราะไม่มี Backend/OpenAPI. ทุก feature ยังเป็น `prototype`; production build ใช้ implementation เดิมและไม่เรียก mock. ไม่มีการประกาศว่า R4a contract frozen, Backend พร้อม หรือ Production ใช้งานได้.
 
 ## สิ่งที่ย้าย/ต่อแล้ว
 
@@ -23,7 +23,7 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 
 ### R8 — Payment / Redeem
 
-- Web checkout เริ่ม mock Payment และหน้า result อ่าน status; ไม่ redirect ไป `checkout_url` และไม่เปิดสิทธิ์จาก URL กลับมาเอง
+- Web checkout เริ่ม mock Payment และหน้า result อ่าน status; ไม่ redirect ไป `checkout_url` และไม่เปิดสิทธิ์จาก URL กลับมาเอง. Development มีปุ่มจำลอง signed Stripe event ผ่าน webhook handler ปกติ เพื่อพิสูจน์ flow ใน mock เท่านั้น
 - Web redeem ใช้ API; Admin สร้าง/ค้น/ยกเลิกรหัส โดยแสดงรหัสเต็มเฉพาะรอบสร้างและปกปิดย้อนหลัง
 - Admin Payment lookup อ่านทีละ Payment ID พร้อม status, fulfillment, amount และ webhook events; ไม่มีรายการทั้งหมดหรือคำสั่ง refund
 - Mock ปฏิเสธการเริ่ม Checkout/ออกโค้ดขายสำหรับคอร์สฟรี; integration tests ครอบ signed webhook simulator เท่านั้น, idempotency, fulfillment และ redeem race
@@ -36,14 +36,16 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 
 ## R10 และข้อจำกัดที่ยังเปิด
 
-- Automated tests วิ่ง cross-flow บน provisional server ครอบ Auth/Catalog/Enrollment/Learning/Assessment/Certificate/Payment/Redeem/AI/Authoring/Blog/Admin rules; `npm.cmd test` ผ่าน 173/173
-- Browser smoke ตรวจ Web Landing และ Guest `/courses/crs_mock_002`; หลัง login ด้วยบัญชีทดลองยืนยัน Web `/learn/ai` และ `/checkout/crs_mock_002` render ได้ และ Admin `/admin/access-codes`, `/admin/payments`, `/admin/ai` render ได้; logout ทั้งสอง app หลังตรวจ โดยไม่สร้าง Payment/แก้ข้อมูลจาก UI
+- Automated tests วิ่ง cross-flow บน provisional server ครอบ Auth/Catalog/Enrollment/Learning/Assessment/Certificate/Payment/Redeem/AI/Authoring/Blog/Admin rules; `npm.cmd test` ผ่าน 175/175
+- Browser authenticated R7 journey: สมัครคอร์สฟรี → เรียนวิดีโอและบันทึกตำแหน่ง/ทำเสร็จ → ทำแบบทดสอบและได้ผล 4/4 หลัง Instructor เจ้าของคอร์สให้คะแนนข้อเขียน → ทำบทอ่านเสร็จ → หน้าเรียนยืนยัน 3/3, 100% และเปิดใบรับรอง `cert_0002`
+- Browser authenticated R8 journey: Learner สร้าง Payment ของคอร์สเสียเงิน `crs_mock_002` → ปุ่มพัฒนาเรียก signed mock event → หน้า Payment แสดงชำระสำเร็จ/เปิดสิทธิ์และเข้าเรียนได้; Admin ค้น `pay_0001` แล้วเห็น `succeeded`, `granted`, enrollment และ event `checkout.session.completed`
+- Browser checks เพิ่มเติม: URL รายละเอียดคอร์สแบบ slug ที่มีอยู่เดิม resolve ผ่าน public catalog list แล้วโหลดรายละเอียดด้วย id; Admin grading queue แสดงคำตอบเฉพาะคอร์สที่ตนเป็นเจ้าของและคิวหายหลังให้คะแนน
 - Local HTTP smoke ยืนยัน Catalog 3 รายการ และ Web/Admin sessions แยกกันเมื่อใช้ mock server เดียว
 - R10 **ยังไม่สมบูรณ์**: ไม่มี Backend owner/OpenAPI, database, Stripe credentials/webhook runtime หรือ AI provider; จึงไม่มีหลักฐาน persistence ข้าม session/device หรือ authorization จาก server จริง
 - `R4a` ยัง Draft; DTO ของ mock ไม่ถูกนำไปใส่ `packages/contracts` และต้อง freeze กับ Backend ต่อ flow
 - Auth register/verification/reset/Google, Admin business APIs, Course Authoring และ `/explore` ยังเป็น local/demo flows
 - Mock server เก็บข้อมูลใน memory; restart แล้ว Payment/Enrollment/Progress/Attempt/Certificate/AI history/transcript หาย
-- ยังไม่ได้ browser-interact authenticated journey ครบทุก flow, responsive/accessibility matrix หรือ Admin Payment lookup ด้วย Payment จริงที่สร้างจาก Web UI; รอบนี้ยืนยันเฉพาะการ render ของหน้าที่ระบุ ไม่ได้ submit chat/practice, redeem, checkout, issue code หรือแก้ Transcript; tests/API smoke ไม่แทน UI acceptance
+- ยังไม่ได้ browser-interact ครบทุก flow: AI chat/practice, redeem, Admin สร้าง/เพิกถอน code และแก้ Transcript ยังต้องตรวจ; responsive/accessibility matrix ยังเปิด. Video URL ใน seed เป็น placeholder ที่ YouTube แจ้ง unavailable แต่หน้า progress/resume/complete ทำงานกับ mock ได้; ไม่ถือเป็นการตรวจสื่อจริง
 - ไม่ถอน legacy fallback เพราะยังเป็นเส้นทาง production prototype; R10 cleanup รอ real API replacement
 - Docker ไม่ได้รันตามคำสั่งผู้ใช้
 
@@ -53,7 +55,7 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 - `npm.cmd test` ผ่าน 173/173
 - `npm.cmd run check:boundaries` ผ่าน
 - `npm.cmd run build` และ token check ผ่านทั้ง Web/Admin; มี warnings `use client` ของ dependencies และ chunk เกิน 500 kB
-- Browser smoke ผ่าน Web Landing/Guest course detail และ authenticated page-render smoke สำหรับ Web AI/Checkout กับ Admin redeem/payment/AI ด้วยบัญชีทดลอง; ยังไม่ใช่ authenticated end-to-end flow หรือ responsive/accessibility acceptance
+- Browser smoke ผ่าน Web Landing/Guest course detail; authenticated R7 free-enrollment→assessment→grading→certificate และ R8 checkout→signed mock webhook→enrollment + Admin Payment lookup ผ่านบน Vite dev/mock ที่ viewport ปกติ. AI/redeem/transcript interactions, responsive/accessibility matrix, real Stripe/Backend persistence และ production authorization ยังไม่ผ่านการยืนยัน
 
 ## ขั้นตอน dev
 
