@@ -3,7 +3,7 @@ import { Button, ConfigProvider } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { LandingHeader, LandingFooter } from './LandingChrome';
-import { landingTheme } from './LandingPage';
+import { landingTheme } from '@melearn/ui';
 import { founders, FounderPortrait, StoryReveal } from './BrandStory';
 import './landing.css';
 import './brand-story.css';

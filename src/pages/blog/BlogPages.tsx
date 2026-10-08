@@ -6,8 +6,9 @@ import { useLms } from '../../store';
 import { blogCoverFor } from '../../data';
 import { LandingHeader, LandingFooter } from '../landing/LandingChrome';
 import { RichDocument } from '@melearn/ui';
-import { landingTheme } from '../landing/LandingPage';
+import { landingTheme } from '@melearn/ui';
 import type { BlogPost, User } from '../../types';
+import '../landing/landing.css';
 import './blog.css';
 
 const dateLabel = (value?: string | null) =>
