@@ -41,3 +41,5 @@ Vite ค่าที่ browser เห็นเป็น build-time configuratio
 Frontend CI มี hosted container matrix Web/Admin (max-parallel1) หลัง shared checks ผ่าน; build images จาก root แล้วใช้ verify-container.mjs ตรวจ PORT8080 และ8181. Runner สร้าง/ลบเฉพาะ smoke containers ของตน ไม่มี registry push/deploy/credentials ใหม่. validate job รวมผล containers เพื่อให้ failure ไม่ถูกมองเป็น CI success. เปลี่ยน app ตรวจ appนั้น; เปลี่ยน packages/tools/root configs ตรวจทั้งคู่; docs-only skip code/container jobs.
 
 ผล static runtime ไม่ยืนยันการ login/edit/review/payment หรือ Backend integration. ดู current run/SHA ใน docs/R7_API_MOCK_PROGRESS_TH.md. รอบนี้ไม่เปิด Docker daemon หรือรัน image บนเครื่องผู้ใช้.
+
+Current proof: [run37858748885](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37858748885) ที่6d36294 ผ่าน Web/Admin build และ runtime smoke ทั้ง PORT8080/8181. ไม่ push image/deploy และไม่ยืนยัน app flows/real Backend.

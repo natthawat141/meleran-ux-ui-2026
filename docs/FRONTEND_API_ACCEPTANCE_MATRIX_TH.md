@@ -56,3 +56,23 @@ Authoring/Instructor/Admin management/Blog ย้าย API แล้วแล�
 ## Audit runtime/CI — 9 ต.ค. 2026
 
 Management/Authoring/Blog/transcript resources ตรวจ payload ตาม operation และ nested DTO ก่อน UI; actual mock journey ของ pending→owner grade→graded/roster ผ่าน decoder. Quiz draft parser ตรวจ incomplete/stale/corrupt data. Current local tests159/typecheck/build/boundariesผ่าน. Sourceมี up/down actions และ responsive CSS แต่ **ยังไม่ยืนยัน keyboard/mobile/flow interaction จริง** เพราะ browser security policy ปฏิเสธ preview. Hosted CI/containerผล current SHA อ่านจาก progress; local Dockerไม่ถูกใช้. ไม่ปิด R10/R13 จากผล static runtime/DTO tests.
+
+
+## Current UI checklist (ยังไม่ผ่าน browser acceptance)
+
+ทุกข้อด้านล่างต้องตรวจจริงบน desktop และจอเล็ก เช่น390×844; source/mock tests ไม่แทนผล click/layout. บันทึก source SHA/app origin/mock config และห้ามใช้บัญชี/ข้อมูลจริง.
+
+| Flow | กรณีที่ต้องตรวจใน UI | ผล audit รอบนี้ |
+| --- | --- | --- |
+| Create/edit course | owner Instructor กับ Admin สร้าง/บันทึก/reload; invalid title/priceไม่หาย; save disabled/pending | Browser blocked; HTTP/client testsผ่าน |
+| Reorder | chapters/items ด้วยdrag และเมนูup/down; Tab/Enter/Arrow/Escape; save/reload order | มีfallbackactionsในsource; keyboard/layoutจริงยังไม่ยืนยัน |
+| Quiz | new generated IDs, rich prompt/choices/essay, save/reload, pass fixed70; historylock | HTTP roundtrip/history testsผ่าน; editor interactionยังไม่ยืนยัน |
+| Review/publish | owner submit→Admin approve→owner/Admin publish; stale review/version409; approved editต้องreviewใหม่ | HTTP permission/revision testsผ่าน; UI journeyยังไม่ยืนยัน |
+| Grading | owner scoreรายข้อ, exactly70 fail, pending→graded; other Instructor/Admin denied; retryบางข้อ | HTTP/decoder testsผ่าน; actual typing/focusยังไม่ยืนยัน |
+| Admin users | list/detail/add InstructorคงLearner; username/email nullable; private/public separation | HTTP/decoder testsผ่าน; dialog/table mobileยังไม่ยืนยัน |
+| Blog | rich image/text→draft preview→publish→public→edit/unpublish/delete; stale409; missing fields422 | Actual feature-client testsผ่าน; editor/public visualยังไม่ยืนยัน |
+| Draft restore | refresh incomplete draft, change account, stale baseline, corrupt storage; failed saveรักษาinput | Pure parser testsผ่าน; browser refresh/account switchingยังไม่ยืนยัน |
+| Error/loading/empty | slow/offline/malformed200/401/403/404/422/409, retry, empty lists; stale draftห้ามsilent overwrite | DTO/error tests+sourceผ่าน; interactive UXยังไม่ยืนยัน |
+| Responsive | title/actionsไม่ทับ, tableoverflowเฉพาะcontainer, editor/menus/keyboard focusใช้ได้ | CSS sourceตรวจแล้ว; screenshot/computed geometryยังไม่ยืนยัน |
+
+Hosted CI/containerผ่าน [run37858748885](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37858748885) ที่6d36294; ไม่เปลี่ยนสถานะ UI checklist ด้านบนเป็นpassed. เมื่อ browser accessพร้อมต้องกลับมาตรวจรายการนี้ก่อนปิด R13.

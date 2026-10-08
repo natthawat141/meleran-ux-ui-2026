@@ -79,10 +79,10 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 
 | พื้นที่ | ใช้ฐานปัจจุบัน |
 | --- | --- |
-| Workspace shell/sidebar/profile menu | Mantine + Tabler icons ใน `src/components/Shell.tsx` |
+| Workspace shell/sidebar/profile menu | Mantine + Tabler icons ใน `packages/ui/src/components/Shell.tsx` |
 | CRUD, form, table, upload, modal, dropdown | Ant Design + `@ant-design/icons` |
-| Login/register inputs, fields, buttons | shadcn/Base UI primitives ที่ export จาก `@melearn/ui` (`packages/ui/src/primitives/`); `src/pages/AuthPages.tsx` ยังเป็น legacy consumer ระหว่าง migration |
-| Rich content | Tiptap ใน `src/components/chapter/RichTextEditor.tsx` |
+| Login/register inputs, fields, buttons | shadcn/Base UI primitives ที่ export จาก `@melearn/ui` (`packages/ui/src/primitives/`); Auth pages อยู่ `apps/*/src/features/auth/pages` |
+| Rich content | Tiptap ใน `apps/*/src/features/course-authoring/components/chapter/RichTextEditor.tsx` |
 | Motion/parallax | `motion/react` และ component เดิมใน Landing |
 
 - ห้ามใช้อีโมจิแทนไอคอนหรือใช้เป็นของตกแต่ง UI ใช้ชุดไอคอนตามบริบทเดิมของหน้า ไม่ผสมหลายสไตล์ใน toolbar เดียว
@@ -94,8 +94,8 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 
 ## 6. Asset และภาพ
 
-- Logo: `src/assets/melearn-ui/logo.PNG`; เป็นสำเนา asset แบรนด์เดิมใน workspace ให้รักษาสัดส่วน พื้นที่หายใจ และไม่ขยายจนทับ header
-- ภาพกราฟิก Melearn: `src/assets/generated/`; อ่านบันทึก asset ในโฟลเดอร์เมื่อจะเปลี่ยน ใช้ภาพที่มี neutral/white balance ไม่สร้างภาพฟ้าล้วนทุกหัวข้อ
+- Logo: `packages/ui/src/assets/melearn-ui/logo.PNG`; เป็นสำเนา asset แบรนด์เดิมใน workspace ให้รักษาสัดส่วน พื้นที่หายใจ และไม่ขยายจนทับ header
+- ภาพกราฟิก Melearn: `packages/ui/src/assets/generated/`; อ่านบันทึก asset ในโฟลเดอร์เมื่อจะเปลี่ยน ใช้ภาพที่มี neutral/white balance ไม่สร้างภาพฟ้าล้วนทุกหัวข้อ
 - ภาพทีม: `public/images/founders/`; mapping ชื่อ/ตำแหน่งอยู่ใน `BrandStory.tsx` เป็นข้อมูลร่วมของ Landing และ About ห้ามเดาชื่อ ประวัติ ความเชี่ยวชาญ หรือเปลี่ยน mapping รูปเอง
 - ถ้าต้องสร้างกราฟิกใหม่ ให้ทำเป็นงานเฉพาะแบรนด์ตามคำขอ ใช้ image generation เมื่อมีเครื่องมือ ไม่แทนด้วยภาพ stock จาก URL สุ่ม
 - ไม่มี fake partner logos, รีวิว ยอดผู้เรียน หรือรางวัลที่ยืนยันไม่ได้ ถ้าใช้ข้อความร่าง ต้องไม่เขียนเป็นผลงานจริง

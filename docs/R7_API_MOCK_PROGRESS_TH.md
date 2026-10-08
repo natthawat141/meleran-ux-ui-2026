@@ -57,6 +57,9 @@ Browser รอบ migration นี้ **ยังไม่ตรวจสำเ�
 | DTO validation | typed HTTP mock responses รวม roster/owner grading/Admin account/authoring/transcript ผ่าน runtime checks; malformed fields/unknown operations คืน invalid_payload ก่อน UI |
 | Local code gates | tests159, typecheck Web/Admin/packages, boundaries/diff checks และ build Web/Admin ผ่าน; dependency/chunk warnings ยังคงมี |
 | CI finding/fix | Run37826483729 ที่9fe52cb ล้มเพราะ missing typecheck:legacy; เปลี่ยนเป็น packages, เพิ่ม tools path filter และ container job |
-| Hosted Docker | รอ current run หลัง push; matrix Web/Admin sequential, verify non-root/health/assets/deep links/cache/404 ที่8080/8181. ไม่ใช้ Docker/RAMในเครื่อง |
+| Hosted Docker | **ผ่าน hosted run37858748885 ที่6d36294**: Web/Admin build + non-root/health/assets/deep links/cache/404 ที่8080/8181; validate jobสำเร็จ. ไม่ใช้ Docker/RAMในเครื่อง |
 
 ไม่มี real Backend/OpenAPI/provider ใหม่, deployment หรือ merge main. ผล browserเก่าไม่ถือว่า current acceptance ผ่าน. ตาราง R และ container guide อัปเดตตรงกับ store sunset/current workflow แล้ว.
+
+
+CI evidence: [run37858748885](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37858748885), source `6d36294c788ff4ef1e6a2b67e7bf3750be163df4`: changes/shared-checks/web/admin/containers(web)/containers(admin)/validate สำเร็จทั้งหมด. Dockerยืนยัน static runtime เท่านั้น; feature readiness ยังprototype, API pathsไม่มี Backend/proxy. Follow-up docs commit ไม่เปลี่ยน app/runtime code; ไม่ถือว่า current browser/real API acceptanceผ่าน.
