@@ -2,7 +2,7 @@
 
 ไฟล์ชุดนี้เตรียม static frontend ของ `apps/web` และ `apps/admin` ให้ build แยกจาก monorepo root ใช้ NGINX แบบ non-root เสิร์ฟผล Vite build ไม่ใช่ dev/preview server และไม่เลือก hosting หรือเปิด deployment
 
-**สถานะ 8 ต.ค. 2026: R11 configuration preparation เท่านั้น และ R12 CI-only draft — ผู้ใช้สั่งไม่รัน Docker เนื่องจากใช้ RAM.** หยุด build ของทั้งสองแอประหว่างขั้น `npm ci` ก่อน app build/image export; ยังไม่มีผล image build หรือ runtime smoke ที่ผ่าน และไม่เคยเปิด smoke container. ตรวจเฉพาะ Node syntax, YAML parse และ path selection แบบ static; ยังไม่มี GitHub Actions run URL. Workflow ไม่มีคำสั่ง Docker เพื่อไม่ให้ push แล้วเริ่ม build/smoke อัตโนมัติ คำสั่ง manual ด้านล่างเป็นวิธีตรวจในรอบที่อนุญาตให้รัน ไม่ให้รันต่อระหว่างข้อจำกัดดังกล่าว
+**สถานะ 8 ต.ค. 2026: R11 configuration preparation เท่านั้น และ R12 CI-only.** ผู้ใช้สั่งไม่รัน Docker เนื่องจากใช้ RAM; image build/runtime smoke ยังไม่ผ่านและไม่มี smoke container. GitHub Actions [run 37743882854](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37743882854) สำหรับ commit `2fbe389` ผ่านครบทั้ง shared checks, Web/Admin typecheck/build/artifacts และ final status job; มีเพียง warning เรื่อง action รุ่นปัจจุบันถูกบังคับใช้ Node 24 กับ runner image ที่จะเปลี่ยนในอนาคต. Workflow ไม่มีคำสั่ง Docker เพื่อไม่ให้ push แล้วเริ่ม build/smoke อัตโนมัติ คำสั่ง manual ด้านล่างเป็นวิธีตรวจในรอบที่อนุญาตให้รัน ไม่ให้รัน Docker ระหว่างข้อจำกัดดังกล่าว
 
 ## Build และตรวจบนเครื่อง
 
