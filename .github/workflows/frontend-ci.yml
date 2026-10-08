@@ -6,37 +6,57 @@ on:
       - main
       - prototype
       - refactor/**
-    paths:
-      - "apps/**"
-      - "packages/**"
-      - "public/**"
-      - "src/**"
-      - "tests/**"
-      - "scripts/**"
-      - "docs/**"
-      - "package.json"
-      - "package-lock.json"
-      - "tsconfig*.json"
-      - "vite.config.ts"
-      - "components.json"
-      - ".github/workflows/frontend-ci.yml"
   pull_request:
-    paths:
-      - "apps/**"
-      - "packages/**"
-      - "public/**"
-      - "src/**"
-      - "tests/**"
-      - "scripts/**"
-      - "package.json"
-      - "package-lock.json"
-      - "tsconfig*.json"
-      - "vite.config.ts"
-      - "components.json"
-      - ".github/workflows/frontend-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  validate:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      web: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.web == 'true' || steps.filter.outputs.shared == 'true' }}
+      admin: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.admin == 'true' || steps.filter.outputs.shared == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          # On push, compare with the same branch before the push; PRs use their base.
+          base: ${{ github.ref }}
+          filters: |
+            web:
+              - 'apps/web/**'
+            admin:
+              - 'apps/admin/**'
+            shared:
+              - 'packages/**'
+              - 'src/**'
+              - 'public/**'
+              - 'scripts/**'
+              - 'tests/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig*.json'
+              - 'vite.config.*'
+              - 'components.json'
+              - '.npmrc'
+              - '.dockerignore'
+              - 'containers/*.template'
+              - 'containers/*.mjs'
+              - '.github/workflows/frontend-ci.yml'
+
+  shared-checks:
+    needs: changes
+    if: needs.changes.outputs.web == 'true' || needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,8 +65,68 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run typecheck
+      - run: npm run tokens:check
+      - run: npm run typecheck:legacy
       - run: npm test
       - run: npm run check:boundaries
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck:web
       - run: npm run build:web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: dist/web
+          if-no-files-found: error
+          retention-days: 7
+
+  admin:
+    needs: changes
+    if: needs.changes.outputs.admin == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck:admin
       - run: npm run build:admin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-${{ github.sha }}
+          path: dist/admin
+          if-no-files-found: error
+          retention-days: 7
+
+  # Keep one stable overall status, including successful docs-only runs.
+  validate:
+    needs: [changes, shared-checks, web, admin]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify selected checks succeeded
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          SHARED_RESULT: ${{ needs.shared-checks.result }}
+          WEB_RESULT: ${{ needs.web.result }}
+          ADMIN_RESULT: ${{ needs.admin.result }}
+        run: |
+          test "$CHANGES_RESULT" = success
+          for result in "$SHARED_RESULT" "$WEB_RESULT" "$ADMIN_RESULT"; do
+            case "$result" in
+              success|skipped) ;;
+              *) exit 1 ;;
+            esac
+          done

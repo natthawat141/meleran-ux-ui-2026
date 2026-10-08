@@ -1,0 +1,40 @@
+server {
+    listen ${PORT};
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    server_tokens off;
+
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        add_header Cache-Control "no-store" always;
+        return 200 "ok\n";
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-store" always;
+    }
+
+    # Vite fingerprints these assets; missing files must never return SPA HTML.
+    location ^~ /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # This image serves frontend files only. API proxying needs an agreed backend.
+    location = /api { return 404; }
+    location ^~ /api/ { return 404; }
+    location ~ /\. { return 404; }
+
+    # Public files do not have content hashes, so use a short cache lifetime.
+    location ~* \.(?:css|js|mjs|map|json|png|jpe?g|gif|svg|ico|webp|avif|woff2?|ttf|eot|mp4|webm|pdf)$ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=3600";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-store" always;
+    }
+}
