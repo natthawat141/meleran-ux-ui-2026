@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, Input, Segmented, Table, type TableProps } from 'antd';
 import { AppstoreOutlined, ArrowLeftOutlined, ArrowRightOutlined, SearchOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { LandingFooter, LandingHeader, RichDocument, blogCoverFor, landingTheme } from '@melearn/ui';
 import type { BlogPost, User } from '@melearn/contracts';
 import '@melearn/ui/styles/landing.css';

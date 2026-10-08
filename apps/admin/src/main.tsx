@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { LmsProvider } from '@legacy/store';
+import { LmsProvider } from '@melearn/store';
 import { MelearnUiProvider, defaultColorMode } from '@melearn/ui';
 import { AdminRoutes } from './App';
 import { AuthSessionProvider } from './features/auth/api/AuthSessionProvider';

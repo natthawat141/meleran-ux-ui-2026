@@ -1,7 +1,7 @@
 import { Button, Empty, Form, message } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, StatusTag } from '@melearn/ui';
 import defaultCourseCover from '@melearn/ui/assets/generated/course-default-v2.png';
 import { ImageUploadField } from '@melearn/ui';

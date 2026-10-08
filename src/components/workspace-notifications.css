@@ -1,6 +1,0 @@
-.workspace-notifications { max-width: calc(100vw - 24px); }
-.workspace-notification-item .mantine-Menu-itemLabel { display: grid; gap: 4px; white-space: normal; }
-.workspace-notification-item strong { color: var(--ink); font-size: 14px; font-weight: 550; }
-.workspace-notification-item span, .workspace-notification-item small { color: var(--ink-secondary); font-size: 12px; line-height: 1.65; }
-.notification-read-spacer { width: 7px; }
-.notification-empty { padding: 12px; }

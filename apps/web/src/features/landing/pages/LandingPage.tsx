@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ConfigProvider, type ThemeConfig } from 'antd';
 import { LandingFooter, LandingHeader, designTokens, landingTheme } from '@melearn/ui';
 export { landingTheme } from '@melearn/ui';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { CourseCollection } from './CourseCollection';
 import { LandingFaq } from './LearningSections';
 import { LearningStart } from './LearningStart';

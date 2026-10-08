@@ -6,7 +6,7 @@ import { readAppRouteInventory } from './lib/app-route-inventory.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const appNames = ['web', 'admin'];
-const packageNames = ['ui', 'api-client', 'contracts', 'course-authoring'];
+const packageNames = ['ui', 'api-client', 'contracts', 'course-authoring', 'store'];
 const sourceExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs']);
 
 function sourceFiles(directory) {
@@ -37,15 +37,12 @@ for (const appName of appNames) {
     const code = readFileSync(file, 'utf8');
     for (const specifier of importSpecifiers(code)) {
       assert.ok(!/^@melearn\/(?:web|admin)(?:\/|$)/.test(specifier), `${path.relative(root, file)} imports app package ${specifier}`);
+      assert.ok(!specifier.startsWith('@legacy/'), `${path.relative(root, file)} may not depend on legacy code: ${specifier}`);
       if (specifier.startsWith('.')) {
         const resolvedPath = path.resolve(path.dirname(file), specifier);
         const otherAppName = appName === 'web' ? 'admin' : 'web';
         const otherAppPath = path.join(root, 'apps', otherAppName) + path.sep;
         assert.ok(!resolvedPath.startsWith(otherAppPath), `${path.relative(root, file)} imports another app directly: ${specifier}`);
-      }
-      if (specifier.startsWith('@legacy/')) {
-        const legacyFile = path.resolve(root, 'src', specifier.slice('@legacy/'.length));
-        assert.ok(existsSync(legacyFile) || existsSync(`${legacyFile}.ts`) || existsSync(`${legacyFile}.tsx`) || existsSync(path.join(legacyFile, 'index.ts')), `${path.relative(root, file)} has unresolved transitional import ${specifier}`);
       }
     }
   }

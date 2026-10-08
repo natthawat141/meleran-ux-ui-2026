@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { Course, LmsData, Quiz, QuizAttempt, User } from '../src/types/index.ts';
-import { getReviewQueue } from '../src/lib/assessment-review.ts';
-import { getGradingReturnTo } from '../src/lib/grading-navigation.ts';
+import type { Course, LmsData, Quiz, QuizAttempt, User } from '../packages/store/src/types.ts';
+import { getReviewQueue } from '../packages/store/src/lib/assessment-review.ts';
+import { getGradingReturnTo } from '../packages/store/src/lib/grading-navigation.ts';
 
 const makeCourse = (id: string, instructorId: string): Course => ({
   id,

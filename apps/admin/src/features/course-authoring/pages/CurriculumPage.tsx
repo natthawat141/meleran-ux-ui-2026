@@ -17,7 +17,7 @@ import {
   RightOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { ContentTypeIcon } from '@melearn/ui';
 import type { Chapter, CourseItem, CourseItemType, Quiz } from '@melearn/contracts';
 import '../styles/curriculum-workspace.css';

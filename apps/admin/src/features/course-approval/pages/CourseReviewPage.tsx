@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, Button, Empty, Form, Input, Modal, Space, Table, Typography, message, type TableProps } from 'antd';
 import { Link } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, StatusTag } from '@melearn/ui';
 import type { Course } from '@melearn/contracts';
 

@@ -10,7 +10,7 @@ import {
 } from 'antd';
 import { ArrowRightOutlined, PlusOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { CourseCard, PageTitle, SectionHeading, StatusTag, flattenItems } from '@melearn/ui';
 import type { Course } from '@melearn/contracts';
 

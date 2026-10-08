@@ -7,7 +7,7 @@ import {
   preserveVideoTranscripts,
   saveVideoTranscript,
   setCourseAiEnabled,
-} from '../src/lib/ai-course-support.ts';
+} from '../packages/store/src/lib/ai-course-support.ts';
 
 const course = {
   id: 'course-1', instructorId: 'instructor-1', status: 'approved', aiEnabled: false,

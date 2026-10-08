@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { migrateLegacyRedeemCodes, preparePrototypeRedeem, quoteRedeemCode } from '../src/lib/redeem-code.ts';
-import type { Course, Enrollment, LmsData, RedeemCode, User } from '../src/types/index.ts';
+import { migrateLegacyRedeemCodes, preparePrototypeRedeem, quoteRedeemCode } from '../packages/store/src/lib/redeem-code.ts';
+import type { Course, Enrollment, LmsData, RedeemCode, User } from '../packages/store/src/types.ts';
 
 const learner: User = { id: 'learner-1', name: 'Learner', email: 'learner@example.test', role: 'learner', status: 'active' };
 const admin: User = { id: 'admin-1', name: 'Admin', email: 'admin@example.test', role: 'admin', status: 'active' };
@@ -95,7 +95,7 @@ test('legacy migration creates redeem rights only from cash codes and retains al
 });
 
 test('legacy data retains paid course rights through existing enrollments only', async () => {
-  const { normalizePrototypeSnapshot } = await import('../src/lib/prototype-snapshot.ts');
+  const { normalizePrototypeSnapshot } = await import('../packages/store/src/lib/prototype-snapshot.ts');
   const initial: LmsData = {
     users: [learner, instructor, admin], currentUserId: learner.id, courses: [course], blogPosts: [], quizzes: [],
     attempts: [], enrollments: [], redeemCodes: [], certificates: [], progress: {},
@@ -120,7 +120,7 @@ test('legacy data retains paid course rights through existing enrollments only',
 });
 
 test('legacy redeem result adapter maps an old order id only when existing enrollment grants access', async () => {
-  const { resolveRedeemResult } = await import('../src/lib/redeem-code.ts');
+  const { resolveRedeemResult } = await import('../packages/store/src/lib/redeem-code.ts');
   const data: LmsData = {
     users: [learner], currentUserId: learner.id, courses: [course], blogPosts: [], quizzes: [], attempts: [],
     enrollments: [{ id: 'enrollment-1', courseId: course.id, userId: learner.id, createdAt: '2026-10-01' }],
@@ -139,7 +139,7 @@ test('legacy redeem result adapter maps an old order id only when existing enrol
 
 
 test('stored snapshots never refill missing collections from fixtures and retain rejected history', async () => {
-  const { normalizePrototypeSnapshot } = await import('../src/lib/prototype-snapshot.ts');
+  const { normalizePrototypeSnapshot } = await import('../packages/store/src/lib/prototype-snapshot.ts');
   const initial: LmsData = {
     users: [learner], currentUserId: learner.id, courses: [course], blogPosts: [], quizzes: [],
     attempts: [], enrollments: [], redeemCodes: [redeemCode], certificates: [], progress: { demo: { learner: true } },
@@ -158,7 +158,7 @@ test('stored snapshots never refill missing collections from fixtures and retain
 });
 
 test('migration round trips active learning records, immutable answers and retired assignment metadata', async () => {
-  const { normalizePrototypeSnapshot } = await import('../src/lib/prototype-snapshot.ts');
+  const { normalizePrototypeSnapshot } = await import('../packages/store/src/lib/prototype-snapshot.ts');
   const attempt = { id: 'history', quizId: 'quiz', courseId: course.id, userId: learner.id,
     answers: { essay: 'original answer' }, essayStatus: 'graded' as const, passed: true,
     status: 'submitted' as const, score: 99, submittedAt: '2026-09-01', assignmentId: 'legacy-assignment' };
@@ -182,7 +182,7 @@ test('migration round trips active learning records, immutable answers and retir
 
 
 test('a malformed saved root is quarantined without sample users or course rights', async () => {
-  const { normalizePrototypeSnapshot } = await import('../src/lib/prototype-snapshot.ts');
+  const { normalizePrototypeSnapshot } = await import('../packages/store/src/lib/prototype-snapshot.ts');
   const initial: LmsData = { users: [learner], currentUserId: learner.id, courses: [course], blogPosts: [],
     quizzes: [], attempts: [], enrollments: [], redeemCodes: [redeemCode], certificates: [], progress: {} };
   const result = normalizePrototypeSnapshot('unreadable old snapshot', initial, '2026-10-07');

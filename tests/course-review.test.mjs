@@ -7,7 +7,7 @@ import {
   canSubmitCourse,
   coursePublicationIssue,
   invalidateCourseReview,
-} from '../src/lib/course-review.ts';
+} from '../packages/store/src/lib/course-review.ts';
 
 const teacher = { id: 'teacher-1', role: 'instructor' };
 const otherTeacher = { id: 'teacher-2', role: 'instructor' };

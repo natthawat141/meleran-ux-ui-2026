@@ -18,12 +18,16 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "allowJs": false,
+    "types": ["node"],
 
     /* Path aliases */
     "paths": {
-      "@/*": ["./src/*"],
-      "@melearn/course-authoring": ["./packages/course-authoring/src/index.ts"]
+      "@melearn/course-authoring": ["./packages/course-authoring/src/index.ts"],
+      "@melearn/contracts": ["./packages/contracts/src/index.ts"],
+      "@melearn/ui": ["./packages/ui/src/index.ts"],
+      "@melearn/api-client": ["./packages/api-client/src/index.ts"],
+      "@melearn/store": ["./packages/store/src/index.ts"]
     }
   },
-  "include": ["src", "vite.config.ts", "tests/**/*.ts", "tools/provisional-api/**/*.ts"]
+  "include": ["packages/**/*.ts", "packages/**/*.tsx", "tests/**/*.ts", "tools/provisional-api/**/*.ts"]
 }

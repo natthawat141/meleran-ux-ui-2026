@@ -13,7 +13,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@legacy': fileURLToPath(new URL('../../src', import.meta.url)),
     },
   },
   publicDir: fileURLToPath(new URL('../../public', import.meta.url)),

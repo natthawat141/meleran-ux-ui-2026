@@ -1,7 +1,7 @@
 import { Button, Empty, Typography } from 'antd';
 import { ArrowRightOutlined, BookOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, StatusTag, flattenItems } from '@melearn/ui';
 
 const { Text, Title } = Typography;

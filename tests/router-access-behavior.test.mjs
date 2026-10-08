@@ -29,6 +29,7 @@ async function loadAccess(appName) {
   const module = { exports: {} };
   const mocks = {
     'react-router-dom': { Navigate, useLocation: () => location, useParams: () => params },
+    '@melearn/store': { useLms: () => session },
     '@legacy/store': { useLms: () => session },
     '@legacy/components/Shell': { PublicShell, WorkspaceShell },
     '@legacy/pages/SystemPages': { NoAccessPage },

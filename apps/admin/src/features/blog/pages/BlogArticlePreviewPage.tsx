@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { RichDocument, WorkspaceShell, blogCoverFor } from '@melearn/ui';
 import type { BlogPost, User } from '@melearn/contracts';
 import '../styles/blog.css';

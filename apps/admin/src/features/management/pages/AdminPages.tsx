@@ -3,7 +3,7 @@ import { Alert, Avatar, Button, Descriptions, Empty, Pagination, Popconfirm, Seg
 import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowRightOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import {
   PageTitle,
   StatusTag,

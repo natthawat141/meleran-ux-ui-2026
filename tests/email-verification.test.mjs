@@ -6,7 +6,7 @@ import {
   verificationResendAvailable,
   verificationResendRemainingMs,
   verificationTokenState,
-} from '../src/lib/email-verification.ts';
+} from '../packages/store/src/lib/email-verification.ts';
 
 const now = Date.parse('2026-10-06T00:00:00.000Z');
 const record = {

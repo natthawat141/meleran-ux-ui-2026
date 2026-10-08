@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { getNotificationTarget } from '../src/lib/notification-targets.ts';
+import { getNotificationTarget } from '../packages/store/src/lib/notification-targets.ts';
 
 const instructor = { id: 'instructor-1', role: 'instructor' as const };
 const learner = { id: 'learner-1', role: 'learner' as const };

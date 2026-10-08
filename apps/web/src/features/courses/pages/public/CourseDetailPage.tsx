@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { Alert, Button, Space, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, CourseOutline, UserAvatar, formatPrice, instructorFor } from '@melearn/ui';
 
 const DevCourseDetailPage = import.meta.env.DEV

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createCheckoutSession, getPaymentStatus, getPaymentEligibility, isHostedStripeCheckoutUrl, paymentGrantsCourseAccess } from '../src/api/payments.ts';
-import type { Course, Enrollment, User } from '../src/types/index.ts';
+import { createCheckoutSession, getPaymentStatus, getPaymentEligibility, isHostedStripeCheckoutUrl, paymentGrantsCourseAccess } from '../packages/store/src/api/payments.ts';
+import type { Course, Enrollment, User } from '../packages/store/src/types.ts';
 
 const user = (values: Partial<User> = {}) => ({ id: 'learner-1', role: 'learner', email: 'learner@example.test', name: 'Learner', ...values }) as User;
 const course = (values: Partial<Course> = {}) => ({ id: 'course-1', instructorId: 'teacher-1', price: 1250, status: 'published', ...values }) as Course;

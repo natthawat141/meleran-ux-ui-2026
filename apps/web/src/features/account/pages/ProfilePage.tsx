@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Popconfirm, message } from 'antd';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { ProfileSettings } from '../components/ProfileSettings';
 
 export function ProfilePage() {

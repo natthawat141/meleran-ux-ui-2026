@@ -1,7 +1,7 @@
 import React from 'react';
 import { Avatar, Col, Row, Tag, Typography } from 'antd';
 import { useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { CourseCard, PageTitle, SectionHeading } from '@melearn/ui';
 
 const { Title, Paragraph } = Typography;

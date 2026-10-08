@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { NoAccessPage, WorkspaceShell } from '@melearn/ui';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { useAuthSession } from '../../features/auth/api/AuthSessionProvider';
 
 export function AdminPage({ children }: { children: React.ReactNode }) {

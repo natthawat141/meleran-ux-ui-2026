@@ -3,7 +3,7 @@ import { Alert, Button, Form, Input, Typography } from 'antd';
 import { ArrowLeftOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthFrame } from '@melearn/ui';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { verificationResendRemainingMs } from '@melearn/contracts';
 import { useAuthSession } from '../api/AuthSessionProvider';
 import { provisionalDemoAccounts, provisionalLoginError } from '../api/auth-session';

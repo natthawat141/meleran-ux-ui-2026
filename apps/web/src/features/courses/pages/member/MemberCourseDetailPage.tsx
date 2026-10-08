@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Button, Empty, Space, Tag, Typography, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { CourseOutline, CourseProgress, PageTitle, UserAvatar, formatPrice, instructorFor } from '@melearn/ui';
 import '@melearn/ui/styles/catalog.css';
 

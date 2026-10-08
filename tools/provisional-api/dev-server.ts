@@ -11,7 +11,7 @@ export const provisionalCatalogBasePath = '/mock-api/v1';
 
 export function startProvisionalDevServer(port = 0): Promise<Server> {
   const api = createProvisionalApi({ environment: 'development', basePath: provisionalCatalogBasePath });
-  const server = createServer((incoming, outgoing) => {
+  const server = createServer((incoming: IncomingMessage, outgoing: ServerResponse) => {
     void forward(api, incoming, outgoing);
   });
   return new Promise((resolve, reject) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Col, Empty, Input, Row, Segmented, Select, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { CourseCard, CourseProgress, PageTitle, instructorFor, matchesDirectorySearch } from '@melearn/ui';
 import '@melearn/ui/styles/catalog.css';
 

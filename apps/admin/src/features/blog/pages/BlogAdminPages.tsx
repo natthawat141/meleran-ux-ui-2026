@@ -4,7 +4,7 @@ import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowLeftOutlined, EyeOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { JSONContent } from '@tiptap/react';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { ImageUploadField, PageTitle, RichDocument, blogCoverFor, textDocument } from '@melearn/ui';
 import { RichTextEditor } from '../../course-authoring/components/chapter/RichTextEditor';
 import type { BlogPost } from '@melearn/contracts';

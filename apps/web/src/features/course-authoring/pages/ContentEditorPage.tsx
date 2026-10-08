@@ -1,6 +1,6 @@
 import { Alert, Button, Empty, Form, Input, Typography, message } from 'antd';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle } from '@melearn/ui';
 import type { CourseItemType } from '@melearn/contracts';
 

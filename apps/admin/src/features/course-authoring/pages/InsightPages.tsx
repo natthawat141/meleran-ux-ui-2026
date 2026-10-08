@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Avatar, Button, Empty, Progress, Table, Tag, Typography, message, type TableProps } from 'antd';
 import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, StatusTag, flattenItems } from '@melearn/ui';
 import type { Course, User } from '@melearn/contracts';
 

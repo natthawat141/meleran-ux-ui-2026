@@ -17,7 +17,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { createId } from '@melearn/ui';
 import { RichTextEditor } from '../components/chapter/RichTextEditor';
 import { VideoEditor } from '../components/chapter/VideoEditor';

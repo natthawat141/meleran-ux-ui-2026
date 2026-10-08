@@ -3,7 +3,7 @@ import { Alert, Button, Empty, Form, Input, InputNumber, Space, Table, Typograph
 import type { TableProps } from 'antd';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, RichDocument, StatusTag, UserAvatar, WrittenAnswerView, writtenAnswer } from '@melearn/ui';
 import type { Course, Question, Quiz, QuizAttempt, Role, User } from '@melearn/contracts';
 import '@melearn/ui/styles/grading-workspace.css';

@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Button, Col, Input, Row, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { CourseCard, PageTitle, matchesDirectorySearch } from '@melearn/ui';
 
 const DevPublicCatalogPage = import.meta.env.DEV

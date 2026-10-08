@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultUsername, validateProfile, certificateRecipient, snapshotLegacyCertificateNames } from '../src/lib/profile-model.ts';
+import { defaultUsername, validateProfile, certificateRecipient, snapshotLegacyCertificateNames } from '../packages/store/src/lib/profile-model.ts';
 
 const users = [{ id: 'learner-1', name: 'Legacy name' }, { id: 'learner-2', name: 'Other learner', username: 'taken.name' }];
 

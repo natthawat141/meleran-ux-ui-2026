@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { authenticatePrototypeUser, findUserByLoginIdentifier } from '../src/lib/auth-identity.ts';
+import { authenticatePrototypeUser, findUserByLoginIdentifier } from '../packages/store/src/lib/auth-identity.ts';
 
 const users = [
   { id: 'learner-1', email: 'somchai@example.com', username: 'somchai.learn', password: 'learner-pass', role: 'learner' },

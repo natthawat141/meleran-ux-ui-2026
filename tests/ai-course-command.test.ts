@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { findCourseCommand, removeCourseCommand } from '../src/pages/learner/ai-course-command.ts';
+import { findCourseCommand, removeCourseCommand } from '../packages/store/src/lib/ai-course-command.ts';
 
 test('slash and slash-space open an unfiltered course command', () => {
   assert.equal(findCourseCommand('/', 1)?.query, '');
@@ -17,7 +17,7 @@ test('selecting a course preserves the question before and after the command', (
   const caret = draft.indexOf('\nให้ที');
   const command = findCourseCommand(draft, caret);
   assert.ok(command);
-  assert.equal(removeCourseCommand(draft, command), 'ช่วยอธิบายข้อนี้\n\nให้ที');
+  assert.equal(removeCourseCommand(draft, command!), 'ช่วยอธิบายข้อนี้\n\nให้ที');
 });
 
 test('a slash in arithmetic, a fraction, or a URL is ordinary question text', () => {
@@ -30,7 +30,7 @@ test('the command follows the caret instead of deleting the rest of a draft', ()
   const draft = '  /Math คำถามที่เหลือ';
   const command = findCourseCommand(draft, 7);
   assert.ok(command);
-  assert.equal(command.query, 'math');
-  assert.equal(removeCourseCommand(draft, command), '   คำถามที่เหลือ');
+  assert.equal(command!.query, 'math');
+  assert.equal(removeCourseCommand(draft, command!), '   คำถามที่เหลือ');
   assert.equal(findCourseCommand(draft, 1), null);
 });

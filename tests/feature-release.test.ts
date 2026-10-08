@@ -99,7 +99,7 @@ test('Web and Admin routes have unique paths per app and registered feature wrap
 test('feature summary and full route inventory match the code registry', () => {
   const document = fs.readFileSync(new URL('../docs/FEATURE_RELEASE_MATRIX.md', import.meta.url), 'utf8');
   const documentLines = document.split(/\r?\n/);
-  const summaryHeaderIndex = documentLines.findIndex((line) => line.startsWith('| Feature key | Feature | Phase (เสนอ) |'));
+  const summaryHeaderIndex = documentLines.findIndex((line: string) => line.startsWith('| Feature key | Feature | Phase (เสนอ) |'));
   assert.notEqual(summaryHeaderIndex, -1, 'feature summary table exists');
   const summaryLines: string[] = [];
   for (let index = summaryHeaderIndex + 1; index < documentLines.length && documentLines[index].startsWith('|'); index += 1) {
@@ -128,19 +128,19 @@ test('feature summary and full route inventory match the code registry', () => {
 
   const inventorySection = document.split('## Inventory baseline จาก App.tsx ก่อน split')[1]?.split('## วิธีเปลี่ยนสถานะและตรวจรับ')[0];
   assert.ok(inventorySection, 'route inventory section exists');
-  const inventory = inventorySection.split(/\r?\n/).flatMap((line) => {
+  const inventory = inventorySection.split(/\r?\n/).flatMap((line: string) => {
     const match = /^\|\s*`([^`]+)`\s*\|\s*(`([^`]+)`|—)\s*\|/.exec(line);
     return match ? [{ path: match[1], featureKey: match[3] ?? '—' }] : [];
   });
-  assert.equal(new Set(inventory.map(({ path }) => path)).size, inventory.length, 'documented inventory paths are unique');
-  const systemFallbacks = inventory.filter(({ featureKey }) => featureKey === '—');
+  assert.equal(new Set(inventory.map(({ path }: { path: string }) => path)).size, inventory.length, 'documented inventory paths are unique');
+  const systemFallbacks = inventory.filter(({ featureKey }: { featureKey: string }) => featureKey === '—');
   assert.deepEqual(systemFallbacks, [
     { path: '/403', featureKey: '—' },
     { path: '*', featureKey: '—' },
   ]);
   assert.deepEqual(
-    inventory.filter(({ featureKey }) => featureKey !== '—')
-      .map(({ path, featureKey }) => `${path}=${featureKey}`).sort(),
+    inventory.filter(({ featureKey }: { featureKey: string }) => featureKey !== '—')
+      .map(({ path, featureKey }: { path: string; featureKey: string }) => `${path}=${featureKey}`).sort(),
     Object.entries(ROUTE_FEATURES).map(([path, featureKey]) => `${path}=${featureKey}`).sort(),
   );
 });

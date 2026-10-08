@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Empty, Table, Typography, type TableProps } from 'antd';
 import { PrinterOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle, flattenItems } from '@melearn/ui';
 import type { Certificate } from '@melearn/contracts';
 

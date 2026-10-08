@@ -1,7 +1,7 @@
 import { Button, Empty, Popconfirm, Space, Table, Typography, message } from 'antd';
 import type { TableProps } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@legacy/store';
+import { useLms } from '@melearn/store';
 import { PageTitle } from '@melearn/ui';
 import type { Quiz } from '@melearn/contracts';
 import '../styles/grading-workspace.css';

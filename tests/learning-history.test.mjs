@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { canManageCourse, contentRemovalIssue } from '../src/lib/learning-history.ts';
+import { canManageCourse, contentRemovalIssue } from '../packages/store/src/lib/learning-history.ts';
 
 const teacher = { id: 'teacher', role: 'instructor' };
 const otherTeacher = { id: 'other', role: 'instructor' };

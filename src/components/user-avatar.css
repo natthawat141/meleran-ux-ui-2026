@@ -1,9 +1,0 @@
-.user-avatar {
-  flex-shrink: 0;
-  border: 1px solid var(--line);
-}
-
-.user-avatar .mantine-Avatar-placeholder {
-  color: var(--ink-secondary);
-  background: var(--surface-muted);
-}
