@@ -6,7 +6,7 @@
 
 R1a แยก Payment/Redeem/roster ออกจาก legacy gates แล้ว R1b/R1c ถอน Cart/Orders/Finance/Inbox/Assignment/comparison dashboards/request/invite/public full lesson preview/public certificate verification/global Admin certificate viewer และ Admin grading ก่อน deep refactor รายงานผลและข้อจำกัดอยู่ใน [R1 report](R1_SCOPE_CLEANUP_REPORT_TH.md)
 
-Source ยังเป็นแอปเดียวและ browser-local prototype; monorepo split/Query/contracts/server integration เป็นงานลำดับถัดไป Runtime status ต้องมีหลักฐานตรง revision ก่อนเลื่อน ตาม CODE_SPEC ไม่เปิดทุกอย่างเพื่อให้ demo ทำงานใน production
+Source แยกเป็น Web/Admin apps และยังเป็น browser-local prototype; การย้าย feature slices, Query/contracts และ server integration ยังดำเนินต่อ Runtime status ต้องมีหลักฐานตรง revision ก่อนเลื่อน ตาม CODE_SPEC ไม่เปิดทุกอย่างเพื่อให้ demo ทำงานใน production
 
 ## ภาพรวม feature
 
@@ -41,9 +41,9 @@ Phase เป็น metadata ลำดับส่งมอบที่ source �
 
 Development/preview เปิด prototype; staging ต้อง integration/released; production ต้อง released Invalid environment/status fail closed ระบบ fallback `/403` และ `*` ไม่ผูก feature guards ใช้เพื่อแสดง error/not-found
 
-## Inventory จาก App.tsx
+## Inventory baseline จาก App.tsx ก่อน split
 
-มี 61 route declarations: 59 feature routes และ 2 system fallbacks URLs ของ retained routes คงเดิม Removed URLs จบ not-found และไม่มีเนื้อหา/action เดิม; Admin /teach authoring migration ไป own app ยังทำใน R2
+ตารางนี้เก็บ canonical feature inventory จาก R1 ก่อนแยก router: 61 route declarations, 59 feature routes และ 2 system fallbacks. R2–R3 ย้าย declarations ไปยัง WebRouter/AdminRouter และมี Admin path mappings; tests/workspace-route-ownership.test.mjs ตรวจ owner และ compatibility ปัจจุบัน. URLs ของ retained routes คงเดิมใน Web; Admin authoring ใช้ `/admin/*` และเส้นทาง `/teach/*` ที่รองรับจะ redirect ตาม migration map ส่วน retired paths จบที่ not-found.
 
 | Route | Feature key | Current UX guard/layout |
 | --- | --- | --- |

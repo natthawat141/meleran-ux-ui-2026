@@ -1,7 +1,10 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import path from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { ROUTE_FEATURES, FEATURES, getFeatureEnvironment, isFeatureEnabled } from '../src/config/features.ts';
+import { readAppRouteInventory } from '../scripts/lib/app-route-inventory.mjs';
 
 const statuses = ['prototype', 'integration', 'released', 'disabled'] as const;
 const environments = ['development', 'preview', 'staging', 'production'] as const;
@@ -63,59 +66,34 @@ test('retained Stripe, Redeem, and instructor roster routes use their owning pro
   }
 });
 
-type AppRoute = { path: string; openingTag: string };
+type AppName = 'web' | 'admin';
+type AppRoute = { path: string; featurePath: string | null; element: string; file: string };
 
 function getAppRoutes(): AppRoute[] {
-  const source = fs.readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
-  const routes: AppRoute[] = [];
-  let cursor = 0;
-  while ((cursor = source.indexOf('<Route', cursor)) >= 0) {
-    if (/[A-Za-z]/.test(source[cursor + 6] ?? '')) { cursor += 6; continue; }
-    const routeStart = cursor;
-    let braceDepth = 0;
-    let quote = '';
-    let escaped = false;
-    let tagEnd = -1;
-    for (let index = routeStart; index < source.length; index += 1) {
-      const char = source[index];
-      if (quote) {
-        if (escaped) escaped = false;
-        else if (char === '\\') escaped = true;
-        else if (char === quote) quote = '';
-        continue;
-      }
-      if (char === '"' || char === "'" || char === '`') { quote = char; continue; }
-      if (char === '{') braceDepth += 1;
-      else if (char === '}') braceDepth -= 1;
-      else if (char === '>' && braceDepth === 0) { tagEnd = index + 1; break; }
-    }
-    assert.notEqual(tagEnd, -1, 'Route opening tag is complete');
-    const openingTag = source.slice(routeStart, tagEnd);
-    const path = /\bpath="([^"]+)"/.exec(openingTag)?.[1];
-    assert.ok(path, `route path in ${openingTag.slice(0, 100)}`);
-    routes.push({ path, openingTag });
-    cursor = tagEnd;
-  }
-  return routes;
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  return (['web', 'admin'] satisfies AppName[]).flatMap((appName) =>
+    readAppRouteInventory(root, appName),
+  );
 }
 
-test('each App route has a unique path and its own matching outer feature wrapper', () => {
+test('Web and Admin routes have unique paths per app and registered feature wrappers', () => {
   const routes = getAppRoutes();
-  const paths = routes.map(({ path }) => path);
-  assert.equal(new Set(paths).size, paths.length, 'App route paths are unique');
+  const routeOwners: AppName[] = ['web', 'admin'];
+  for (const owner of routeOwners) {
+    const ownedRoutes = routes.filter(({ file }) => file.includes(`${path.sep}apps${path.sep}${owner}${path.sep}`));
+    const paths = ownedRoutes.map(({ path: routePath }) => routePath);
+    assert.ok(paths.length > 0, `${owner} has composed routes`);
+    assert.equal(new Set(paths).size, paths.length, `${owner} route paths are unique`);
 
-  const systemFallbacks = routes.filter(({ path }) => path === '/403' || path === '*');
-  assert.deepEqual(systemFallbacks.map(({ path }) => path).sort(), ['*', '/403']);
-  const concreteRoutes = routes.filter(({ path }) => path !== '/403' && path !== '*');
-  assert.deepEqual(concreteRoutes.map(({ path }) => path).sort(), Object.keys(ROUTE_FEATURES).sort());
+    const systemFallbacks = ownedRoutes.filter(({ path: routePath }) => routePath === '/403' || routePath === '*');
+    assert.deepEqual(systemFallbacks.map(({ path: routePath }) => routePath).sort(), ['*', '/403'], `${owner} keeps both system fallbacks`);
+    for (const { path: routePath, featurePath } of ownedRoutes) {
+      if (featurePath) assert.ok(Object.hasOwn(ROUTE_FEATURES, featurePath), `${owner} ${routePath} feature ${featurePath} is registered`);
+    }
+  }
 
-  for (const { path, openingTag } of concreteRoutes) {
-    const wrapper = /\belement=\{\s*featureElement\(\s*(['"])([^'"]+)\1\s*,/.exec(openingTag);
-    assert.equal(wrapper?.[2], path, `${path} has a matching outer featureElement in its Route opening tag`);
-  }
-  for (const { path, openingTag } of systemFallbacks) {
-    assert.doesNotMatch(openingTag, /\belement=\{\s*featureElement\(/, `${path} remains an ungated system route`);
-  }
+  const registeredFeaturePaths = [...new Set(routes.flatMap(({ featurePath }) => featurePath ? [featurePath] : []))].sort();
+  assert.deepEqual(registeredFeaturePaths, Object.keys(ROUTE_FEATURES).sort(), 'composed Web/Admin modules cover the release registry');
 });
 
 test('feature summary and full route inventory match the code registry', () => {
@@ -148,7 +126,7 @@ test('feature summary and full route inventory match the code registry', () => {
     assert.equal(status, FEATURES[key as keyof typeof FEATURES].status, `${key} runtime status`);
   }
 
-  const inventorySection = document.split('## Inventory จาก App.tsx')[1]?.split('## วิธีเปลี่ยนสถานะและตรวจรับ')[0];
+  const inventorySection = document.split('## Inventory baseline จาก App.tsx ก่อน split')[1]?.split('## วิธีเปลี่ยนสถานะและตรวจรับ')[0];
   assert.ok(inventorySection, 'route inventory section exists');
   const inventory = inventorySection.split(/\r?\n/).flatMap((line) => {
     const match = /^\|\s*`([^`]+)`\s*\|\s*(`([^`]+)`|—)\s*\|/.exec(line);

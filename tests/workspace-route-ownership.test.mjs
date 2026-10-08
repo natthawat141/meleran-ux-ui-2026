@@ -11,10 +11,29 @@ const webRoutes = readAppRouteInventory(root, 'web');
 const adminRoutes = readAppRouteInventory(root, 'admin');
 // Fixed R3b checkpoint declarations; this records the migration behavior, not a generated current expectation.
 const baseline = JSON.parse(await readFile(new URL('./fixtures/r3c-routes.json', import.meta.url), 'utf8'));
+const approvedElementMigrations = {
+  admin: [
+    {
+      path: '/articles/:id',
+      from: '<BlogArticlePage />',
+      to: '<BlogArticlePreviewPage />',
+      reason: 'R5 gives Admin its own article preview page',
+    },
+  ],
+};
 
-test('composed modules preserve every R3b route path, gate, element, and declaration order', () => {
+test('composed modules preserve the R3b route inventory and record intentional element migrations', () => {
   for (const [appName, routes] of [['web', webRoutes], ['admin', adminRoutes]]) {
-    assert.deepEqual(routes.map(({ file, ...route }) => route), baseline[appName], appName);
+    const actual = routes.map(({ file, ...route }) => route);
+    const expected = baseline[appName].map((route) => ({ ...route }));
+    for (const migration of approvedElementMigrations[appName] ?? []) {
+      const previous = expected.find((route) => route.path === migration.path);
+      const current = actual.find((route) => route.path === migration.path);
+      assert.equal(previous?.element, migration.from, `${appName} ${migration.path} baseline matches: ${migration.reason}`);
+      assert.equal(current?.element, migration.to, `${appName} ${migration.path} uses reviewed component: ${migration.reason}`);
+      previous.element = migration.to;
+    }
+    assert.deepEqual(actual, expected, appName);
     assert.equal(new Set(routes.map((route) => route.path)).size, routes.length, `${appName} has unique paths`);
     assert.ok(routes.every((route) => route.file.includes(`${path.sep}app${path.sep}router${path.sep}`)), `${appName} declarations belong to router modules`);
   }
