@@ -6,6 +6,8 @@ import { AuthFrame } from '@legacy/components/Shell';
 import { useLms } from '@legacy/store';
 import { DEMO_ACCOUNTS } from '@legacy/data';
 import { verificationResendRemainingMs } from '@legacy/lib/email-verification';
+import { useAuthSession } from '../api/AuthSessionProvider';
+import { provisionalDemoAccounts, provisionalLoginError } from '../api/auth-session';
 import {
   Alert as UiAlert,
   AlertDescription,
@@ -90,16 +92,28 @@ export interface LoginPageProps {
 
 export function LoginPage({ audience = 'web' }: LoginPageProps) {
   const { signIn } = useLms();
+  const session = useAuthSession();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState('');
   const next = new URLSearchParams(location.search).get('next');
+  const loginDemoAccounts = session.enabled
+    ? provisionalDemoAccounts.map((account) => ({ ...account, email: account.identifier }))
+    : DEMO_ACCOUNTS.filter((account) => audience !== 'admin' || account.role === 'admin');
 
-  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const identifier = String(form.get('identifier') ?? '').trim();
     const password = String(form.get('password') ?? '');
+    if (session.enabled) {
+      try {
+        const user = await session.login(identifier, password, audience);
+        const role = user.roles.includes('instructor') ? 'instructor' : 'learner';
+        navigate(audience === 'admin' ? next || '/admin' : next || (role === 'instructor' ? '/teach' : '/learn'));
+      } catch (error) { setError(provisionalLoginError(error)); }
+      return;
+    }
     const result = signIn(identifier, password, audience === 'admin' ? 'admin' : undefined);
     if (!result.ok || !result.user) {
       setError(result.message || 'เข้าสู่ระบบไม่สำเร็จ');
@@ -122,7 +136,7 @@ export function LoginPage({ audience = 'web' }: LoginPageProps) {
       intro={audience === 'admin' ? 'เข้าสู่ระบบ Melearn Admin' : 'เข้าสู่ระบบ MeLearn เพื่อเรียนต่อจากที่ค้างไว้'}
     >
       <FieldDescription className="mb-4 block">
-        ต้นแบบนี้ตรวจสอบบัญชีจากข้อมูลจำลองในเบราว์เซอร์ ยังไม่เชื่อมต่อระบบบัญชีจริง
+        {session.enabled ? 'เข้าสู่ระบบผ่าน API จำลองสำหรับการพัฒนา ไม่มี Backend จริง' : 'ต้นแบบนี้ตรวจสอบบัญชีจากข้อมูลจำลองในเบราว์เซอร์ ยังไม่เชื่อมต่อระบบบัญชีจริง'}
       </FieldDescription>
       {error && (
         <UiAlert variant="destructive" className="mb-5">
@@ -175,8 +189,8 @@ export function LoginPage({ audience = 'web' }: LoginPageProps) {
       <details className="login-demo-accounts">
         <summary>ดูบัญชีสำหรับทดลอง</summary>
         <div className="login-demo-list">
-          {DEMO_ACCOUNTS.map((account) => (
-            <div key={account.role}>
+          {loginDemoAccounts.map((account) => (
+            <div key={account.email}>
               <span>{account.label}</span>
               <code>{account.email}</code>
               <code>{account.password}</code>

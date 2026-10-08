@@ -13,7 +13,7 @@
 
 import type { Clock, Db, OutboxEmail } from './db.ts';
 import { createClock, createEmptyDb } from './db.ts';
-import { ApiError, defaultMockConfig } from './http.ts';
+import { ApiError, defaultMockConfig, sessionCookieNameForApp } from './http.ts';
 import type { HandlerResult, MockConfig, RequestContext, Route } from './http.ts';
 import { seedDefaultData } from './seed.ts';
 import { authRoutes } from './flow-a-auth.ts';
@@ -42,8 +42,8 @@ export interface ProvisionalApiOptions {
 }
 
 export interface ProvisionalApi {
-  /** A new "browser": same server state, own cookie jar. */
-  createFetcher(): typeof fetch;
+  /** A fetch client with an isolated cookie jar, optionally hydrated from an HTTP Cookie header. */
+  createFetcher(options?: { cookieHeader?: string }): typeof fetch;
   db: Db;
   clock: Clock;
   config: MockConfig;
@@ -130,7 +130,7 @@ export function createProvisionalApi(options: ProvisionalApiOptions): Provisiona
         }
       }
 
-      const sessionId = jar.get(sessionCookieName) ?? null;
+      const sessionId = jar.get(sessionCookieNameForApp(request.headers.get('x-melearn-app'))) ?? null;
       const session = sessionId ? db.sessions.get(sessionId) ?? null : null;
       const principal = session ? db.users.get(session.user_id) ?? null : null;
       const context: RequestContext = {
@@ -154,8 +154,12 @@ export function createProvisionalApi(options: ProvisionalApiOptions): Provisiona
     }
   };
 
-  const createFetcher = (): typeof fetch => {
+  const createFetcher = (options: { cookieHeader?: string } = {}): typeof fetch => {
     const jar = new Map<string, string>();
+    for (const part of (options.cookieHeader ?? '').split(';')) {
+      const separator = part.indexOf('=');
+      if (separator > 0) jar.set(part.slice(0, separator).trim(), part.slice(separator + 1).trim());
+    }
     const fetcher = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       const request = input instanceof Request ? input : undefined;
       const method = (init?.method ?? request?.method ?? 'GET').toUpperCase();

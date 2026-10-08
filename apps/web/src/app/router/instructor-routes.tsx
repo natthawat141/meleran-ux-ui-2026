@@ -11,13 +11,14 @@ import { QuizManagerPage } from '../../features/course-authoring/pages/QuizManag
 import { QuizEditorPage } from '../../features/course-authoring/pages/QuizEditorPage';
 import { QuizAttemptsPage, GradeEssayPage } from '@legacy/pages/instructor/QuizPages';
 import { CoursePreviewPage, InstructorLearnersPage } from '@legacy/pages/instructor/InsightPages';
+import { InstructorGradingPage } from '../../features/assessment/pages/InstructorGradingPage';
 import { LearnerReviewQueuePage } from '@legacy/pages/instructor/LearnerReviewQueuePage';
 import { grader, instructor } from './access';
 
 export const instructorRoutes = (
   <>
     <Route path="/teach" element={featureElement('/teach', instructor(<InstructorDashboardPage />))} />
-    <Route path="/teach/reviews" element={featureElement('/teach/reviews', grader(<LearnerReviewQueuePage />))} />
+    <Route path="/teach/reviews" element={featureElement('/teach/reviews', grader(import.meta.env.DEV ? <InstructorGradingPage /> : <LearnerReviewQueuePage />))} />
     <Route path="/teach/courses" element={featureElement('/teach/courses', instructor(<InstructorCoursesPage />))} />
     <Route path="/teach/courses/new" element={featureElement('/teach/courses/new', instructor(<InstructorCourseEditorPage />))} />
     <Route path="/teach/courses/:courseId" element={featureElement('/teach/courses/:courseId', instructor(<CourseOverviewPage />))} />

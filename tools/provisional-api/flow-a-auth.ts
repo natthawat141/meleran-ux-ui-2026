@@ -17,6 +17,7 @@ import {
   rejectUnknownFields, requireRole, requireUser, requiredString, validationFailed,
 } from './http.ts';
 import type { FieldError, HandlerResult, MockConfig, RequestContext, Route } from './http.ts';
+import { sessionCookieNameForApp } from './http.ts';
 
 const sessionCookie = 'melearn_mock_session';
 const minPasswordLength = 8;
@@ -82,10 +83,10 @@ function startSession(context: RequestContext, user: UserRecord, audience: 'web'
   if (context.sessionId) db.sessions.delete(context.sessionId);
   const id = nextId(db, 'ses');
   db.sessions.set(id, { id, user_id: user.id, audience, created_at: iso(clock.now()) });
-  return `${sessionCookie}=${id}; ${sessionCookieAttributes}`;
+  return `${sessionCookieNameForApp(context.headers.get('x-melearn-app'))}=${id}; ${sessionCookieAttributes}`;
 }
 
-const clearedSessionCookie = `${sessionCookie}=; Max-Age=0; ${sessionCookieAttributes}`;
+const clearedSessionCookie = (context: RequestContext) => `${sessionCookieNameForApp(context.headers.get('x-melearn-app'))}=; Max-Age=0; ${sessionCookieAttributes}`;
 
 /** Only same-app absolute paths are accepted as return targets (scope: no open redirects). */
 function safeReturnPath(value: string | null): string {
@@ -209,6 +210,7 @@ export const authRoutes: Route[] = [
       // The same answer whether the account exists, has no password, or the password is wrong.
       if (!user || user.password === null || user.password !== password) throw new ApiError(401, 'credentials_invalid', 'ข้อมูลเข้าสู่ระบบไม่ถูกต้อง');
       if (audience === 'admin' && !user.roles.includes('admin')) throw new ApiError(403, 'audience_not_allowed', 'บัญชีนี้เข้าส่วนผู้ดูแลไม่ได้');
+      if (audience === 'web' && user.roles.includes('admin')) throw new ApiError(403, 'audience_not_allowed', 'บัญชีผู้ดูแลใช้ Melearn Web ไม่ได้');
       const cookie = startSession(context, user, audience as 'web' | 'admin');
       return ok({ user: toCurrentUser(user) }, { 'set-cookie': cookie });
     },
@@ -310,9 +312,10 @@ export const authRoutes: Route[] = [
   {
     // FA9
     method: 'POST', path: 'auth/logout',
-    handler: ({ db, sessionId }) => {
+    handler: (context) => {
+      const { db, sessionId } = context;
       if (sessionId) db.sessions.delete(sessionId);
-      return noContent({ 'set-cookie': clearedSessionCookie });
+      return noContent({ 'set-cookie': clearedSessionCookie(context) });
     },
   },
   {

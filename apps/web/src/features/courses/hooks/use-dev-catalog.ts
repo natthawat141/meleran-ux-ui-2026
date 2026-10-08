@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { devCatalogApi } from '../api/dev-catalog-client.ts';
 import { catalogLoadErrorText } from '../api/catalog-display.ts';
 import type { CatalogListQuery } from '../api/catalog-api.ts';
@@ -36,119 +37,59 @@ function listQuery(filter: DevCatalogFilter, cursor?: string): CatalogListQuery 
 }
 
 export function useDevCatalogList(filter: DevCatalogFilter, reloadToken: number) {
-  const [state, setState] = useState<DevCatalogListState>({ status: 'loading' });
-  const generation = useRef(0);
-  const stateRef = useRef(state);
-  stateRef.current = state;
-
-  useEffect(() => {
-    const generationAtStart = ++generation.current;
-    const controller = new AbortController();
-    setState({ status: 'loading' });
-    devCatalogApi.listCourses(listQuery(filter), { signal: controller.signal }).then(
-      (page) => {
-        if (generation.current !== generationAtStart) return;
-        setState({
-          status: 'ready',
-          items: page.items,
-          nextCursor: page.next_cursor,
-          loadingMore: false,
-          moreMessage: null,
-        });
-      },
-      (error: unknown) => {
-        if (generation.current !== generationAtStart) return;
-        const message = catalogLoadErrorText(error);
-        if (!message) return;
-        setState({ status: 'error', message });
-      },
-    );
-    return () => controller.abort();
-  }, [filter.q, filter.category, reloadToken]);
-
-  const loadMore = useCallback(() => {
-    const current = stateRef.current;
-    if (current.status !== 'ready' || !current.nextCursor || current.loadingMore) return;
-    const cursor = current.nextCursor;
-    const generationAtStart = generation.current;
-    setState({ ...current, loadingMore: true, moreMessage: null });
-    devCatalogApi.listCourses(listQuery(filter, cursor)).then(
-      (page) => {
-        if (generation.current !== generationAtStart) return;
-        setState((prev) => {
-          if (prev.status !== 'ready') return prev;
-          return {
-            ...prev,
-            items: [...prev.items, ...page.items],
-            nextCursor: page.next_cursor,
-            loadingMore: false,
-            moreMessage: null,
-          };
-        });
-      },
-      (error: unknown) => {
-        if (generation.current !== generationAtStart) return;
-        const message = catalogLoadErrorText(error) ?? 'โหลดคอร์สเพิ่มไม่สำเร็จ';
-        setState((prev) => (prev.status === 'ready' ? { ...prev, loadingMore: false, moreMessage: message } : prev));
-      },
-    );
-  }, [filter]);
-
-  return { state, loadMore };
+  const query = useInfiniteQuery({
+    queryKey: ['catalog', 'public', filter.q, filter.category, reloadToken],
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam, signal }) => devCatalogApi.listCourses(listQuery(filter, pageParam), { signal }),
+    getNextPageParam: (page) => page.next_cursor ?? undefined,
+  });
+  const pages = query.data?.pages ?? [];
+  const nextCursor = pages.at(-1)?.next_cursor ?? null;
+  const state: DevCatalogListState = query.isPending
+    ? { status: 'loading' }
+    : !query.data && query.isError
+      ? { status: 'error', message: catalogLoadErrorText(query.error) ?? 'โหลดคอร์สไม่สำเร็จ' }
+      : { status: 'ready', items: pages.flatMap((page) => page.items), nextCursor,
+          loadingMore: query.isFetchingNextPage, moreMessage: query.isFetchNextPageError ? catalogLoadErrorText(query.error) ?? 'โหลดคอร์สเพิ่มไม่สำเร็จ' : null };
+  return { state, loadMore: () => { if (nextCursor && !query.isFetchingNextPage) void query.fetchNextPage(); }, reload: query.refetch };
 }
 
 export function useDevCatalogCategories(reloadToken: number): string[] {
-  const [categories, setCategories] = useState<string[]>([]);
-  useEffect(() => {
-    const controller = new AbortController();
-    devCatalogApi.listCourses({}, { signal: controller.signal }).then(
-      (page) => {
-        if (!controller.signal.aborted) setCategories([...new Set(page.items.map((item) => item.category))]);
-      },
-      (error: unknown) => {
-        if (catalogLoadErrorText(error) === null) return;
-        setCategories([]);
-      },
-    );
-    return () => controller.abort();
-  }, [reloadToken]);
-  return categories;
+  const query = useQuery({ queryKey: ['catalog', 'categories', reloadToken], queryFn: async ({ signal }) => {
+    const page = await devCatalogApi.listCourses({}, { signal });
+    return [...new Set(page.items.map((item) => item.category))];
+  } });
+  return query.data ?? [];
 }
 
 export function useDevCatalogCourse(courseId: string, reloadToken: number): DevCatalogCourseState {
-  const [state, setState] = useState<DevCatalogCourseState>({ status: 'loading' });
-  useEffect(() => {
-    if (!courseId) {
-      setState({ status: 'missing' });
-      return undefined;
-    }
-    const controller = new AbortController();
-    let active = true;
-    setState({ status: 'loading' });
-    devCatalogApi.getCourse(courseId, { signal: controller.signal }).then(
-      (course) => {
-        if (!active) return;
-        setState(course ? { status: 'ready', course } : { status: 'missing' });
-      },
-      (error: unknown) => {
-        if (!active) return;
-        const message = catalogLoadErrorText(error);
-        if (message) setState({ status: 'error', message });
-      },
-    );
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [courseId, reloadToken]);
-  return state;
+  const query = useQuery({ queryKey: ['catalog', 'detail', courseId, reloadToken], queryFn: ({ signal }) => devCatalogApi.getCourse(courseId, { signal }), enabled: Boolean(courseId) });
+  if (!courseId || query.data === null) return { status: 'missing' };
+  if (query.isPending) return { status: 'loading' };
+  if (query.isError) return { status: 'error', message: catalogLoadErrorText(query.error) ?? 'โหลดคอร์สไม่สำเร็จ' };
+  return query.data ? { status: 'ready', course: query.data } : { status: 'missing' };
+}
+
+export function useDevMyEnrollments(enabled: boolean) {
+  return useQuery({ queryKey: ['enrollments', 'mine'], queryFn: ({ signal }) => devCatalogApi.getMyEnrollments({ signal }), enabled });
+}
+
+export function useDevEnrollFree() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (courseId: string) => devCatalogApi.enrollFree(courseId),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['enrollments', 'mine'] }),
+        queryClient.invalidateQueries({ queryKey: ['learning'] }),
+        queryClient.invalidateQueries({ queryKey: ['catalog'] }),
+      ]);
+    },
+  });
 }
 
 export function useDebouncedValue(value: string, delayMs: number): string {
   const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delayMs);
-    return () => clearTimeout(timer);
-  }, [value, delayMs]);
+  useEffect(() => { const timer = setTimeout(() => setDebounced(value), delayMs); return () => clearTimeout(timer); }, [value, delayMs]);
   return debounced;
 }

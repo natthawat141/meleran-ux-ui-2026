@@ -102,16 +102,23 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function WorkspaceShell({ children, availableRoles }: { children: React.ReactNode; availableRoles?: Role[] }) {
-  const { currentUser, signInDemo, signOut } = useLms();
+type ShellIdentity = { id: string; name: string; email: string; role: Role; avatar?: string; emailVerified?: boolean; roles?: Role[] };
+
+export function WorkspaceShell({ children, availableRoles, identity, onLogout }: {
+  children: React.ReactNode; availableRoles?: Role[]; identity?: ShellIdentity | null; onLogout?: () => void | Promise<void>;
+}) {
+  const { currentUser: localUser, signInDemo, signOut } = useLms();
+  const currentUser = identity === undefined ? localUser : identity;
   const location = useLocation();
   const navigate = useNavigate();
   const [opened, setOpened] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 62em)', false);
   const compact = desktopCollapsed && isDesktop;
-  const roleOptions = availableRoles ?? ['learner', 'instructor', 'admin'];
-  const role: Role = (currentUser?.role as Role) ?? 'learner';
+  const roleOptions = availableRoles ?? identity?.roles ?? ['learner', 'instructor', 'admin'];
+  const role: Role = identity && location.pathname.startsWith('/teach') && identity.roles?.includes('instructor')
+    ? 'instructor'
+    : (currentUser?.role as Role) ?? 'learner';
   const meta = roleMeta[role] ?? roleMeta.learner;
   const items = roleMenus[role] ?? roleMenus.learner;
   const selected =
@@ -125,8 +132,11 @@ export function WorkspaceShell({ children, availableRoles }: { children: React.R
 
   const toWorkspace = (nextRole: Role) => {
     if (!roleOptions.includes(nextRole)) return;
-    const result = signInDemo(nextRole);
-    if (result.ok) navigate(roleMeta[nextRole].home);
+    if (identity) navigate(roleMeta[nextRole].home);
+    else {
+      const result = signInDemo(nextRole);
+      if (result.ok) navigate(roleMeta[nextRole].home);
+    }
   };
   const navLinks = items.map((item) => {
     return (
@@ -203,7 +213,7 @@ export function WorkspaceShell({ children, availableRoles }: { children: React.R
             </Text>
           </Group>
           <Group gap="md" wrap="nowrap" className="workspace-header-actions">
-            {roleOptions.length > 1 && <Select
+            {!identity && roleOptions.length > 1 && <Select
               aria-label="ดูตัวอย่างในบทบาท"
               className="role-switch"
               value={role}
@@ -235,7 +245,7 @@ export function WorkspaceShell({ children, availableRoles }: { children: React.R
                 <Menu.Item component={Link} to="/account/profile" leftSection={<IconSettings size={16} />}>
                   บัญชีของฉัน
                 </Menu.Item>
-                {roleOptions.length > 1 && <div className="profile-mobile-roles">
+                {!identity && roleOptions.length > 1 && <div className="profile-mobile-roles">
                   <Menu.Divider />
                   <Menu.Label>ดูตัวอย่างในบทบาท</Menu.Label>
                   {roleOptions.map((key) => (
@@ -249,7 +259,7 @@ export function WorkspaceShell({ children, availableRoles }: { children: React.R
                   color="red"
                   leftSection={<IconLogout size={16} />}
                   onClick={() => {
-                    signOut();
+                    if (onLogout) void onLogout(); else signOut();
                     navigate('/');
                   }}
                 >

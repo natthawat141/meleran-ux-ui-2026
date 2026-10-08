@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { LmsProvider } from '@legacy/store';
 import { MelearnUiProvider, defaultColorMode } from '@melearn/ui';
 import { AdminRoutes } from './App';
+import { AuthSessionProvider } from './features/auth/api/AuthSessionProvider';
+import { QueryProvider } from './app/providers/QueryProvider';
 import './app.css';
 import '@mantine/core/styles.css';
 import '@fontsource-variable/anuphan';
@@ -17,9 +19,9 @@ if (rootElement) {
   createRoot(rootElement).render(
     <React.StrictMode>
       <MelearnUiProvider>
-        <BrowserRouter>
-          <LmsProvider><AdminRoutes /></LmsProvider>
-        </BrowserRouter>
+        <QueryProvider><BrowserRouter>
+          <LmsProvider><AuthSessionProvider><AdminRoutes /></AuthSessionProvider></LmsProvider>
+        </BrowserRouter></QueryProvider>
       </MelearnUiProvider>
     </React.StrictMode>
   );

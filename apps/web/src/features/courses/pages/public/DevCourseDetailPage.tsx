@@ -6,6 +6,8 @@ import { PageTitle } from '@legacy/components/common';
 import { formatCatalogPrice, safeCatalogCoverUrl } from '../../api/catalog-display.ts';
 import type { ProvisionalOutlineItemType } from '../../api/catalog-provisional-contract.ts';
 import { useDevCatalogCourse } from '../../hooks/use-dev-catalog.ts';
+import { useDevEnrollFree, useDevMyEnrollments } from '../../hooks/use-dev-catalog.ts';
+import { useAuthSession } from '../../../auth/api/AuthSessionProvider';
 
 const itemTypeLabel: Record<ProvisionalOutlineItemType, string> = {
   video: 'วิดีโอ',
@@ -17,7 +19,11 @@ export function DevCourseDetailPage() {
   const { slug = '' } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [reloadToken, setReloadToken] = useState(0);
+  const session = useAuthSession();
   const state = useDevCatalogCourse(slug, reloadToken);
+  const enrollments = useDevMyEnrollments(session.enabled && Boolean(session.user));
+  const enrollFree = useDevEnrollFree();
+  const [enrollError, setEnrollError] = useState('');
 
   if (state.status === 'loading') {
     return (
@@ -53,6 +59,18 @@ export function DevCourseDetailPage() {
   const coverUrl = safeCatalogCoverUrl(course.cover_url);
   const itemCount = course.outline.reduce((sum, chapter) => sum + chapter.items.length, 0);
   const login = `/login?next=${encodeURIComponent(`/courses/${course.id}`)}`;
+  const enrolled = enrollments.data?.some((entry) => entry.enrollment.course_id === course.id) ?? false;
+  const isAdmin = session.user?.roles.includes('admin') ?? false;
+  const ownsCourse = session.user?.roles.includes('instructor') && session.user.id === course.instructor.id;
+  const startCourse = async () => {
+    setEnrollError('');
+    if (!session.user) { navigate(login); return; }
+    if (enrolled) { navigate(`/learn/courses/${course.id}`); return; }
+    if (isAdmin || ownsCourse) return;
+    if (course.price !== null) { setEnrollError('การชำระเงินจะเชื่อมต่อในขั้นตอน R8'); return; }
+    try { await enrollFree.mutateAsync(course.id); navigate(`/learn/courses/${course.id}`); }
+    catch { setEnrollError('ลงเรียนไม่สำเร็จ กรุณาลองอีกครั้ง'); }
+  };
 
   return (
     <div className="public-page course-detail-page">
@@ -66,14 +84,16 @@ export function DevCourseDetailPage() {
           {course.subtitle && <Typography.Paragraph>{course.subtitle}</Typography.Paragraph>}
           <Typography.Paragraph type="secondary">สอนโดย {course.instructor.display_name}</Typography.Paragraph>
           <div className="detail-hero-actions">
-            <Button type="primary" size="large" onClick={() => navigate(login)}>
-              เข้าสู่ระบบเพื่อเริ่มเรียน <ArrowRightOutlined aria-hidden="true" />
+            <Button type="primary" size="large" onClick={startCourse} loading={enrollFree.isPending} disabled={Boolean(isAdmin || ownsCourse)}>
+              {!session.user ? 'เข้าสู่ระบบเพื่อลงเรียน' : enrolled ? 'ไปยังบทเรียน' : course.price === null ? 'ลงเรียนฟรี' : 'ซื้อคอร์ส'} <ArrowRightOutlined aria-hidden="true" />
             </Button>
             <Typography.Text className="detail-price">{formatCatalogPrice(course.price)}</Typography.Text>
           </div>
           <Typography.Paragraph type="secondary">
-            โหมดพัฒนา: หน้านี้อ่านจาก API จำลอง การเข้าสู่ระบบยังไม่สมัครเรียนผ่าน API
+            โหมดพัฒนา: ข้อมูลและการสมัครเรียนมาจาก API จำลอง ไม่ใช่ Backend จริง
           </Typography.Paragraph>
+          {enrollments.isError && <Typography.Paragraph role="alert">โหลดสถานะการลงเรียนไม่สำเร็จ</Typography.Paragraph>}
+          {enrollError && <Typography.Paragraph role="alert">{enrollError}</Typography.Paragraph>}
         </div>
         <div className="detail-cover">
           {coverUrl ? <img src={coverUrl} alt="" /> : <div className="course-cover" />}

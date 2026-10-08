@@ -11,9 +11,8 @@ export const provisionalCatalogBasePath = '/mock-api/v1';
 
 export function startProvisionalDevServer(port = 0): Promise<Server> {
   const api = createProvisionalApi({ environment: 'development', basePath: provisionalCatalogBasePath });
-  const fetcher = api.createFetcher();
   const server = createServer((incoming, outgoing) => {
-    void forward(fetcher, incoming, outgoing);
+    void forward(api, incoming, outgoing);
   });
   return new Promise((resolve, reject) => {
     const onError = (error: Error) => reject(error);
@@ -25,7 +24,7 @@ export function startProvisionalDevServer(port = 0): Promise<Server> {
   });
 }
 
-async function forward(fetcher: typeof fetch, incoming: IncomingMessage, outgoing: ServerResponse): Promise<void> {
+async function forward(api: ReturnType<typeof createProvisionalApi>, incoming: IncomingMessage, outgoing: ServerResponse): Promise<void> {
   try {
     const url = new URL(incoming.url ?? '/', 'http://127.0.0.1');
     const method = (incoming.method ?? 'GET').toUpperCase();
@@ -36,7 +35,7 @@ async function forward(fetcher: typeof fetch, incoming: IncomingMessage, outgoin
       if (typeof value === 'string') headers.set(name, value);
       else if (Array.isArray(value)) for (const item of value) headers.append(name, item);
     }
-    const response = await fetcher(`${url.pathname}${url.search}`, {
+    const response = await api.createFetcher({ cookieHeader: incoming.headers.cookie })(`${url.pathname}${url.search}`, {
       method,
       headers,
       body: method === 'GET' || method === 'HEAD' ? undefined : Buffer.concat(chunks).toString('utf8'),

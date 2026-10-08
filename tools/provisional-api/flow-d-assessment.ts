@@ -226,7 +226,7 @@ export const assessmentRoutes: Route[] = [
         return {
           attempt_id: attempt.id, course_id: attempt.course_id, item_id: attempt.item_id,
           learner_display_name: learner?.display_name ?? '', submitted_at: attempt.submitted_at,
-          questions_to_grade: attempt.snapshot.filter((question) => question.type === 'essay' || question.type === 'image').map((question) => ({
+          questions_to_grade: attempt.snapshot.filter((question) => (question.type === 'essay' || question.type === 'image') && !attempt.grades[question.id]).map((question) => ({
             question_id: question.id, type: question.type, prompt: question.prompt, max: question.points,
             answer: publicAnswer(attempt.answers[question.id]),
           })),

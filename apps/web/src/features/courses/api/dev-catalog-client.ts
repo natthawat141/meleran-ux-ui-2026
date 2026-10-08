@@ -9,7 +9,7 @@ export const devCatalogBasePath = '/mock-api/v1';
 export const devCatalogApi = createCatalogApi(createHttpClient({
   baseUrl: devCatalogBasePath,
   fetcher: globalThis.fetch.bind(globalThis),
-  headers: { accept: 'application/json' },
-  credentials: 'omit',
+  headers: { accept: 'application/json', 'x-melearn-app': 'web' },
+  credentials: 'same-origin',
   timeoutMs: 8_000,
 }));

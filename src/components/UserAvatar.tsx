@@ -5,7 +5,7 @@ import './user-avatar.css';
 import type { User } from '../types';
 
 export interface UserAvatarProps {
-  user?: User | null;
+  user?: Pick<User, 'name' | 'avatar'> | null;
   size?: number;
 }
 

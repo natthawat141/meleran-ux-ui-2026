@@ -12,7 +12,7 @@
 - ไม่มี DTO ใน `packages/contracts` จนกว่า Backend freeze
 - เป็น server จำลองใน memory แบบ fetch-compatible: เสียบเข้า `createHttpClient({ fetcher })` ของ `@melearn/api-client` ได้โดยไม่แก้ client
 - Deterministic: นาฬิกาและ id ถูกฉีดได้ (ไม่มี `Math.random`, `Date.now`, `process.env`, network ใน mock) ทำให้ test ซ้ำได้
-- ค่าเริ่มต้นของ session: cookie ต่อ "browser" (cookie jar) ตามข้อเสนอ D1; Base path ใน test คือ `/mock-api/v1`
+- session ของ `createFetcher()` แยก cookie jar ต่อ caller; dev HTTP server รับ/ส่ง cookie ของ browser และแยกชื่อ cookie Web/Admin (`x-melearn-app`) เพื่อให้สอง Vite app ใช้ session คนละชุด; Base path ใน test คือ `/mock-api/v1`
 
 วิธีใช้ (ใน test):
 
@@ -106,15 +106,15 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ข้อจำกัด: test พิสูจน์ว่า mock สอดคล้องกันเองและกับ Scope เท่านั้น ไม่พิสูจน์ว่า Backend จริงจะตอบเหมือนกัน
 
-## 8. ที่ต่อเข้า Web แล้ว และที่ยังไม่ได้ทำ
+## 8. ที่ต่อเข้า Web/Admin แล้ว และที่ยังไม่ได้ทำ
 
-`vite dev` ของ Web เปิด guest `/courses` และ `/courses/:id` จาก API จำลองผ่าน `tools/provisional-api/dev-server.ts` (127.0.0.1:8787, Vite proxy ที่ `/mock-api`) โค้ดใน `apps/web/src` ไม่ import mock ถ้าโหลดไม่สำเร็จหน้าแสดงข้อผิดพลาดและปุ่มลองใหม่ ไม่กลับไปใช้คอร์สใน local store
+`vite dev` ของ Web/Admin เปิด dev server `tools/provisional-api/dev-server.ts` ที่ `127.0.0.1:8787` ผ่าน Vite proxy `/mock-api`. Auth `/auth/login`, `/me`, `/auth/logout` ใช้ cookie แยก app; Web Landing/Catalog/detail และ free Enrollment อ่าน mock. R7 routes ใน Web อ่าน enrolled courses, lessons, progress/resume, quiz attempts/results, instructor grading และ certificates. Query cache ถูกแยกต่อ app และเคลียร์เมื่อ sign in/out.
 
 Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](R4B_FLOW_B_CATALOG_TH.md)
 
-ยังไม่ได้ทำ:
+ยังไม่ได้ทำหรือยังไม่ยืนยัน:
 
-- หน้าแรก, `/explore` ของผู้ที่ล็อกอิน, การสมัครเรียน, Admin และ flow C–H ยังไม่อ่าน API นี้
-- ยังไม่มี TanStack Query และยังไม่มี DTO ใน `packages/contracts` (รอ Backend freeze)
-- dev server ใช้ cookie jar เดียวของโปรเซส ยังไม่แมป cookie ของเบราว์เซอร์เป็น session ของ mock
+- `/explore`, register/verification/reset, Admin business APIs, Authoring, Payment/Redeem และ AI ยังเป็น local/demo flows; paid enrollment รอ R8
+- ยังไม่มี DTO ใน `packages/contracts` (รอ Backend freeze); TanStack Query ใช้เฉพาะ server-like state ที่ย้ายแล้ว
+- Dev session เป็นการจำลองใน memory; server restart ล้างบัญชี/Enrollment/Progress/Attempt/Certificate และไม่ยืนยัน persistence ข้ามอุปกรณ์
 - หลักฐานฝั่ง server (R10, R13) ยังรอ Backend จริง

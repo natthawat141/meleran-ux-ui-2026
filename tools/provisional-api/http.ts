@@ -5,6 +5,10 @@
 
 import type { Clock, CourseRecord, Db, Role, UserRecord } from './db.ts';
 
+export function sessionCookieNameForApp(app: string | null): string {
+  return app === 'web' || app === 'admin' ? `melearn_mock_session_${app}` : 'melearn_mock_session';
+}
+
 export interface FieldError { field: string; code: string }
 
 export class ApiError extends Error {
