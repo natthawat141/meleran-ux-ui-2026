@@ -10,8 +10,8 @@ import { PageTitle, RichDocument, textDocument } from '@melearn/ui';
 import { ImageUploadField } from '@legacy/components/ImageUploadField';
 import { RichTextEditor } from '@legacy/components/chapter/RichTextEditor';
 import type { BlogPost } from '@legacy/types';
-import './blog.css';
-import './blog-editor.css';
+import '../styles/blog.css';
+import '../styles/blog-editor.css';
 
 const { Text } = Typography;
 

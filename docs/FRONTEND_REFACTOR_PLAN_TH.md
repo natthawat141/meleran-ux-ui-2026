@@ -67,7 +67,7 @@ docs/
 
 `packages/course-authoring` อยู่นอกโครงสร้างบังคับ: R0 ยืนยันแล้วว่า Admin และ Instructor ใช้หน้า editor เดียวกันจริง แต่ page ยังผูก useLms/router/storage R2a ต้องพิสูจน์ controlled editor core interface ก่อน split หากต้อง extract ให้รับ draft/callbacks/capabilities/ID factory จาก host และไม่มี app/store/seed imports; host เป็นเจ้าของ save/dirty/conflict/navigation และ Admin Transcript แยกจาก learning draft R6 ทบทวน boundary หลังต่อ API ห้าม import ข้าม apps, copy editor ทั้งก้อน หรือซ่อน business editor ใน packages/ui เพื่อหลบ boundary
 
-ภายใน feature มี `api/`, `hooks/`, `pages/`, `components/` และ types เท่าที่มีงานใช้จริง ไม่แยกไฟล์เล็กทุกฟังก์ชันเป็นข้อบังคับ เป้าหมายคือตาม bug/flow ได้ในเจ้าของ feature เดียว
+ภายใน feature จัดโครงสร้างเป็น `pages/` (มีเฉพาะหน้าจอ route `.tsx` ล้วนๆ ห้ามมี `.css` ปนในนี้), `components/` (ชิ้นส่วนย่อย), `styles/` (รวมไฟล์ stylesheet ประจำ feature), `api/`/`hooks/`, และ `types/` เท่าที่มีงานใช้จริง เป้าหมายคือตาม bug/flow ได้ง่าย และมองเห็น route directory ใน `pages/` ได้อย่างชัดเจนและสบายตา
 
 Apps import packages ได้; packages ไม่ import apps; ไม่ให้ Web import `apps/admin/src` หรือกลับกัน; แยก shell/pages ออกจาก reusable authoring และป้องกันวงจร dependency ส่วน API เฉพาะ feature อยู่ใน app ที่ใช้ ไม่ย้าย business API ทั้งหมดเข้า client กลาง
 

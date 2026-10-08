@@ -3,7 +3,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Button, Carousel, Modal, Tag, type CarouselRef } from 'antd';
 import { Link } from 'react-router-dom';
 import { useReducedMotion } from 'motion/react';
-import './instructor-spotlight.css';
+import '../styles/instructor-spotlight.css';
 
 type Instructor = {
   id: 'mind' | 'ton' | 'praew' | 'nont';

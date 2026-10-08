@@ -13,9 +13,9 @@ import { LandingAnnouncement, LandingHero } from './LandingHero';
 import { NewsletterBanner } from './NewsletterBanner';
 import { InstructorSpotlight } from './InstructorSpotlight';
 import '@legacy/pages/landing/landing.css';
-import './landing-hero.css';
-import './landing-vivid.css';
-import './landing-collections.css';
+import '../styles/landing-hero.css';
+import '../styles/landing-vivid.css';
+import '../styles/landing-collections.css';
 
 // Scope the new palette to the landing route; public pages keep their existing theme.
 const homePageTheme: ThemeConfig = {

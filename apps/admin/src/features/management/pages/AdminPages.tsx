@@ -9,8 +9,8 @@ import { PageTitle, StatusTag } from '@melearn/ui';
 import { formatPrice, flattenItems, instructorFor } from '@legacy/data';
 import { DirectorySearch, matchesDirectorySearch, useDirectorySearch } from '@legacy/components/DirectorySearch';
 import type { Course, QuizAttempt, User } from '@legacy/types';
-import './admin-courses.css';
-import './admin-users.css';
+import '../styles/admin-courses.css';
+import '../styles/admin-users.css';
 
 const { Text, Title } = Typography;
 

@@ -84,8 +84,9 @@
 - ใบรับรองหน้าบัญชีผู้เรียนกรองเจ้าของเสมอ รวมถึงเมื่อผู้ใช้เป็น Admin ไม่มี global Admin certificate browser/download-all ใน V1; Admin ดู completion/results เพื่อจัดการตาม scope ไม่เพิ่ม certificate.read_admin
 - `DirectorySearch` เก็บคำค้นและตัวกรองใน URL ใช้รายการ field ที่ระบุอย่างชัดเจนในการค้น ไม่ค้นจากการ serialize user ทั้งก้อนหรือข้อมูลรหัสผ่าน การเปลี่ยนคำค้น/ตัวกรองเริ่ม pagination ใหม่ และ returnTo ของรายละเอียดจำกัดให้เป็น path รายการภายในที่ตรงกัน
 
-- Page รับ route/context และประกอบหน้าจอ; component ดูแล interaction/การแสดงผลที่เกี่ยวข้อง; prototype ปัจจุบันมี action/state ใน store ส่วน slice ที่ refactor แล้วใช้ feature API/query กับ UI state ตามข้อ 1.1; style แยกตามบริบท
-- Component ของ feature เดียวเก็บใกล้ page หรือใน `components/chapter/` ตามโครงสร้างเดิม ย้ายเป็น shared component เมื่อมีการใช้ร่วมกันจริง
+- โครงสร้าง Feature ภายใน `apps/web` และ `apps/admin`: จัดเป็นสัดส่วนตามมาตรฐาน `features/<feature-name>/` ประกอบด้วย `pages/` (สำหรับ route entrypoints), `components/` (สำหรับ UI ย่อย), `styles/` (สำหรับ stylesheets ประจำ feature), และ `api/`/`hooks/` (สำหรับ query/mutations)
+- **กฎของโฟลเดอร์ `pages/` และสไตล์:** โฟลเดอร์ `pages/` มีหน้าที่เป็น Route Directory เท่านั้น ต้องมีเฉพาะไฟล์หน้าจอ `.tsx` ล้วนๆ ห้ามวางไฟล์ `.css` ปนในโฟลเดอร์ `pages/` สไตล์ทั้งหมดของ feature ต้องเก็บไว้ในโฟลเดอร์ `styles/` ใต้ feature นั้นๆ (เช่น `features/course-authoring/styles/`) เพื่อให้โครงสร้างสะอาด มองเห็น route ทั้งหมดได้ชัดเจนในแวบเดียว และสะดวกต่อการตรวจสอบ/สกัดสไตล์เป็น Tailwind ในอนาคต
+- Component ของ feature เดียวเก็บใน `components/` ย้ายเป็น shared component เมื่อมีการใช้ร่วมกันจริงข้าม feature/app
 - ไม่รวมทั้งระบบเป็น JSX file เดียวหรือยัด HTML string ที่สร้างหน้าจอเอง ไม่ตั้ง abstractions ขนาดใหญ่เพื่อแก้จุดเล็ก
 - ใช้ functional React components, named exports ตามรอบข้าง แยก JSX ที่เพิ่มใหม่ให้อ่านง่าย ไม่ต่อ component ยาวทั้งหน้าบรรทัดเดียว
 - ตั้งชื่อให้บอกหน้าที่ ใช้ stable ID จาก helper เดิม ไม่ใช้ index เป็น key ของรายการที่เพิ่ม/ลบ/เรียงลำดับ

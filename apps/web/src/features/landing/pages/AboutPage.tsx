@@ -6,7 +6,7 @@ import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrom
 import { landingTheme } from '@melearn/ui';
 import { founders, FounderPortrait, StoryReveal } from './BrandStory';
 import '@legacy/pages/landing/landing.css';
-import './brand-story.css';
+import '../styles/brand-story.css';
 
 interface Principle {
   title: string;

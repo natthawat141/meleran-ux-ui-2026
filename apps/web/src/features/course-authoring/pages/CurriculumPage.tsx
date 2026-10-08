@@ -20,7 +20,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
 import { ContentTypeIcon } from '@legacy/components/common';
 import type { Chapter, CourseItem, CourseItemType, Quiz } from '@legacy/types';
-import './curriculum-workspace.css';
+import '../styles/curriculum-workspace.css';
 
 const contentKinds: { key: CourseItemType; label: string; icon: React.ReactNode }[] = [
   { key: 'video', label: 'วิดีโอ', icon: <PlayCircleOutlined /> },

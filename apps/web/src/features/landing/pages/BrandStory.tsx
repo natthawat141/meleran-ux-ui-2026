@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { motion, useReducedMotion } from 'motion/react';
-import './brand-story.css';
+import '../styles/brand-story.css';
 
 export interface Founder {
   id: number;

@@ -4,7 +4,7 @@ import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { useLms } from '@legacy/store';
 import { PageTitle } from '@melearn/ui';
 import type { RedeemCode } from '@legacy/types';
-import './access-codes.css';
+import '../styles/access-codes.css';
 
 const { Text } = Typography;
 

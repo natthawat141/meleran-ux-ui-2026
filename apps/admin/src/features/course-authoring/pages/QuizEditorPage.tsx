@@ -8,7 +8,7 @@ import { createId } from '@legacy/data';
 import { RichDocument } from '@melearn/ui';
 import { RichTextEditor } from '../components/chapter/RichTextEditor';
 import type { Question, Quiz } from '@legacy/types';
-import './quiz-editor-workspace.css';
+import '../styles/quiz-editor-workspace.css';
 
 interface QuestionDraft {
   id: string;

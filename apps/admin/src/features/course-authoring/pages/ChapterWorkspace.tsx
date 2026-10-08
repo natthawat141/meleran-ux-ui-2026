@@ -24,7 +24,7 @@ import { VideoEditor } from '../components/chapter/VideoEditor';
 import { AssessmentEditor, newQuestion } from '../components/chapter/AssessmentEditor';
 import { ChapterPreview } from '../components/chapter/ChapterPreview';
 import type { Chapter, Course, CourseItem, CourseItemType, Quiz } from '@legacy/types';
-import './chapter-workspace.css';
+import '../styles/chapter-workspace.css';
 
 const kinds: Record<CourseItemType, { label: string; icon: React.ReactNode }> = {
   video: { label: 'วิดีโอ', icon: <PlayCircleOutlined /> },
