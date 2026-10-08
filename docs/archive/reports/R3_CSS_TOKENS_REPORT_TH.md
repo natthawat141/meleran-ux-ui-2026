@@ -8,7 +8,7 @@
 
 ## สิ่งที่เปลี่ยน
 
-- เพิ่ม [`design-tokens.json`](../packages/ui/src/design-tokens.json) เป็น source of truth สำหรับ legacy light/dark palette, semantic colors, Mantine/Ant adapters, font/radius และ Landing brand profile ค่าที่ใช้ร่วมกันอ้าง token ด้วย `$path` เพื่อลดค่าหลักซ้ำ
+- เพิ่ม [`design-tokens.json`](../../../packages/ui/src/design-tokens.json) เป็น source of truth สำหรับ legacy light/dark palette, semantic colors, Mantine/Ant adapters, font/radius และ Landing brand profile ค่าที่ใช้ร่วมกันอ้าง token ด้วย `$path` เพื่อลดค่าหลักซ้ำ
 - เพิ่ม `design-tokens.ts` เพื่อ resolve token references ให้ TypeScript adapters ใช้ และปรับ `theme.ts`, `MelearnUiProvider.tsx` กับ Landing `ConfigProvider` ให้อ่าน object ชุดเดียวกัน
 - เพิ่ม `scripts/generate-ui-tokens.mjs` สร้าง `packages/ui/src/tokens.css` และ `tailwind.css` แบบ deterministic; `npm.cmd run tokens:check` ตรวจ generated files ว่าตรงกับ source และ root build scripts เรียก check ก่อน build
 - ย้าย Tailwind theme mapping/shadcn light-dark variables เข้า shared stylesheet โดยคงข้อห้าม Tailwind Preflight ไว้; เพิ่ม semantic utilities เช่น `bg-canvas`, `bg-surface`, `text-ink`, `border-line`, `bg-primary-soft` และ status colors
@@ -27,10 +27,10 @@
 
 ## วิธีแก้ token ต่อไป
 
-แก้ค่าที่ [`design-tokens.json`](../packages/ui/src/design-tokens.json) แล้วรัน `npm.cmd run tokens:generate`; ก่อน build/commit ให้รัน `npm.cmd run tokens:check` อย่าแก้ `tokens.css` หรือ `tailwind.css` โดยตรง เพราะ generator จะสร้างทับ ตรวจ light/dark aliases และ foreground/hover/focus/disabled รวมทั้ง color scope ของ Landing หลังเปลี่ยน token
+แก้ค่าที่ [`design-tokens.json`](../../../packages/ui/src/design-tokens.json) แล้วรัน `npm.cmd run tokens:generate`; ก่อน build/commit ให้รัน `npm.cmd run tokens:check` อย่าแก้ `tokens.css` หรือ `tailwind.css` โดยตรง เพราะ generator จะสร้างทับ ตรวจ light/dark aliases และ foreground/hover/focus/disabled รวมทั้ง color scope ของ Landing หลังเปลี่ยน token
 
 ## งานถัดไป
 
-R3b code gate ผ่าน แต่ visual QA ยังเปิดตามเกณฑ์ใน [แผน refactor](FRONTEND_REFACTOR_PLAN_TH.md) งานถัดไปคือ R3c แยก route modules/layouts/guards ตาม route ledger โดยรักษา URL/redirect/no-access behavior; การตรวจ visual ของ R2b/R3a/R3b ต้องบันทึกแยกตามหน้าที่เปิดจริง
+R3b code gate ผ่าน แต่ visual QA ยังเปิดตามเกณฑ์ใน [แผน refactor](../../FRONTEND_REFACTOR_PLAN_TH.md) งานถัดไปคือ R3c แยก route modules/layouts/guards ตาม route ledger โดยรักษา URL/redirect/no-access behavior; การตรวจ visual ของ R2b/R3a/R3b ต้องบันทึกแยกตามหน้าที่เปิดจริง
 
 งานนี้เตรียมโครงสร้าง frontend ไม่ได้เชื่อม API จริงและไม่ใช่หลักฐานว่า Web/Admin พร้อม Production

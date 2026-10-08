@@ -1,6 +1,6 @@
 # R4b-flow B — แคตตาล็อกสาธารณะในโหมดพัฒนา
 
-สถานะ: guest Catalog + Landing และ free Enrollment อ่าน provisional mock ขณะ `vite dev`; Auth และ R7 learner pages มี integration report แยกที่ [R7 progress](R7_API_MOCK_PROGRESS_TH.md). Contract ยังเป็น Draft และไม่มี DTO ใน `packages/contracts`.
+สถานะ: guest Catalog + Landing และ free Enrollment อ่าน provisional mock ขณะ `vite dev`; Auth และ R7 learner pages มี integration report แยกที่ [R7 progress](../../R7_API_MOCK_PROGRESS_TH.md). Contract ยังเป็น Draft และไม่มี DTO ใน `packages/contracts`.
 
 ## สิ่งที่เปลี่ยน
 

@@ -56,7 +56,7 @@ Preview mode ใช้เปิด prototype/integration routes ตาม `FEATU
 - Blog index/article, Instructor public profile, About, Login และ Register render ข้อมูลในหน้าจอ
 - `/learn` และ `/teach/courses` ที่ไม่มี session พาไป Login พร้อมเก็บ `next`; Admin `/admin` พาไป Admin login พร้อม `next=/admin`
 
-การตรวจใน R3c รอบแรกไม่ได้เปลี่ยนหรือล้าง browser session/localStorage เพื่อจำลองบทบาท จึงยังไม่ได้เปิดหน้าหลัง login ของ Learner, Instructor หรือ Admin ในรอบนั้น; การ spot-check authenticated screens ด้วย demo account ที่ทำต่อภายหลัง พร้อมผลตรวจ responsive/accessibility ที่ยังค้างและ API limitations อยู่ใน [FRONTEND_V1_6_UI_AUDIT_TH.md](FRONTEND_V1_6_UI_AUDIT_TH.md)
+การตรวจใน R3c รอบแรกไม่ได้เปลี่ยนหรือล้าง browser session/localStorage เพื่อจำลองบทบาท จึงยังไม่ได้เปิดหน้าหลัง login ของ Learner, Instructor หรือ Admin ในรอบนั้น; การ spot-check authenticated screens ด้วย demo account ที่ทำต่อภายหลัง พร้อมผลตรวจ responsive/accessibility ที่ยังค้างและ API limitations อยู่ใน [FRONTEND_V1_6_UI_AUDIT_TH.md](../../FRONTEND_V1_6_UI_AUDIT_TH.md)
 
 ## ขั้นถัดไป
 

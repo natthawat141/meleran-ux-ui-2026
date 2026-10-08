@@ -114,7 +114,7 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 Browser smoke ที่ทำ 8 ต.ค. ยืนยัน Web free-enrollment → lesson progress → quiz/essay grading → completion/certificate และ Web paid Checkout → signed mock webhook → entitlement; Admin ค้น Payment ที่สร้างจาก Web และเห็น fulfillment/event. หน้า `/courses/:slug` คง URL เดิมและ resolve ไป detail ด้วย course id ผ่าน public list เพราะ draft API detail รับ id เท่านั้น.
 
-Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](R4B_FLOW_B_CATALOG_TH.md)
+Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](archive/reports/R4B_FLOW_B_CATALOG_TH.md)
 
 ยังไม่ได้ทำหรือยังไม่ยืนยัน:
 

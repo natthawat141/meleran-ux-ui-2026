@@ -51,7 +51,7 @@
 | เอกสาร/กติกา | ลิงก์ path ความสอดคล้อง และ whitespace; ไม่ต้อง build แอปเพียงเพราะแก้เอกสาร |
 | Source JavaScript | Build และ flow ที่สัมพันธ์กับการเปลี่ยน |
 | Source TypeScript | Typecheck, build และ flow ที่สัมพันธ์กับการเปลี่ยน |
-| Migration ทั้งระบบ | เกณฑ์ใน [คำสั่งย้าย TypeScript](TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md) รวมการรักษา UI/ข้อมูลเดิม |
+| Migration ทั้งระบบ | เกณฑ์ใน [คำสั่งย้าย TypeScript](archive/reports/TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md) รวมการรักษา UI/ข้อมูลเดิม |
 
 ตรวจ whitespace ของไฟล์ใหม่ด้วย เพราะ `git diff --check` ปกติไม่ครอบคลุม untracked จนกว่าจะ stage
 

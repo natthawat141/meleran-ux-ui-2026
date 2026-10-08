@@ -2,7 +2,7 @@
 
 วันที่ 7 ตุลาคม 2026 · branch `refactor/v1-api-ready`
 
-ผู้ใช้สั่ง “ทำต่อเลย” หลังรับรายงาน R0 จึงเริ่ม implementation ตาม [execution plan](FRONTEND_REFACTOR_PLAN_TH.md) โดยไม่ deploy/merge main หรือ reset ข้อมูลใน browser ขอบเขตธุรกิจยังเป็น [Final 1.6](MELEARN_V1_SCOPE.md) ผลต่อ API จริงต้องตรวจแยกจาก prototype
+ผู้ใช้สั่ง “ทำต่อเลย” หลังรับรายงาน R0 จึงเริ่ม implementation ตาม [execution plan](../../FRONTEND_REFACTOR_PLAN_TH.md) โดยไม่ deploy/merge main หรือ reset ข้อมูลใน browser ขอบเขตธุรกิจยังเป็น [Final 1.6](../../MELEARN_V1_SCOPE.md) ผลต่อ API จริงต้องตรวจแยกจาก prototype
 
 ## จุดเริ่มและขอบเขต
 

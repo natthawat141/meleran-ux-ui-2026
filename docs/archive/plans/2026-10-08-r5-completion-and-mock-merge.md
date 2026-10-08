@@ -14,7 +14,7 @@
 
 ## Global Constraints
 
-- รักษา URL, Route Guard และ Navigation behavior ทั้งหมดตาม [ROUTE_MIGRATION_LEDGER_TH.md](docs/ROUTE_MIGRATION_LEDGER_TH.md)
+- รักษา URL, Route Guard และ Navigation behavior ทั้งหมดตาม [ROUTE_MIGRATION_LEDGER_TH.md](../../ROUTE_MIGRATION_LEDGER_TH.md)
 - ห้าม App นำเข้าโค้ดข้ามกัน (`apps/web` ห้าม import จาก `apps/admin` และในทางกลับกัน)
 - ไม่แตะต้องหรือ staging ไฟล์ `.codex/README.md` ซึ่งมีงานอื่นแก้ไขค้างอยู่
 - ยังคงใช้ `@legacy/store` เป็น demo bridge ชั่วคราวสำหรับการทำงานของหน้าจอจนกว่าจะต่อ API ใน R4b
@@ -187,13 +187,13 @@ Expected: PASS ทั้ง Web และ Admin
 ### Task 5: บันทึกรายงาน R5e และ Commit Checkpoint
 
 **Files:**
-- Create: `docs/R5E_AUTH_ACCOUNT_MANAGEMENT_OWNERSHIP_TH.md`
+- Create: `docs/archive/reports/R5E_AUTH_ACCOUNT_MANAGEMENT_OWNERSHIP_TH.md`
 - Modify: `docs/README.md`
 - Modify: `docs/FRONTEND_REFACTOR_PLAN_TH.md`
 
 - [ ] **Step 1: เขียนรายงานสรุปผล R5e**
 
-บันทึกผลการย้าย AccessCodes, Profile, Auth, และ Blog decoupling ลงใน `docs/R5E_AUTH_ACCOUNT_MANAGEMENT_OWNERSHIP_TH.md`
+บันทึกผลการย้าย AccessCodes, Profile, Auth, และ Blog decoupling ลงใน `docs/archive/reports/R5E_AUTH_ACCOUNT_MANAGEMENT_OWNERSHIP_TH.md`
 
 - [ ] **Step 2: อัปเดตสถานะในแผน Refactor**
 
@@ -243,7 +243,7 @@ Run: `git push origin refactor/v1-api-ready`
 
 ## Execution Handoff
 
-Plan complete and saved to `docs/superpowers/plans/2026-10-08-r5-completion-and-mock-merge.md`. Two execution options:
+Plan complete and saved to `docs/archive/plans/2026-10-08-r5-completion-and-mock-merge.md`. Two execution options:
 
 1. **Inline Execution (Recommended for this session):** ดำเนินการตาม Tasks 1 ถึง 6 ในเซสชันนี้ทีละ Task พร้อมรัน Verification และ Checkpoints
 2. **Subagent-Driven:** เรียก subagent เข้ามาช่วยดำเนินการทีละ Task ตามลำดับ

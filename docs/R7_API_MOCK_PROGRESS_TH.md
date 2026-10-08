@@ -47,7 +47,7 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 - Mock server เก็บข้อมูลใน memory; restart แล้ว Payment/Enrollment/Progress/Attempt/Certificate/AI history/transcript หาย
 - ยังไม่ได้ browser-interact ครบทุก flow: AI chat/practice, redeem, Admin สร้าง/เพิกถอน code และแก้ Transcript ยังต้องตรวจ; responsive/accessibility matrix ยังเปิด. Video URL ใน seed เป็น placeholder ที่ YouTube แจ้ง unavailable แต่หน้า progress/resume/complete ทำงานกับ mock ได้; ไม่ถือเป็นการตรวจสื่อจริง
 - ไม่ถอน legacy fallback เพราะยังเป็นเส้นทาง production prototype; R10 cleanup รอ real API replacement
-- R7–R10 flow validation ในรายงานนี้ไม่ได้รัน Docker; R11 container build/runtime verification ทำภายหลังแล้ว ดู [รายงาน R11](R11_CONTAINER_VERIFICATION_TH.md)
+- R7–R10 flow validation ในรายงานนี้ไม่ได้รัน Docker; R11 container build/runtime verification ทำภายหลังแล้ว ดู [รายงาน R11](archive/reports/R11_CONTAINER_VERIFICATION_TH.md)
 
 ## การตรวจล่าสุด
 
