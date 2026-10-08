@@ -1,0 +1,17 @@
+.member-catalog-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.member-catalog-controls > .ant-input-affix-wrapper { flex: 1 1 250px; }
+.member-catalog-controls > .ant-select { width: 180px; }
+.member-catalog-course { height: 100%; display: flex; flex-direction: column; }
+.member-catalog-course .course-card { flex: 1; height: auto; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.member-catalog-course-status { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 12px 12px; background: var(--surface); }
+.member-catalog-course-actions { display: flex; justify-content: space-between; flex-wrap: wrap; }
+.member-course-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 28px; margin: 24px 0; }
+.member-course-summary > img { width: 100%; border-radius: 12px; align-self: start; }
+.member-course-summary > div { display: grid; gap: 16px; align-content: start; min-width: 0; }
+.member-course-teacher { display: flex; align-items: center; gap: 10px; }
+@media (max-width: 760px) { .member-course-summary { grid-template-columns: 1fr; } .member-catalog-controls > .ant-segmented { max-width: 100%; } }
+@media (max-width: 760px) {
+  .member-catalog .page-title > div:first-child,
+  .member-course-detail .page-title > div:first-child,
+  .member-catalog .page-title-actions { flex: 0 1 auto; }
+}

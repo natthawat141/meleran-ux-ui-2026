@@ -62,6 +62,17 @@ export {
 } from './components/common';
 export { NoAccessPage, NotFoundPage } from './components/SystemPages';
 export { AuthFrame, type AuthFrameProps } from './components/AuthFrame';
+export { LandingHeader, LandingFooter, MelearnLogo, MainNavigation, type LandingUser } from './components/LandingChrome';
+export {
+  PublicShell,
+  WorkspaceShell,
+  Brand,
+  WorkspaceNotifications,
+  type ShellIdentity,
+  type ShellNotificationItem,
+} from './components/Shell';
+export { FeatureRoute, featureElement } from './components/FeatureRoute';
 
 // Shared Formatters & Utilities
 export { formatPrice, flattenItems, createId, instructorFor } from './lib/formatters';
+export { blogCovers, blogCoverFor, type BlogCoverOption } from './lib/blog';

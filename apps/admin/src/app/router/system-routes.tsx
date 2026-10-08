@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate, Route, useLocation } from 'react-router-dom';
-import { WorkspaceShell } from '@legacy/components/Shell';
-import { NoAccessPage, NotFoundPage } from '@melearn/ui';
+import { NoAccessPage, NotFoundPage, WorkspaceShell } from '@melearn/ui';
 import { resolveAdminCompatibilityRoute } from '../../route-compatibility';
 
 /* Allowlisted migration paths; Instructor and retired grading paths fail closed. */

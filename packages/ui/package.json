@@ -6,7 +6,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./tailwind.css": "./src/tailwind.css",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./styles/*": "./src/styles/*",
+    "./assets/*": "./src/assets/*"
   },
   "peerDependencies": {
     "@base-ui/react": "^1.8.0",

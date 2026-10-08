@@ -3,11 +3,11 @@ import { Alert, Button, Input, Modal, Popconfirm, Select, Spin, Typography } fro
 import { NavLink } from '@mantine/core';
 import { IconArrowUp, IconBook2, IconMessageChatbot, IconPencil, IconSparkles, IconTrash } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
-import logo from '@legacy/assets/melearn-ui/logo.PNG';
+import logo from '@melearn/ui/assets/melearn-ui/logo.PNG';
 import { useAuthSession } from '../../auth/api/AuthSessionProvider';
 import { useAiContextCourses, useAiConversations, useAiMessages, useAiUsage, useAnswerAiPractice, useCreateAiConversation, useDeleteAiConversation, useRenameAiConversation, useSendAiMessage } from '../hooks/use-ai';
 import type { AiMessage } from '../api/ai-api';
-import '@legacy/pages/learner/learner-ai.css';
+import '@melearn/ui/styles/learner-ai.css';
 
 const starters = ['ช่วยสรุปเรื่องที่กำลังเรียน', 'สร้างแบบฝึกหัดเรื่องเศษส่วน 5 ข้อ', 'อธิบายแนวคิดนี้ให้เข้าใจง่าย'];
 function makeRequestId() { return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`; }

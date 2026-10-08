@@ -9,9 +9,9 @@ import { QueryProvider } from './app/providers/QueryProvider';
 import './app.css';
 import '@mantine/core/styles.css';
 import '@fontsource-variable/anuphan';
-import '@legacy/styles.css';
-import '@legacy/system-theme.css';
-import '@legacy/workspace-responsive.css';
+import '@melearn/ui/styles/styles.css';
+import '@melearn/ui/styles/system-theme.css';
+import '@melearn/ui/styles/workspace-responsive.css';
 
 document.documentElement.dataset.theme = defaultColorMode;
 const rootElement = document.getElementById('root');

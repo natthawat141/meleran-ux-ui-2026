@@ -1,8 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation, useParams } from 'react-router-dom';
-import { PublicShell, WorkspaceShell } from '@legacy/components/Shell';
+import { NoAccessPage, PublicShell, WorkspaceShell } from '@melearn/ui';
 import { useLms } from '@legacy/store';
-import { NoAccessPage } from '@melearn/ui';
 import type { Role } from '@melearn/contracts';
 import { VerifyEmailPage } from '../../features/auth/pages/AuthPages';
 import { useAuthSession } from '../../features/auth/api/AuthSessionProvider';

@@ -2,10 +2,9 @@ import React, { useEffect } from 'react';
 import { Button, ConfigProvider } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRightOutlined } from '@ant-design/icons';
-import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrome';
-import { landingTheme } from '@melearn/ui';
+import { LandingFooter, LandingHeader, landingTheme } from '@melearn/ui';
 import { founders, FounderPortrait, StoryReveal } from './BrandStory';
-import '@legacy/pages/landing/landing.css';
+import '@melearn/ui/styles/landing.css';
 import '../styles/brand-story.css';
 
 interface Principle {

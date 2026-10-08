@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { ROUTE_FEATURES } from '../src/config/features.ts';
+import { ROUTE_FEATURES } from '../packages/contracts/src/features.ts';
 import { readAppRouteInventory } from '../scripts/lib/app-route-inventory.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

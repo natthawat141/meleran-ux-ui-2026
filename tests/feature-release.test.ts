@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { ROUTE_FEATURES, FEATURES, getFeatureEnvironment, isFeatureEnabled } from '../src/config/features.ts';
+import { ROUTE_FEATURES, FEATURES, getFeatureEnvironment, isFeatureEnabled } from '../packages/contracts/src/features.ts';
 import { readAppRouteInventory } from '../scripts/lib/app-route-inventory.mjs';
 
 const statuses = ['prototype', 'integration', 'released', 'disabled'] as const;

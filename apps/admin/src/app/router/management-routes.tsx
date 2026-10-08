@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { featureElement } from '@legacy/components/FeatureRoute';
+import { featureElement } from '@melearn/ui';
 import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorsPage, AdminCoursesPage, AdminCourseDetailPage } from '../../features/management/pages/AdminPages';
 import { CourseReviewPage } from '../../features/course-approval/pages/CourseReviewPage';
 import { AccessCodesPage } from '../../features/management/pages/AccessCodesPage';

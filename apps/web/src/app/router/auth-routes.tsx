@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { featureElement } from '@legacy/components/FeatureRoute';
+import { featureElement } from '@melearn/ui';
 import { LoginPage, RegisterPage, DemoAccountPage, VerifyEmailPage } from '../../features/auth/pages/AuthPages';
 
 export const authRoutes = (

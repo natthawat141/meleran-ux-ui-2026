@@ -3,11 +3,9 @@ import { ConfigProvider, Input, Segmented, Table, type TableProps } from 'antd';
 import { AppstoreOutlined, ArrowLeftOutlined, ArrowRightOutlined, SearchOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { blogCoverFor } from '@legacy/data';
-import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrome';
-import { RichDocument, landingTheme } from '@melearn/ui';
+import { LandingFooter, LandingHeader, RichDocument, blogCoverFor, landingTheme } from '@melearn/ui';
 import type { BlogPost, User } from '@melearn/contracts';
-import '@legacy/pages/landing/landing.css';
+import '@melearn/ui/styles/landing.css';
 import '../styles/blog.css';
 
 const dateLabel = (value?: string | null) =>
