@@ -6,8 +6,9 @@
       "@legacy/*": ["../../src/*"],
       "@melearn/ui": ["../../packages/ui/src/index.ts"],
       "@melearn/contracts": ["../../packages/contracts/src/index.ts"],
-      "@melearn/api-client": ["../../packages/api-client/src/index.ts"]
+      "@melearn/api-client": ["../../packages/api-client/src/index.ts"],
+      "@melearn/course-authoring": ["../../packages/course-authoring/src/index.ts"]
     }
   },
-  "include": ["src", "vite.config.ts", "../../src", "../../packages/ui/src", "../../packages/contracts/src", "../../packages/api-client/src"]
+  "include": ["src", "vite.config.ts", "../../src", "../../packages/ui/src", "../../packages/contracts/src", "../../packages/api-client/src", "../../packages/course-authoring/src"]
 }

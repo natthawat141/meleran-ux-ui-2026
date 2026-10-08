@@ -21,7 +21,8 @@
 
     /* Path aliases */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@melearn/course-authoring": ["./packages/course-authoring/src/index.ts"]
     }
   },
   "include": ["src", "vite.config.ts", "tests/**/*.ts"]

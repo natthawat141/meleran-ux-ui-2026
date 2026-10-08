@@ -17,6 +17,7 @@
     "@mantine/hooks": "^9.6.2",
     "@melearn/api-client": "0.1.0",
     "@melearn/contracts": "0.1.0",
+    "@melearn/course-authoring": "0.1.0",
     "@melearn/ui": "0.1.0",
     "@tabler/icons-react": "^3.48.0",
     "@tiptap/extension-image": "^3.31.3",

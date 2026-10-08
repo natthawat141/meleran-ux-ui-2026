@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const editorPath = new URL('../src/features/course-authoring/CourseMetadataEditor.tsx', import.meta.url);
+const editorPath = new URL('../packages/course-authoring/src/CourseMetadataEditor.tsx', import.meta.url);
 const hostPath = new URL('../src/pages/instructor/CoursePages.tsx', import.meta.url);
 
 test('course metadata editor stays controlled and independent from prototype app services', async () => {
@@ -16,6 +16,7 @@ test('course metadata editor stays controlled and independent from prototype app
   assert.match(editor, /ImageUploadField: ComponentType/);
   assert.match(editor, /StatusTag: ComponentType/);
   assert.doesNotMatch(editor, /from ['"][^'"]*\/(store|router|data|mocks|types|pages|layouts)(\/|['"])/);
+  assert.doesNotMatch(editor, /@legacy\/|@melearn\/(?:web|admin)/);
   assert.doesNotMatch(editor, /useLms|useNavigate|useParams|saveChapterWorkspace|saveVideoTranscript|Transcript|Melearn AI/);
 });
 

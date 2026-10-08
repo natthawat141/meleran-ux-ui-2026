@@ -24,7 +24,7 @@ import type { Course } from '../../types';
 import {
   CourseMetadataEditor,
   type CourseMetadataFormValues,
-} from '../../features/course-authoring/CourseMetadataEditor';
+} from '@melearn/course-authoring';
 
 const { Text, Title } = Typography;
 
