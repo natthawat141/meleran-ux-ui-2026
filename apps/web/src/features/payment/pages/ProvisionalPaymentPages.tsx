@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Input, Result, Space, Spin, Typography, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { PageTitle } from '@legacy/components/common';
+import { PageTitle } from '@melearn/ui';
 import { devCatalogApi } from '../../courses/api/dev-catalog-client';
 import { usePaymentStatus, useRedeemCourseCode, useSimulateStripeCompletion, useStartPayment } from '../hooks/use-payment';
 

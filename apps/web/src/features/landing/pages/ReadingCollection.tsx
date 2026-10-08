@@ -3,7 +3,7 @@ import { Tabs } from 'antd';
 import { ArrowRightOutlined, BookOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { landingCover } from './LandingArtwork';
-import type { BlogPost } from '@legacy/types';
+import type { BlogPost } from '@melearn/contracts';
 
 export interface ReadingCollectionProps {
   posts: BlogPost[];

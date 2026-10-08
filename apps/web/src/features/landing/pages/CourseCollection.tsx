@@ -1,15 +1,15 @@
 import React from 'react';
 import { ArrowRightOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { formatPrice, instructorFor, flattenItems } from '@legacy/data';
+import { formatPrice, instructorFor, flattenItems } from '@melearn/ui';
 import { landingCover } from './LandingArtwork';
-import type { Course, LmsData } from '@legacy/types';
+import type { Course, User } from '@melearn/contracts';
 import { useDevCatalogList } from '../../courses/hooks/use-dev-catalog';
 import { formatCatalogPrice, safeCatalogCoverUrl } from '../../courses/api/catalog-display';
 
 interface LandingCourseCardProps {
   course: Course;
-  data: LmsData;
+  data: { users: User[] };
 }
 
 function LandingCourseCard({ course, data }: LandingCourseCardProps) {
@@ -43,7 +43,7 @@ function LandingCourseCard({ course, data }: LandingCourseCardProps) {
 
 export interface CourseCollectionProps {
   courses: Course[];
-  data: LmsData;
+  data: { users: User[] };
 }
 
 export function CourseCollection({ courses, data }: CourseCollectionProps) {

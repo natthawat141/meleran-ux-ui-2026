@@ -2,8 +2,7 @@ import { Button, Empty, Typography } from 'antd';
 import { ArrowRightOutlined, BookOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { PageTitle, StatusTag } from '@melearn/ui';
-import { flattenItems } from '@legacy/data';
+import { PageTitle, StatusTag, flattenItems } from '@melearn/ui';
 
 const { Text, Title } = Typography;
 export function CourseOverviewPage() {

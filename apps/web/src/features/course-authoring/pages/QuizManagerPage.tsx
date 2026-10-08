@@ -3,7 +3,7 @@ import type { TableProps } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
 import { PageTitle } from '@melearn/ui';
-import type { Quiz } from '@legacy/types';
+import type { Quiz } from '@melearn/contracts';
 import '../styles/grading-workspace.css';
 
 const { Text } = Typography;

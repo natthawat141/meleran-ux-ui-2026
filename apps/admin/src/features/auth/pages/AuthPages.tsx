@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Form, Input, Typography } from 'antd';
 import { ArrowLeftOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AuthFrame } from '@legacy/components/Shell';
+import { AuthFrame } from '@melearn/ui';
 import { useLms } from '@legacy/store';
 import { DEMO_ACCOUNTS } from '@legacy/data';
-import { verificationResendRemainingMs } from '@legacy/lib/email-verification';
+import { verificationResendRemainingMs } from '@melearn/contracts';
 import { useAuthSession } from '../api/AuthSessionProvider';
 import { provisionalDemoAccounts, provisionalLoginError } from '../api/auth-session';
 import {

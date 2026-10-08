@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, Button, Card, Empty, Input, InputNumber, List, Space, Typography, message } from 'antd';
-import { PageTitle } from '@legacy/components/common';
+import { PageTitle } from '@melearn/ui';
 import { useGradeQuestion, useGradingQueue } from '../../learning/hooks/use-assessment';
 
 export function InstructorGradingPage() {

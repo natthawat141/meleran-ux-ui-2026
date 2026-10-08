@@ -26,3 +26,42 @@ export { appTheme, colorModeTokens, defaultColorMode, type ColorMode, type Color
 export { designTokens } from './design-tokens';
 export { landingTheme } from './landing-theme';
 export { RichDocument, textDocument, type RichDocumentProps, type RichTextNode } from './RichDocument';
+
+// Common widgets and layout chrome
+export { UserAvatar, type UserAvatarProps } from './components/UserAvatar';
+export { CourseCard, type CourseCardProps } from './components/CourseCard';
+export { CourseOutline, type CourseOutlineProps } from './components/CourseOutline';
+export {
+  DirectorySearch,
+  matchesDirectorySearch,
+  useDirectorySearch,
+  type DirectorySearchProps,
+  type DirectoryFilterOption,
+} from './components/DirectorySearch';
+export { ImageUploadField, readImageFile, type ImageUploadFieldProps } from './components/ImageUploadField';
+export {
+  SectionHeading,
+  ContentTypeIcon,
+  EmptyState,
+  CourseProgress,
+  confirmDelete,
+  showSaved,
+  showError,
+  RolePill,
+  DemoNote,
+  LearningEmptyAction,
+  StoryParagraphs,
+  StatLine,
+  appBrand,
+  type SectionHeadingProps,
+  type ContentTypeIconProps,
+  type EmptyStateProps,
+  type CourseProgressProps,
+  type ConfirmDeleteOptions,
+  type StatLineProps,
+} from './components/common';
+export { NoAccessPage, NotFoundPage } from './components/SystemPages';
+export { AuthFrame, type AuthFrameProps } from './components/AuthFrame';
+
+// Shared Formatters & Utilities
+export { formatPrice, flattenItems, createId, instructorFor } from './lib/formatters';

@@ -5,7 +5,7 @@ import { useLms } from '@legacy/store';
 import { blogCoverFor } from '@legacy/data';
 import { RichDocument } from '@melearn/ui';
 import { WorkspaceShell } from '@legacy/components/Shell';
-import type { BlogPost, User } from '@legacy/types';
+import type { BlogPost, User } from '@melearn/contracts';
 import '../styles/blog.css';
 
 const dateLabel = (value?: string | null) =>

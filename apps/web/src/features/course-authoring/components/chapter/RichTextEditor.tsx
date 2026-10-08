@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons';
 import type { RcFile } from 'antd/es/upload';
 import { textDocument, type RichTextNode } from '@melearn/ui';
-import { readImageFile } from '@legacy/components/ImageUploadField';
+import { readImageFile } from '@melearn/ui';
 
 const imageTypes = ['image/png', 'image/jpeg', 'image/webp'];
 const aligns = [

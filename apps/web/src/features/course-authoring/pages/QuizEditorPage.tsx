@@ -4,10 +4,9 @@ import type { FormInstance, FormListFieldData } from 'antd';
 import { ArrowDownOutlined, ArrowLeftOutlined, ArrowUpOutlined, CheckCircleOutlined, CopyOutlined, DeleteOutlined, DownOutlined, EllipsisOutlined, EyeOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { createId } from '@legacy/data';
-import { RichDocument } from '@melearn/ui';
+import { createId, RichDocument } from '@melearn/ui';
 import { RichTextEditor } from '../components/chapter/RichTextEditor';
-import type { Question, Quiz } from '@legacy/types';
+import type { Question, Quiz } from '@melearn/contracts';
 import '../styles/quiz-editor-workspace.css';
 
 interface QuestionDraft {

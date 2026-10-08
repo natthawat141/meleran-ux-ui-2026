@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
 import { PageTitle, StatusTag } from '@melearn/ui';
 import defaultCourseCover from '@legacy/assets/generated/course-default-v2.png';
-import { ImageUploadField } from '@legacy/components/ImageUploadField';
+import { ImageUploadField } from '@melearn/ui';
 import { CourseMetadataEditor, type CourseMetadataFormValues } from '@melearn/course-authoring';
 
 export function InstructorCourseEditorPage() {

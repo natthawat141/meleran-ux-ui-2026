@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Card, Empty, Input, List, Progress, Result, Space, Spin, Typography, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { PageTitle } from '@legacy/components/common';
+import { PageTitle } from '@melearn/ui';
 import { safeCatalogCoverUrl } from '../../courses/api/catalog-display';
 import type { LearningItem } from '../api/learning-api';
 import { useAuthSession } from '../../auth/api/AuthSessionProvider';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, Input, Segmented, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { RcFile } from 'antd/es/upload';
-import type { VideoItem } from '@legacy/types';
+import type { VideoItem } from '@melearn/contracts';
 
 export interface VideoEditorProps {
   item: VideoItem;

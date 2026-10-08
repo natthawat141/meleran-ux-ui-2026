@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Form, Input, Select, Typography, message } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
-import { ImageUploadField } from '@legacy/components/ImageUploadField';
-import { defaultUsername, validateProfile, type ProfileUserLike, type ProfileValues } from '@legacy/lib/profile-model';
+import { ImageUploadField } from '@melearn/ui';
+import { defaultUsername, validateProfile, type ProfileUserLike, type ProfileValues } from '@melearn/contracts';
 import './profile-settings.css';
 
 const { Text } = Typography;

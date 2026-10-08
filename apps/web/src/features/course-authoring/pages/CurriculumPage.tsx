@@ -18,8 +18,8 @@ import {
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { ContentTypeIcon } from '@legacy/components/common';
-import type { Chapter, CourseItem, CourseItemType, Quiz } from '@legacy/types';
+import { ContentTypeIcon } from '@melearn/ui';
+import type { Chapter, CourseItem, CourseItemType, Quiz } from '@melearn/contracts';
 import '../styles/curriculum-workspace.css';
 
 const contentKinds: { key: CourseItemType; label: string; icon: React.ReactNode }[] = [

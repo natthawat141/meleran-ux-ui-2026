@@ -3,10 +3,7 @@ import { Alert, Button, Space, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { PageTitle } from '@legacy/components/common';
-import { CourseOutline } from '@legacy/components/CourseOutline';
-import { UserAvatar } from '@legacy/components/UserAvatar';
-import { formatPrice, instructorFor } from '@legacy/data';
+import { PageTitle, CourseOutline, UserAvatar, formatPrice, instructorFor } from '@melearn/ui';
 
 const DevCourseDetailPage = import.meta.env.DEV
   ? lazy(() => import('./DevCourseDetailPage.tsx').then((module) => ({ default: module.DevCourseDetailPage })))

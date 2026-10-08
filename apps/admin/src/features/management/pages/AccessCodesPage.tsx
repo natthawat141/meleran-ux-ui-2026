@@ -3,7 +3,7 @@ import { Alert, Button, Empty, Form, Select, Space, Table, Tag, Typography, mess
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
 import { useLms } from '@legacy/store';
 import { PageTitle } from '@melearn/ui';
-import type { RedeemCode } from '@legacy/types';
+import type { RedeemCode } from '@melearn/contracts';
 import '../styles/access-codes.css';
 
 const { Text } = Typography;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { NoAccessPage, NotFoundPage } from '@legacy/pages/SystemPages';
+import { NoAccessPage, NotFoundPage } from '@melearn/ui';
 import { Public } from './access';
 
 export const systemRoutes = (

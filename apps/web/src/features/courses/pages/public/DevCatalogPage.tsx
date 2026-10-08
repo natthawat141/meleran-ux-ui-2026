@@ -3,7 +3,7 @@ import { Button, Col, Input, Row, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Text, Title } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import { PageTitle } from '@legacy/components/common';
+import { PageTitle } from '@melearn/ui';
 import { catalogCoverStyle, formatCatalogPrice } from '../../api/catalog-display.ts';
 import type { ProvisionalCourseSummary } from '../../api/catalog-provisional-contract.ts';
 import { useDebouncedValue, useDevCatalogCategories, useDevCatalogList } from '../../hooks/use-dev-catalog.ts';

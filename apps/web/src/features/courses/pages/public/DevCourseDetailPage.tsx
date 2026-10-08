@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Space, Tag, Typography } from 'antd';
 import { ArrowRightOutlined, CheckCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { PageTitle } from '@legacy/components/common';
+import { PageTitle } from '@melearn/ui';
 import { formatCatalogPrice, safeCatalogCoverUrl } from '../../api/catalog-display.ts';
 import type { ProvisionalOutlineItemType } from '../../api/catalog-provisional-contract.ts';
 import { useDevCatalogCourse } from '../../hooks/use-dev-catalog.ts';

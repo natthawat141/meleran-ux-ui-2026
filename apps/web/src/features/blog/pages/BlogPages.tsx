@@ -6,7 +6,7 @@ import { useLms } from '@legacy/store';
 import { blogCoverFor } from '@legacy/data';
 import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrome';
 import { RichDocument, landingTheme } from '@melearn/ui';
-import type { BlogPost, User } from '@legacy/types';
+import type { BlogPost, User } from '@melearn/contracts';
 import '@legacy/pages/landing/landing.css';
 import '../styles/blog.css';
 

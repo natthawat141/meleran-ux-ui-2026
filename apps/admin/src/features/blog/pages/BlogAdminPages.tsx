@@ -7,9 +7,9 @@ import type { JSONContent } from '@tiptap/react';
 import { useLms } from '@legacy/store';
 import { blogCoverFor } from '@legacy/data';
 import { PageTitle, RichDocument, textDocument } from '@melearn/ui';
-import { ImageUploadField } from '@legacy/components/ImageUploadField';
-import { RichTextEditor } from '@legacy/components/chapter/RichTextEditor';
-import type { BlogPost } from '@legacy/types';
+import { ImageUploadField } from '@melearn/ui';
+import { RichTextEditor } from '../../course-authoring/components/chapter/RichTextEditor';
+import type { BlogPost } from '@melearn/contracts';
 import '../styles/blog.css';
 import '../styles/blog-editor.css';
 

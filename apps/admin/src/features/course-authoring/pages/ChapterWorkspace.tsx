@@ -18,12 +18,12 @@ import {
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { createId } from '@legacy/data';
+import { createId } from '@melearn/ui';
 import { RichTextEditor } from '../components/chapter/RichTextEditor';
 import { VideoEditor } from '../components/chapter/VideoEditor';
 import { AssessmentEditor, newQuestion } from '../components/chapter/AssessmentEditor';
 import { ChapterPreview } from '../components/chapter/ChapterPreview';
-import type { Chapter, Course, CourseItem, CourseItemType, Quiz } from '@legacy/types';
+import type { Chapter, Course, CourseItem, CourseItemType, Quiz } from '@melearn/contracts';
 import '../styles/chapter-workspace.css';
 
 const kinds: Record<CourseItemType, { label: string; icon: React.ReactNode }> = {

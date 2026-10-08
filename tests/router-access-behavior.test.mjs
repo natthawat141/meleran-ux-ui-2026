@@ -32,6 +32,7 @@ async function loadAccess(appName) {
     '@legacy/store': { useLms: () => session },
     '@legacy/components/Shell': { PublicShell, WorkspaceShell },
     '@legacy/pages/SystemPages': { NoAccessPage },
+    '@melearn/ui': { NoAccessPage },
     '../../features/auth/pages/AuthPages': { VerifyEmailPage },
     '../../features/auth/api/AuthSessionProvider': { useAuthSession: () => ({ enabled: false, status: 'ready', user: null, logout: async () => {}, refresh: async () => null }) },
   };

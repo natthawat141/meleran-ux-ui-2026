@@ -4,11 +4,18 @@ import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowRightOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
-import { CourseProgress } from '@legacy/components/common';
-import { PageTitle, StatusTag } from '@melearn/ui';
-import { formatPrice, flattenItems, instructorFor } from '@legacy/data';
-import { DirectorySearch, matchesDirectorySearch, useDirectorySearch } from '@legacy/components/DirectorySearch';
-import type { Course, QuizAttempt, User } from '@legacy/types';
+import {
+  PageTitle,
+  StatusTag,
+  CourseProgress,
+  formatPrice,
+  flattenItems,
+  instructorFor,
+  DirectorySearch,
+  matchesDirectorySearch,
+  useDirectorySearch,
+} from '@melearn/ui';
+import type { Course, QuizAttempt, User } from '@melearn/contracts';
 import '../styles/admin-courses.css';
 import '../styles/admin-users.css';
 
