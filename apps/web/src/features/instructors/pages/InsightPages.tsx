@@ -2,7 +2,8 @@ import React from 'react';
 import { Alert, Avatar, Button, Empty, Progress, Table, Tag, Typography, message, type TableProps } from 'antd';
 import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useManagedData } from '../../instructors/api/useManagedData';
+import { useAuthoringWorkspace } from '../../course-authoring/api/useAuthoringWorkspace';
 import { PageTitle, StatusTag, flattenItems } from '@melearn/ui';
 import type { Course, User } from '@melearn/contracts';
 
@@ -10,7 +11,7 @@ const { Text, Title } = Typography;
 
 export function CoursePreviewPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, currentUser, submitCourseForReview, publishCourse } = useLms();
+  const { data, currentUser, submitCourseForReview, publishCourse } = useAuthoringWorkspace();
   const course = data.courses.find((item) => item.id === courseId);
 
   if (!course) return <Empty description="ไม่พบคอร์สนี้" />;
@@ -95,10 +96,10 @@ export function CoursePreviewPage() {
             block
             type="primary"
             disabled={!ready || (course.status !== 'draft' && course.status !== 'approved') || (course.status === 'draft' && currentUser?.role !== 'instructor' && currentUser?.role !== 'admin')}
-            onClick={() => {
+            onClick={async () => {
               const result = course.status === 'approved'
-                ? publishCourse(course.id)
-                : submitCourseForReview(course.id);
+                ? await publishCourse(course.id)
+                : await submitCourseForReview(course.id);
               if (result.ok) message.success(result.message); else message.error(result.message);
             }}
           >
@@ -122,42 +123,15 @@ interface LearnerRow {
 
 export function InstructorLearnersPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, currentUser } = useLms();
+  const { data, currentUser, roster } = useManagedData('roster');
   const currentUserId = currentUser?.id ?? '';
   const courses = data.courses.filter(
-    (course) => course.instructorId === currentUserId && (!courseId || course.id === courseId)
+    (course) => (currentUser?.role === 'admin' || course.instructorId === currentUserId) && (!courseId || course.id === courseId)
   );
   const courseIds = courses.map((course) => course.id);
   const enrollments = data.enrollments.filter((item) => courseIds.includes(item.courseId));
 
-  const rows: LearnerRow[] = enrollments.map((enrollment) => {
-    const course = data.courses.find((item) => item.id === enrollment.courseId);
-    const learner = data.users.find((item) => item.id === enrollment.userId);
-    const learnerId = learner?.id ?? '';
-    const items = flattenItems(course);
-    const completed = items.filter((item) =>
-      'quizId' in item
-        ? data.attempts.some(
-            (attempt) =>
-              attempt.quizId === item.quizId &&
-              attempt.userId === learnerId &&
-              attempt.passed
-          )
-        : data.progress[`${course?.id}:${item.id}`]?.[learnerId]
-    ).length;
-
-    return {
-      id: enrollment.id,
-      learner,
-      course,
-      completed,
-      total: items.length,
-      percent: items.length ? Math.round((completed / items.length) * 100) : 0,
-      certificate: data.certificates.some(
-        (cert) => cert.userId === learnerId && cert.courseId === course?.id
-      ),
-    };
-  });
+  const rows: LearnerRow[] = roster.map(row => ({id:row.id,learner:data.users.find(u=>u.id===row.user_id),course:data.courses.find(c=>c.id===row.course_id),completed:row.completed_items,total:row.total_items,percent:row.percent,certificate:Boolean(row.certificate)}));
 
   const columns: TableProps<LearnerRow>['columns'] = [
     {
@@ -196,7 +170,7 @@ export function InstructorLearnersPage() {
       <PageTitle
         eyebrow="ข้อมูลผู้เรียน"
         title={courseId ? courses[0]?.title ?? 'ผู้เรียน' : 'ผู้เรียนในคอร์สของฉัน'}
-        subtitle="ความคืบหน้าและสถานะใบรับรองมาจากกิจกรรมที่เกิดขึ้นในต้นแบบ"
+        subtitle="ความคืบหน้าและสถานะใบรับรองจากข้อมูลการเรียนที่บันทึกไว้"
       />
       <Table<LearnerRow>
         rowKey="id"

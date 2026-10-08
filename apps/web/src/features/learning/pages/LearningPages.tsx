@@ -1,3 +1,4 @@
+import { RichDocument } from '@melearn/ui';
 import React, { useState } from 'react';
 import { Alert, Button, Card, Empty, Input, List, Progress, Result, Space, Spin, Typography, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -66,7 +67,7 @@ export function LessonPage({ expectedType }: { expectedType: 'video' | 'article'
   const youtubeId = item.data.type === 'video' ? item.data.video_url?.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|watch\?v=))([\w-]{11})/)?.[1] : undefined;
   return <div className="public-page">
     <PageTitle eyebrow={course.data.title} title={item.data.title} actions={<Link to={`/learn/courses/${courseId}`}><Button>กลับไปที่เนื้อหาคอร์ส</Button></Link>} />
-    {expectedType === 'video' ? youtubeId ? <div className="lesson-video-frame"><iframe title={item.data.title} src={`https://www.youtube-nocookie.com/embed/${youtubeId}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div> : <Alert type="info" message="ไม่มีวิดีโอที่เปิดได้ในตัวอย่างนี้" /> : <Card><Typography.Paragraph style={{ whiteSpace: 'pre-wrap' }}>{item.data.body || 'ไม่มีเนื้อหาในบทอ่านนี้'}</Typography.Paragraph></Card>}
+    {expectedType === 'video' ? youtubeId ? <div className="lesson-video-frame"><iframe title={item.data.title} src={`https://www.youtube-nocookie.com/embed/${youtubeId}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div> : <Alert type="info" message="ไม่มีวิดีโอที่เปิดได้ในตัวอย่างนี้" /> : <Card><RichDocument document={item.data.body_doc} text={item.data.body??''} /></Card>}
     {expectedType === 'video' && <Card className="top-space"><Typography.Text>บันทึกตำแหน่งวิดีโอ (วินาที)</Typography.Text><Space><Input type="number" min={0} value={position} onChange={(event) => setPosition(Math.max(0, Number(event.target.value) || 0))} /><Button loading={saveResume.isPending} onClick={() => saveResume.mutate({ itemId, positionSeconds: position }, { onSuccess: () => void message.success('บันทึกตำแหน่งแล้ว') })}>บันทึกตำแหน่ง</Button></Space></Card>}
     <div className="top-space"><Button type="primary" loading={complete.isPending} disabled={Boolean(item.data.id && course.data.outline.flatMap((chapter) => chapter.items).find((entry) => entry.id === itemId)?.completed_at)} onClick={() => complete.mutate(itemId, { onSuccess: () => void message.success('บันทึกว่าเรียนรายการนี้เสร็จแล้ว') })}>ทำรายการนี้เสร็จ</Button>{complete.isError && <Alert className="top-space" type="error" message="บันทึกความคืบหน้าไม่สำเร็จ" />}</div>
   </div>;
@@ -106,7 +107,7 @@ export function QuizAttemptPage() {
   if (attempt.status !== 'in_progress') return <div className="public-page"><Result status="info" title="ส่งคำตอบแล้ว" subTitle={attempt.status === 'pending_review' ? 'มีคำตอบข้อเขียนรอผู้สอนตรวจ' : 'เปิดดูผลการทำแบบฝึกหัด'} extra={<Button type="primary" onClick={() => navigate(`/learn/attempts/${attemptId}/result`)}>ดูผล</Button>} /></div>;
   const setAnswer = (id: string, value: { option_ids?: string[]; text?: string; image_url?: string }) => setAnswers((current) => ({ ...current, [id]: value }));
   return <div className="public-page"><PageTitle eyebrow={`ครั้งที่ ${attempt.number}`} title="ทำแบบฝึกหัด" subtitle={`คะแนนเต็ม ${attempt.max}`} />
-    <Space direction="vertical" size="large" className="w-full">{attempt.questions.map((question) => <Card key={question.id} title={`${question.prompt} (${question.points} คะแนน)`}>
+    <Space direction="vertical" size="large" className="w-full">{attempt.questions.map((question) => <Card key={question.id} title={<><RichDocument document={question.prompt_doc} text={question.prompt} /><span>{question.points} คะแนน</span></>}>
       {(question.type === 'single_choice' || question.type === 'multiple_choice') && question.options.map((option) => <div key={option.id} className="top-space"><label><input type={question.type === 'single_choice' ? 'radio' : 'checkbox'} name={question.id} checked={(answers[question.id]?.option_ids ?? []).includes(option.id)} onChange={(event) => {
         if (question.type === 'single_choice') setAnswer(question.id, { option_ids: [option.id] });
         else { const selected = new Set(answers[question.id]?.option_ids ?? []); event.target.checked ? selected.add(option.id) : selected.delete(option.id); setAnswer(question.id, { option_ids: [...selected] }); }

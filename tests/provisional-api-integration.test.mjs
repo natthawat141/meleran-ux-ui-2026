@@ -216,7 +216,7 @@ test('authoring to catalog: a course is public only after review, approval and A
 
   const publicStatuses = async () => [(await guest.get(`courses/${id}`)).status, (await guest.get('courses')).body.items.some((course) => course.id === id)];
   assert.deepEqual(await publicStatuses(), [404, false]);
-  assert.equal((await owner.post(`courses/${id}/publish`, {})).status, 403, 'Instructors cannot publish');
+  assert.equal((await owner.post(`courses/${id}/publish`, {})).status, 409, 'Instructor cannot publish before approval');
 
   const review = await owner.post(`courses/${id}/submit-review`, { expected_revision: 2 });
   assert.equal(review.status, 201);

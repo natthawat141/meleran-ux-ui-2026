@@ -23,6 +23,7 @@ import { assessmentRoutes } from './flow-d-assessment.ts';
 import { authoringRoutes } from './flow-e-authoring.ts';
 import { paymentRoutes, createStripeSimulator, createDevStripeSimulationRoutes } from './flow-f-payments.ts';
 import { aiRoutes } from './flow-g-ai.ts';
+import { managementRoutes } from './management.ts';
 import { blogRoutes } from './flow-h-blog.ts';
 
 export const sessionCookieName = 'melearn_mock_session';
@@ -56,7 +57,7 @@ export interface ProvisionalApi {
 
 const allRoutes: readonly Route[] = [
   ...authRoutes, ...catalogRoutes, ...learningRoutes, ...assessmentRoutes,
-  ...authoringRoutes, ...paymentRoutes, ...aiRoutes, ...blogRoutes,
+  ...authoringRoutes, ...paymentRoutes, ...aiRoutes, ...blogRoutes, ...managementRoutes,
 ];
 
 function matchPath(pattern: string, segments: string[]): Record<string, string> | null {

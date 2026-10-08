@@ -3,7 +3,7 @@ import { createConnection } from 'node:net';
 import path from 'node:path';
 import type { Plugin } from 'vite';
 
-const port = 8787;
+const port = Number(process.env.MELEARN_MOCK_PORT ?? 8787);
 const healthUrl = `http://127.0.0.1:${port}/mock-api/v1/courses`;
 
 async function catalogApiHealthy(timeoutMs = 0): Promise<boolean> {

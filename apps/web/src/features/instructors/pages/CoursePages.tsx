@@ -10,14 +10,14 @@ import {
 } from 'antd';
 import { ArrowRightOutlined, PlusOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useManagedData } from '../api/useManagedData';
 import { CourseCard, PageTitle, SectionHeading, StatusTag, flattenItems } from '@melearn/ui';
 import type { Course } from '@melearn/contracts';
 
 const { Text } = Typography;
 
 export function InstructorDashboardPage() {
-  const { data, currentUser } = useLms();
+  const { data, currentUser, summary } = useManagedData('dashboard');
   const currentUserId = currentUser?.id ?? '';
   const courses = data.courses.filter(
     (course) => currentUser?.role === 'admin' || course.instructorId === currentUserId
@@ -26,11 +26,7 @@ export function InstructorDashboardPage() {
   const pending = data.attempts.filter(
     (attempt) => courseIds.includes(attempt.courseId) && attempt.essayStatus === 'pending'
   );
-  const learners = new Set(
-    data.enrollments
-      .filter((enrollment) => courseIds.includes(enrollment.courseId))
-      .map((enrollment) => enrollment.userId)
-  );
+
 
   return (
     <>
@@ -56,14 +52,14 @@ export function InstructorDashboardPage() {
         </div>
         <div>
           <span>ผู้เรียนที่ลงทะเบียน</span>
-          <strong>{learners.size}</strong>
+          <strong>{summary?.learner_count}</strong>
           <Link to="/teach/learners">
             ดูความคืบหน้า <ArrowRightOutlined />
           </Link>
         </div>
         <div>
           <span>ข้อเขียนรอตรวจ</span>
-          <strong>{pending.length}</strong>
+          <strong>{summary?.pending_grading_count}</strong>
           <Link to="/teach/quizzes">
             เปิดงานตรวจ <ArrowRightOutlined />
           </Link>
@@ -117,7 +113,7 @@ export function InstructorDashboardPage() {
 }
 
 export function InstructorCoursesPage() {
-  const { data, currentUser } = useLms();
+  const { data, currentUser } = useManagedData('courses');
   const navigate = useNavigate();
   const courses = data.courses.filter(
     (course) => currentUser?.role === 'admin' || course.instructorId === currentUser?.id

@@ -23,7 +23,7 @@ test('course metadata editor stays controlled and independent from prototype app
 
 test('Instructor page host owns Web draft, persistence, review, and navigation', async () => {
   const host = await readFile(webHostPath, 'utf8');
-  assert.match(host, /useLms\(\)/);
+  assert.match(host, /useAuthoringWorkspace\(\)/);
   assert.match(host, /Form\.useForm<CourseMetadataFormValues>/);
   assert.match(host, /saveCourse\(/);
   assert.match(host, /navigate\('\/teach\/courses\/' \+ savedId\)/);
@@ -35,7 +35,7 @@ test('Instructor page host owns Web draft, persistence, review, and navigation',
 
 test('Admin page host owns Admin instructor assignment, AI setting, and navigation', async () => {
   const host = await readFile(adminHostPath, 'utf8');
-  assert.match(host, /useLms\(\)/);
+  assert.match(host, /useAuthoringWorkspace\(\)/);
   assert.match(host, /saveCourse\(/);
   assert.match(host, /navigate\('\/admin\/courses\/' \+ savedId \+ '\/overview'\)/);
   assert.match(host, /data\.users/);

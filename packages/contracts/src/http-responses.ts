@@ -16,9 +16,9 @@ export interface WireLearningCourse {
   outline: Array<{ id: string; title: string; items: WireLearningItem[] }>;
   progress: WireLearningEnrollment['progress']; resume_item_id: string | null; certificate_id: string | null;
 }
-export interface WireLearningItemContent { id: string; type: WireLearningItem['type']; title: string; video_url?: string | null; body?: string | null; quiz?: { question_count: number; max_score: number } }
+export interface WireLearningItemContent { id: string; type: WireLearningItem['type']; title: string; video_url?: string | null; body?: string | null; body_doc?: import('./management-http.ts').JsonValue | null; quiz?: { question_count: number; max_score: number } }
 
-export interface WireAttemptQuestion { id: string; type: 'single_choice' | 'multiple_choice' | 'essay' | 'image'; prompt: string; points: number; options: Array<{ id: string; text: string }> }
+export interface WireAttemptQuestion { id: string; type: 'single_choice' | 'multiple_choice' | 'essay' | 'image'; prompt: string; prompt_doc?: import('./management-http.ts').JsonValue | null; points: number; options: Array<{ id: string; text: string }> }
 export interface WireAttemptView {
   id: string; item_id: string; course_id: string; number: number;
   status: 'in_progress' | 'pending_review' | 'graded'; started_at: string; submitted_at: string | null; graded_at: string | null;

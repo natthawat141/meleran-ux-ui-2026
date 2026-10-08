@@ -46,8 +46,8 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 ## 3. กติกาธุรกิจที่ mock บังคับ (จาก Scope Final 1.6)
 
 - คอร์สสาธารณะ/รายการ/detail เห็นเฉพาะ Published; Draft, Pending, Approved ตอบ 404 เหมือนไม่มีอยู่; Outline สาธารณะไม่มี video URL, เนื้อหา, เฉลย, หมายเหตุรีวิว
-- Admin เท่านั้นที่ Publish; Instructor ส่งรีวิวได้เฉพาะคอร์สตัวเอง; แก้ระหว่างรอรีวิวทำให้รีวิวเก่า stale (approve ไม่ได้); คอร์ส Published แก้แล้วมีผลทันที
-- สมัครเรียน: ฟรีเท่านั้นผ่าน `enroll`; คอร์สเสียเงินต้อง Stripe หรือ Redeem; หนึ่ง Enrollment ต่อ (ผู้ใช้, คอร์ส); Admin และเจ้าของคอร์สสมัครไม่ได้; ต้องยืนยันอีเมลก่อน
+- Admin approve/return; owner Instructor หรือ Admin Publish ได้หลัง current approval; Instructor ส่งรีวิวได้เฉพาะคอร์สตัวเอง; แก้ระหว่างรอรีวิวทำให้รีวิวเก่า stale (approve ไม่ได้); คอร์ส Published แก้แล้วมีผลทันที
+- สมัครเรียน: ฟรีเท่านั้นผ่าน `enroll`; คอร์สเสียเงินต้อง Stripe หรือ Redeem; หนึ่ง Enrollment ต่อ (ผู้ใช้, คอร์ส); Admin และเจ้าของคอร์สสมัครไม่ได้; self-email signup ต้องยืนยันอีเมลก่อน, บัญชี Admin-created ได้ตาม eligibility ของ server
 - Progress = รายการที่เรียนจบ ÷ รายการปัจจุบัน ไม่ปัดขึ้น; Quiz ผ่านเมื่อคะแนน **มากกว่า** 70% (เท่ากับ 70% ไม่ผ่าน คำนวณแบบจำนวนเต็ม); ใช้ attempt ที่ตรวจแล้วสูงสุด ไม่ลดจากครั้งหลัง; snapshot ข้อสอบถูกล็อกตั้งแต่เริ่มทำ; ข้อเขียนต้อง Instructor เจ้าของตรวจ
 - เรียนครบ 100% → สร้าง snapshot และใบรับรองเดียวต่อ Enrollment; เพิ่มเนื้อหาภายหลังไม่ทำให้คอร์สที่จบแล้วถอยกลับ
 - Stripe: Checkout ไม่ให้สิทธิ์; มีเฉพาะ webhook ที่เซ็นถูกต้องที่ให้สิทธิ์; idempotent ตาม `event_id`; fulfilment ที่ล้มเหลวลองใหม่ได้; หน้า status อ่านอย่างเดียว
@@ -108,20 +108,12 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ข้อจำกัด: test พิสูจน์ว่า mock สอดคล้องกันเองและกับ Scope เท่านั้น ไม่พิสูจน์ว่า Backend จริงจะตอบเหมือนกัน
 
-## 8. ที่ต่อเข้า Web/Admin แล้ว และที่ยังไม่ได้ทำ
+## 8. สถานะ Frontend integration — 9 ต.ค. 2026
 
-`vite dev` ของ Web/Admin ใช้ dev server `tools/provisional-api/dev-server.ts` ที่ `127.0.0.1:8787` ผ่าน Vite proxy `/mock-api`. Auth `/auth/login`, `/me`, `/auth/logout` ใช้ cookie แยก app; Web Landing/Catalog/detail และ free Enrollment อ่าน mock. Web R7 routes อ่าน enrollments, lessons, progress/resume, quiz attempts/results, Instructor grading และ certificates. Web R8 เพิ่มหน้า Checkout/status/Redeem; Admin เพิ่ม lookup Payment แบบอ่านอย่างเดียวทีละ ID และจัดการ redeem codes. R9 เพิ่ม Web AI conversations/history/course context/usage/AIPractice และ Admin ตั้งค่า AI support/แก้ transcript. Query cache แยกต่อ app และเคลียร์เมื่อ sign in/out.
+Web/Admin ใช้ app-owned HTTP client และ Query ทั้ง Authoring, Instructor management/grading, Admin management/review และ Blog editor รวมกับ Auth/Catalog/Learning/Payment/Redeem/AI ที่ย้ายก่อนหน้า. `packages/store` และ browser business persistence ถอนแล้ว; API failure ไม่ fallback ไป snapshot. Build default remote, dev default mock.
 
-Browser smoke ที่ทำ 8 ต.ค. ยืนยัน Web free-enrollment → lesson progress → quiz/essay grading → completion/certificate และ Web paid Checkout → signed mock webhook → entitlement; Admin ค้น Payment ที่สร้างจาก Web และเห็น fulfillment/event. หน้า `/courses/:slug` คง URL เดิมและ resolve ไป detail ด้วย course id ผ่าน public list เพราะ draft API detail รับ id เท่านั้น.
+Draft wire DTO และตัวอย่าง request/response/validation/error อยู่ [API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md); Backend ยังไม่ freeze. ดู [progress/ข้อจำกัด/หลักฐาน](R7_API_MOCK_PROGRESS_TH.md). Mock ไม่ส่ง global LmsData snapshot; resources แยก scope/owner และ public fields.
 
-Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](archive/reports/R4B_FLOW_B_CATALOG_TH.md)
+Dev server default 8787; Vite รับ `MELEARN_MOCK_PORT` สำหรับ isolated preview. Standalone รับ port ผ่าน CLI argument. ข้อมูล/session/history อยู่ใน memory และหายเมื่อ restart. ไม่มี real Google/email/Stripe/AI/media services หรือ durable database; production containers ไม่รวม mock server.
 
-ยังไม่ได้ทำหรือยังไม่ยืนยัน:
-
-- `/explore`, register/verification/reset, Admin business APIs และ Course Authoring ยังเป็น local/demo flows
-- หน้า Payment เป็น provisional flow: สร้างรายการและอ่าน status ได้ แต่ mock ไม่มี Stripe Checkout จริง จึงไม่ redirect ไป `checkout_url`; มี dev-only signed-event simulator สำหรับทดสอบ UI และไม่มีการให้สิทธิ์จาก success URL
-- Redeem codes/Enrollment/Payment/AI history/transcript อยู่ใน memory ของ mock; restart แล้วหาย และไม่มี API persistence ข้ามอุปกรณ์
-- AI ตอบด้วยข้อความ deterministic mock; ไม่มี model/provider จริง แม้ mock ทดสอบ quota, request dedupe, history ownership และ answer-key withholding
-- ยังไม่มี DTO ใน `packages/contracts` (รอ Backend freeze); TanStack Query ใช้เฉพาะ server-like state ที่ย้ายแล้ว
-- Dev session เป็นการจำลองใน memory; server restart ล้างบัญชี/Enrollment/Progress/Attempt/Certificate และไม่ยืนยัน persistence ข้ามอุปกรณ์
-- R10 ทำได้เพียง automated และ authenticated browser integration บาง journey กับ provisional API; ไม่มี Backend/OpenAPI, database, Stripe signing config หรือ AI provider จึงยังพิสูจน์ server permissions/persistence/operations และปิด R10/R13 ไม่ได้
+Browser หลักฐานรอบก่อนอ้าง revision เก่า. รอบ migration ล่าสุดเปิด preview ถูก ERR_BLOCKED_BY_CLIENT จึงยังไม่ผ่าน interactive UI acceptance. R10/R13 real integration gates ยังเปิด.

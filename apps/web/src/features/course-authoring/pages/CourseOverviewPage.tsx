@@ -1,18 +1,18 @@
 import { Button, Empty, Typography } from 'antd';
 import { ArrowRightOutlined, BookOutlined, TeamOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useAuthoringWorkspace } from '../api/useAuthoringWorkspace';
 import { PageTitle, StatusTag, flattenItems } from '@melearn/ui';
 
 const { Text, Title } = Typography;
 export function CourseOverviewPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data } = useLms();
+  const { data } = useAuthoringWorkspace();
   const course = data.courses.find((item) => item.id === courseId);
 
   if (!course) return <Empty description="ไม่พบคอร์สนี้" />;
 
-  const studentCount = data.enrollments.filter((item) => item.courseId === course.id).length;
+  const studentCount = course.enrollmentCount;
   const questionCount = data.quizzes
     .filter((quiz) => quiz.courseId === course.id)
     .reduce((sum, quiz) => sum + quiz.questions.length, 0);

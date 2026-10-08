@@ -61,7 +61,7 @@ async function forward(api: ReturnType<typeof createProvisionalApi>, incoming: I
 
 const entry = process.argv[1];
 if (entry && path.resolve(entry) === fileURLToPath(import.meta.url)) {
-  startProvisionalDevServer(provisionalCatalogPort).then((server) => {
+  startProvisionalDevServer(Number(process.argv[2] ?? provisionalCatalogPort)).then((server) => {
     const address = server.address();
     const port = typeof address === 'object' && address ? address.port : provisionalCatalogPort;
     console.log(`provisional catalog API http://127.0.0.1:${port}${provisionalCatalogBasePath}`);

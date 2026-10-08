@@ -42,7 +42,7 @@ function decodeItem(value: unknown): LearningItemContent {
   const record = object(value);
   return { id: text(record.id), type: text(record.type) as LearningItem['type'], title: text(record.title),
     ...(record.video_url !== undefined ? { video_url: nullableText(record.video_url) } : {}),
-    ...(record.body !== undefined ? { body: nullableText(record.body) } : {}),
+    ...(record.body !== undefined ? { body: nullableText(record.body),body_doc:(record.body_doc??null) as LearningItemContent['body_doc'] } : {}),
     ...(record.quiz !== undefined ? { quiz: object(record.quiz) as { question_count: number; max_score: number } } : {}) };
 }
 

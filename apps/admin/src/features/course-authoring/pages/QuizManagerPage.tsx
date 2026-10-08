@@ -1,15 +1,15 @@
 import { Button, Popconfirm, Space, Table, Typography, message } from 'antd';
 import type { TableProps } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useAuthoringWorkspace } from '../api/useAuthoringWorkspace';
 import { PageTitle } from '@melearn/ui';
-import type { Quiz } from '@melearn/contracts';
+import type { EditorQuiz as Quiz } from '@melearn/course-authoring';
 import '../styles/grading-workspace.css';
 
 const { Text } = Typography;
 
 export function QuizManagerPage() {
-  const { data, currentUser, removeQuiz } = useLms();
+  const { data, currentUser, removeQuiz } = useAuthoringWorkspace();
   const navigate = useNavigate();
   const { courseId } = useParams<{ courseId?: string }>();
   const myCourses = data.courses.filter(
@@ -24,7 +24,7 @@ export function QuizManagerPage() {
         <div className="table-course-name">
           <strong>{quiz.title}</strong>
           <Text type="secondary">
-            {quiz.questions.length} ข้อ · เกณฑ์ผ่าน {quiz.passPercent}%
+            {quiz.questionCount} ข้อ · เกณฑ์ผ่าน {quiz.passPercent}%
           </Text>
         </div>
       ),
@@ -44,8 +44,8 @@ export function QuizManagerPage() {
             title="ลบแบบทดสอบนี้หรือไม่"
             okText="ลบ"
             cancelText="ยกเลิก"
-            onConfirm={() => {
-              const result = removeQuiz(quiz.id);
+            onConfirm={async () => {
+              const result = await removeQuiz(quiz.id);
               result.ok ? message.success('ลบแบบทดสอบแล้ว') : message.error(result.message);
             }}
           >

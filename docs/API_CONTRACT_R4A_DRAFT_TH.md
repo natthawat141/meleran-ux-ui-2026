@@ -37,7 +37,7 @@
 | API base path/version | **รอ Backend** — `/api/v1` เป็นตัวอย่างเท่านั้น |
 | ID และ enum | **รอ Backend** — รูปแบบ ID, casing ของ enum และการคง ID ข้าม version |
 | เวลา | **ข้อเสนอ** — ส่งเวลาเป็น ISO-8601 UTC; UI แปลงตาม timezone ที่ scope ระบุ เช่น quota ใช้วัน Asia/Bangkok |
-| Success envelope | **ข้อเสนอ** — กำหนดให้สม่ำเสมอว่าจะคืน resource โดยตรงหรือมี `data`; อย่าลงโค้ดจนมีตัวอย่างจริง |
+| Success envelope | **Draft implemented** — คืน resource โดยตรงตาม HTTP mock/client; ตัวอย่างในภาคผนวก. Backend review ก่อน freeze |
 | Error envelope | **ข้อเสนอ** — มี machine-readable `code`, safe user-facing `message` และ `request_id`; Backend ยืนยัน HTTP status/code mapping |
 | Pagination/filter/sort | **รอ Backend** — รูปแบบ cursor/offset, default/max page size และ allowlist ของ sort/filter |
 | Session transport | **รอ decision** — cookie/session หรือ bearer, CSRF/CORS, refresh/logout behavior และการใช้ identity ข้าม origin ของ Web/Admin |
@@ -170,3 +170,198 @@ Candidate paths เป็นเพียงตัวช่วยสนทนา 
 ไม่เพิ่ม API สำหรับ Cart/Order history เต็ม, Refund/Finance dashboard, Revenue share, Referral, Inbox/ถามผู้สอน, Assignment แยก, ผู้สอนร่วม, Archive, Admin grading, Big Data/Release dashboards หรือ Admin ดูแชตของผู้เรียน เพราะไม่ได้อยู่ในขอบเขต Final 1.6 รอบแรก
 
 ไม่เลือก Backend framework/database, session provider, hosting, media provider นอก YouTube, live payment credentials หรือ deployment service แทนเจ้าของผลิตภัณฑ์
+
+
+## Screen HTTP Draft — Authoring / Instructor / Admin / Blog (9 ต.ค. 2026)
+
+ภาคผนวกนี้เป็น **Draft ที่ implement/test กับ HTTP mock แล้ว** ตามคำสั่งผู้ใช้ ไม่ใช่ frozen Backend spec. ตัวอย่าง error ตัวพิมพ์ใหญ่ด้านบนเป็น illustrative เก่า; integration ปัจจุบันใช้ lowercase codes ตามด้านล่าง. Auth/Profile/Catalog แบบละเอียดอ่าน [Flow AB Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md); Learning/Assessment/Certificate/Payment/Redeem/AI wire responses อยู่ [http-responses.ts](../packages/contracts/src/http-responses.ts). ภาคผนวกนี้เติมหน้าที่เพิ่งถอน store.
+
+Canonical types: [management-http.ts](../packages/contracts/src/management-http.ts), [blog.ts](../packages/contracts/src/blog.ts). Business/API adapters อยู่ใน feature ของแต่ละ app; shared course-authoring มี pure form conversion. UI camelCase models ไม่ใช่ JSON schema ของ Backend. ID/timestamps/revision/owner/history/score มาจาก server.
+
+### หน้าจอ → API → permission
+
+ทุก path ด้านล่างต่อหลัง base `/mock-api/v1` (dev) หรือ `/api/v1` (remote draft). Query lists คืน `{ "items": [], "next_cursor": null }`, ใช้ `limit`/`cursor`; limit/default/maximum อ้าง mock config จน freeze. ไม่มี endpoint คืน store/LmsData ทั้งระบบ. Request/response Content-Type เป็น JSON; success คืน resource โดยตรง ไม่มี `data` wrapper.
+
+| หน้าจอ/owner | Read | Write | Permission / response |
+| --- | --- | --- | --- |
+| Web Instructor dashboard | GET instructor/summary, instructor/courses, instructor/grading-queue | — | Instructor; course-owned counters/list/queue |
+| Web/Admin course list/overview/settings | GET instructor/courses หรือ admin/courses; GET courses/{id}/authoring | POST instructor/courses หรือ admin/courses; PATCH courses/{id} | เจ้าของ Instructor หรือ Admin; AuthoringCourseDto |
+| Curriculum/Chapter/Content/Quiz editor ทั้งสอง apps | GET courses/{id}/authoring; managed-quizzes/{quizId} สำหรับหา course/item จาก URL เดิม | PATCH courses/{id} พร้อม expected_revision + chapters | เป็น course aggregate resource เดียว, scoped permission; ไม่ใช่ global snapshot |
+| Course review/approve/publish | GET admin/course-reviews, admin/course-reviews/{id}; Admin UI ใช้ latest_review ของ admin/courses ด้วย | POST courses/{id}/submit-review; admin/course-reviews/{id}/approve หรือ /return; courses/{id}/publish | submit โดย owner/Admin; approve/return Admin; publish owner/Admin หลัง current approval |
+| Instructor course learners/attempts | GET courses/{id}/learners, courses/{id}/attempts, instructor/learners | — | owner Instructor; Admin read-only ได้สำหรับ course management |
+| Web attempts/grade page | GET instructor/attempts/{id}, instructor/grading-queue | PUT instructor/attempts/{id}/questions/{questionId}/grade | owning Instructor เท่านั้น; Admin grade ถูกปฏิเสธ |
+| Public Instructor | GET instructors/{id}, instructors/{id}/courses | — | public allowlist + Published courses เท่านั้น |
+| Admin dashboard/users/instructors/user detail | GET admin/summary, admin/users, admin/instructors, admin/users/{id}, /enrollments, /attempts, admin/learners | POST admin/users; POST admin/users/{id}/instructor | Admin; roles เพิ่ม Instructor โดยคง Learner |
+| Admin Blog editor/list/preview | GET admin/blog, admin/blog/{id}/preview | POST admin/blog, PATCH admin/blog/{id}, POST /publish, POST /unpublish, DELETE admin/blog/{id} | Admin only; AdminBlogDto/revision |
+| Public Blog | GET blog, GET blog/{slug} | — | Published only; UI คง /articles/{id} แล้ว resolve slug จาก list |
+| Admin video AI fields ใน Chapter | PATCH admin/courses/{id}/ai-support, GET/PUT admin/courses/{id}/videos/{itemId}/ai-transcript | API เดิม Flow G; แยกจาก authoring PATCH | Admin เท่านั้น; AI fields ไม่รวมใน editor draft/review payload |
+
+AI toggle request `{ "ai_enabled": true }` → `{course_id,ai_enabled}`; transcript PUT `{ "text": "เนื้อหา" }` text <=200000 chars, GET/PUT คืน item_id/text/edited_by/edited_at (edited fields nullable) ตาม Flow G view. แยกจาก review revision. Video upload courses/{id}/videos/uploads คืน503 video_upload_not_available ไม่สร้าง record.
+
+### 1. Course metadata และ curriculum
+
+Instructor create request `POST instructor/courses`:
+
+```json
+{"title":"คอร์สใหม่","subtitle":null,"description":"รายละเอียด","cover_url":null,"category":"ทั่วไป","level":"เริ่มต้น","price":{"amount_minor":19900,"currency":"THB"},"outcomes":["อธิบายแนวคิดได้"]}
+```
+
+Admin create ใช้ body เดียวกันเพิ่ม `instructor_id` ของบัญชี Instructor ที่ valid. Instructor ส่ง owner เองไม่ได้. Free price ใช้ null; amount_minor คือหน่วยสตางค์และต้องเป็น integer >=0, currency THB; mock normalize amount_minor=0 เป็น null. แยก business free/paid จาก UI formatting.
+
+Response `201` และ GET/PATCH ใช้ AuthoringCourseDto:
+
+```json
+{
+  "id":"crs_001","slug":"course-crs_001","title":"คอร์สใหม่","subtitle":null,
+  "description":"รายละเอียด","cover_url":null,"category":"ทั่วไป","level":"เริ่มต้น",
+  "price":{"amount_minor":19900,"currency":"THB"},"outcomes":["อธิบายแนวคิดได้"],
+  "instructor":{"id":"usr_owner","display_name":"ผู้สอน","avatar_url":null},
+  "chapters":[],"status":"draft","revision":1,"published_at":null,"published_by":null,
+  "created_by":"usr_owner","created_at":"2026-10-09T00:00:00.000Z",
+  "updated_at":"2026-10-09T00:00:00.000Z","latest_review":null,"ai_enabled":false,"enrollment_count":0
+}
+```
+
+IDs/slugs เป็น illustrative string; server กำหนดค่า ไม่ควรสร้าง permanent ID จาก UI. Metadata PATCH ใช้ `{ "expected_revision": 1, "title": "ชื่อใหม่" }`; fields ที่ไม่ส่งคงเดิม nullable fields ส่ง null เพื่อล้าง. Read-only fields owner/status/audit/revision/count ส่ง PATCH ไม่ได้ ยกเว้น Admin อาจส่ง instructor_id.
+
+Curriculum PATCH ตัวอย่างสร้าง chapter/article/quiz ใหม่:
+
+```json
+{
+  "expected_revision":1,
+  "chapters":[{
+    "title":"บทแรก","description":"คำอธิบายบท",
+    "items":[
+      {"type":"article","title":"บทอ่าน","body":"ข้อความย่อ","body_doc":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"ข้อความย่อ"}]}]},"reading_minutes":2},
+      {"type":"video","title":"วิดีโอ","video_url":"https://www.youtube.com/watch?v=dQw4w9WgXcQ","description":"คำอธิบาย","duration":"05:00"},
+      {"type":"quiz","title":"ทดสอบ","quiz":{"pass_percent":70,"questions":[
+        {"type":"single_choice","prompt":"ข้อใดถูก","prompt_doc":null,"points":2,"options":[{"text":"ก"},{"text":"ข"}],"correct_option_indices":[1]},
+        {"type":"essay","prompt":"อธิบาย","points":2,"response_mode":"either","rubric":"ดูความเข้าใจ","prompt_doc":null}
+      ]}}
+    ]
+  }]
+}
+```
+
+`chapters` คือ replacement ของ curriculum คอร์สนั้นทั้งก้อนตามลำดับ array. Client ต้อง preserve chapters/items ที่ไม่ได้แก้ ไม่ส่ง partial array ที่ทำให้รายการอื่นหาย. Backend ควร transaction validate ก่อน mutate; mock validation failure ไม่เขียน metadata บางส่วน. หากจะแตกเป็น chapter/item mutation endpoints ภายหลังต้องปรับ contract/client ร่วมกัน.
+
+Existing chapter/item/question/option ส่ง `id` เดิม; new resource ละ `id` แล้ว server assign. UI temporary IDs ไม่ส่งเป็น ID จริง. ID ต้องอยู่ในคอร์สเดิม/option ใน question เดิม; unknown/foreign/duplicate IDs ปฏิเสธ. Reorder ใช้ลำดับ arrays ไม่ใช่ field sort จาก browser.
+
+Response nested item เพิ่ม `id`, `has_history`, description/duration/reading_minutes; article คืน body/body_doc, video คืน video_url และ has_ai_transcript (ไม่มี transcript body). Quiz questions คืน generated option IDs และ `correct_option_ids` เฉพาะ authorized authoring detail; list/preview/learner ไม่ส่ง keys. Client writes ใช้ `correct_option_indices` zero-based เพื่อ new options; mock รองรับ existing correct_option_ids เพื่อ compatibility แต่ห้ามส่งสองรูปแบบพร้อมกัน.
+
+| Field/rule | Validation ปัจจุบัน |
+| --- | --- |
+| title | string ไม่ว่าง หลัง trim; max120 |
+| subtitle/description | string หรือ null; max240/max20000 |
+| category/level | string; max80 |
+| cover_url | string หรือ null; max2,000,000; URL/media policy ต้อง freeze เพิ่ม |
+| outcomes | array ของ strings; ไม่ส่ง owner/audit fields |
+| nested type | item video/article/quiz; question single_choice/multiple_choice/essay/image |
+| quiz options/answers | choice >=2 options; single_choice key 1 ค่า; multiple_choice >=1 ค่า; IDs/indices unique และอ้าง option จริง |
+| points | finite positive; quiz pass_percent fixed70; score ผ่าน raw >70% ไม่ใช่ >=70 หรือ rounded display |
+| response_mode | text/image/either; rubric string/null, prompt_doc JSON/null |
+| rich JSON | root doc, size <=2,000,000 serialized chars, depth<=30, nodes<=20,000; reject unsafe URL/prototype keys; renderer ยังต้อง allowlist |
+| YouTube | validated YouTube URL; upload endpoint unavailable503 |
+| history | ลบ/เปลี่ยน type รายการที่มีประวัติไม่ได้; แก้ quiz definition หลังมี attempt ไม่ได้; unchanged definition บันทึกได้; snapshot ประวัติไม่เปลี่ยน |
+
+### 2. Review และ publish
+
+Submit `POST courses/{id}/submit-review` body `{ "expected_revision": 2 }`; ต้องมี curriculum และ required metadata. Approve `POST admin/course-reviews/{reviewId}/approve` body `{ "expected_revision": 2 }`. Return body `{ "reason": "กรุณาเติมรายละเอียด" }` reason nonempty <=1000. Mock ตรวจ pending/current review ก่อน decision. Review resource คืน id/course_id/revision/status/submitted_by/submitted_at/decided_by/decided_at/reason ตาม read view; latest_review ใน course ไม่มี course_id ซ้ำ.
+
+Publish `POST courses/{id}/publish` body `{}`; owner Instructor หรือ Admin ต้องผ่าน current-revision approval. ไม่ approve จาก client flag. Published edit มีผลทันทีตาม Final 1.6; edit ของ Approved/Pending ทำฉบับเดิมใช้ต่อไม่ได้และกลับ Draft ต้อง review ใหม่. Wire `pending_review` คือสถานะ business submitted_for_review; mapping นี้เป็น Draft ต้องยืนยัน enum กับ Backend ไม่สร้าง state เพิ่ม.
+
+### 3. Instructor roster / attempt / grading
+
+Roster response ใช้ ResourcePage<LearnerRosterDto>:
+
+```json
+{"items":[{"id":"enr_001","course_id":"crs_001","user_id":"usr_learner","learner_display_name":"ผู้เรียน","granted_at":"2026-10-09T00:00:00.000Z","completed_items":2,"total_items":4,"percent":50,"completed_at":null,"certificate":null}],"next_cursor":null}
+```
+
+Counts/percent/completion มาจาก server; completion เดิมใช้ snapshot หลังแก้ curriculum. Certificate ถ้ามีเป็น `{id,code,learner_name,issued_at}` snapshot ไม่ใช้ชื่อ account ปัจจุบันแทน. Unauthorized owner-scope read คืน404เพื่อไม่เผย resource.
+
+`GET instructor/attempts/{id}` และ course/user attempts lists ใช้ ManagedAttemptDto:
+
+```json
+{
+ "id":"att_001","course_id":"crs_001","item_id":"itm_quiz","user_id":"usr_learner","learner_display_name":"ผู้เรียน",
+ "status":"pending_review","started_at":"2026-10-09T00:00:00.000Z","submitted_at":"2026-10-09T00:05:00.000Z","graded_at":null,
+ "earned":null,"max":4,"passed":null,"choice_earned":2,"choice_max":2,
+ "questions":[{"id":"q_essay","type":"essay","prompt":"อธิบาย","points":2,"prompt_doc":null,"rubric":"ความเข้าใจ","response_mode":"either"}],
+ "answers":{"q_essay":{"text":"คำตอบ"}},"grades":{}
+}
+```
+
+ตัวอย่างย่อ questions เฉพาะ essay; response จริงมี snapshot ทุกข้อที่คะแนน max อ้างอยู่. Questions ไม่ส่ง correct_option_ids; answers เป็น object keyed by question ID. State in_progress/submitted/pending_review/graded. Grade `PUT instructor/attempts/{id}/questions/{questionId}/grade`:
+
+```json
+{"score":1.5,"comment":"อธิบายเพิ่มได้"}
+```
+
+score finite 0..question.points, increment0.5; comment required string/null. pending_review และ owning Instructor เท่านั้น; Admin403. Server เก็บ graded_by/time และ finalize เมื่อ manual questions ครบ, รวม choice score และกำหนดผ่าน raw>70. Grade response เป็น WireAttemptView ตาม http-responses.ts (questions/answers/manual-question grades/result) ไม่ใช่ ManagedAttemptDto; reload read model หลังบันทึก. Frontend ไม่ส่งรวมคะแนนหรือ passed flag. Retry หลังบันทึกบางข้อจะข้าม grades ที่อ่านกลับมาแล้ว; real database concurrency/idempotency ยังต้องตกลง.
+
+### 4. Admin accounts / dashboard / public Instructor
+
+Admin summary `{course_count,enrollment_count,learner_count,pending_grading_count,user_count,pending_course_count}` integers. Instructor summary ไม่มี user_count/pending_course_count และนับเฉพาะ owned courses. Lists paginate scoped projections.
+
+`GET admin/users/{id}` ตัวอย่าง:
+
+```json
+{"id":"usr_001","display_name":"ผู้เรียน","username":"student01","email":null,"email_verified":false,"avatar_url":null,"roles":["learner"],"origin":"admin_created","status":"active","created_at":"2026-10-09T00:00:00.000Z","profile":{"firstName":"ชื่อ","lastName":"นามสกุล","certificateName":"ชื่อบนใบรับรอง","interests":[],"learningGoals":[]},"auth_methods":["password"]}
+```
+
+Root username/email/avatar nullable. Profile ใช้ AccountProfile keys ตาม Flow AB (camelCase ใน profile ปัจจุบัน); optional profile fields อาจ omit; type ไม่รับ null ใน string profile fields. Fields อื่น: firstNameEnglish/lastNameEnglish/birthDate/phone/bio/school/educationLevel. status active/pending เป็น projection ของ self-email verification ไม่ใช่ suspended/account-approval lifecycle. Lists ไม่ส่ง full profile/auth methods/password/OAuth subject. Create `{username,password,display_name,email?}` →201 `{user,created_by,created_at}`; password8..128, username pattern/uniqueness ตาม Flow A, display_name max80, email nullable max254. POST admin/users/{id}/instructor `{}` → `{user,instructor_added_by,instructor_added_at}`; preserve learner role, deny Admin account409. UI ไม่มี revoke/suspend API ใน scope นี้.
+
+Public Instructor `{id,display_name,avatar_url,bio}` เท่านั้น; courses Published-only ใช้ Catalog CourseDetailDto. Private username/email/phone/birthDate/auth fields ไม่ส่ง.
+
+### 5. Blog editor → public
+
+Create `POST admin/blog` body:
+
+```json
+{"slug":"article-unique-id","title":"บทความ","category":"ทั่วไป","cover_url":null,"excerpt":"คำอธิบายย่อ","content":"ข้อความ","content_doc":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"ข้อความ"}]}]}}
+```
+
+Create201/PATCH/preview/publish ใช้ AdminBlogDto:
+
+```json
+{"id":"blg_001","slug":"article-unique-id","title":"บทความ","category":"ทั่วไป","cover_url":null,"excerpt":"คำอธิบายย่อ","reading_minutes":2,"author":{"id":"usr_admin","display_name":"ผู้ดูแล"},"content":"ข้อความ","content_doc":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"ข้อความ"}]}]},"status":"draft","author_id":"usr_admin","editor_id":"usr_admin","revision":1,"created_at":"2026-10-09T00:00:00.000Z","updated_at":"2026-10-09T00:00:00.000Z","published_at":null}
+```
+
+PATCH ส่งเฉพาะ fields ที่แก้ได้ + expected_revision; content_doc null ล้าง rich doc, content string ไม่ใช่ null. UI generate stable slug ตอน create (ไม่มี input slug ใน UI เดิม); slug unique ตาม pattern `^[a-z0-9-]{3,80}$` ของ mock; stricter slug style เป็น freeze decision. เคย publish แล้วเปลี่ยน slug ไม่ได้แม้กลับ Draft เพื่อรักษา URL; redirect strategy เป็น Backend decision.
+
+Blog title nonempty <=120, category nonempty <=40, excerpt nullable <=2000, content string <=200000, cover_url nullable <=2000000; rich JSON validation ใช้ rule เดียวกับ article. Unknown fields ปฏิเสธ.
+
+Publish/unpublish body `{ "expected_revision": 1 }`; publish ต้องมี title และ content หรือ image rich document. Unpublish คืน draft resource. Delete body `{ "expected_revision": 1 }` → `{ "id": "blg_001", "deleted": true }`. DELETE JSON body เป็น Draft ต้องตกลง transport/If-Match convention กับ Backend. Client ทุก existing write ส่ง revision; mock ยอม omission สำหรับ compatibility กับ tests/older consumers แต่ Production ต้องยืนยันว่าจะ enforce required revision.
+
+Public list summary ไม่มี content/content_doc/private audit; detailมี rich doc. ทั้งคู่มี category/read-time/author. Draft hidden404/listไม่คืน. Editor save success หลัง HTTP สำเร็จเท่านั้น; dirty draft ไม่ silently rebase revision จาก background refetch.
+
+### 6. Errors และการตกลงก่อน freeze
+
+Validation422:
+
+```json
+{"error":{"code":"validation_failed","message":"ข้อมูลที่ส่งไม่ถูกต้อง","details":{"fields":[{"field":"chapters[0].items[0].video_url","code":"invalid"}]}}}
+```
+
+Course stale409:
+
+```json
+{"error":{"code":"revision_conflict","message":"ข้อมูลมีการเปลี่ยนแปลง กรุณาโหลดข้อมูลล่าสุดแล้วตรวจอีกครั้ง","details":{"current_revision":3}}}
+```
+
+| HTTP/code | สาเหตุ/Frontend behavior |
+| --- | --- |
+| 401 unauthenticated | session ไม่มี/หมดอายุ; auth policy จัดการ ไม่ fallback business state |
+| 403 forbidden | wrong role; hide/deny actions ตาม UX แต่ server ตรวจซ้ำ |
+| 404 not_found | missing/hidden/out-of-owner/Draft public resource |
+| 422 validation_failed | field paths + codes; preserve draft, แสดง safe local error text |
+| 409 revision_conflict | โหลดล่าสุด/ตรวจ draft, ไม่เขียนทับอัตโนมัติ |
+| 409 learning_history_conflict | remove/type/quiz definition ที่ทำลาย history |
+| 409 invalid_state | wrong review/publish/grade lifecycle |
+| 409 slug_taken/username_taken/email_taken | unique constraint conflict |
+| 503 video_upload_not_available / dependency code | ตรวจ code จริงของ operation; mockไม่บันทึก upload; providerจริงยังไม่มี |
+
+Resource client เก็บเฉพาะ allowlisted error code/field paths และ HTTP status; ไม่แสดง raw server message/HTML. Default transport ไม่อ่าน error body ถ้า featureไม่เลือก decoder. Abort/network/timeout ต่างจาก HTTP validation. Resource root/list ตรวจ runtime; DTO compile checks ไม่ใช่ comprehensive schema validation.
+
+ก่อน freeze ต้องตกลง enum/ID/time/nullability, pagination/search/filter, rich doc/URL/size limits, nested aggregate transaction, revision enforcement/If-Match, idempotencyของcreate/grade, deletion/audit/retention, cookie/CORS/CSRF และ uploads/provider APIs. การทำ Backendตาม Draft ช่วยลดการย้าย UI รอบใหม่ แต่การเปลี่ยน base URL อย่างเดียวไม่รับประกัน real integration ผ่าน. R10/R13 ต้องตรวจ HTTP+browser+durable Backend ตาม acceptance matrix.

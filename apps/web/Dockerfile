@@ -10,7 +10,6 @@ COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/api-client/package.json ./packages/api-client/package.json
 COPY packages/contracts/package.json ./packages/contracts/package.json
 COPY packages/course-authoring/package.json ./packages/course-authoring/package.json
-COPY packages/store/package.json ./packages/store/package.json
 RUN npm ci --no-audit --no-fund
 
 COPY tsconfig.json ./

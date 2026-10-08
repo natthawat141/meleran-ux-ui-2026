@@ -12,3 +12,4 @@ export * from './authoring.ts';
 export * from './profile.ts';
 export * from './features.ts';
 export * from './http-responses.ts';
+export * from './management-http.ts';

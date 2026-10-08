@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useBlogEditor } from '../api/useBlogEditor';
 import { RichDocument, WorkspaceShell, blogCoverFor } from '@melearn/ui';
 import type { BlogPost, User } from '@melearn/contracts';
 import '../styles/blog.css';
@@ -57,7 +57,7 @@ function PostMeta({ post, author }: { post: BlogPost; author?: User }) {
 
 export function BlogArticlePreviewPage() {
   const { id } = useParams<{ id: string }>();
-  const { data, currentUser } = useLms();
+  const { data, currentUser } = useBlogEditor();
   const post = data.blogPosts.find((item) => item.id === id);
 
   if (!post || (post.status !== 'published' && currentUser?.role !== 'admin')) {

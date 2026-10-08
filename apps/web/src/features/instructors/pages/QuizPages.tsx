@@ -3,7 +3,7 @@ import { Alert, Button, Empty, Form, Input, InputNumber, Space, Table, Typograph
 import type { TableProps } from 'antd';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useManagedData } from '../api/useManagedData';
 import { PageTitle, RichDocument, StatusTag, UserAvatar, WrittenAnswerView, writtenAnswer } from '@melearn/ui';
 import type { Course, Question, Quiz, QuizAttempt, Role, User } from '@melearn/contracts';
 import '@melearn/ui/styles/grading-workspace.css';
@@ -126,7 +126,7 @@ export function getReviewQueue(data: LmsData, options: ReviewQueueOptions = {}):
 
 export function QuizAttemptsPage() {
   const { quizId } = useParams<{ quizId?: string }>();
-  const { data, currentUser } = useLms();
+  const { data, currentUser } = useManagedData('attempts');
   const quiz = data.quizzes.find((item) => item.id === quizId);
   const attempts = data.attempts.filter((attempt) => attempt.quizId === quizId && attempt.status === 'submitted');
   if (!quiz) return <Empty description="ไม่พบแบบทดสอบ" />;
@@ -189,7 +189,7 @@ export function QuizAttemptsPage() {
 export function GradeEssayPage() {
   const { attemptId } = useParams<{ attemptId?: string }>();
   const [search] = useSearchParams();
-  const { data, currentUser } = useLms();
+  const { data, currentUser } = useManagedData('grade');
   const navigate = useNavigate();
   const attempt = data.attempts.find((item) => item.id === attemptId);
   const quiz = attempt?.quizSnapshot ?? data.quizzes.find((item) => item.id === attempt?.quizId);
@@ -218,12 +218,12 @@ interface GradingWorkspaceProps {
 }
 
 interface GradingFormValues {
-  score?: number;
+  scores?: Record<string,number>;
   feedback?: string;
 }
 
 function GradingWorkspace({ attempt, quiz, returnTo }: GradingWorkspaceProps) {
-  const { data, currentUser, gradeAttempt } = useLms();
+  const { data, currentUser, gradeAttempt, attempt: wireAttempt } = useManagedData('grade');
   const navigate = useNavigate();
   const [form] = Form.useForm<GradingFormValues>();
   const learner = data.users.find((item) => item.id === attempt.userId);
@@ -236,19 +236,20 @@ function GradingWorkspace({ attempt, quiz, returnTo }: GradingWorkspaceProps) {
     try {
       const saved = JSON.parse(sessionStorage.getItem(draftKey) || '{}');
       return {
-        score: typeof saved.score === 'number' && Number.isFinite(saved.score) ? saved.score : undefined,
+        scores: {...(saved.scores&&typeof saved.scores==='object'?saved.scores:{}),...Object.fromEntries(Object.entries(wireAttempt?.grades??{}).map(([id,g])=>[id,g.score]))},
         feedback: typeof saved.feedback === 'string' ? saved.feedback : '',
       };
     } catch {
       return { feedback: '' };
     }
   });
-  const [dirty, setDirty] = useState(initialDraft.score !== undefined || Boolean(initialDraft.feedback));
+  const [dirty, setDirty] = useState(Boolean(initialDraft.scores && Object.keys(initialDraft.scores).length) || Boolean(initialDraft.feedback));
   const [draftError, setDraftError] = useState(false);
   const dirtyRef = useRef(dirty);
   dirtyRef.current = dirty;
-  const score = Form.useWatch('score', form);
-  const validScore = typeof score === 'number' && Number.isFinite(score) && score >= 0 && score <= max;
+  const scores = Form.useWatch('scores', form) as Record<string,number> | undefined;
+  const score = Object.values(scores??{}).reduce((n,x)=>n+Number(x||0),0);
+  const validScore = questions.every(q=>typeof scores?.[q.id]==='number' && scores[q.id]>=0 && scores[q.id]<=q.points);
   const totalMax = Number(attempt.maxChoice || 0) + max;
 
   useEffect(() => {
@@ -275,9 +276,9 @@ function GradingWorkspace({ attempt, quiz, returnTo }: GradingWorkspaceProps) {
     if (dirty && draftError && !window.confirm('ยังเก็บคะแนนและความคิดเห็นฉบับร่างไม่ได้ ต้องการออกและทิ้งข้อมูลที่กรอกหรือไม่?')) return;
     navigate(path);
   };
-  const submit = (values: GradingFormValues) => {
-    if (values.score === undefined) return;
-    const result = gradeAttempt(attempt.id, { score: values.score, feedback: values.feedback });
+  const submit = async (values: GradingFormValues) => {
+    if (!values.scores) return;
+    const result = await gradeAttempt(attempt.id, { scores: values.scores, feedback: values.feedback });
     if (!result.ok) { message.error(result.message); return; }
     dirtyRef.current = false;
     try {
@@ -372,26 +373,11 @@ function GradingWorkspace({ attempt, quiz, returnTo }: GradingWorkspaceProps) {
 
         <aside className="grading-score-panel" aria-labelledby="grading-score-title">
           <h2 id="grading-score-title">ให้คะแนนและความคิดเห็น</h2>
-          <p className="grading-panel-description">คะแนนรวมของข้อเขียนและภาพงาน {questions.length} ข้อ</p>
+          <p className="grading-panel-description">ให้คะแนนแต่ละข้อของข้อเขียนและภาพงาน {questions.length} ข้อ</p>
           <Form form={form} layout="vertical" initialValues={initialDraft} onFinish={submit} onValuesChange={preserveDraft}>
-            <Form.Item
-              name="score"
-              label="คะแนนที่ให้"
-              rules={[
-                { required: true, message: 'กรอกคะแนนก่อนบันทึก' },
-                { type: 'number', min: 0, max, message: `คะแนนต้องอยู่ระหว่าง 0 ถึง ${max}` },
-              ]}
-            >
-              <InputNumber
-                className="grading-score-input"
-                aria-label="คะแนนที่ให้"
-                min={0}
-                max={max}
-                suffix={<span>/ {max} คะแนน</span>}
-                placeholder="ระบุคะแนน"
-                controls={false}
-              />
-            </Form.Item>
+            {questions.map((question,index) => <Form.Item key={question.id} name={['scores',question.id]} label={`ข้อ ${index+1} · ${question.points} คะแนน`} rules={[{required:true,message:'ระบุคะแนนข้อนี้'},{type:'number',min:0,max:question.points,message:'คะแนนเกินช่วงที่กำหนด'}]}>
+              <InputNumber min={0} max={question.points} step={0.5} disabled={Boolean(wireAttempt?.grades[question.id])} aria-label={`คะแนนข้อ ${index+1}`} />
+            </Form.Item>)}
             <Form.Item name="feedback" label="ความคิดเห็นถึงผู้เรียน">
               <Input.TextArea rows={7} placeholder="ระบุจุดที่ทำได้ดีและสิ่งที่ควรปรับปรุง" />
             </Form.Item>
@@ -406,7 +392,7 @@ function GradingWorkspace({ attempt, quiz, returnTo }: GradingWorkspaceProps) {
                 <span>คะแนนรวมหลังตรวจ</span>
                 <strong>{validScore && score !== undefined ? `${Number(attempt.score || 0) + score} / ${totalMax}` : 'รอระบุคะแนน'}</strong>
               </div>
-              <p>รวมคะแนนเพื่อตัดสินผลผ่านตามเกณฑ์ {quiz.passPercent}% และเงื่อนไขใบรับรองของคอร์ส</p>
+              <p>รวมคะแนนเพื่อตัดสินผลผ่านตามเกณฑ์มากกว่า {quiz.passPercent}% และเงื่อนไขใบรับรองของคอร์ส</p>
             </div>
             {draftError && <Alert type="warning" showIcon title="เก็บฉบับร่างในแท็บนี้ไม่ได้ กรุณาบันทึกคะแนนก่อนออกจากหน้า" />}
             <div className="grading-submit-area">

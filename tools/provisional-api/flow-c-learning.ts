@@ -113,7 +113,7 @@ export const learningRoutes: Route[] = [
       // Learners with access may read lesson content. Seed SECRET markers live in this content on purpose: they
       // are leak detectors for PUBLIC routes, and must not be scrubbed here.
       if (item.type === 'video') content.video_url = item.video_url ?? null;
-      if (item.type === 'article') content.body = item.body ?? null;
+      if (item.type === 'article') {content.body = item.body ?? null;content.body_doc=item.body_doc??null;}
       if (item.type === 'quiz') content.quiz = {
         question_count: item.quiz?.questions.length ?? 0,
         max_score: item.quiz?.questions.reduce((sum, question) => sum + question.points, 0) ?? 0,

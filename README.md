@@ -1,84 +1,33 @@
-# E-Learning UX Prototype V2
+# Melearn Frontend
 
-**Approved business scope:** [Melearn Final 1.6](docs/MELEARN_V1_SCOPE.md), based on the owner-reviewed Final 1.5 and the confirmed Stripe/AI-practice additions on 6 October 2026. This is the source of truth for the first month. [Release matrix](docs/FEATURE_RELEASE_MATRIX.md) tracks implementation readiness separately. Stripe course payments are now in scope. Cart/order history, finance and inbox screens remain legacy prototypes outside V1.
+React + TypeScript monorepo: `apps/web` สำหรับ Guest/Learner/Instructor และ `apps/admin` สำหรับ Admin; build/deployment แยกกัน. ขอบเขตธุรกิจใช้ [Final 1.6](docs/MELEARN_V1_SCOPE.md). ยังไม่มี Production Backend.
 
-React + TypeScript + Ant Design/Mantine prototype. Demo accounts and course data stay in browser storage. Web and Admin are separate origins in local development, so their browser-local demo data does not synchronize.
+Business data ใช้ HTTP client + TanStack Query กับ API mock; ถอน root `src`, `@legacy` และ `packages/store` แล้ว. Mock เก็บข้อมูลใน memory ร่วมกัน ขณะที่ cookies/query cache แยก app/account. Restart mock ล้างข้อมูล. Unsaved editor drafts อาจอยู่ใน sessionStorage; ไม่ใช่ business source of truth.
 
-## AI / developer instructions
-
-Before changing this prototype, read [AGENTS.md](AGENTS.md), [UI_SPEC.md](docs/UI_SPEC.md) and [CODE_SPEC.md](docs/CODE_SPEC.md). They describe the current Melearn design direction, component reuse and code conventions. [AI setup guide](docs/README.md) covers Codex, Gemini CLI and Cursor; project instructions are included in this repository so they also work after cloning it separately.
-
-This is the active UX/UI prototype, not a Production backend. Latest user decisions take precedence over draft specifications.
-
-Install once with `npm install`. Run `npm run dev:web` for Guest/Learner/Instructor at `http://127.0.0.1:5173/` and `npm run dev:admin` for Admin at `http://127.0.0.1:5174/`. These are separate prototype runtimes, not API-integrated apps.
-
-## Environment
-
-V1 uses YouTube links. Mux/Bunny has not been selected. `.env.example` retains the optional `VITE_MUX_ENV_KEY` from the prototype for potential Mux Data analytics; do not treat it as a required V1 integration. `.env.local` is ignored by Git. The current prototype does not yet initialize Mux analytics, so adding this value alone does not enable tracking.
-
-## New first-month requirements
-
-AI accepts “สร้างแบบฝึกหัด” or `/quiz` and returns an interactive multiple-choice set in chat, with saved answers and feedback. These practice scores do not affect course progress or certificates. Stripe course checkout grants lifetime enrollment only after the Backend verifies a successful signed webhook. The success page reads Backend status and never fulfills a payment. Redemption codes remain another entry path. The Checkout frontend calls Payment APIs; this repository has no Backend or webhook handler, so an unavailable API shows an error instead of simulated payment success. AI quiz generation remains a browser-local mock.
-
-## Stripe Checkout frontend
-
-`src/api/payments.ts` sends `course_id` and `request_id` to `POST /me/payments/checkout`, then redirects to the validated hosted Stripe URL. The result page uses read-only `GET /me/payments/{id}`. A learning link requires a successful payment, granted fulfillment and a matching server enrollment. The adapter never creates a browser enrollment or trusts URL payment status.
-
-Set the optional public `VITE_API_BASE_URL` to a same-origin path prefix such as `/api`; blank uses the paths above directly. Absolute URLs are not supported. This value contains no Stripe keys. Real session authentication, signature verification, persistent Payment/PaymentEvent records and webhook fulfillment must be implemented in the Backend before real payments work. Course-learning pages still use browser-local enrollments; displaying a server-confirmed payment result does not integrate those pages with the Backend. Legacy Redeem remains a separate local prototype flow and still uses the existing Order data structure.
-
-## Feature readiness and preview builds
-
-[Feature Release Matrix](docs/FEATURE_RELEASE_MATRIX.md) inventories all routes and separates UI, business approval, backend, and release readiness. `src/config/features.ts` controls route availability; every current feature is a prototype.
-
-Development and Preview allow `prototype`, `integration`, and `released`; Staging allows `integration` and `released`; Production allows only `released`. `disabled` is blocked everywhere. First-month scope follows the approved Final 1.6. Items marked Later are outside that scope and have no committed delivery date. Phase numbers are proposed inventory only and do not open routes.
-
-`npm run dev` starts the Web app. Build both apps with `npm run build`; outputs are kept separately in `dist/web` and `dist/admin`. To preview each app with Preview feature gates enabled:
+## เริ่มพัฒนา
 
 ```powershell
-npm.cmd run build --workspace @melearn/web -- --mode preview
-npm.cmd run build --workspace @melearn/admin -- --mode preview
-npm.cmd run preview:web
-npm.cmd run preview:admin
+npm.cmd ci
+npm.cmd run dev:web
+npm.cmd run dev:admin
 ```
 
-The default `npm run build` creates both Production-mode bundles and hides every current prototype feature route. `npm run preview:web` and `npm run preview:admin` serve the last build and do not change its environment.
-
-An explicit public `VITE_APP_ENV` build setting accepts `development`, `preview`, `staging`, or `production` and overrides the mode. Invalid values default to Production. Rebuild when changing the environment. No deployment settings were changed; any prototype pipeline using the default build must explicitly select Preview. Route gates do not enforce API permissions or remove code from the bundle.
-
-
-Demo sign-in:
-
-| Role | Email | Password |
-| --- | --- | --- |
-| Learner | `learner@learn.demo` | `Learn123!` |
-| Instructor | `teacher@learn.demo` | `Teach123!` |
-| Admin | `admin@learn.demo` | `Admin123!` |
-
-Reset the browser demo data from Account → Reset demo data. The instructor role switch in the header is a walkthrough shortcut; Admin alone grants Instructor access under the approved scope; legacy application screens are outside V1.
-
-## Verification
-
-Use Node.js 24 or later for the native TypeScript test entry. On Windows:
+Web default `http://127.0.0.1:5173`, Admin `http://127.0.0.1:5174`, API mock `127.0.0.1:8787` ผ่าน Vite proxy `/mock-api/v1`. Vite plugins เริ่ม/reuse server ร่วมกัน. บัญชีทดสอบและ reset behavior ดู [Mock guide](docs/PROVISIONAL_API_MOCK_TH.md).
 
 ```powershell
-npm.cmd run typecheck
-npm.cmd run build
 npm.cmd test
+npm.cmd run typecheck
 npm.cmd run check:boundaries
+npm.cmd run build
 ```
 
-The boundary check prevents cross-app source imports and package-to-app dependencies. The current `@legacy/*` alias is a temporary bridge to the remaining prototype source under `src/`; it does not indicate shared backend state or API readiness.
+Build outputs: `dist/web`, `dist/admin`. `VITE_API_MODE=mock|remote`, `VITE_API_BASE_URL`, `VITE_API_CREDENTIALS` เป็น build-time config; default dev=mock, build=remote (`/api/v1`). API unavailable แสดง error. Production frontend containers ไม่รวม mock และยังต้องต่อ Backend URL/proxy/CORS/session policy.
 
-Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/archive/reports/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
+## อ่านต่อ
 
-## Email verification and course review prototype
+- [Docs index](docs/README.md), [UI Spec](docs/UI_SPEC.md), [Code Spec](docs/CODE_SPEC.md), [AGENTS](AGENTS.md)
+- [Frontend plan](docs/FRONTEND_REFACTOR_PLAN_TH.md), [current progress/known gaps](docs/R7_API_MOCK_PROGRESS_TH.md)
+- [API Draft พร้อม Screen HTTP JSON](docs/API_CONTRACT_R4A_DRAFT_TH.md), [Auth/Catalog Draft](docs/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md)
+- [Acceptance matrix](docs/FRONTEND_API_ACCEPTANCE_MATRIX_TH.md), [Release matrix](docs/FEATURE_RELEASE_MATRIX.md)
 
-Self-service email registration creates an unverified account and a local verification link. Login is allowed, while enrollment, redemption and learning require verification. Links expire after 24 hours and work once. `/verify-email` offers a new mock link after a prototype cooldown of 60 seconds. No email is sent and Resend is not connected. Existing demo accounts and Admin-created accounts without an unverified flag keep their access.
-
-Google mode only simulates linking a matching email to the currently signed-in account. It does not perform OAuth, create users or merge accounts.
-
-Courses follow `draft → pending_review → approved → published`. The owner Instructor or Admin submits a draft, Admin approves or returns it with a reason at `/admin/courses/reviews`, and the owner or Admin publishes an approved course. Editing an approved or pending course returns it to draft; published edits remain published.
-
-Checks and browser walkthrough results: [Email verification and course review](docs/archive/reports/EMAIL_VERIFICATION_COURSE_REVIEW_20261006.md).
-
-`/learn/ai` is a standalone chat page for learners, instructors and admins. Learners must be enrolled in an AI-enabled course; instructors can use their own enabled courses or courses they are enrolled in, and admins can inspect enabled courses. It stores account-scoped chat history locally and renders demo responses, math and interactive response blocks; no real model or course-document retrieval is connected yet.
+Draft contracts ใช้ส่งต่อ Backend ได้ แต่ต้อง review/freeze และตรวจ real integration ก่อน Production. YouTube อยู่ใน V1; Google/email/upload/Stripe/AI provider จริงยังไม่พร้อม. Mock tests/build ไม่ยืนยัน deployment หรือ security/persistence ของ Backend จริง.

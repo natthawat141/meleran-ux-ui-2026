@@ -102,7 +102,7 @@ test('course lifecycle hides every pre-publish state from public catalog', async
   assert.equal(published.status, 200);
   assert.equal((await world.browser().get(`courses/${course.id}`)).status, 200);
   assert.ok((await world.browser().get('courses')).body.items.some((item) => item.id === course.id));
-  assert.equal((await instructor.post(`courses/${course.id}/publish`, {})).status, 403);
+  assert.equal((await instructor.post(`courses/${course.id}/publish`, {})).status, 200);
   assert.deepEqual(world.api.unexpectedErrors, []);
 });
 

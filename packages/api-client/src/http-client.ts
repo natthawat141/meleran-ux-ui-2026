@@ -11,8 +11,13 @@ export interface HttpClientOptions {
   timeoutMs: number | null;
 }
 
-export interface HttpRequestOptions<T> extends Omit<RequestInit, 'headers' | 'credentials' | 'signal'> {
+export interface HttpRequestOptions<T> extends Omit<
+  RequestInit,
+  'headers' | 'credentials' | 'signal'
+> {
   decoder: PayloadDecoder<T>;
+  /** Opt-in allow-list decoder; default failures never read the response body. */
+  errorDecoder?: (payload: unknown, status: number) => HttpClientError;
   headers?: HeadersInit;
   signal?: AbortSignal;
 }
@@ -36,13 +41,19 @@ function parseBaseUrl(value: string): { url: URL; absolute: boolean; pathname: s
   } catch {
     throw new HttpClientError('configuration');
   }
-  if (url.username || url.password || url.search || url.hash) throw new HttpClientError('configuration');
+  if (url.username || url.password || url.search || url.hash)
+    throw new HttpClientError('configuration');
   return { url, absolute, pathname: url.pathname.replace(/\/+$/, '') };
 }
 
 function joinUrl(base: ReturnType<typeof parseBaseUrl>, path: string): string {
-  if (typeof path !== 'string' || path.includes('\\') || path.includes('#')
-    || path.startsWith('//') || /^[a-z][a-z\d+.-]*:/i.test(path)) {
+  if (
+    typeof path !== 'string' ||
+    path.includes('\\') ||
+    path.includes('#') ||
+    path.startsWith('//') ||
+    /^[a-z][a-z\d+.-]*:/i.test(path)
+  ) {
     throw new HttpClientError('configuration');
   }
   let url: URL;
@@ -51,8 +62,12 @@ function joinUrl(base: ReturnType<typeof parseBaseUrl>, path: string): string {
   } catch {
     throw new HttpClientError('configuration');
   }
-  if (url.origin !== base.url.origin
-    || (base.pathname && url.pathname !== base.pathname && !url.pathname.startsWith(`${base.pathname}/`))) {
+  if (
+    url.origin !== base.url.origin ||
+    (base.pathname &&
+      url.pathname !== base.pathname &&
+      !url.pathname.startsWith(`${base.pathname}/`))
+  ) {
     throw new HttpClientError('configuration');
   }
   return base.absolute ? url.href : `${url.pathname}${url.search}`;
@@ -61,11 +76,15 @@ function joinUrl(base: ReturnType<typeof parseBaseUrl>, path: string): string {
 /** JSON transport preparation only; callers own endpoints, payloads, decoders and session policy. */
 export function createHttpClient(options: HttpClientOptions): HttpClient {
   const base = parseBaseUrl(options.baseUrl);
-  if (typeof options.fetcher !== 'function'
-    || !['omit', 'same-origin', 'include'].includes(options.credentials)
-    || (options.timeoutMs !== null && (!Number.isInteger(options.timeoutMs)
-      || options.timeoutMs <= 0 || options.timeoutMs > 2_147_483_647))
-    || options.headers === undefined) {
+  if (
+    typeof options.fetcher !== 'function' ||
+    !['omit', 'same-origin', 'include'].includes(options.credentials) ||
+    (options.timeoutMs !== null &&
+      (!Number.isInteger(options.timeoutMs) ||
+        options.timeoutMs <= 0 ||
+        options.timeoutMs > 2_147_483_647)) ||
+    options.headers === undefined
+  ) {
     throw new HttpClientError('configuration');
   }
   let defaultHeaders: Headers;
@@ -79,7 +98,7 @@ export function createHttpClient(options: HttpClientOptions): HttpClient {
   return {
     async request<T>(path: string, requestOptions: HttpRequestOptions<T>): Promise<T> {
       const url = joinUrl(base, path);
-      const { decoder, headers: requestHeaders, signal, ...init } = requestOptions;
+      const { decoder, errorDecoder, headers: requestHeaders, signal, ...init } = requestOptions;
       if (typeof decoder !== 'function') throw new HttpClientError('configuration');
       let headers: Headers;
       try {
@@ -93,7 +112,9 @@ export function createHttpClient(options: HttpClientOptions): HttpClient {
       const controller = new AbortController();
       let stopped: 'aborted' | 'timeout' | undefined;
       let rejectStopped: (error: HttpClientError) => void;
-      const stoppedRequest = new Promise<never>((_resolve, reject) => { rejectStopped = reject; });
+      const stoppedRequest = new Promise<never>((_resolve, reject) => {
+        rejectStopped = reject;
+      });
       const stop = (kind: 'aborted' | 'timeout') => {
         if (stopped) return;
         stopped = kind;
@@ -101,7 +122,9 @@ export function createHttpClient(options: HttpClientOptions): HttpClient {
         controller.abort();
       };
       const forwardAbort = () => stop('aborted');
-      const checkStopped = () => { if (stopped) throw new HttpClientError(stopped); };
+      const checkStopped = () => {
+        if (stopped) throw new HttpClientError(stopped);
+      };
       signal?.addEventListener('abort', forwardAbort, { once: true });
       const timer = timeoutMs === null ? undefined : setTimeout(() => stop('timeout'), timeoutMs);
 
@@ -109,25 +132,59 @@ export function createHttpClient(options: HttpClientOptions): HttpClient {
         checkStopped();
         let response: Response;
         try {
-          response = await fetcher(url, { ...init, headers, credentials, signal: controller.signal });
+          response = await fetcher(url, {
+            ...init,
+            headers,
+            credentials,
+            signal: controller.signal,
+          });
         } catch {
           checkStopped();
           throw new HttpClientError('network');
         }
         checkStopped();
-        if (!response.ok) throw new HttpClientError('http', response.status);
+        if (!response.ok) {
+          if (
+            errorDecoder &&
+            (response.headers.get('content-type') ?? '').startsWith('application/json')
+          ) {
+            let error: HttpClientError | undefined;
+            try {
+              const raw = await response.text();
+              if (raw.length <= 100000) error = errorDecoder(JSON.parse(raw), response.status);
+            } catch {
+              /* Invalid error payloads keep transport-only metadata. */
+            }
+            checkStopped();
+            if (error instanceof HttpClientError) throw error;
+          }
+          throw new HttpClientError('http', response.status);
+        }
 
         let payload: unknown;
-        if (response.status !== 204 && response.status !== 205 && init.method?.toUpperCase() !== 'HEAD') {
-          const mediaType = (response.headers.get('content-type') ?? '').split(';', 1)[0].trim().toLowerCase();
-          if (mediaType !== 'application/json' && !/^application\/[^\s/;]+\+json$/.test(mediaType)) {
+        if (
+          response.status !== 204 &&
+          response.status !== 205 &&
+          init.method?.toUpperCase() !== 'HEAD'
+        ) {
+          const mediaType = (response.headers.get('content-type') ?? '')
+            .split(';', 1)[0]
+            .trim()
+            .toLowerCase();
+          if (
+            mediaType !== 'application/json' &&
+            !/^application\/[^\s/;]+\+json$/.test(mediaType)
+          ) {
             throw new HttpClientError('non_json', response.status);
           }
           try {
             payload = await response.json();
           } catch (cause) {
             checkStopped();
-            throw new HttpClientError(cause instanceof SyntaxError ? 'malformed_json' : 'network', response.status);
+            throw new HttpClientError(
+              cause instanceof SyntaxError ? 'malformed_json' : 'network',
+              response.status,
+            );
           }
         }
         checkStopped();

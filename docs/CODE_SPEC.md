@@ -7,9 +7,10 @@
 
 ## สถานะ implementation ล่าสุด — 9 ตุลาคม 2026
 
-- Pages อยู่ใน `apps/web/src/features` และ `apps/admin/src/features`; root `src/` กับ alias `@legacy` ถอดแล้ว. `packages/store` ยังเป็น compatibility runtime ของ Authoring/Instructor/Admin/Blog management บางหน้า; ห้ามเรียกส่วนนี้ว่า API-ready
-- Auth session ใช้ API เท่านั้นทั้ง dev/build; Profile ใช้ `GET/PATCH /me`. Catalog/Public Blog และ learner API pages ไม่ mount `LmsProvider`. `PrototypeDataBoundary` จำกัด provider นี้ตามรายการ route ในแต่ละ app จน migrate feature ที่เหลือ
-- `packages/contracts` มี Draft HTTP DTO พร้อม nullable fields ของ client/mock และ decoders; legacy/UI models ยังแยกความหมายจาก DTO. Backend ยังไม่ freeze
+- Pages อยู่ใน `apps/web/src/features` และ `apps/admin/src/features`; root `src/`, `@legacy`, `packages/store`, `LmsProvider` และ `PrototypeDataBoundary` ถอนแล้ว
+- ทุก business flow ที่ยังอยู่ใน scope รวม Authoring/Instructor/Admin management/Blog ใช้ app-owned HTTP adapters และ Query. Backend/mock เป็น source of truth; ห้ามเพิ่ม browser persistence สำหรับ Course/User/Progress/Attempt/Payment
+- Unsaved editor draft เก็บใน controlled state หรือ sessionStorage ที่แยกบัญชีได้. Shared course-authoring มีเฉพาะ reusable editor/form conversion ไม่ถือ HTTP/session/permission หรือ state กลาง
+- `packages/contracts` แยก Draft wire DTO (`management-http.ts`, `blog.ts`, `http-responses.ts`) จาก UI models. DTO compiler checks และ HTTP tests ไม่เท่ากับ full runtime JSON Schema validation; resources ใหม่ตรวจ object/list envelope และ safe error fields. Backend ยังไม่ freeze
 - `apps/*/src/shared/api/client.ts` เป็น transport instance ต่อ app. `VITE_API_MODE=mock|remote`, `VITE_API_BASE_URL`, `VITE_API_CREDENTIALS` กำหนดตอน build; default dev=mock, build=remote. Remote ล้มเหลวต้องแสดง error ไม่ fallback localStorage. ยังต้องตกลง CORS/cookie/CSRF กับ Backend
 - `packages/api-client` ไม่ถือ origin/session/business endpoints; UI ไม่เรียก fetch กระจายเอง
 - Docker build context อยู่ monorepo root, COPY workspace manifests ครบและไม่อ้าง root `src/`. Runtime มีเฉพาะ `dist/web` หรือ `dist/admin`; default Nginx ไม่ proxy API จนมี Backend และจะตอบ 404 API paths แทน SPA HTML
@@ -18,7 +19,7 @@
 
 ## 1. ข้อเท็จจริงและขอบเขต
 
-- ใช้ React, Vite, TypeScript/TSX, React Router และ browser-local state เวอร์ชันติดตั้งตรวจจาก `package.json` / lockfile
+- ใช้ React, Vite, TypeScript/TSX, React Router และ TanStack Query สำหรับ server state เวอร์ชันติดตั้งตรวจจาก `package.json` / lockfile
 - ผู้ใช้ยืนยันทิศทาง React Frontend refactor ตามข้อ 1.1 แล้ว แต่ repository นี้ยังไม่มี backend Production ไม่อนุมาน backend stack, database, auth gateway หรือ deployment configuration จากชื่อ workspace
 - repository ใช้ npm workspaces แยก `apps/web`, `apps/admin` และ `packages/ui`, `packages/api-client`, `packages/contracts`, `packages/course-authoring`; root scripts ตรวจแต่ละ app และ packages และ regression tests ใช้ native Node อย่าอ้างว่าคำสั่งเหล่านั้นผ่านถ้าไม่มีการรันจริง
 - อนาคต MCP/CLI/skill ต้องมีงานที่ระบุ scope และ permission model ของตัวเอง ไม่วาง mock tool เป็นบริการจริง
@@ -31,10 +32,10 @@
 - ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก R2b สร้าง workspace/entry/build และ route owners แล้ว; R5c ย้าย Web public/account slices กับ Admin Blog list/editor ชุดแรกเข้า app; root `src/` และ alias `@legacy` ถอดแล้ว; transitional business state อยู่ใน `packages/store`
 - ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
 - `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
-- เป้าหมายคือแต่ละแอปเป็นเจ้าของ page/route orchestration ของตนเอง. R6b extract controlled Course Metadata Editor UI เป็น `@melearn/course-authoring`; R6c แยก CourseEditor hosts; R6d ย้าย Course Overview, Curriculum, Chapter, Content และ Quiz authoring pages ไป `apps/web`/`apps/admin` พร้อม chapter editor components/styles ในแต่ละ app. Admin Quiz Manager เป็น authoring-only; attempt review/grading คงเป็น Instructor assessment ใน Web. หน้าต่าง app-owned เหล่านี้ยังต่อกับ `@melearn/store`, prototype data/types และ local draft บางส่วนจน R4 contracts/API flow รองรับ; การย้ายหน้าไม่ยืนยัน API readiness หรือ server permissions. Shared package ปัจจุบันมีเฉพาะ controlled metadata UI; อย่าขยาย package หรือคัดลอก editor ทั้งก้อนข้าม apps โดยไม่มี interface/reuse evidence ที่ตรวจได้
+- เป้าหมายคือแต่ละแอปเป็นเจ้าของ page/route orchestration ของตนเอง. R6b extract controlled Course Metadata Editor UI เป็น `@melearn/course-authoring`; R6c แยก CourseEditor hosts; R6d ย้าย Course Overview, Curriculum, Chapter, Content และ Quiz authoring pages ไป `apps/web`/`apps/admin` พร้อม chapter editor components/styles ในแต่ละ app. Admin Quiz Manager เป็น authoring-only; attempt review/grading คงเป็น Instructor assessment ใน Web. หน้าต่าง app-owned เหล่านี้ยังต่อกับ `@melearn/store`, prototype data/types และ local draft บางส่วนจน R4 contracts/API flow รองรับ; การย้ายหน้าไม่ยืนยัน API readiness หรือ server permissions. Shared package ปัจจุบันมี reusable controlled editor UI และ pure HTTP/form conversion; อย่าขยาย package หรือคัดลอก editor ทั้งก้อนข้าม apps โดยไม่มี interface/reuse evidence ที่ตรวจได้
 - `packages/ui` เป็น shared UI/theme adapters (R2b export `PageTitle`/`StatusTag`; R3a เพิ่ม `MelearnUiProvider`; R3b ใช้ `design-tokens.json` เป็น source เดียวที่ TypeScript adapters อ่านและ generator แปลงเป็น `tokens.css`/`tailwind.css`); Web/Admin เป็นเจ้าของ Router กับ LmsProvider ของตน และแต่ละ app stylesheet import shared Tailwind พร้อมลงทะเบียน source scope ของแอป; `src/shadcn.css`/`src/styles.css` คงเป็น compatibility imports สำหรับ legacy; `packages/api-client` export generic HTTP/error transport จาก R4b-prep โดยไม่กำหนด API origin, auth/session policy, envelope หรือ business DTO; `packages/contracts` มี Draft HTTP DTO ที่ตรงกับ clients/mock; ยังรอ Backend ยืนยันเพื่อ freeze. ห้ามคัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract
-- Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ระหว่าง migration อนุญาตเฉพาะ alias `@legacy/*` ไปยัง prototype root ที่ระบุในแผน; ลบ alias เมื่อ slice ถูกย้ายแล้ว
-- `App.tsx` ประกอบ providers/router เท่านั้น; R3c แยก route declarations และ UX access wrappers ไป `apps/web/src/app/router/` (Public/Auth/Learner/Instructor/System) กับ `apps/admin/src/app/router/` (Entry/Management/Authoring/System) โดย snapshot/test คง path, feature key, element และลำดับเดิม ปัจจุบัน wrappers ยังเรียก `@legacy` pages/shells; dedicated `layouts/` และ feature slices จะเกิดระหว่างการย้าย flow ไม่ถือว่าแยก legacy implementation เสร็จแล้ว
+- Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป alias `@legacy` ถอนแล้ว ห้ามเพิ่ม app-to-app import หรือ root-source bridge กลับมา
+- `App.tsx` ประกอบ providers/router เท่านั้น; R3c แยก route declarations และ UX access wrappers ไป `apps/web/src/app/router/` (Public/Auth/Learner/Instructor/System) กับ `apps/admin/src/app/router/` (Entry/Management/Authoring/System) โดย snapshot/test คง path, feature key, element และลำดับเดิม ปัจจุบัน wrappers เรียก app-owned pages และ shared UI; ไม่มี `@legacy` runtime
 - Page ดูแล route params/query และประกอบหน้าจอ; feature component ดูแล behavior ของ feature; shared UI ดูแล presentation/interaction ทั่วไป ไม่เรียก API เฉพาะธุรกิจเอง
 - Course, Enrollment, Progress, Payment, AI Conversation และ Certificate เป็น server state ผ่าน TanStack Query; form/editor draft, modal/sidebar และสถานะ UI อยู่ local/client state ตามเจ้าของ ไม่สร้าง global store ข้อมูล backend ซ้ำ
 - AuthProvider ดูแล lifecycle ของ session ไม่รวม users/courses ทั้งระบบ; query cache ต้องแยกหรือเคลียร์เมื่อเปลี่ยนบัญชี ทั้งสองแอปมี cache ของตัวเอง ไม่แชร์ React store ข้ามแอป
@@ -47,44 +48,29 @@
 - ลำดับแผนใหม่คือ R0 inventory → R1 scope cleanup → R2 split apps/basic CI → R3 shared UI/router → R4a contract → R4b API/Query → migrate features; cleanup ถอดตามความสามารถ/dependency ไม่ลบตามชื่อโฟลเดอร์ analytics จน grading/learner list หาย
 - แผนมี Containerization และ CI/CD เป็นงานอนาคตพร้อมเกณฑ์ตรวจแยกจาก integration ใช้ build context ที่ monorepo root; shared packages/root lockfile/config เปลี่ยนต้องตรวจ apps ที่ได้รับผล Cloud Run เป็น hosting candidate ยังไม่เลือกปลายทางหรืออนุญาต deploy ดู R11–R13 ในแผน
 
-ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source prototype ปัจจุบัน; `apps/web`/`apps/admin` มี route owners และ page slices แยกแล้วบางส่วน แต่ Auth pages, `ProfileSettings`, blog CSS/chrome, store/data และ types บางส่วนยังเป็น `@legacy` bridge รอ feature migration กติกา prototype ที่ระบุ `store.tsx` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่ API contract
-
-## 2. แผนที่ code ที่ต้องหาให้ถูก
+## 2. แผนที่ code ปัจจุบัน
 
 | งาน | จุดเริ่มต้น |
 | --- | --- |
-| Web entry/providers/routes | `apps/web/src/main.tsx`, `apps/web/src/App.tsx` |
-| Admin entry/providers/routes | `apps/admin/src/main.tsx`, `apps/admin/src/App.tsx` |
-| Root legacy entry | ถอดใน R5c (`index.html`, `src/main.tsx`, `src/App.tsx`); root `src/` ยังมี transitional modules ไม่ได้เป็น runnable app |
-| Shared shell/navigation/profile | `src/components/Shell.tsx` |
-| Shared profile image/default avatar | `src/components/UserAvatar.tsx`, `user-avatar.css` |
-| Workspace notification menu | `src/components/WorkspaceNotifications.tsx`, `workspace-notifications.css` |
-| Review queue / grading workspace | `src/pages/instructor/LearnerReviewQueuePage.tsx`, ส่วน attempts/grading ใน `QuizPages.tsx`, `review-queue.css`, `grading-workspace.css`; Admin ไม่มี route ตรวจ/ให้คะแนน |
-| Shared title/status exports | `packages/ui/src/`; legacy common re-exports from package |
-| Tokens / light-dark foundation | `packages/ui/src/design-tokens.json`, `design-tokens.ts`, `theme.ts` |
-| Generated CSS / Tailwind theme | `packages/ui/src/tokens.css`, `tailwind.css`; generator `scripts/generate-ui-tokens.mjs` |
-| CSS compatibility / system overrides | `src/styles.css`, `src/shadcn.css`, `src/system-theme.css` |
-| Landing/About app pages และ CSS เฉพาะหน้า | `apps/web/src/features/landing/pages/` |
-| Landing chrome/base CSS bridge | `src/pages/landing/LandingChrome.tsx`, `landing.css`; ยังมี consumer ใน legacy Shell และ Admin Blog article preview |
-| About / รายชื่อทีมร่วมกัน | `apps/web/src/features/landing/pages/AboutPage.tsx`, `BrandStory.tsx`, `brand-story.css` |
-| Auth / shadcn controls | Shared primitives: `packages/ui/src/primitives/` via `packages/ui/src/index.ts`; current legacy consumer: `src/pages/AuthPages.tsx`; compatibility styles: `src/shadcn.css` |
-| Web public blog reader | `apps/web/src/features/blog/pages/BlogPages.tsx`; Published only, ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` |
-| Admin blog list/editor/article preview | `apps/admin/src/features/blog/pages/`; preview route `/articles/:id` ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` และ RichDocument จาก `packages/ui` |
-| Web/Admin profile pages | `apps/web/src/features/account/pages/ProfilePage.tsx`, `apps/admin/src/features/account/pages/ProfilePage.tsx`; `ProfileSettings` form และ profile state ยังเป็น legacy bridge |
-| Web/Admin course overview และ curriculum | `apps/web/src/features/course-authoring/pages/{CourseOverviewPage,CurriculumPage}.tsx`; Admin-owned versions อยู่ใน path เดียวกันใต้ `apps/admin/` |
-| Chapter/content/quiz authoring | App-owned `ChapterWorkspace.tsx`, `ContentEditorPage.tsx`, `QuizManagerPage.tsx`, `QuizEditorPage.tsx` และ `components/chapter/` + CSS ใต้ `apps/web/src/features/course-authoring/` กับ `apps/admin/src/features/course-authoring/` |
-| Instructor attempt review/grading | `src/pages/instructor/QuizPages.tsx` และ `LearnerReviewQueuePage.tsx`; ย้ายภายหลังกับ assessment flow |
-| Rich text editor bridge | `components/chapter/RichTextEditor.tsx` ใน Web/Admin authoring; `src/components/chapter/RichTextEditor.tsx` ยังใช้จาก legacy Blog editor |
-| Admin courses และ card/table toggle | `src/pages/admin/AdminPages.tsx`, `admin-courses.css` |
-| State/actions/persistence | `src/store.tsx`, `src/lib/prototype-snapshot.ts` (local compatibility ไม่ใช่ API contract) |
-| Prototype Redeem / code lifecycle | `src/lib/redeem-code.ts`, `src/pages/learner/RedeemCourseCodePage.tsx`, `src/pages/admin/AccessCodesPage.tsx` |
-| Stripe checkout/status | `src/api/payments.ts`, `src/pages/learner/PaymentPages.tsx`, `StripePaymentPages.tsx` |
-| Demo seed/helpers/asset mapping | `src/data.ts` |
-| Uploaded profile/cover UI | `src/components/ImageUploadField.tsx` |
-| Written/image response UI | `src/components/WrittenAnswer.tsx` |
-| Artwork และแบรนด์ | `src/assets/generated/`, `src/assets/melearn-ui/`, `public/images/founders/` |
+| App entries/providers/routes | `apps/web/src`, `apps/admin/src`; ResourceBoundary + AuthSessionProvider แยก app |
+| Shared shell/avatar/title/status/image upload | `packages/ui/src/components` และ exports ใน `packages/ui/src/index.ts` |
+| Theme/tokens/styles | `packages/ui/src/design-tokens.json`, `design-tokens.ts`, `theme.ts`, `tokens.css`, `tailwind.css`, `styles/` |
+| Public landing/About | `apps/web/src/features/landing` |
+| Auth/account/profile | `apps/*/src/features/auth`, `features/account` |
+| Catalog/learning/assessment/certificates | `apps/web/src/features/courses`, `features/learning` |
+| Instructor dashboard/roster/attempts/grading | `apps/web/src/features/instructors` + owned HTTP resource adapters |
+| Authoring pages/controlled editors | `apps/*/src/features/course-authoring`; reusable form/editor exports + pure mapping ใน `packages/course-authoring` |
+| Admin management/review | `apps/admin/src/features/management`, `features/course-approval` |
+| Blog read/write | `apps/web/src/features/blog`, `apps/admin/src/features/blog`; public renderer `packages/ui` |
+| Payment/Redeem/AI | app-owned feature folders; server state ผ่าน API/Query |
+| HTTP transport/config | `apps/*/src/shared/api`; transport utilities `packages/api-client` |
+| Wire DTO / UI models | `packages/contracts`; wire names management-http/http-responses/blog แยกจาก presentation types |
+| Development mock/fixtures | `tools/provisional-api`; ไม่ import เข้า app runtime หรือ shared package |
+| Artwork | `packages/ui/src/assets`; root public assets ตาม UI consumer |
 
-ตรวจ route declaration ใน `apps/web/src/app/router/instructor-routes.tsx` และ `apps/admin/src/app/router/authoring-routes.tsx`; owner ปัจจุบันคือหน้าใต้ `features/course-authoring` ของแต่ละแอป. `src/pages/instructor/QuizPages.tsx` เหลือ attempt review/grading ไม่ใช่ Quiz Manager/Editor. Root legacy store/data ยังเป็น transitional dependency ไม่ใช่ server contract
+Root `src`, `@legacy`, `packages/store` ถอนแล้ว. ห้ามเพิ่ม bridge/persistence สำหรับ business state กลับมา. กติกา architecture ในข้อ 1.1 และ status ด้านบนเป็นปัจจุบัน; ตัวอย่าง prototype paths ที่ยังปรากฏในคำอธิบายเก่าไม่ใช่ตำแหน่ง executable source.
+
+ตรวจ route declaration ใน `apps/web/src/app/router/instructor-routes.tsx` และ `apps/admin/src/app/router/authoring-routes.tsx`; owner ปัจจุบันคือหน้าใต้ `features/course-authoring` ของแต่ละแอป. `apps/web/src/features/instructors/pages/QuizPages.tsx` ดูแล attempt review/grading ไม่ใช่ Quiz Manager/Editor. Root legacy store/data ถอนแล้ว; editor view models ไม่ใช่ server contract
 
 ## 3. โครงสร้างและรูปแบบการเขียน
 
@@ -133,11 +119,11 @@
 
 ## 6. State และการบันทึก
 
-- ก่อนย้าย slice ใช้ `useLms()` และ actions ใน `store.tsx` เป็นแหล่ง state หลักของ prototype ไม่สร้าง localStorage/store ชุดสองสำหรับข้อมูลเดียวกัน; หลังย้าย slice ให้ใช้ feature query/mutation และ adapter ตามข้อ 1.1 โดยมีเจ้าของข้อมูลเพียงแหล่งเดียว ไม่เขียนสองระบบพร้อมกัน
+- ทุก slice ที่ยังใช้งานใช้ feature query/mutation และ API adapter. ห้ามกลับไปใช้ `useLms` หรือเพิ่ม business localStorage; UI draft ต้องไม่มีสิทธิ์ยืนยัน ownership/progress/score/payment
 - ใช้ local component state สำหรับ draft, selected item, modal, filter และ view mode เท่าที่เหมาะสม การป้อนแต่ละตัวอักษรไม่ควรเปลี่ยนข้อมูลหลักก่อนผู้ใช้บันทึกเมื่อ pattern ของหน้าคือ draft
 - หน้าตรวจงานเก็บเฉพาะ draft คะแนน/feedback ใน `sessionStorage` ตาม user/attempt เพื่อกลับมาต่อในแท็บเดิมได้; ใช้ `gradeAttempt` เดิมเมื่อบันทึกและล้าง draft จากแท็บเมื่อเสร็จ ไม่ใช้ draft เปลี่ยนผลคะแนนหรือ Analytics ล่วงหน้า
 - คิวตรวจเก็บ course/courseId, mode และคำค้น `q` ใน URL; ส่ง `returnTo` ให้หน้าตรวจ และใช้บริบทเดียวกันสำหรับงานก่อนหน้า/ถัดไป โดยคง role scoping และลำดับ FIFO
-- แจ้งเตือน prototype อยู่ใน `data.notifications` ของ store เดิม สร้างจาก `submitAttempt`, `gradeAttempt` และ `saveAssignment`; เมนูกรอง recipient ตามบัญชีปัจจุบัน และ `markNotificationRead` แก้เฉพาะรายการของบัญชีนั้น ไม่สร้างแจ้งเตือนซ้ำเมื่อส่ง/ตรวจ attempt เดิม
+- Notification/Inbox ของ prototype ถูกถอนจาก V1; ห้ามคืน state/action เดิมจาก store. หากเปิด scope ใหม่ต้องกำหนด API และ permission ก่อน
 - Inbox ยังไม่ทำในรอบแรก เอกสาร [Inbox เดิม](archive/pre-final-20261006/INBOX_PERMISSION_SPEC.md) อยู่ใน archive ไม่ใช้เป็นกติกาใหม่
 - รักษา `courseId`, `chapterId`, `itemId`, `quizId` และการเชื่อมกัน ตรวจว่าการเพิ่ม/ลบเนื้อหาไม่ทิ้ง reference ที่ใช้ไม่ได้
 - การบันทึกบทและแบบฝึกหัดร่วมกันใช้ action เดิม เช่น `saveChapterWorkspace` ตรวจสิทธิ์/validation/result จาก action ไม่เขียน path แยกที่บันทึกเพียงครึ่งหนึ่ง
@@ -205,7 +191,7 @@ Preview ปกติ: `http://127.0.0.1:5174/` ตรวจ server ที่ร�
 - ใช้ YouTube Link ก่อน Upload Video API ต้องตอบไม่พร้อมและไม่สร้าง upload record ส่วน Mux Data key ที่มีเป็นข้อมูลต้นแบบ ไม่ใช่การเลือกผู้ให้บริการวิดีโอ
 - AI ของต้นแบบยังตอบ mock และเก็บประวัติใน browser ส่วนระบบจริงต้องเก็บคำถาม/คำตอบใน Database บังคับสิทธิ์คอร์ส และนับโควตาที่ server ตามฉบับหลัก ค่า limit อยู่จุดกลางแก้ได้ ไม่ใช้ quota ที่ client เป็นหลักฐาน
 - คอร์สใช้ draft → pending_review → approved → published; แก้ approved ก่อน publish ต้องตรวจใหม่ published แก้เนื้อหาได้ทันที การแก้เฉพาะ AI/Transcript ไม่เปลี่ยนสถานะอนุมัติ
-- R1 ถอน Cart/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่จาก active source แล้ว; local fields เดิมอยู่ใน inert legacy snapshot เพื่อรักษาข้อมูล ไม่เปิด selectors/actions ของฟีเจอร์ที่ถอน
+- R1 ถอน Cart/ส่วนลด/Orders/Finance/Inbox/คำขอ Instructor และ analytics แบบใหญ่แล้ว; ชุดย้าย API 9 ต.ค. ถอน `packages/store` ทั้งหมด จึงไม่มี inert legacy snapshot ใน runtime
 
 ## ขอบเขต Stripe และ AIPractice ที่เพิ่ม
 

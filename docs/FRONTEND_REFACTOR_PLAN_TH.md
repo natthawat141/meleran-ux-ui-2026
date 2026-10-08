@@ -4,7 +4,7 @@
 
 ปรับแผนตาม [ผล R0 Inventory และ Lead Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md): inventory ครบ 89 routes, แยก retained dependencies ก่อน scope cleanup, เตรียม authoring interface ก่อน split apps และแยก functional acceptance ออกจาก structural migration
 
-สถานะล่าสุด 9 ต.ค. 2026: โครงสร้าง Web/Admin และ root legacy sunset ทำแล้ว แต่ **API migration ยังไม่ครบ** เพราะ Authoring/Instructor/Admin management กับ Blog editor ยังใช้ `packages/store`/localStorage. Auth/Profile/Catalog/Public Blog และ learner API flows ต่อผ่าน client และไม่ mount prototype provider แล้ว; response DTO ที่ใช้จริงอยู่ใน `packages/contracts` แบบ Draft. Remote transport ใช้ได้ผ่าน config แต่ไม่เท่ากับ production integration. R7–R10 ยังมี acceptance ค้าง; ผลปัจจุบันดู [progress](R7_API_MOCK_PROGRESS_TH.md). Dockerfile แก้ source/manifests หลัง sunset แล้ว; รายงาน R11 เก่าเป็นหลักฐานของ revision เก่าและต้องตรวจ Docker ใหม่เมื่อ daemon พร้อม. R12 deployment/R13 และ Backend/OpenAPI/Stripe/AI provider ยังไม่ปิด. ไม่มี deploy หรือ merge `main`.
+อัปเดต 9 ต.ค. 2026: ย้าย Authoring, Instructor dashboard/roster/attempt/grading/public profile, Admin management/review และ Blog editor/preview ไป HTTP mock แล้ว ถอน `packages/store` และ prototype persistence provider แล้ว. UI draft อยู่ในหน้าจอหรือ sessionStorage ต่อบัญชี; business state อ่านจาก API. Contracts เป็น Draft ยังไม่ freeze กับ Backend. ดู [progress และข้อจำกัด](R7_API_MOCK_PROGRESS_TH.md).
 
 ## 1. ผลลัพธ์ที่ต้องการและสิ่งที่ยังไม่สรุป
 

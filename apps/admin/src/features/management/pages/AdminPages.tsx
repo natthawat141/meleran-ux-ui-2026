@@ -3,11 +3,11 @@ import { Alert, Avatar, Button, Descriptions, Empty, Pagination, Popconfirm, Seg
 import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowRightOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useManagedData } from '../api/useManagedData';
+import { Progress } from 'antd';
 import {
   PageTitle,
   StatusTag,
-  CourseProgress,
   formatPrice,
   flattenItems,
   instructorFor,
@@ -15,29 +15,30 @@ import {
   matchesDirectorySearch,
   useDirectorySearch,
 } from '@melearn/ui';
-import type { Course, QuizAttempt, User } from '@melearn/contracts';
+import type { Course, QuizAttempt, User as BaseUser } from '@melearn/contracts';
 import '../styles/admin-courses.css';
 import '../styles/admin-users.css';
 
+type User = BaseUser & import('@melearn/contracts').ProfileDetails & { roles: string[] };
+type ManagedCourse = Course & { enrollmentCount: number };
 const { Text, Title } = Typography;
 
 export function AdminDashboardPage() {
-  const { data } = useLms();
-  const pendingCourseReviews = data.courses.filter((course) => course.status === 'pending_review').length;
+  const { data, summary } = useManagedData('dashboard');
 
   return (
     <>
       <PageTitle eyebrow="ผู้ดูแลระบบ" title="ภาพรวมระบบ" subtitle="ดูจำนวนบัญชี คอร์ส การลงทะเบียน และคิวตรวจคอร์ส" />
       <div className="admin-work-summary">
-        <Link to="/admin/users"><span>บัญชีผู้ใช้</span><strong>{data.users.length}</strong><small>บัญชีที่มีในระบบ</small></Link>
+        <Link to="/admin/users"><span>บัญชีผู้ใช้</span><strong>{summary?.user_count}</strong><small>บัญชีที่มีในระบบ</small></Link>
         <Link to="/admin/courses">
-          <span>คอร์สทั้งหมด</span><strong>{data.courses.length}</strong><small>จัดการคอร์สของผู้สอน</small>
+          <span>คอร์สทั้งหมด</span><strong>{summary?.course_count}</strong><small>จัดการคอร์สของผู้สอน</small>
         </Link>
         <Link to="/admin/courses">
-          <span>การลงทะเบียน</span><strong>{data.enrollments.length}</strong><small>จำนวนรายการลงทะเบียน</small>
+          <span>การลงทะเบียน</span><strong>{summary?.enrollment_count}</strong><small>จำนวนรายการลงทะเบียน</small>
         </Link>
         <Link to="/admin/courses/reviews">
-          <span>คอร์สรอตรวจ</span><strong>{pendingCourseReviews}</strong><small>รอ Admin พิจารณา</small>
+          <span>คอร์สรอตรวจ</span><strong>{summary?.pending_course_count}</strong><small>รอ Admin พิจารณา</small>
         </Link>
       </div>
       <section className="admin-recent">
@@ -63,7 +64,7 @@ export function AdminDashboardPage() {
 }
 
 export function AdminUsersPage() {
-  const { data } = useLms();
+  const { data } = useManagedData('users');
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('all');
   const roles = [
@@ -75,7 +76,7 @@ export function AdminUsersPage() {
   const { query, filter, setQuery, setFilter } = useDirectorySearch('role', roles);
   const users = data.users.filter(
     (user) =>
-      (filter === 'all' || user.role === filter) &&
+      (filter === 'all' || (user as User & {roles:string[]}).roles.includes(filter)) &&
       (statusFilter === 'all' || (user.status ?? 'pending') === statusFilter) &&
       matchesDirectorySearch(query, [
         user.id,
@@ -159,7 +160,7 @@ export function AdminUsersPage() {
 
 export function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { data, assignInstructorRole } = useLms();
+  const { data, assignInstructorRole } = useManagedData('user');
   const user = data.users.find((item) => item.id === id);
   if (!user) return <Empty description="ไม่พบบัญชีผู้ใช้นี้" />;
 
@@ -211,8 +212,8 @@ export function AdminUserDetailPage() {
     ['ระดับการศึกษา', user.educationLevel], ['วิชาที่สนใจ', user.interests], ['เป้าหมายการเรียน', user.learningGoals],
     ['Google ที่เชื่อมไว้ (สถานะเดโม)', user.googleLinkedEmail], ['แนะนำตัว', user.bio],
   ];
-  const addInstructorRole = () => {
-    const result = assignInstructorRole(user.id);
+  const addInstructorRole = async () => {
+    const result = await assignInstructorRole(user.id);
     if (result.ok) message.success(result.message || 'เพิ่มผู้สอนให้บัญชีนี้แล้ว');
     else message.error(result.message || 'ไม่สามารถเพิ่มผู้สอนให้บัญชีนี้ได้');
   };
@@ -315,7 +316,7 @@ export function AdminUserDetailPage() {
                             </div>
                             {course && (
                               <div className="admin-user-course-progress">
-                                <CourseProgress course={course} data={data} userId={user.id} />
+                                <Progress percent={entry.percent} />
                               </div>
                             )}
                           </div>
@@ -379,7 +380,7 @@ export function AdminUserDetailPage() {
 }
 
 export function AdminInstructorsPage() {
-  const { data } = useLms();
+  const { data } = useManagedData('instructors');
   const instructors = data.users.filter((user) => user.role === 'instructor');
   const columns: TableProps<User>['columns'] = [
     {
@@ -432,13 +433,13 @@ export function AdminInstructorsPage() {
 }
 
 export function AdminCoursesPage() {
-  const { data } = useLms();
+  const { data } = useManagedData('courses');
   const navigate = useNavigate();
   const [view, setView] = useState<'table' | 'card'>('table');
   const [cardPage, setCardPage] = useState(1);
   const pendingCourseCount = data.courses.filter((course) => course.status === 'pending_review').length;
 
-  const columns: TableProps<Course>['columns'] = [
+  const columns: TableProps<ManagedCourse>['columns'] = [
     {
       title: 'คอร์ส',
       render: (_, course) => (
@@ -506,7 +507,7 @@ export function AdminCoursesPage() {
               {cardCourses.map((course) => {
                 const teacher = instructorFor(data, course);
                 const lessonCount = flattenItems(course).length;
-                const learnerCount = data.enrollments.filter((enrollment) => enrollment.courseId === course.id).length;
+                const learnerCount = course.enrollmentCount;
                 return (
                   <article className="admin-course-card" key={course.id}>
                     <div className="admin-course-card-cover">
@@ -563,7 +564,7 @@ export function AdminCoursesPage() {
 
 export function AdminCourseDetailPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data } = useLms();
+  const { data } = useManagedData('courses');
   const course = data.courses.find((item) => item.id === courseId);
   if (!course) return <Empty description="ไม่พบคอร์สนี้" />;
   const teacher = instructorFor(data, course);
@@ -591,7 +592,7 @@ export function AdminCourseDetailPage() {
           {course.chapters.map((chapter) => `${chapter.title} (${chapter.items.length})`).join(' · ')}
         </Descriptions.Item>
         <Descriptions.Item label="ผู้เรียน">
-          {data.enrollments.filter((item) => item.courseId === course.id).length} คน
+          {course.enrollmentCount} คน
         </Descriptions.Item>
       </Descriptions>
     </>

@@ -13,10 +13,10 @@ const nullableText = (value: unknown): string | null => value === null ? null : 
 export function decodeBlogSummary(value: unknown): PublicBlogSummary {
   const row = record(value);
   return { id: text(row.id), slug: text(row.slug), title: text(row.title), cover_url: nullableText(row.cover_url),
-    excerpt: nullableText(row.excerpt), published_at: nullableText(row.published_at) };
+    excerpt: nullableText(row.excerpt), published_at: nullableText(row.published_at),category:text(row.category),reading_minutes:Number(row.reading_minutes),author:{id:text(record(row.author).id),display_name:text(record(row.author).display_name)} };
 }
 export function decodeBlogDetail(value: unknown): PublicBlogDetail {
-  return { ...decodeBlogSummary(value), content: text(record(value).content) };
+  return { ...decodeBlogSummary(value), content: text(record(value).content),content_doc:(record(value).content_doc??null) as PublicBlogDetail['content_doc'] };
 }
 export function decodeBlogPage(value: unknown): PublicBlogPage {
   const row = record(value);

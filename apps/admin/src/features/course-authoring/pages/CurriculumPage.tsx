@@ -17,7 +17,7 @@ import {
   RightOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useAuthoringWorkspace } from '../api/useAuthoringWorkspace';
 import { ContentTypeIcon } from '@melearn/ui';
 import type { Chapter, CourseItem, CourseItemType, Quiz } from '@melearn/contracts';
 import '../styles/curriculum-workspace.css';
@@ -81,7 +81,7 @@ function moveIds<T extends { id: string }>(entries: T[], id: string, to: number)
 
 export function CurriculumPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, currentUser, saveChapter, removeChapter, removeItem, reorderCurriculum } = useLms();
+  const { data, currentUser, saveChapter, removeChapter, removeItem, reorderCurriculum } = useAuthoringWorkspace();
   const navigate = useNavigate();
   const [closed, setClosed] = useState<Set<string>>(() => new Set());
   const [creating, setCreating] = useState(false);
@@ -100,13 +100,7 @@ export function CurriculumPage() {
   const total = course.chapters.reduce((sum, chapter) => sum + chapter.items.length, 0);
   const someOpen = course.chapters.some((chapter) => !closed.has(chapter.id));
 
-  const hasHistory = (item: CourseItem): boolean =>
-    Object.values(data.progress[`${course.id}:${item.id}`] || {}).some(Boolean) ||
-    Boolean(
-      'quizId' in item &&
-        item.quizId &&
-        data.attempts.some((attempt) => attempt.quizId === item.quizId)
-    );
+  const hasHistory = (entry: CourseItem): boolean => Boolean(course.itemHistory[entry.id]);
 
   const openChapter = (chapter: Chapter, query: Record<string, string>) =>
     navigate(`${coursePath}/chapters/${chapter.id}?${new URLSearchParams(query)}`);
@@ -119,7 +113,7 @@ export function CurriculumPage() {
       return next;
     });
 
-  const reorder = (
+  const reorder = async (
     chapterId: string | null,
     entries: { id: string }[],
     id: string,
@@ -127,7 +121,7 @@ export function CurriculumPage() {
   ) => {
     const ids = moveIds(entries, id, to);
     if (!ids) return;
-    const result = reorderCurriculum(course.id, chapterId, ids);
+    const result = await reorderCurriculum(course.id, chapterId, ids);
     if (result.ok) message.success('บันทึกลำดับใหม่แล้ว');
     else message.error(result.message);
   };
@@ -145,8 +139,8 @@ export function CurriculumPage() {
       okText: item ? 'นำออกจากบท' : 'ลบบท',
       cancelText: 'ยกเลิก',
       okButtonProps: { danger: true },
-      onOk: () => {
-        const result = item ? removeItem(course.id, chapter.id, item.id) : removeChapter(course.id, chapter.id);
+      onOk: async () => {
+        const result = item ? await removeItem(course.id, chapter.id, item.id) : await removeChapter(course.id, chapter.id);
         if (!result.ok) { message.error(result.message); return; }
         message.success(item ? 'นำเนื้อหาออกแล้ว' : 'ลบบทแล้ว');
       },
@@ -172,13 +166,13 @@ export function CurriculumPage() {
     } catch {
       return;
     }
-    saveChapter(course.id, {
+    try { await saveChapter(course.id, {
       title: values.title.trim(),
       description: values.description?.trim() || '',
     });
     setCreating(false);
     form.resetFields();
-    message.success('เพิ่มบทแล้ว เลือกเพิ่มเนื้อหาเพื่อเริ่มเขียน');
+    message.success('เพิ่มบทแล้ว เลือกเพิ่มเนื้อหาเพื่อเริ่มเขียน'); }catch(e){message.error(e instanceof Error?e.message:'บันทึกไม่สำเร็จ');}
   };
 
   return (

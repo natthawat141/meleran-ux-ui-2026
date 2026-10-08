@@ -18,7 +18,6 @@
     "@melearn/api-client": "0.1.0",
     "@melearn/contracts": "0.1.0",
     "@melearn/course-authoring": "0.1.0",
-    "@melearn/store": "0.1.0",
     "@melearn/ui": "0.1.0",
     "@tabler/icons-react": "^3.48.0",
     "@tanstack/react-query": "^5.104.1",

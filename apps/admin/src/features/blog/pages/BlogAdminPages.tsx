@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, Empty, Form, Input, Popconfirm, Segmented, Select, Space, Table, Tag, Typography, message } from 'antd';
 import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowLeftOutlined, EyeOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { JSONContent } from '@tiptap/react';
-import { useLms } from '@melearn/store';
+import { useBlogEditor } from '../api/useBlogEditor';
 import { ImageUploadField, PageTitle, RichDocument, blogCoverFor, textDocument } from '@melearn/ui';
 import { RichTextEditor } from '../../course-authoring/components/chapter/RichTextEditor';
 import type { BlogPost } from '@melearn/contracts';
@@ -14,7 +14,7 @@ import '../styles/blog-editor.css';
 const { Text } = Typography;
 
 export function AdminBlogPage() {
-  const { data, removeBlogPost } = useLms();
+  const { data, removeBlogPost } = useBlogEditor();
   const [view, setView] = useState<'table' | 'card'>('table');
   const [query, setQuery] = useState('');
   const posts = [...data.blogPosts]
@@ -35,8 +35,8 @@ export function AdminBlogPage() {
         okText="ลบ"
         cancelText="ยกเลิก"
         okButtonProps={{ danger: true }}
-        onConfirm={() => {
-          removeBlogPost(post.id);
+        onConfirm={async () => {
+          try { await removeBlogPost(post.id); } catch (e) { message.error(e instanceof Error ? e.message : 'ลบไม่สำเร็จ'); return; }
           message.success('ลบบทความแล้ว');
         }}
       >
@@ -148,7 +148,7 @@ interface BlogEditorFormValues {
 export function AdminBlogEditorPage() {
   const { id } = useParams<{ id?: string }>();
   const isNew = !id;
-  const { data, currentUser, saveBlogPost } = useLms();
+  const { data, currentUser, saveBlogPost } = useBlogEditor();
   const navigate = useNavigate();
   const [form] = Form.useForm<BlogEditorFormValues>();
   const [saving, setSaving] = useState(false);
@@ -156,6 +156,7 @@ export function AdminBlogEditorPage() {
   const [categorySearch, setCategorySearch] = useState('');
   const [bodyError, setBodyError] = useState('');
   const post = data.blogPosts.find((item) => item.id === id);
+  const revisionRef=useRef(post?.revision);
   const [loadedId, setLoadedId] = useState(id);
   const [doc, setDoc] = useState<JSONContent>(() => post?.bodyDoc || textDocument(post?.body || ''));
   const [plain, setPlain] = useState(post?.body || '');
@@ -192,7 +193,7 @@ export function AdminBlogEditorPage() {
         return;
       }
       setSaving(true);
-      const savedId = saveBlogPost(
+      const saved = await saveBlogPost(
         {
           ...values,
           title: values.title.trim(),
@@ -203,8 +204,10 @@ export function AdminBlogEditorPage() {
           bodyDoc: doc,
           status,
         },
-        id
+        id,revisionRef.current
       );
+      const savedId=saved.id;
+      revisionRef.current=saved.revision;
       if (!savedId) {
         message.error('เฉพาะแอดมินเท่านั้นที่บันทึกบทความได้');
         return;
@@ -212,8 +215,8 @@ export function AdminBlogEditorPage() {
       message.success(status === 'published' ? 'เผยแพร่บทความแล้ว' : 'บันทึกฉบับร่างแล้ว');
       setPreview(false);
       navigate(`/admin/articles/${savedId}/edit`);
-    } catch {
-      /* Ant Design shows validation errors beside the relevant fields. */
+    } catch (e) {
+      if (e instanceof Error) message.error(e.message);
     } finally {
       setSaving(false);
     }

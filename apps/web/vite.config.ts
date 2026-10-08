@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [tailwindcss(), devCatalogServerPlugin(repoRoot)],
   server: {
     proxy: {
-      '/mock-api': { target: 'http://127.0.0.1:8787' },
+      '/mock-api': { target: `http://127.0.0.1:${process.env.MELEARN_MOCK_PORT ?? 8787}` },
     },
   },
   resolve: {

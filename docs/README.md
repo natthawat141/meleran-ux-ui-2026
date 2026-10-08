@@ -29,7 +29,7 @@
 
 ## สถานะปัจจุบัน
 
-ไม่มี root `src/` หรือ `@legacy` แล้ว แต่การเลิกใช้ข้อมูลต้นแบบยังไม่ครบ: Course Authoring, Instructor management/grading บางหน้า และ Admin management/Blog ยังใช้ `packages/store` กับ localStorage. Auth/Profile/Catalog/Public Blog และ learner API flows แยกจาก provider นี้แล้ว. Draft HTTP DTO อยู่ใน `packages/contracts`; adapter เลือก mock/remote ผ่าน config ของแต่ละ app โดยไม่ fallback ไป store. Dockerfile ไม่ COPY `src` แล้ว; รอบปัจจุบันตรวจ build context แบบ static ส่วน Docker runtime ยังไม่ได้รันทดสอบใหม่เพราะ daemon ไม่พร้อม. สถานะและงานค้างอยู่ใน [progress](R7_API_MOCK_PROGRESS_TH.md).
+อัปเดต 9 ต.ค. 2026: ย้าย Authoring, Instructor dashboard/roster/attempt/grading/public profile, Admin management/review และ Blog editor/preview ไป HTTP mock แล้ว ถอน `packages/store` และ prototype persistence provider แล้ว. UI draft อยู่ในหน้าจอหรือ sessionStorage ต่อบัญชี; business state อ่านจาก API. Contracts เป็น Draft ยังไม่ freeze กับ Backend. ดู [progress และข้อจำกัด](R7_API_MOCK_PROGRESS_TH.md).
 
 ## เอกสารย้อนหลัง
 

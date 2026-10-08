@@ -243,7 +243,7 @@ export function BlogArticlePage() {
           <img src={post.cover || blogCoverFor(post.coverKey)} alt="" />
         </div>
         <div className="blog-article-body">
-          <RichDocument text={post.body} />
+          <RichDocument document={post.bodyDoc} text={post.body} />
         </div>
         <div className="blog-article-end">
           <span>อ่านจบแล้ว ลองนำหนึ่งไอเดียไปใช้ในวันนี้</span>

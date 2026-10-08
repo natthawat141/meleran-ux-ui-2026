@@ -17,7 +17,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useAuthoringWorkspace } from '../api/useAuthoringWorkspace';
 import { createId } from '@melearn/ui';
 import { RichTextEditor } from '../components/chapter/RichTextEditor';
 import { VideoEditor } from '../components/chapter/VideoEditor';
@@ -35,7 +35,7 @@ const kinds: Record<CourseItemType, { label: string; icon: React.ReactNode }> = 
 export function ChapterWorkspace() {
   const { courseId, chapterId } = useParams<{ courseId: string; chapterId: string }>();
   const [search] = useSearchParams();
-  const { data } = useLms();
+  const { data } = useAuthoringWorkspace();
   const course = data.courses.find((entry) => entry.id === courseId);
   const chapter = course?.chapters.find((entry) => entry.id === chapterId);
 
@@ -54,7 +54,7 @@ export function ChapterWorkspace() {
 }
 
 interface WorkspaceProps {
-  course: Course;
+  course: Course & { revision: number; itemHistory: Record<string,boolean> };
   initial: Chapter;
   initialItem?: string | null;
   initialAdd?: string | null;
@@ -68,14 +68,15 @@ interface UndoState {
 }
 
 function Workspace({ course, initial, initialItem, initialAdd, initialView }: WorkspaceProps) {
-  const { data, currentUser, saveChapterWorkspace, saveVideoTranscript, removeChapter } = useLms();
+  const { data, currentUser, saveChapterWorkspace, saveVideoTranscript, removeChapter } = useAuthoringWorkspace();
   const navigate = useNavigate();
   const initialQuizzes = (): Quiz[] =>
     initial.items
       .filter((item): item is CourseItem & { quizId: string } => 'quizId' in item && Boolean(item.quizId))
       .map((item) => data.quizzes.find((quiz) => quiz.id === item.quizId))
-      .filter((quiz): quiz is Quiz => Boolean(quiz));
+      .filter((quiz) => Boolean(quiz)) as Quiz[];
 
+  const revisionRef = useRef(course.revision);
   const [draft, setDraft] = useState<Chapter>(() => structuredClone(initial));
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => structuredClone(initialQuizzes()));
   const [baseline, setBaseline] = useState<string>(() =>
@@ -124,15 +125,9 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     item && 'quizId' in item && item.quizId
       ? quizzes.find((entry) => entry.id === item.quizId)
       : null;
-  const locked = Boolean(quiz && data.attempts.some((entry) => entry.quizId === quiz.id));
+  const locked = Boolean(quiz && course.itemHistory[quiz.id]);
 
-  const hasHistory = (entry: CourseItem): boolean =>
-    Boolean(
-      Object.values(data.progress[`${course.id}:${entry.id}`] || {}).some(Boolean) ||
-        ('quizId' in entry &&
-          entry.quizId &&
-          data.attempts.some((attempt) => attempt.quizId === entry.quizId))
-    );
+  const hasHistory = (entry: CourseItem): boolean => Boolean(course.itemHistory[entry.id]);
 
   const updateItem = (values: Partial<CourseItem>) => {
     setError('');
@@ -247,20 +242,25 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     return '';
   };
 
-  const save = (): boolean => {
+  const save = async (): Promise<boolean> => {
     const problem = validate();
     if (problem) {
       setError(problem);
       return false;
     }
     setSaving(true);
-    const result = saveChapterWorkspace(course.id, draft, quizzes, baseline);
+    const result = await saveChapterWorkspace(course.id, draft, quizzes, baseline, revisionRef.current);
     setSaving(false);
     if (!result.ok) {
       setError(result.message || 'บันทึกไม่สำเร็จ');
       return false;
     }
-    setBaseline(JSON.stringify({ chapter: draft, quizzes }));
+    const savedChapter = result.chapter!;
+    const selectedIndex = draft.items.findIndex(i => i.id === selected);
+    setDraft(savedChapter); setQuizzes(result.quizzes!);
+    if (selectedIndex >= 0) setSelected(savedChapter.items[selectedIndex]?.id ?? 'settings');
+    revisionRef.current = result.revision!;
+    setBaseline(JSON.stringify({ chapter: savedChapter, quizzes: result.quizzes }));
     dirtyRef.current = false;
     setUndo(null);
     setError('');
@@ -268,10 +268,10 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     return true;
   };
 
-  const saveTranscript = () => {
+  const saveTranscript = async () => {
     if (item?.type !== 'video' || currentUser?.role !== 'admin') return;
     setTranscriptSaving(true);
-    const result = saveVideoTranscript(course.id, draft.id, item.id, transcriptDraft);
+    const result = await saveVideoTranscript(course.id, draft.id, item.id, transcriptDraft);
     setTranscriptSaving(false);
     if (!result.ok) { message.error(result.message); return; }
     const withTranscript = (chapter: Chapter) => ({
@@ -306,15 +306,15 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
       content: 'มีการเปลี่ยนแปลงในบทนี้ที่ยังไม่บันทึก',
       okText: 'บันทึกแล้วกลับ',
       cancelText: 'อยู่ต่อ',
-      onOk: () => {
-        if (save()) go();
+      onOk: async () => {
+        if (await save()) go();
         else return Promise.reject();
       },
       footer: (_, { OkBtn, CancelBtn }) => (
         <Space>
           <Button
             danger
-            onClick={() => {
+            onClick={async () => {
               Modal.destroyAll();
               go();
             }}
@@ -348,7 +348,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
           title: newTitle.trim(),
           courseId: course.id,
           chapterId: draft.id,
-          passPercent: 60,
+          passPercent: 70,
           questions: [newQuestion()],
         },
       ]);
@@ -457,8 +457,8 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                   okText: 'ลบบท',
                   okButtonProps: { danger: true },
                   cancelText: 'ยกเลิก',
-                  onOk: () => {
-                    const result = removeChapter(course.id, draft.id);
+                  onOk: async () => {
+                    const result = await removeChapter(course.id, draft.id);
                     if (!result.ok) { message.error(result.message); return; }
                     dirtyRef.current = false;
                     navigate(`/teach/courses/${course.id}/curriculum`);
@@ -479,7 +479,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
           action={
             <Button
               size="small"
-              onClick={() => {
+              onClick={async () => {
                 if (!confirmTranscriptChange()) return;
                 setDraft((current) => {
                   const items = [...current.items];
@@ -501,7 +501,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
           <button
             type="button"
             className={`chapter-settings-link ${selected === 'settings' ? 'is-active' : ''}`}
-            onClick={() => { if (confirmTranscriptChange()) setSelected('settings'); }}
+            onClick={async () => { if (confirmTranscriptChange()) setSelected('settings'); }}
           >
             <SettingOutlined /> ข้อมูลบท
           </button>
@@ -537,7 +537,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                 <button
                   className="chapter-outline-select"
                   aria-current={selected === entry.id ? 'true' : undefined}
-                  onClick={() => {
+                  onClick={async () => {
                     if (confirmTranscriptChange()) setSelected(entry.id);
                   }}
                 >

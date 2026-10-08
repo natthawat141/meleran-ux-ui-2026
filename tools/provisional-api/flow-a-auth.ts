@@ -436,7 +436,7 @@ export const authRoutes: Route[] = [
       return ok({
         items: page.items.map((user) => ({
           id: user.id, display_name: user.display_name, username: user.username, email: user.email,
-          email_verified: user.email_verified, roles: [...user.roles], origin: user.origin,
+          email_verified: user.email_verified, roles: [...user.roles], origin: user.origin, avatar_url: user.avatar_url, created_at: user.created_at, status: user.origin === 'self_email' && !user.email_verified ? 'pending' : 'active',
         })),
         next_cursor: page.next_cursor,
       });

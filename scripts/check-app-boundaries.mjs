@@ -6,7 +6,7 @@ import { readAppRouteInventory } from './lib/app-route-inventory.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const appNames = ['web', 'admin'];
-const packageNames = ['ui', 'api-client', 'contracts', 'course-authoring', 'store'];
+const packageNames = ['ui', 'api-client', 'contracts', 'course-authoring'];
 const sourceExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs']);
 
 function sourceFiles(directory) {

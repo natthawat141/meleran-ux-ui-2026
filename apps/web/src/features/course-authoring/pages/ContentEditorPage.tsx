@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import { Alert, Button, Empty, Form, Input, Typography, message } from 'antd';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useAuthoringWorkspace } from '../api/useAuthoringWorkspace';
 import { PageTitle } from '@melearn/ui';
 import type { CourseItemType } from '@melearn/contracts';
 
@@ -22,9 +23,10 @@ interface ContentFormValues {
 export function ContentEditorPage({ type }: ContentEditorPageProps) {
   const { courseId, itemId } = useParams<{ courseId: string; itemId: string }>();
   const [search] = useSearchParams();
-  const { data, saveItem } = useLms();
+  const { data, saveItem } = useAuthoringWorkspace();
   const navigate = useNavigate();
   const course = data.courses.find((item) => item.id === courseId);
+  const revisionRef=useRef(course?.revision);
   const found = course?.chapters
     .flatMap((chapter) => chapter.items.map((item) => ({ ...item, chapterId: chapter.id })))
     .find((item) => item.id === itemId);
@@ -36,7 +38,7 @@ export function ContentEditorPage({ type }: ContentEditorPageProps) {
       title: '',
       duration: '',
       readingMinutes: 5,
-      videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      videoUrl: '',
       articleBody: '',
     };
   const [form] = Form.useForm<ContentFormValues>();
@@ -44,10 +46,10 @@ export function ContentEditorPage({ type }: ContentEditorPageProps) {
   if (!course || !chapter) return <Empty description="ไม่พบบทที่จะเพิ่มเนื้อหา" />;
 
   const isNew = itemId === 'new';
-  const submit = (values: ContentFormValues) => {
-    saveItem(course.id, chapter.id, { ...values, type, id: isNew ? undefined : itemId });
+  const submit = async (values: ContentFormValues) => {
+    try { await saveItem(course.id, chapter.id, { ...values, type, id: isNew ? undefined : itemId },revisionRef.current);
     message.success('บันทึกเนื้อหาแล้ว');
-    navigate(`/teach/courses/${course.id}/curriculum`);
+    navigate(`/teach/courses/${course.id}/curriculum`); } catch(e) {message.error(e instanceof Error?e.message:'บันทึกไม่สำเร็จ');}
   };
 
   return (

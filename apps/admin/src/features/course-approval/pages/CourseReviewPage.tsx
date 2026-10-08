@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, Button, Empty, Form, Input, Modal, Space, Table, Typography, message, type TableProps } from 'antd';
 import { Link } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { useManagedData } from '../../management/api/useManagedData';
 import { PageTitle, StatusTag } from '@melearn/ui';
 import type { Course } from '@melearn/contracts';
 
 export function CourseReviewPage() {
-  const { data, currentUser, reviewCourse } = useLms();
+  const { data, currentUser, reviewCourse } = useManagedData('reviews');
   const [returningCourse, setReturningCourse] = useState<Course | null>(null);
   const [form] = Form.useForm<{ reason: string }>();
   const pending = useMemo(() => data.courses.filter((course) => course.status === 'pending_review'), [data.courses]);
@@ -21,11 +21,11 @@ export function CourseReviewPage() {
     { title: 'สถานะ', key: 'status', render: () => <StatusTag status="pending_review"/> },
     { title: 'การจัดการ', key: 'actions', render: (_, course) => <Space wrap>
       <Link to={`/admin/courses/${course.id}/preview`}><Button>ดูตัวอย่าง</Button></Link>
-      <Button type="primary" onClick={() => {
-        const result = reviewCourse(course.id, 'approve');
+      <Button type="primary" onClick={async () => {
+        const result = await reviewCourse(course.id, 'approve');
         if (result.ok) message.success(result.message); else message.error(result.message);
       }}>อนุมัติ</Button>
-      <Button danger onClick={() => { setReturningCourse(course); form.resetFields(); }}>ส่งกลับ</Button>
+      <Button danger onClick={async () => { setReturningCourse(course); form.resetFields(); }}>ส่งกลับ</Button>
     </Space> },
   ];
 
@@ -34,9 +34,9 @@ export function CourseReviewPage() {
     <Alert className="bottom-space" type="info" showIcon message="การอนุมัติยังไม่เผยแพร่คอร์ส" description="หลังอนุมัติ ผู้สอนเจ้าของคอร์สหรือแอดมินจึงเผยแพร่ได้ หากมีการแก้เนื้อหาหรือแบบทดสอบก่อนเผยแพร่ สถานะจะกลับเป็นฉบับร่างและต้องส่งตรวจใหม่" />
     {pending.length ? <Table rowKey="id" dataSource={pending} columns={columns} pagination={{ pageSize: 10 }} scroll={{ x: 900 }} /> : <Empty description="ไม่มีคอร์สรอตรวจ"/>}
     <Modal open={Boolean(returningCourse)} title={`ส่ง “${returningCourse?.title ?? ''}” กลับให้ผู้สอน`} okText="ส่งกลับพร้อมเหตุผล" cancelText="ยกเลิก" onCancel={() => setReturningCourse(null)} onOk={() => form.submit()}>
-      <Form form={form} layout="vertical" onFinish={({ reason }) => {
+      <Form form={form} layout="vertical" onFinish={async ({ reason }) => {
         if (!returningCourse) return;
-        const result = reviewCourse(returningCourse.id, 'return', reason);
+        const result = await reviewCourse(returningCourse.id, 'return', reason);
         if (!result.ok) { message.error(result.message); return; }
         message.success(result.message);
         setReturningCourse(null);

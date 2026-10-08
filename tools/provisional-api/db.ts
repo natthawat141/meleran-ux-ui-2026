@@ -1,4 +1,4 @@
-// PROVISIONAL MOCK — development and tests only.
+// PROVISIONAL MOCK â€” development and tests only.
 //
 // In-memory records for the provisional API mock. These shapes model what a server might store; they are NOT
 // a database design, NOT a contract and NOT evidence that any Backend exists. Public responses are built by
@@ -56,13 +56,16 @@ export interface QuizQuestionRecord {
   id: string;
   type: QuestionType;
   prompt: string;
+  prompt_doc?: import('../../packages/contracts/src/management-http.ts').JsonValue | null;
+  rubric?: string | null;
+  response_mode?: 'text' | 'image' | 'either';
   points: number;
   options?: { id: string; text: string }[];
   /** Answer key. Never public, never in a learner-facing attempt before grading rules allow it. */
   correct_option_ids?: string[];
 }
 
-export interface QuizRecord { questions: QuizQuestionRecord[] }
+export interface QuizRecord { questions: QuizQuestionRecord[]; pass_percent?: number }
 
 export type ItemType = 'video' | 'article' | 'quiz';
 
@@ -73,12 +76,16 @@ export interface ItemRecord {
   /** Restricted: only learners with access (Flow C) and managers (Flow E) may read. */
   video_url?: string;
   body?: string;
+  body_doc?: import('../../packages/contracts/src/management-http.ts').JsonValue | null;
+  description?: string;
+  duration?: string;
+  reading_minutes?: number;
   quiz?: QuizRecord;
   /** Admin-only plain text for AI support (Flow G). */
   ai_transcript?: { text: string; edited_by: string; edited_at: string };
 }
 
-export interface ChapterRecord { id: string; title: string; items: ItemRecord[] }
+export interface ChapterRecord { id: string; title: string; description?: string; items: ItemRecord[] }
 
 export type CourseStatus = 'draft' | 'pending_review' | 'approved' | 'published';
 
@@ -95,6 +102,7 @@ export interface CourseRecord {
   price: Money | null;
   instructor_id: string;
   published_at: string | null;
+  published_by?: string | null;
   outcomes: string[];
   chapters: ChapterRecord[];
   /** Never public. */
@@ -266,6 +274,10 @@ export interface AiMessageRecord {
 }
 
 export interface BlogPostRecord {
+  revision?: number;
+  category?: string;
+  content_doc?: import('../../packages/contracts/src/management-http.ts').JsonValue | null;
+  author_display_name?: string;
   id: string;
   slug: string;
   title: string;

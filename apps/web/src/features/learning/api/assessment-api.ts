@@ -10,7 +10,7 @@ function decodeAttempt(value: unknown): AttemptView {
   return {
     id: str(a.id), item_id: str(a.item_id), course_id: str(a.course_id), number: Number(a.number), status: str(a.status) as AttemptView['status'],
     started_at: str(a.started_at), submitted_at: a.submitted_at as string | null, graded_at: a.graded_at as string | null,
-    questions: a.questions.map((question) => { const q = record(question); return { id: str(q.id), type: str(q.type) as AttemptQuestion['type'], prompt: str(q.prompt), points: Number(q.points), options: Array.isArray(q.options) ? q.options.map((option) => { const o = record(option); return { id: str(o.id), text: str(o.text) }; }) : [] }; }),
+    questions: a.questions.map((question) => { const q = record(question); return { id: str(q.id), type: str(q.type) as AttemptQuestion['type'], prompt: str(q.prompt), prompt_doc:(q.prompt_doc??null) as AttemptQuestion['prompt_doc'], points: Number(q.points), options: Array.isArray(q.options) ? q.options.map((option) => { const o = record(option); return { id: str(o.id), text: str(o.text) }; }) : [] }; }),
     answers: a.answers as AttemptView['answers'], max: Number(a.max), earned: a.earned as number | null, percent: a.percent as number | null, passed: a.passed as boolean | null,
     question_results: Array.isArray(a.question_results) ? a.question_results.map((row) => { const q = record(row); return { question_id: str(q.question_id), score: Number(q.score), max: Number(q.max), comment: q.comment as string | null }; }) : null,
   };

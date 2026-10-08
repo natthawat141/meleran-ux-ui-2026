@@ -1,62 +1,46 @@
 # R7–R10 — Frontend/API mock progress
 
-อัปเดต 9 ตุลาคม 2026 · `refactor/v1-api-ready` · ใช้ Final 1.6
+อัปเดต 9 ตุลาคม 2026 · `refactor/v1-api-ready` · Final 1.6
 
-สถานะ: **แก้ Auth/Profile และ DTO/config ที่ตรวจพบแล้ว แต่การถอน business localStorage ยังไม่ครบ**. ไม่มี Backend/OpenAPI จริง; Draft DTO ใช้พัฒนาและตรวจ mock ได้ตามคำสั่งผู้ใช้ ไม่ต้องรอ Backend เพื่อเริ่ม Frontend. การย้ายไฟล์/root `src` sunset ไม่ใช่การย้าย business state เสร็จ.
+## ผลชุดย้าย business state
 
-## ชุดแก้ล่าสุด
+Authoring, Instructor และ Admin management/Blog ที่เหลือย้ายผ่าน app-owned HTTP client และ TanStack Query แล้ว. ถอน `packages/store`, dependencies/aliases, prototype providers และ business localStorage ใน active source. ไม่มี LmsData snapshot endpoint หรือ fallback ไป store เมื่อ API ล้มเหลว. โครงสร้างนี้พร้อมทำ Backend ตาม Draft contract แต่ยังไม่ใช่ Production integration.
 
-| ประเด็น | ผลปัจจุบัน | ขอบเขตที่ยังไม่เสร็จ |
-| --- | --- | --- |
-| Login → Profile ว่าง | Web/Admin อ่าน identity จาก API session เท่านั้น; Profile อ่าน `GET /me`, บันทึก `PATCH /me` และ refresh session; ไม่มี fallback ไป user ของ store; learner route ใช้ learning_eligible จาก server จึงไม่บังคับบัญชี Admin-created ที่ไม่มีอีเมลไปยืนยันอีเมล | Google OAuth/Media upload จริงยังไม่มี; Profile รองรับ URL รูปภาพ |
-| DTO ไม่ตรง payload | Login ใช้ identifier/password/audience; CurrentUser nullable username/email/avatar, origin ที่ตรง mock และ profile object; Catalog nullable fields; direct error/success envelope; API response types ของ Learning/Assessment/Certificate/Payment/Redeem/AI/Admin อยู่ใน `packages/contracts/src/http-responses.ts` และ feature ใช้ aliases | DTO ยัง Draft; legacy/UI models ใน contracts ยังต้องถอนหลัง migrate ทุก consumer; ยังไม่มี strict decoder/typed requests ครบทุก operation หรือ OpenAPI |
-| ข้อมูลหลายแหล่ง | Catalog, Landing course collection และ `/explore` ใช้ API ชุดเดียว; Public Blog/Landing articles ใช้ paginated API; Auth/Profile/learner flows ไม่ mount prototype provider; Admin Redeem/Payment/AI ใช้ API ในทุก build ไม่ fallback local page | Authoring/Instructor/Admin management/Admin Blog editor ยังใช้ `packages/store`/localStorage และไม่ได้แชร์ข้อมูลกับ API mock |
-| Docker อ้าง src ที่ลบแล้ว | ถอด COPY src, ใส่ workspace manifests course-authoring/store ก่อน npm ci, build arguments สำหรับ API mode/base URL; runtime COPY เฉพาะ dist ของ app; API/mock paths ตอบ 404 แทน SPA HTML | ตรวจ Dockerfile/build context แบบ static ผ่าน; **ยังไม่ได้ build/run Docker ใหม่** เพราะ Docker daemon ติดต่อไม่ได้. รายงาน R11 เดิมอ้าง revision เก่า |
+| หน้าจอ | แหล่งข้อมูลและการบันทึกปัจจุบัน |
+| --- | --- |
+| Course overview/settings/create | scoped course list + authoring detail, metadata POST/PATCH, optimistic revision |
+| Curriculum/Chapter/Content/Quiz editor | course-resource PATCH; preserve rich documents/options/answer keys, generated IDs, order และ history guards |
+| Instructor dashboard/learner list/course roster | summary/roster APIs; counts, progress และ certificate snapshots จาก server |
+| Quiz attempts/essay grading | owned attempts/queue + score ต่อ question; server รวมคะแนนและยืนยันผ่าน `>70%`; Admin ตรวจคะแนนไม่ได้ |
+| Public Instructor | public allowlist/profile + Published courses; ไม่ส่ง private account fields |
+| Admin dashboard/users/instructors/detail/review | summaries, account detail/history, additive role grant, revision-aware approve/return |
+| Admin Blog list/editor/preview/public | Blog resource CRUD/publish/unpublish; rich document/category/author/read-time ชุดเดียวกัน, revision-aware writes |
 
-Profile update ไม่รับ roles/email_verified/OAuth state; mock ตรวจ username unique และวันเกิดก่อน mutation. ค่า certificateName/ชื่อจริงถูก snapshot ตอนออกใบรับรองครั้งแรก; แก้ profile ภายหลังไม่เปลี่ยนใบรับรองเก่า. Tests นี้พิสูจน์ in-memory server behavior เท่านั้น.
+`packages/course-authoring` ใช้ร่วมจริงใน controlled editors และ pure HTTP/form conversion เท่านั้น. HTTP hooks, auth และ business policy อยู่กับแต่ละ app. UI types บางตัวที่ชื่อเดิมยังอยู่ใน contracts เพื่อ presentation; wire DTO ไม่อนุมานจาก types เหล่านั้น.
 
-Public Blog เก็บ URL เดิม `/articles/:id`: list หา id/slug ก่อนขอ detail ด้วย slug และไม่เปิด Draft. Category/author/rich document metadata ยังไม่มีใน DTO ของ mock ปัจจุบัน; UI ใช้หมวดทั่วไปและ plain content, เวลาอ่านเป็นค่าประมาณ. ต้องเพิ่ม Draft fields/renderer acceptance เมื่อย้าย Admin Blog editor เพื่อให้ editor/public อ่านชุดเดียวกัน.
+## Contract ส่งต่อ Backend
 
-## API configuration
+ดู [API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md) ภาคผนวก Screen HTTP Draft และ [Auth/Profile/Catalog Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md). Canonical wire types อยู่ `packages/contracts/src/management-http.ts`, `blog.ts`, `http-responses.ts`. ครอบคลุม request/response, nullable fields, generated IDs, validation, conflict/history errors และ ownership ของหน้าที่ย้าย.
 
-- แต่ละ app มี `src/shared/api/client.ts`/`config.ts`; packages/api-client เป็น transport กลาง ไม่ถือ business/session policy
-- `VITE_API_MODE=mock|remote`; default Vite dev ใช้ mock, build ใช้ remote
-- `VITE_API_BASE_URL` default mock `/mock-api/v1`, remote `/api/v1`; `VITE_API_CREDENTIALS` default include. เป็น build-time config, เปลี่ยนแล้วต้อง build ใหม่
-- API failure แสดง loading/error/guest ตาม HTTP result ไม่ fallback localStorage. ปุ่ม/endpointจำลอง Stripe ถูกจำกัด mock mode
-- Nginx ใน frontend container ยังไม่มี backend proxy; /api และ /mock-api คืน 404. ใช้ external base URL หรือเพิ่ม proxy หลังตกลง Backend/CORS/cookie/CSRF
-- ทุก feature ยัง prototype ตาม release registry; production gate ไม่ถูกเปลี่ยนเป็น released จากการแก้นี้
+DTO ยัง **Draft** ตามคำสั่งผู้ใช้. การตกลงกับ Backend ต้องตรวจ OpenAPI, authentication/cookie/CORS/CSRF, transactions, persistence, uploads, delete retention และ provider errors. Adapter resources ใหม่ตรวจ root object/list และ safe error fields แต่ยังไม่มี full runtime schema decoder ทุก field.
 
-## API flows ที่มีอยู่
+## Configuration และการตรวจ
 
-- R7: My Courses, outline/lesson/resume/complete, attempt/save/submit/result, `/teach/reviews` queue และ certificate ใช้ API/query hooks
-- R8: Checkout/Payment status, mock signed webhook, Redeem; Admin code create/search/revoke และ Payment lookup. Real Stripe redirect/webhook/database acceptance ยังเปิด
-- R9: AI conversations/messages/context/quota/practice; Admin course AI toggle/transcript ใช้ deterministic mock. ไม่มี AI provider จริง
-- ไม่มีการ reset demo data หรือนำ API session ไปเขียนใส่ store. Provider เดิมจำกัดใน `PrototypeDataBoundary` ของแต่ละ app; ไม่ได้ทำให้ข้อมูลเหล่านั้นกลายเป็น server state
+- `npm.cmd run dev:web` / `npm.cmd run dev:admin`: สอง Vite apps ใช้ mock server ร่วมบน 127.0.0.1:8787, cookies/query cache แยก app/account
+- `MELEARN_MOCK_PORT` เปลี่ยน port ของ Vite mock startup/proxy; standalone ใช้ `node tools/provisional-api/dev-server.ts <port>`
+- `VITE_API_MODE=mock|remote`, `VITE_API_BASE_URL`, `VITE_API_CREDENTIALS` เป็น build-time configuration; default dev=mock, build=remote. ไม่มี API แสดง error ไม่ fallback
+- Frontend containers มีเฉพาะ app dist; manifests ไม่อ้าง store. Nginx ยังไม่มี Backend proxy และ API paths คืน 404 ต้องต่อ URL/proxy หลังตกลง Backend
 
-## Inventory ของ localStorage ที่ยังต้องย้าย
+หลักฐานรอบนี้: tests ของ mock business flows, DTO compatibility และ actual feature client → HTTP mock; typecheck/boundaries/build ทั้ง Web/Admin. `npm.cmd test` 154/154 ผ่าน; `npm.cmd run typecheck`, `npm.cmd run check:boundaries`, `npm.cmd run build` และ `git diff --check` ผ่าน. Build ยังเตือน dependency use-client และ chunk size. ลบ 11 test modules ของ store ที่ถอนแล้ว และเพิ่ม tests ของ HTTP resource/client แทน; จำนวน tests เก่า 191 ไม่ใช่ผลรอบนี้.
 
-| App / Route family | Source owner | งานถัดไปและ JSON/operation ที่ต้องเพิ่ม/ยืนยัน |
-| --- | --- | --- |
-| Web `/teach` และ `/teach/courses/*` | instructors, course-authoring | Course metadata/version, chapters/items/reorder, quiz/options/correct answer references, owner-scoped learners/summary; เพิ่ม runtime decoders และ async save/error/conflict states |
-| Web `/teach/quizzes/*/attempts`, `/teach/attempts/*/grade` | instructors/QuizPages | ต่อ assessment API แทน attempts/users ใน store; API queue ปัจจุบันอยู่ `/teach/reviews` เท่านั้น |
-| Web `/instructors/:id` | instructors/InstructorProfilePage | Public Instructor detail + published course list; ไม่มี public Instructor detail endpoint ใน mock ปัจจุบัน |
-| Admin `/admin`, users/instructors/courses/reviews/learners | management, course-approval, course-authoring | API summaries/account detail/learning history/roster และ review/version operations; ห้ามคำนวณสิทธิ์/คะแนนจาก snapshot localStorage |
-| Admin `/admin/articles/*` | blog | ย้าย editor/preview/list ไป Blog API; เพิ่ม category/read-time/rich document และ delete/unpublish ตาม scope; flow ปัจจุบันยังไม่มีครบ |
+Browser รอบ migration นี้ **ยังไม่ตรวจสำเร็จ**: in-app browser เปิด local dev แล้วถูก `net::ERR_BLOCKED_BY_CLIENT`. Tests ของ feature clients ใช้ query/hook harness จึงไม่ยืนยัน React lifecycle, layout หรือการคลิกจริง. หลักฐาน browser เก่าเป็นคนละ revision. ไม่ได้ build/run Docker ใหม่ในชุดนี้.
 
-สิ่งเหล่านี้เป็น Frontend/mock work ที่ค้าง ไม่ใช่ข้ออ้างว่าต้องรอ Backend ทุกข้อ. ปิดได้ด้วย Draft DTO + mock operation + feature adapter/page migration ทีละ flow แล้วค่อยถอน packages/store. ห้ามแก้ด้วยการส่ง LmsData ทั้งก้อนเป็น API snapshot หรือย้าย localStorage ไป memory แล้วเรียกว่า API-ready.
+## Acceptance ที่ยังเปิด
 
-## หลักฐานล่าสุด
-
-- `npm.cmd test`: **191/191 ผ่าน** ครอบ login DTO, Profile refresh/new session, reject privileged fields/invalid DOB/duplicate username, certificate name snapshot, Blog pagination/draft filtering และ provider boundary
-- `npm.cmd run typecheck`: Web/Admin/packages ผ่าน
-- `npm.cmd run check:boundaries` และ `git diff --check` ผ่าน
-- `npm.cmd run build`: Web/Admin ผ่าน; dependency use-client/chunk-size warnings ยังมี
-- Browser: Login learner → Profile แสดงข้อมูล → บันทึกชื่อ/ชื่อจริง → refresh ยังอยู่; Admin Login → Profile บันทึกอีกบัญชี → Web ยังเป็นผู้เรียน. ตรวจซ้ำหลังถอด root persistence provider แล้ว Profile ทั้งคู่แสดงข้อมูล
-- Browser: `/articles` แสดงสอง Published posts จาก mock, เปิด `/articles/blg_mock_001` แล้วเห็น content ที่ตรง API; Draft ไม่แสดง. ภาพ local proof อยู่ `D:/code/elearn-prod/artifacts/api-session-fix/`
-- ยังไม่ได้ browser-interact ทุก R7–R9 flow ใหม่หลังแก้ config; responsive/accessibility matrix, real Google/Stripe/AI, database persistence และ production authorization ยังเปิด
-
-## วิธีรันและขั้นตอนต่อไป
-
-Web `npm run dev:web`, Admin `npm run dev:admin`; mock server memory ที่ 127.0.0.1:8787. Learner `learner@example.test`, Instructor `instructor-a@example.test`, Admin `admin`; รหัส mock `mock-password-1`. Restart mock แล้วข้อมูลธุรกิจจำลองหาย.
-
-ต่อด้วย migration ตาราง localStorage ข้างบนพร้อม Draft JSON ของแต่ละหน้าจอ, ถอน store หลัง consumer เป็นศูนย์, ตรวจ Docker ใหม่เมื่อ daemon พร้อม. R10/R13 ยังไม่ผ่าน Backend/Final acceptance; ห้ามสรุปว่าเหลือแค่เปลี่ยน URL ก็ Production พร้อม.
+- Backend/OpenAPI/database จริงยังไม่มี; mock in-memory restart แล้วข้อมูลหาย ไม่รับประกัน concurrency/transactions จริง
+- Google OAuth, verification email delivery, media upload, Stripe/provider webhook และ AI provider จริงยังไม่พร้อม
+- Full browser regression ของ rich editors/reorder/draft restore/error/retry และ responsive ยังต้องตรวจ
+- Rich image data URLs เป็นความสามารถของ mock/editor; ต้องตกลง safe upload/storage/renderer policy กับ Backend
+- Blog unpublish/delete เป็น Draft API สำหรับ affordance เดิม; ต้องตกลง audit/retention ก่อน Production
+- ปรับ server filtering/search เมื่อ dataset ใหญ่; บางหน้าโหลด paginated summaries หลายหน้าเพื่อ filter ใน UI
+- R10/R13 ยังเปิดสำหรับ real integration/final acceptance; release registry ไม่ถูกเปลี่ยนเป็น released ด้วยผล mock/build

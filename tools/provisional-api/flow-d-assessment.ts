@@ -26,7 +26,7 @@ function quizFound(context: RequestContext, itemId: string) {
 
 function publicQuestion(question: QuizQuestionRecord) {
   return {
-    id: question.id, type: question.type, prompt: question.prompt, points: question.points,
+    id: question.id, type: question.type, prompt: question.prompt, points: question.points, prompt_doc:question.prompt_doc??null,
     options: question.options?.map((option) => ({ id: option.id, text: option.text })) ?? [],
   };
 }
@@ -224,7 +224,7 @@ export const assessmentRoutes: Route[] = [
       }).map((attempt) => {
         const learner = context.db.users.get(attempt.user_id);
         return {
-          attempt_id: attempt.id, course_id: attempt.course_id, item_id: attempt.item_id,
+          attempt_id: attempt.id, course_id: attempt.course_id, item_id: attempt.item_id, user_id: attempt.user_id,
           learner_display_name: learner?.display_name ?? '', submitted_at: attempt.submitted_at,
           questions_to_grade: attempt.snapshot.filter((question) => (question.type === 'essay' || question.type === 'image') && !attempt.grades[question.id]).map((question) => ({
             question_id: question.id, type: question.type, prompt: question.prompt, max: question.points,

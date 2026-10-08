@@ -42,11 +42,11 @@ export function AssessmentEditor({ quiz, onChange, locked = false }: AssessmentE
       <label>
         คะแนนผ่าน (%)
         <InputNumber
-          disabled={locked}
+          disabled
           min={1}
           max={100}
-          value={quiz.passPercent}
-          onChange={(value) => onChange({ passPercent: value ?? 60 })}
+          value={70}
+          onChange={(value) => onChange({ passPercent: value ?? 70 })}
         />
       </label>
       {locked && (
