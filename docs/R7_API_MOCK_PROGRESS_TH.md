@@ -37,13 +37,13 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 ## R10 และข้อจำกัดที่ยังเปิด
 
 - Automated tests วิ่ง cross-flow บน provisional server ครอบ Auth/Catalog/Enrollment/Learning/Assessment/Certificate/Payment/Redeem/AI/Authoring/Blog/Admin rules; `npm.cmd test` ผ่าน 173/173
-- Browser smoke ตรวจ Web Landing อ่าน Catalog mock และ Guest `/courses/crs_mock_002` แสดง course detail/content/ราคาได้; แก้การ redirect ไป Login ที่เกิดจาก legacy `currentUser`
+- Browser smoke ตรวจ Web Landing และ Guest `/courses/crs_mock_002`; หลัง login ด้วยบัญชีทดลองยืนยัน Web `/learn/ai` และ `/checkout/crs_mock_002` render ได้ และ Admin `/admin/access-codes`, `/admin/payments`, `/admin/ai` render ได้; logout ทั้งสอง app หลังตรวจ โดยไม่สร้าง Payment/แก้ข้อมูลจาก UI
 - Local HTTP smoke ยืนยัน Catalog 3 รายการ และ Web/Admin sessions แยกกันเมื่อใช้ mock server เดียว
 - R10 **ยังไม่สมบูรณ์**: ไม่มี Backend owner/OpenAPI, database, Stripe credentials/webhook runtime หรือ AI provider; จึงไม่มีหลักฐาน persistence ข้าม session/device หรือ authorization จาก server จริง
 - `R4a` ยัง Draft; DTO ของ mock ไม่ถูกนำไปใส่ `packages/contracts` และต้อง freeze กับ Backend ต่อ flow
 - Auth register/verification/reset/Google, Admin business APIs, Course Authoring และ `/explore` ยังเป็น local/demo flows
 - Mock server เก็บข้อมูลใน memory; restart แล้ว Payment/Enrollment/Progress/Attempt/Certificate/AI history/transcript หาย
-- ยังไม่ได้ browser-interact authenticated journey ครบทุก flow, responsive/accessibility matrix หรือ Admin Payment lookup ด้วยข้อมูลที่สร้างจาก browser; tests/API smoke ไม่แทน UI acceptance
+- ยังไม่ได้ browser-interact authenticated journey ครบทุก flow, responsive/accessibility matrix หรือ Admin Payment lookup ด้วย Payment จริงที่สร้างจาก Web UI; รอบนี้ยืนยันเฉพาะการ render ของหน้าที่ระบุ ไม่ได้ submit chat/practice, redeem, checkout, issue code หรือแก้ Transcript; tests/API smoke ไม่แทน UI acceptance
 - ไม่ถอน legacy fallback เพราะยังเป็นเส้นทาง production prototype; R10 cleanup รอ real API replacement
 - Docker ไม่ได้รันตามคำสั่งผู้ใช้
 
@@ -53,7 +53,7 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 - `npm.cmd test` ผ่าน 173/173
 - `npm.cmd run check:boundaries` ผ่าน
 - `npm.cmd run build` และ token check ผ่านทั้ง Web/Admin; มี warnings `use client` ของ dependencies และ chunk เกิน 500 kB
-- Browser smoke ผ่าน Web Landing และ Guest `/courses/crs_mock_002`; ไม่ได้ทำ authenticated UI end-to-end
+- Browser smoke ผ่าน Web Landing/Guest course detail และ authenticated page-render smoke สำหรับ Web AI/Checkout กับ Admin redeem/payment/AI ด้วยบัญชีทดลอง; ยังไม่ใช่ authenticated end-to-end flow หรือ responsive/accessibility acceptance
 
 ## ขั้นตอน dev
 
