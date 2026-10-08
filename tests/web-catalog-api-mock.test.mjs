@@ -6,10 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { createHttpClient, HttpClientError } from '@melearn/api-client';
 import { createCatalogApi } from '../apps/web/src/features/courses/api/catalog-api.ts';
 import { decodeCourseDetail, decodeCoursePage } from '../apps/web/src/features/courses/api/catalog-provisional-contract.ts';
-import { mockRestrictedKeys, mockSecretMarkers, provisionalCatalogRecords } from '../apps/web/src/features/courses/api/provisional-mock/catalog-fixtures.ts';
-import { createProvisionalCatalogFetcher } from '../apps/web/src/features/courses/api/provisional-mock/catalog-fetcher.ts';
+import { createProvisionalApi, mockRestrictedKeys, mockSecretMarkers, seedCourses as provisionalCatalogRecords } from '../tools/provisional-api/index.ts';
 
 const basePath = '/mock-api/v1';
+const createProvisionalCatalogFetcher = ({ environment, basePath: path }) => createProvisionalApi({ environment, basePath: path }).createFetcher();
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publishedIds = ['crs_mock_003', 'crs_mock_002', 'crs_mock_001']; // newest first
 const hiddenIds = ['crs_mock_draft', 'crs_mock_pending', 'crs_mock_approved'];
@@ -179,12 +179,16 @@ test('rejects payloads outside the draft shape and drops unknown fields', async 
   assert.throws(() => decodeCourseDetail({ ...summary, description: null, outcomes: [], outline: [{ id: 'c', title: 'C', items: [{ id: 'i', type: 'assignment', title: 'T' }] }] }));
 });
 
-test('honours cancellation and refuses non-GET requests', async () => {
+test('honours cancellation and answers 405 for methods the catalog does not offer', async () => {
   const { api, mockFetcher } = setup();
   const controller = new AbortController();
   controller.abort();
   await assert.rejects(api.listCourses({}, { signal: controller.signal }), (error) => error instanceof HttpClientError && error.kind === 'aborted');
-  await assert.rejects(mockFetcher(`${basePath}/courses`, { method: 'POST', body: '{}' }), /GET requests only/);
+  for (const [method, url] of [['POST', 'courses'], ['DELETE', 'courses/crs_mock_001'], ['PUT', 'courses/crs_mock_001']]) {
+    const response = await mockFetcher(`${basePath}/${url}`, { method, body: '{}' });
+    assert.equal(response.status, 405, `${method} ${url}`);
+    assert.equal((await response.json()).error.code, 'method_not_allowed');
+  }
 });
 
 test('keeps the provisional mock out of app runtime code and the shared contracts package', () => {
@@ -198,11 +202,10 @@ test('keeps the provisional mock out of app runtime code and the shared contract
     if (entry.isDirectory()) return sourceFiles(absolute);
     return /\.(?:ts|tsx|js|jsx|mjs)$/.test(entry.name) ? [absolute] : [];
   });
-  const mockDirectory = path.join(apiDirectory, 'provisional-mock') + path.sep;
-  for (const appName of ['web', 'admin']) {
-    for (const file of sourceFiles(path.join(root, 'apps', appName, 'src'))) {
-      if (file.startsWith(mockDirectory)) continue;
-      assert.ok(!/provisional-mock|catalog-fixtures|catalog-fetcher/.test(readFileSync(file, 'utf8')), `${path.relative(root, file)} references the provisional mock`);
+  for (const directory of [path.join(root, 'apps/web/src'), path.join(root, 'apps/admin/src'), path.join(root, 'packages')]) {
+    for (const file of sourceFiles(directory)) {
+      if (file.includes(`${path.sep}node_modules${path.sep}`)) continue;
+      assert.ok(!/provisional-mock|provisional-api/.test(readFileSync(file, 'utf8')), `${path.relative(root, file)} references the provisional mock`);
     }
   }
   const contractsSource = sourceFiles(path.join(root, 'packages/contracts/src')).map((file) => readFileSync(file, 'utf8')).join('\n');
