@@ -1,76 +1,10 @@
-import React from 'react';
-import { Alert, Button, Empty, Form, Input, Popconfirm, Typography, message } from 'antd';
+import { Alert, Button, Empty, Form, Input, Typography, message } from 'antd';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '../../store';
+import { useLms } from '@legacy/store';
 import { PageTitle } from '@melearn/ui';
-import type { CourseItemType } from '../../types';
-export { CurriculumPage } from './CurriculumWorkspace';
+import type { CourseItemType } from '@legacy/types';
 
 const { Text } = Typography;
-
-interface ChapterFormValues {
-  title: string;
-  description?: string;
-}
-
-export function ChapterEditorPage() {
-  const { courseId, chapterId } = useParams<{ courseId: string; chapterId: string }>();
-  const { data, saveChapter, removeChapter } = useLms();
-  const navigate = useNavigate();
-  const course = data.courses.find((item) => item.id === courseId);
-  const chapter = course?.chapters.find((item) => item.id === chapterId);
-  const [form] = Form.useForm<ChapterFormValues>();
-
-  if (!course || !chapter) return <Empty description="ไม่พบบทนี้" />;
-
-  const submit = (values: ChapterFormValues) => {
-    saveChapter(course.id, { ...values, id: chapter.id, items: chapter.items });
-    message.success('บันทึกบทแล้ว');
-    navigate(`/teach/courses/${course.id}/curriculum`);
-  };
-
-  return (
-    <>
-      <PageTitle
-        eyebrow="แก้บทเรียน"
-        title={chapter.title}
-        subtitle={`อยู่ในคอร์ส ${course.title}`}
-        actions={
-          <Link to={`/teach/courses/${course.id}/curriculum`}>
-            <Button>กลับโครงสร้างบท</Button>
-          </Link>
-        }
-      />
-      <div className="content-editor-panel">
-        <Form form={form} layout="vertical" initialValues={chapter} onFinish={submit}>
-          <Form.Item label="ชื่อบท" name="title" rules={[{ required: true, message: 'กรอกชื่อบท' }]}>
-            <Input size="large" />
-          </Form.Item>
-          <Form.Item label="คำอธิบาย" name="description">
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Button type="primary" htmlType="submit">
-            บันทึกบท
-          </Button>
-          <Popconfirm
-            title="ลบบทนี้หรือไม่"
-            okText="ลบ"
-            cancelText="ยกเลิก"
-            onConfirm={() => {
-              const result = removeChapter(course.id, chapter.id);
-              if (!result.ok) { message.error(result.message); return; }
-              navigate(`/teach/courses/${course.id}/curriculum`);
-            }}
-          >
-            <Button danger className="left-space">
-              ลบบท
-            </Button>
-          </Popconfirm>
-        </Form>
-      </div>
-    </>
-  );
-}
 
 interface ContentEditorPageProps {
   type: CourseItemType;

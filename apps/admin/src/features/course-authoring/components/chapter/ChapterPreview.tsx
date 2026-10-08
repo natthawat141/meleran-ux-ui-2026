@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Empty, Modal, Radio, Space, Tag } from 'antd';
 import { RichDocument } from '@melearn/ui';
-import type { Chapter, EssayQuestion, Quiz } from '../../types';
+import type { Chapter, EssayQuestion, Quiz } from '@legacy/types';
 
 export interface ChapterPreviewProps {
   chapter: Chapter;

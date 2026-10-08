@@ -20,7 +20,7 @@
 - ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก R2b สร้าง workspace/entry/build และ route owners แล้ว; R5c ย้าย Web public/account slices กับ Admin Blog list/editor ชุดแรกเข้า app; modules ใต้ root `src/` ที่ยังเหลือเป็น transitional bridge ผ่าน alias `@legacy` ไม่ใช่ app runtime
 - ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
 - `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
-- เป้าหมายคือแต่ละแอปเป็นเจ้าของ page/route orchestration ของตนเอง; ระหว่าง migration ยังมี route pages ที่เรียกผ่าน `@legacy`. R6b extract controlled Course Metadata Editor UI เป็น `@melearn/course-authoring`; R6c ย้าย CourseEditor page host ไป Web/Admin แยกกัน โดย host ยังเรียก transitional local store และรับผิดชอบ persistence, capabilities, actions และ navigation. Curriculum, Chapter/Content และ Quiz ยังเป็น legacy. Shared package รับเฉพาะ form/draft, capabilities และ callbacks; extract เพิ่มเมื่อมีผู้ใช้ร่วมและ interface ชัด ไม่ copy editor ทั้งก้อนหรือ import source ข้ามแอป
+- เป้าหมายคือแต่ละแอปเป็นเจ้าของ page/route orchestration ของตนเอง. R6b extract controlled Course Metadata Editor UI เป็น `@melearn/course-authoring`; R6c แยก CourseEditor hosts; R6d ย้าย Course Overview, Curriculum, Chapter, Content และ Quiz authoring pages ไป `apps/web`/`apps/admin` พร้อม chapter editor components/styles ในแต่ละ app. Admin Quiz Manager เป็น authoring-only; attempt review/grading คงเป็น Instructor assessment ใน Web. หน้าต่าง app-owned เหล่านี้ยังต่อกับ `@legacy/store`, prototype data/types และ local draft บางส่วนจน R4 contracts/API flow รองรับ; การย้ายหน้าไม่ยืนยัน API readiness หรือ server permissions. Shared package ปัจจุบันมีเฉพาะ controlled metadata UI; อย่าขยาย package หรือคัดลอก editor ทั้งก้อนข้าม apps โดยไม่มี interface/reuse evidence ที่ตรวจได้
 - `packages/ui` เป็น shared UI/theme adapters (R2b export `PageTitle`/`StatusTag`; R3a เพิ่ม `MelearnUiProvider`; R3b ใช้ `design-tokens.json` เป็น source เดียวที่ TypeScript adapters อ่านและ generator แปลงเป็น `tokens.css`/`tailwind.css`); Web/Admin เป็นเจ้าของ Router กับ LmsProvider ของตน และแต่ละ app stylesheet import shared Tailwind พร้อมลงทะเบียน source scope ของแอป; `src/shadcn.css`/`src/styles.css` คงเป็น compatibility imports สำหรับ legacy; `packages/api-client` export generic HTTP/error transport จาก R4b-prep โดยไม่กำหนด API origin, auth/session policy, envelope หรือ business DTO; `packages/contracts` ยังไม่มี API DTO/types เพราะ R4a เป็น Draft ที่รอ Backend ยืนยัน. ห้ามคัดลอก `LmsData` หรือ seed model ทั้งก้อนเป็น server contract
 - Dependency ไหลจาก apps ไป packages; packages ห้าม import apps; ห้าม app หนึ่ง import source ภายในอีก app และห้ามวงจรระหว่าง packages API เฉพาะ feature อยู่ใน feature ของแต่ละแอป ระหว่าง migration อนุญาตเฉพาะ alias `@legacy/*` ไปยัง prototype root ที่ระบุในแผน; ลบ alias เมื่อ slice ถูกย้ายแล้ว
 - `App.tsx` ประกอบ providers/router เท่านั้น; R3c แยก route declarations และ UX access wrappers ไป `apps/web/src/app/router/` (Public/Auth/Learner/Instructor/System) กับ `apps/admin/src/app/router/` (Entry/Management/Authoring/System) โดย snapshot/test คง path, feature key, element และลำดับเดิม ปัจจุบัน wrappers ยังเรียก `@legacy` pages/shells; dedicated `layouts/` และ feature slices จะเกิดระหว่างการย้าย flow ไม่ถือว่าแยก legacy implementation เสร็จแล้ว
@@ -48,7 +48,7 @@
 | Shared shell/navigation/profile | `src/components/Shell.tsx` |
 | Shared profile image/default avatar | `src/components/UserAvatar.tsx`, `user-avatar.css` |
 | Workspace notification menu | `src/components/WorkspaceNotifications.tsx`, `workspace-notifications.css` |
-| Review queue / grading workspace | `src/pages/instructor/LearnerReviewQueuePage.tsx`, `QuizPages.tsx`, `review-queue.css`, `grading-workspace.css` |
+| Review queue / grading workspace | `src/pages/instructor/LearnerReviewQueuePage.tsx`, ส่วน attempts/grading ใน `QuizPages.tsx`, `review-queue.css`, `grading-workspace.css`; Admin ไม่มี route ตรวจ/ให้คะแนน |
 | Shared title/status exports | `packages/ui/src/`; legacy common re-exports from package |
 | Tokens / light-dark foundation | `packages/ui/src/design-tokens.json`, `design-tokens.ts`, `theme.ts` |
 | Generated CSS / Tailwind theme | `packages/ui/src/tokens.css`, `tailwind.css`; generator `scripts/generate-ui-tokens.mjs` |
@@ -60,9 +60,10 @@
 | Web public blog reader | `apps/web/src/features/blog/pages/BlogPages.tsx`; Published only, ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` |
 | Admin blog list/editor/article preview | `apps/admin/src/features/blog/pages/`; preview route `/articles/:id` ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` และ RichDocument จาก `packages/ui` |
 | Web/Admin profile pages | `apps/web/src/features/account/pages/ProfilePage.tsx`, `apps/admin/src/features/account/pages/ProfilePage.tsx`; `ProfileSettings` form และ profile state ยังเป็น legacy bridge |
-| Curriculum จริงที่ route ใช้อยู่ | `src/pages/instructor/CurriculumWorkspace.tsx`, `curriculum-workspace.css` |
-| Chapter workspace จริง | `src/pages/instructor/ChapterWorkspace.tsx`, `chapter-workspace.css` |
-| Video / article / assessment editors | `src/components/chapter/VideoEditor.tsx`, `RichTextEditor.tsx`, `AssessmentEditor.tsx`, `ChapterPreview.tsx` |
+| Web/Admin course overview และ curriculum | `apps/web/src/features/course-authoring/pages/{CourseOverviewPage,CurriculumPage}.tsx`; Admin-owned versions อยู่ใน path เดียวกันใต้ `apps/admin/` |
+| Chapter/content/quiz authoring | App-owned `ChapterWorkspace.tsx`, `ContentEditorPage.tsx`, `QuizManagerPage.tsx`, `QuizEditorPage.tsx` และ `components/chapter/` + CSS ใต้ `apps/web/src/features/course-authoring/` กับ `apps/admin/src/features/course-authoring/` |
+| Instructor attempt review/grading | `src/pages/instructor/QuizPages.tsx` และ `LearnerReviewQueuePage.tsx`; ย้ายภายหลังกับ assessment flow |
+| Rich text editor bridge | `components/chapter/RichTextEditor.tsx` ใน Web/Admin authoring; `src/components/chapter/RichTextEditor.tsx` ยังใช้จาก legacy Blog editor |
 | Admin courses และ card/table toggle | `src/pages/admin/AdminPages.tsx`, `admin-courses.css` |
 | State/actions/persistence | `src/store.tsx`, `src/lib/prototype-snapshot.ts` (local compatibility ไม่ใช่ API contract) |
 | Prototype Redeem / code lifecycle | `src/lib/redeem-code.ts`, `src/pages/learner/RedeemCourseCodePage.tsx`, `src/pages/admin/AccessCodesPage.tsx` |
@@ -72,7 +73,7 @@
 | Written/image response UI | `src/components/WrittenAnswer.tsx` |
 | Artwork และแบรนด์ | `src/assets/generated/`, `src/assets/melearn-ui/`, `public/images/founders/` |
 
-ตรวจ import/re-export ใน `App.tsx` ก่อนเลือก implementation โดยเฉพาะ `CurriculumPages.tsx` ยังมี code เก่า แต่ `CurriculumPage` re-export จาก `CurriculumWorkspace.tsx` และ route แก้บทใช้ `ChapterWorkspace` ไม่ใช่ฟอร์มชื่อบทแบบเก่า
+ตรวจ route declaration ใน `apps/web/src/app/router/instructor-routes.tsx` และ `apps/admin/src/app/router/authoring-routes.tsx`; owner ปัจจุบันคือหน้าใต้ `features/course-authoring` ของแต่ละแอป. `src/pages/instructor/QuizPages.tsx` เหลือ attempt review/grading ไม่ใช่ Quiz Manager/Editor. Root legacy store/data ยังเป็น transitional dependency ไม่ใช่ server contract
 
 ## 3. โครงสร้างและรูปแบบการเขียน
 

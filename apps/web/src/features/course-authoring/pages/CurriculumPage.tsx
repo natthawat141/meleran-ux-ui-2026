@@ -17,9 +17,9 @@ import {
   RightOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { ContentTypeIcon } from '../../components/common';
-import type { Chapter, CourseItem, CourseItemType, Quiz } from '../../types';
+import { useLms } from '@legacy/store';
+import { ContentTypeIcon } from '@legacy/components/common';
+import type { Chapter, CourseItem, CourseItemType, Quiz } from '@legacy/types';
 import './curriculum-workspace.css';
 
 const contentKinds: { key: CourseItemType; label: string; icon: React.ReactNode }[] = [

@@ -9,15 +9,15 @@ import {
   Typography,
   type TableProps,
 } from 'antd';
-import { ArrowRightOutlined, BookOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowRightOutlined, PlusOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLms } from '../../store';
 import { CourseCard, SectionHeading } from '../../components/common';
 import { PageTitle, StatusTag } from '@melearn/ui';
 import { flattenItems } from '../../data';
 import type { Course } from '../../types';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 export function InstructorDashboardPage() {
   const { data, currentUser } = useLms();
@@ -185,63 +185,6 @@ export function InstructorCoursesPage() {
         pagination={{ pageSize: 8 }}
         locale={{ emptyText: 'ยังไม่มีคอร์ส กดสร้างคอร์สเพื่อเริ่มต้น' }}
       />
-    </>
-  );
-}
-
-export function InstructorCourseOverviewPage() {
-  const { courseId } = useParams<{ courseId: string }>();
-  const { data } = useLms();
-  const course = data.courses.find((item) => item.id === courseId);
-
-  if (!course) return <Empty description="ไม่พบคอร์สนี้" />;
-
-  const studentCount = data.enrollments.filter((item) => item.courseId === course.id).length;
-  const questionCount = data.quizzes
-    .filter((quiz) => quiz.courseId === course.id)
-    .reduce((sum, quiz) => sum + quiz.questions.length, 0);
-
-  return (
-    <>
-      <PageTitle
-        eyebrow="ภาพรวมคอร์ส"
-        title={course.title}
-        subtitle="ตรวจสถานะและไปยังงานจัดการคอร์สที่เกี่ยวข้อง"
-        actions={
-          <Link to={`/teach/courses/${course.id}/settings`}>
-            <Button>แก้ข้อมูลคอร์ส</Button>
-          </Link>
-        }
-      />
-      <div className="course-admin-intro">
-        <img src={course.cover} alt="" />
-        <div>
-          <StatusTag status={course.status} />
-          <Title level={3}>{course.subtitle}</Title>
-          <Text type="secondary">
-            {course.chapters.length} บท · {flattenItems(course).length} รายการ · {studentCount} ผู้เรียน
-          </Text>
-        </div>
-      </div>
-      <div className="manage-shortcuts">
-        <Link to={`/teach/courses/${course.id}/curriculum`}>
-          <BookOutlined />
-          <strong>จัดโครงบทเรียน</strong>
-          <span>เพิ่มและเรียงบท วิดีโอ บทความ หรือแบบทดสอบ</span>
-        </Link>
-        <Link to={`/teach/courses/${course.id}/learners`}>
-          <TeamOutlined />
-          <strong>ดูความคืบหน้าผู้เรียน</strong>
-          <span>
-            {studentCount} ผู้เรียน · {questionCount} คำถามในแบบทดสอบ
-          </span>
-        </Link>
-        <Link to={`/teach/courses/${course.id}/preview`}>
-          <ArrowRightOutlined />
-          <strong>ดูตัวอย่างก่อนเผยแพร่</strong>
-          <span>ตรวจมุมมองผู้เรียนและความพร้อมของเนื้อหา</span>
-        </Link>
-      </div>
     </>
   );
 }

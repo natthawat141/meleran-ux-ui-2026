@@ -3,11 +3,11 @@ import { Alert, Button, Dropdown, Empty, Form, Input, InputNumber, Modal, Radio,
 import type { FormInstance, FormListFieldData } from 'antd';
 import { ArrowDownOutlined, ArrowLeftOutlined, ArrowUpOutlined, CheckCircleOutlined, CopyOutlined, DeleteOutlined, DownOutlined, EllipsisOutlined, EyeOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { createId } from '../../data';
+import { useLms } from '@legacy/store';
+import { createId } from '@legacy/data';
 import { RichDocument } from '@melearn/ui';
-import { RichTextEditor } from '../../components/chapter/RichTextEditor';
-import type { Question, Quiz } from '../../types';
+import { RichTextEditor } from '../components/chapter/RichTextEditor';
+import type { Question, Quiz } from '@legacy/types';
 import './quiz-editor-workspace.css';
 
 interface QuestionDraft {
@@ -227,7 +227,7 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
           setDirty(false); setDraftError(false);
           setSavedAt(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
           message.success(isNew ? 'สร้างแบบทดสอบแล้ว' : 'บันทึกแบบทดสอบแล้ว');
-          if (isNew) navigate(`/teach/quizzes/${id}`, { replace: true });
+          if (isNew) navigate(`/admin/quizzes/${id}`, { replace: true });
         } catch {
           retainDraft(); message.error('ยังบันทึกลงเบราว์เซอร์ไม่สำเร็จ การแก้ไขยังอยู่ในหน้านี้ กรุณาลองอีกครั้ง');
         } finally { setSaving(false); }
@@ -236,7 +236,7 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
   };
 
   if (!isNew && !quiz) return <Empty description="ไม่พบแบบทดสอบนี้" />;
-  if (!courses.length) return <Alert type="info" title="สร้างคอร์สก่อนจึงจะเพิ่มแบบทดสอบได้" action={<Link to="/teach/courses/new">สร้างคอร์ส</Link>} />;
+  if (!courses.length) return <Alert type="info" title="สร้างคอร์สก่อนจึงจะเพิ่มแบบทดสอบได้" action={<Link to="/admin/courses/new">สร้างคอร์ส</Link>} />;
 
   return (
     <div className="quiz-editor-workspace">
@@ -249,7 +249,7 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
       }}>
         <header className="qe-toolbar">
           <div className="qe-heading">
-            <Button type="text" icon={<ArrowLeftOutlined />} aria-label="กลับรายการแบบทดสอบ" onClick={() => goTo('/teach/quizzes')} />
+            <Button type="text" icon={<ArrowLeftOutlined />} aria-label="กลับรายการแบบทดสอบ" onClick={() => goTo('/admin/quizzes')} />
             <div><span className="qe-eyebrow">ตัวแก้แบบทดสอบ</span><h1>{values.title?.trim() || 'สร้างแบบทดสอบ'}</h1>
               <p>{questions.length} ข้อ · {totalPoints} คะแนน <span role="status">{dirty ? '· ยังไม่บันทึก' : savedAt ? `· บันทึกแล้ว ${savedAt}` : '· ไม่มีการแก้ไขค้าง'}</span></p>
             </div>
@@ -258,12 +258,10 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
             <Button icon={<EyeOutlined />} onClick={() => setPreviewOpen(true)}>ดูตัวอย่าง</Button>
             <Button type="primary" htmlType="submit" loading={saving}>บันทึกแบบทดสอบ</Button>
             {!isNew && quiz && <Dropdown trigger={['click']} menu={{ items: [
-              { key: 'attempts', label: 'ดูคำตอบผู้เรียน', onClick: () => goTo(`/teach/quizzes/${quiz.id}/attempts`) },
-              { type: 'divider' },
               { key: 'delete', label: 'ลบแบบทดสอบ', danger: true, icon: <DeleteOutlined />, onClick: () => Modal.confirm({
                 title: 'ลบแบบทดสอบนี้หรือไม่', content: `“${quiz.title}” จะถูกนำออกจากบทเรียน และคำตอบจะไม่ปรากฏในรายการแบบทดสอบนี้`,
                 okText: 'ลบแบบทดสอบ', cancelText: 'ยกเลิก', okButtonProps: { danger: true },
-                onOk: () => { const result = removeQuiz(quiz.id); if (!result.ok) { message.error(result.message); return; } sessionStorage.removeItem(draftKey); navigate('/teach/quizzes'); },
+                onOk: () => { const result = removeQuiz(quiz.id); if (!result.ok) { message.error(result.message); return; } sessionStorage.removeItem(draftKey); navigate('/admin/quizzes'); },
               }) },
             ] }}><Button type="text" icon={<EllipsisOutlined />} aria-label="จัดการแบบทดสอบ" /></Dropdown>}
           </div>

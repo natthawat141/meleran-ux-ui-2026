@@ -17,13 +17,13 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { createId } from '../../data';
-import { RichTextEditor } from '../../components/chapter/RichTextEditor';
-import { VideoEditor } from '../../components/chapter/VideoEditor';
-import { AssessmentEditor, newQuestion } from '../../components/chapter/AssessmentEditor';
-import { ChapterPreview } from '../../components/chapter/ChapterPreview';
-import type { Chapter, Course, CourseItem, CourseItemType, Quiz } from '../../types';
+import { useLms } from '@legacy/store';
+import { createId } from '@legacy/data';
+import { RichTextEditor } from '../components/chapter/RichTextEditor';
+import { VideoEditor } from '../components/chapter/VideoEditor';
+import { AssessmentEditor, newQuestion } from '../components/chapter/AssessmentEditor';
+import { ChapterPreview } from '../components/chapter/ChapterPreview';
+import type { Chapter, Course, CourseItem, CourseItemType, Quiz } from '@legacy/types';
 import './chapter-workspace.css';
 
 const kinds: Record<CourseItemType, { label: string; icon: React.ReactNode }> = {
@@ -295,7 +295,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
     const go = () => {
       dirtyRef.current = false;
       transcriptDirtyRef.current = false;
-      navigate(`/teach/courses/${course.id}/curriculum`);
+      navigate(`/admin/courses/${course.id}/curriculum`);
     };
     if (!dirty) {
       go();
@@ -401,7 +401,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                 to={
                   data.users.find((user) => user.id === data.currentUserId)?.role === 'admin'
                     ? '/admin/courses'
-                    : '/teach/courses'
+                    : '/admin/courses'
                 }
               >
                 คอร์สทั้งหมด
@@ -461,7 +461,7 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
                     const result = removeChapter(course.id, draft.id);
                     if (!result.ok) { message.error(result.message); return; }
                     dirtyRef.current = false;
-                    navigate(`/teach/courses/${course.id}/curriculum`);
+                    navigate(`/admin/courses/${course.id}/curriculum`);
                   },
                 });
               },

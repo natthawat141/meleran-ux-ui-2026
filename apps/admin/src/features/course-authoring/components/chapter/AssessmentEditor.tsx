@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Alert, Button, Input, InputNumber, Modal, Radio, Select, Space } from 'antd';
 import { PlusOutlined, CopyOutlined, ArrowUpOutlined, ArrowDownOutlined, DeleteOutlined } from '@ant-design/icons';
-import { createId } from '../../data';
+import { createId } from '@legacy/data';
 import { RichTextEditor } from './RichTextEditor';
-import type { ChoiceQuestion, EssayQuestion, Question, Quiz } from '../../types';
+import type { ChoiceQuestion, EssayQuestion, Question, Quiz } from '@legacy/types';
 
 export const newQuestion = (): ChoiceQuestion => ({
   id: createId('q'),
