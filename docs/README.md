@@ -1,6 +1,6 @@
 # คู่มือ AI และสเปก Melearn UX/UI
 
-อัปเดต 7 ตุลาคม 2026 ชุดนี้ใช้ให้ AI หรือผู้พัฒนาคนใหม่ต่อจากงานปัจจุบัน โดยรักษาหน้าตา flow และรูปแบบ code ที่ตกลงไว้
+อัปเดต 8 ตุลาคม 2026 ชุดนี้ใช้ให้ AI หรือผู้พัฒนาคนใหม่ต่อจากงานปัจจุบัน โดยรักษาหน้าตา flow และรูปแบบ code ที่ตกลงไว้
 
 ## อ่านอะไรเมื่อเริ่ม
 
@@ -11,13 +11,17 @@
 | [`../AGENTS.md`](../AGENTS.md) | กติกาเริ่มงาน ขอบเขต และคำสั่งรัน |
 | [`UI_SPEC.md`](UI_SPEC.md) | แบรนด์ สี ฟอนต์ ไอคอน layout และพฤติกรรมหน้าจอ |
 | [`CODE_SPEC.md`](CODE_SPEC.md) | ที่อยู่ implementation, library, route, state, CSS และการตรวจงาน |
-| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | แผน Web/Admin; R0–R3c code gates ผ่าน; เปิด R3b visual/accessibility QA และเตรียม R4a API Contract ต่อ flow |
+| [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) | แผน Web/Admin; R0–R3d code gates ผ่าน; responsive spot-check บาง viewport ผ่าน; visual/accessibility QA ที่เหลือยังเปิด; R4a draft และ R4b-prep แยกจาก contract/API integration gates |
+| [API_CONTRACT_R4A_DRAFT_TH.md](API_CONTRACT_R4A_DRAFT_TH.md) | Candidate API ต่อ flow แยก Final 1.6 ที่ยืนยันแล้วออกจากข้อเสนอ/TBD; ยังไม่มี Backend owner/OpenAPI จึงห้ามถือว่า frozen |
+| [FRONTEND_API_ACCEPTANCE_MATRIX_TH.md](FRONTEND_API_ACCEPTANCE_MATRIX_TH.md) | Map Scope §9 case IDs ไปยัง UI/mock/API/server evidence; บอก gate ที่ยังปิดไม่ได้จาก build หรือ prototype เพียงอย่างเดียว |
+| [R4B_PREP_REPORT_TH.md](R4B_PREP_REPORT_TH.md) | ผล generic HTTP/error transport prep, checks ที่ผ่าน และสิ่งที่ยังรอ Backend contract |
 | [R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md) | ผล R0/Lead review: inventory 89 routes, KEEP/ADAPT/REMOVE, state/packages/authoring boundaries, baseline 51 tests และ execution plan; R1 ผ่านแล้ว; inventory เดิมอ้าง source baseline |
 | [ROUTE_MIGRATION_LEDGER_TH.md](ROUTE_MIGRATION_LEDGER_TH.md) | R2a metadata seam, R2b route compatibility และผล R3c modules/snapshot ของ Web 50 + Admin 35 routes |
 | [R1_SCOPE_CLEANUP_REPORT_TH.md](R1_SCOPE_CLEANUP_REPORT_TH.md) | ผล scope cleanup, retained routes, legacy snapshot compatibility และหลักฐานการตรวจ |
 | [R3_THEME_PROVIDER_REPORT_TH.md](R3_THEME_PROVIDER_REPORT_TH.md) | R3a: รวม Mantine/Ant themes กับ UI provider ใน `packages/ui`; typecheck/build ผ่าน; CSS/Tailwind tokens และ visual QA ยังแยกเป็นงานถัดไป |
 | [R3_CSS_TOKENS_REPORT_TH.md](R3_CSS_TOKENS_REPORT_TH.md) | R3b: token source JSON เชื่อม Mantine/Ant, CSS variables และ Tailwind; checks/build ผ่าน; browser smoke โหลด Web Landing กับ Admin Dashboard ได้, visual/contrast/keyboard/responsive QA ยังไม่ครบ |
 | [R3C_ROUTE_MODULES_REPORT_TH.md](R3C_ROUTE_MODULES_REPORT_TH.md) | ผล R3c: ย้าย Web/Admin route declarations และ guards เป็น modules, เทียบ 85 routes กับ snapshot R3b, 67 tests/typecheck/build/boundary checks ผ่าน และผล preview-mode smoke |
+| [R3D_RICH_DOCUMENT_REPORT_TH.md](R3D_RICH_DOCUMENT_REPORT_TH.md) | ผล R3d: ย้าย renderer แบบ props-only ไป packages/ui; render-only consumers ไม่ดึง Tiptap editor/uploader; focused tests และ Web/Admin checks ผ่าน |
 | [FRONTEND_V1_6_UI_AUDIT_TH.md](FRONTEND_V1_6_UI_AUDIT_TH.md) | ผล preview และ gap audit เทียบ Final 1.6; แยก UI ที่เห็นได้, prototype mismatches และสิ่งที่รอ API/backend โดยไม่เปลี่ยน business behavior |
 | [R0 workflow ใน .codex](../.codex/workflows/r0-inventory.md) | วิธี Lead dispatch สี่ Luna xhigh inventory roles, common evidence format, read-only boundary, baseline/review/report และ approval ก่อน implementation |
 | [BUSINESS_ANALYTICS_UI_SPEC.md](BUSINESS_ANALYTICS_UI_SPEC.md) | **เลิกใช้เป็นข้อกำหนดปัจจุบัน**; ทางเข้าประวัติต้นแบบ |
@@ -31,7 +35,7 @@
 
 อ่านฉบับหลักก่อน UI/CODE spec ซึ่งใช้รักษาแบรนด์และวิธีทำต้นแบบ การอนุมัติธุรกิจไม่เท่ากับ backend พร้อมหรือเลือกสแตกแล้ว
 
-ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก R0 สำรวจและตรวจ baseline แล้ว ผู้ใช้อนุมัติให้ทำต่อแล้ว R1/R2a/R2b, R3a, R3b และ R3c code gates ผ่าน; CSS variables/Tailwind กับ theme adapters อ่าน token source ใน `packages/ui` และ router declarations อยู่ใน `apps/*/src/app/router/` แล้ว มี authenticated UI spot-check ผ่าน demo accounts ในรอบต่อมา แต่ visual/accessibility/responsive QA เต็มรูปแบบยังเปิด ส่วน R4a API Contract เป็นงานถัดไป
+ผู้ใช้ยืนยัน architecture ของ React Frontend สำหรับ refactor 7 ต.ค. 2026 ตาม CODE_SPEC และแผนด้านบนแล้ว Backend stack, database, session transport และ deployment ยังต้องออกแบบแยก. R0–R3d code gates และ R4b-prep ผ่าน; R4a API Contract ยังเป็น Draft เพราะยังไม่มี Backend owner/OpenAPI. `packages/ui` เป็น token/theme source และมี RichDocument renderer แบบ props-only; router declarations อยู่ใน `apps/*/src/app/router/`. Preview spot-check ยืนยัน Login Web/Admin และ Guest Landing/Catalog/About/Blog ตามที่ระบุใน UI audit; Landing responsive follow-up 390/320px และ Admin Login 390px ผ่าน limited viewport checks. Visual/accessibility/responsive acceptance เต็มรูปแบบยังเปิด; R5–R9, R10 และ R13 ยังไม่เสร็จ, ส่วน R10/R13 ต้องมี Backend/API/runtime evidence ก่อนปิด
 
 ใช้ชื่อเป้าหมาย `apps/web` และ `apps/admin` รองรับ build/deploy แยกกัน มี basic CI หลัง split apps และชุด Containerization/CI-CD ช่วงเตรียมส่งมอบ Cloud Run ยังเป็น candidate โครงสร้างตัวอย่างไม่ใช่คำสั่งเปลี่ยนชื่อ checkout หรือ repository
 
