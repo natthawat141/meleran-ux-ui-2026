@@ -1,6 +1,6 @@
 import { HttpClientError } from '@melearn/api-client';
 import { apiClient } from './client';
-import type { ResourcePage } from '@melearn/contracts';
+import { decodeManagementResponse, type ResourcePage } from '@melearn/contracts';
 export class ResourceError extends HttpClientError {
   readonly code: string;
   readonly fields: { field: string; code: string }[];
@@ -49,7 +49,12 @@ function decodeResourceError(value: unknown, status: number): ResourceError {
   return new ResourceError(status, code, fields);
 }
 /** Resource transport only. Feature APIs own DTOs and endpoint selection. */
-export function resource<T>(path: string, method = 'GET', body?: unknown, signal?: AbortSignal): Promise<T> {
+export function resource<T>(
+  path: string,
+  method = 'GET',
+  body?: unknown,
+  signal?: AbortSignal,
+): Promise<T> {
   return apiClient.request(path, {
     method,
     signal,
@@ -57,11 +62,7 @@ export function resource<T>(path: string, method = 'GET', body?: unknown, signal
     ...(body === undefined
       ? {}
       : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }),
-    decoder: (value: unknown) => {
-      if (!value || typeof value !== 'object' || Array.isArray(value))
-        throw new TypeError('Invalid resource response');
-      return value as T;
-    },
+    decoder: (value: unknown) => decodeManagementResponse(path, method, value) as T,
   });
 }
 export async function resourceList<T>(path: string, signal?: AbortSignal): Promise<T[]> {
@@ -78,7 +79,10 @@ export async function resourceList<T>(path: string, signal?: AbortSignal): Promi
       undefined,
       signal,
     );
-    if (!Array.isArray(page.items) || (page.next_cursor !== null && typeof page.next_cursor !== 'string'))
+    if (
+      !Array.isArray(page.items) ||
+      (page.next_cursor !== null && typeof page.next_cursor !== 'string')
+    )
       throw new TypeError('Invalid resource pagination');
     result.push(...page.items);
     cursor = page.next_cursor;

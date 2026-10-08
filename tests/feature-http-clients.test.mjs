@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { transformWithEsbuild } from 'vite';
 import { createWorld, accounts, mockPassword } from './support/provisional-api.mjs';
 import { createHttpClient } from '../packages/api-client/src/http-client.ts';
+import { decodeManagementResponse } from '../packages/contracts/src/management-decoders.ts';
 import { HttpClientError } from '../packages/api-client/src/errors.ts';
 import {
   authoringForm,
@@ -60,6 +61,7 @@ async function harness(app, feature, filename, kind) {
   const resources = await module('apps/' + app + '/src/shared/api/resources.ts', {
     './client': { apiClient },
     '@melearn/api-client': { HttpClientError },
+    '@melearn/contracts': { decodeManagementResponse },
   });
   const params = {};
   const search = new URLSearchParams();

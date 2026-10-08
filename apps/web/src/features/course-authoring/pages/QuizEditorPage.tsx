@@ -34,25 +34,7 @@ import { RichTextEditor } from '../components/chapter/RichTextEditor';
 import type { Question, Quiz } from '@melearn/contracts';
 import '../styles/quiz-editor-workspace.css';
 
-interface QuestionDraft {
-  id: string;
-  type: 'choice' | 'essay';
-  prompt: string;
-  promptDoc?: unknown;
-  rubric?: string;
-  points: number;
-  options: string[];
-  correctIndex?: number;
-  responseMode: 'either' | 'text' | 'image';
-}
-
-interface QuizDraft {
-  title: string;
-  courseId: string;
-  chapterId?: string;
-  passPercent: number;
-  questions: QuestionDraft[];
-}
+import { restoreQuizDraft, type QuestionDraft, type QuizDraft } from '@melearn/course-authoring';
 
 function newQuestion(): QuestionDraft {
   return {
@@ -322,12 +304,7 @@ function QuizWorkspace({ quizId }: { quizId: string }) {
   const [restored] = useState<QuizDraft | null>(() => {
     try {
       const raw = sessionStorage.getItem(draftKey);
-      if (!raw) return null;
-      const entry = JSON.parse(raw) as { baseline?: string; values?: QuizDraft };
-      // Do not replace changes saved by a different tab with a stale draft.
-      return entry.baseline === JSON.stringify(initial) && Array.isArray(entry.values?.questions)
-        ? entry.values!
-        : null;
+      return restoreQuizDraft(raw, JSON.stringify(initial));
     } catch {
       return null;
     }

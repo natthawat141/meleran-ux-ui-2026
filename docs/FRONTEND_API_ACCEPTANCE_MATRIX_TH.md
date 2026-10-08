@@ -51,3 +51,8 @@ Each row closed in a future report must link or record:
 ## หลักฐานรอบถอน store — 9 ต.ค. 2026
 
 Authoring/Instructor/Admin management/Blog ย้าย API แล้วและ `packages/store` ถอนแล้ว. Tests ใหม่ตรวจ generated IDs, rich documents/answer keys, stale revision, history guards, atomic invalid writes, privacy และ actual feature clients ผ่าน HTTP mock. Browser รอบนี้ถูก ERR_BLOCKED_BY_CLIENT จึงยังยืนยัน UI interactions ไม่ได้; browser หลักฐานเก่าไม่ถือว่า acceptance ของ revision นี้. ดู [progress](R7_API_MOCK_PROGRESS_TH.md).
+
+
+## Audit runtime/CI — 9 ต.ค. 2026
+
+Management/Authoring/Blog/transcript resources ตรวจ payload ตาม operation และ nested DTO ก่อน UI; actual mock journey ของ pending→owner grade→graded/roster ผ่าน decoder. Quiz draft parser ตรวจ incomplete/stale/corrupt data. Current local tests159/typecheck/build/boundariesผ่าน. Sourceมี up/down actions และ responsive CSS แต่ **ยังไม่ยืนยัน keyboard/mobile/flow interaction จริง** เพราะ browser security policy ปฏิเสธ preview. Hosted CI/containerผล current SHA อ่านจาก progress; local Dockerไม่ถูกใช้. ไม่ปิด R10/R13 จากผล static runtime/DTO tests.

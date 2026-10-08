@@ -32,21 +32,12 @@ docker run --rm --publish 127.0.0.1:8081:8080 melearn-admin:local
 
 ## Configuration ที่ยังรอการตัดสินใจ
 
-`.dockerignore` ไม่ส่ง `.env*`, `.npmrc`, Git, `node_modules` หรือ `dist` เข้า build และ Dockerfile ไม่รับ API URL/session/secrets เป็น build arguments ชุดนี้ใช้ build defaults เดิม ซึ่ง feature gates ยังขึ้นกับ readiness ของ prototype ห้ามใช้ผล build เป็นการเปิดฟีเจอร์ `released`
+`.dockerignore` ไม่ส่ง `.env*`, `.npmrc`, Git, `node_modules` หรือ `dist` เข้า build และ Dockerfile รับ public VITE_API_BASE_URL/VITE_API_MODE/VITE_APP_ENV เป็น build arguments; ไม่รับ session/secrets ชุดนี้ใช้ build defaults เดิม ซึ่ง feature gates ยังขึ้นกับ readiness ของ prototype ห้ามใช้ผล build เป็นการเปิดฟีเจอร์ `released`
 
 Vite ค่าที่ browser เห็นเป็น build-time configuration; การส่ง environment variables ให้ `docker run` ไม่เปลี่ยน bundle ที่สร้างแล้ว นอกจาก `PORT` ซึ่งใช้กับ NGINX ต้องตกลง public API URL/config strategy และ session/credentials กับ backend ก่อนสร้าง environment images, image promotion หรือ CD ห้ามฝัง secrets ใน frontend ไม่มี API proxy/backend ใน container นี้ (`/api` และ `/api/*` คืน 404)
 
-## CI ที่เตรียมไว้
+## CI สำหรับตรวจโดยไม่ใช้ local RAM
 
-GitHub Actions workflow เดิมปรับให้ตรวจ Web/Admin แยก เมื่อเปลี่ยน `apps/web` จะเลือก Web เมื่อเปลี่ยน `apps/admin` จะเลือก Admin และเมื่อเปลี่ยน `packages`, legacy `src`, `public`, root lockfile/manifests/config, scripts/tests หรือ container serving/verification จะเลือกทั้งคู่ เพราะยังเป็น dependencies ร่วมกัน ตรวจ legacy typecheck/native regressions/boundaries หนึ่ง job พร้อม jobs ของแอปที่เลือก แต่ละ app job typecheck/build และเก็บ build artifact ระยะสั้น ไม่มี Docker invocation หรือ image build/smoke ใน workflow
+Frontend CI มี hosted container matrix Web/Admin (max-parallel1) หลัง shared checks ผ่าน; build images จาก root แล้วใช้ verify-container.mjs ตรวจ PORT8080 และ8181. Runner สร้าง/ลบเฉพาะ smoke containers ของตน ไม่มี registry push/deploy/credentials ใหม่. validate job รวมผล containers เพื่อให้ failure ไม่ถูกมองเป็น CI success. เปลี่ยน app ตรวจ appนั้น; เปลี่ยน packages/tools/root configs ตรวจทั้งคู่; docs-only skip code/container jobs.
 
-Docs-only ไม่ build apps; manual dispatch ตรวจทั้งคู่ Workflow ไม่มี registry push, deploy job, environment credentials, secrets หรือการเลือก hosting Artifact promotion, environment configuration, deployment permissions และ rollback ของบริการยังเป็น R12 ส่วนที่รอปลายทางและการอนุญาตเปิดจริง
-
-## Gates ที่ต้องรายงานแยก
-
-- Local app typecheck/build/regressions เป็นหลักฐาน frontend source
-- Docker build ของ Web และ Admin พร้อม image IDs และ smoke เป็นหลักฐาน packaging/runtime; ถ้า daemon ใช้ไม่ได้ให้ระบุรายการนี้ว่ายังไม่ตรวจ ห้ามแทนด้วย host Vite build
-- Workflow syntax/path selection ที่ตรวจบนเครื่องยังไม่ยืนยันว่ารันบน GitHub runner สำเร็จ ต้องอ้าง run URL ของ revision นั้นเมื่อเกิดจริง
-- R10/R13 ยังต้องมี backend contracts/OpenAPI ที่รับแล้วและ API/browser/server evidence ตาม scope; health/static smoke ไม่ผ่านแทน auth, Stripe webhook, enrollment, grading/certificate หรือ AI persistence/quota
-
-อ้างอิง implementation ของ [Docker build context](https://docs.docker.com/build/concepts/context/), [NGINX unprivileged image](https://github.com/nginx/docker-nginx-unprivileged) และ [paths-filter action](https://github.com/dorny/paths-filter)
+ผล static runtime ไม่ยืนยันการ login/edit/review/payment หรือ Backend integration. ดู current run/SHA ใน docs/R7_API_MOCK_PROGRESS_TH.md. รอบนี้ไม่เปิด Docker daemon หรือรัน image บนเครื่องผู้ใช้.
