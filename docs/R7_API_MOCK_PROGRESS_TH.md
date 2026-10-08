@@ -47,12 +47,12 @@ R7–R9 มี app-owned Web/Admin pages, feature API adapters และ TanStac
 - Mock server เก็บข้อมูลใน memory; restart แล้ว Payment/Enrollment/Progress/Attempt/Certificate/AI history/transcript หาย
 - ยังไม่ได้ browser-interact ครบทุก flow: AI chat/practice, redeem, Admin สร้าง/เพิกถอน code และแก้ Transcript ยังต้องตรวจ; responsive/accessibility matrix ยังเปิด. Video URL ใน seed เป็น placeholder ที่ YouTube แจ้ง unavailable แต่หน้า progress/resume/complete ทำงานกับ mock ได้; ไม่ถือเป็นการตรวจสื่อจริง
 - ไม่ถอน legacy fallback เพราะยังเป็นเส้นทาง production prototype; R10 cleanup รอ real API replacement
-- Docker ไม่ได้รันตามคำสั่งผู้ใช้
+- R7–R10 flow validation ในรายงานนี้ไม่ได้รัน Docker; R11 container build/runtime verification ทำภายหลังแล้ว ดู [รายงาน R11](R11_CONTAINER_VERIFICATION_TH.md)
 
 ## การตรวจล่าสุด
 
 - `npm.cmd run typecheck` ผ่าน Web/Admin/legacy
-- `npm.cmd test` ผ่าน 173/173
+- `npm.cmd test` ผ่าน 175/175
 - `npm.cmd run check:boundaries` ผ่าน
 - `npm.cmd run build` และ token check ผ่านทั้ง Web/Admin; มี warnings `use client` ของ dependencies และ chunk เกิน 500 kB
 - Browser smoke ผ่าน Web Landing/Guest course detail; authenticated R7 free-enrollment→assessment→grading→certificate และ R8 checkout→signed mock webhook→enrollment + Admin Payment lookup ผ่านบน Vite dev/mock ที่ viewport ปกติ. AI/redeem/transcript interactions, responsive/accessibility matrix, real Stripe/Backend persistence และ production authorization ยังไม่ผ่านการยืนยัน

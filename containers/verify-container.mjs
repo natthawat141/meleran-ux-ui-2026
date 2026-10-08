@@ -32,6 +32,8 @@ try {
   }
   assert.ok(ready, 'Health endpoint did not become ready');
   assert.notEqual(docker('exec', name, 'id', '-u'), '0', 'Static server must run as non-root');
+  const healthCheck = JSON.parse(docker('inspect', '--format', '{{json .Config.Healthcheck}}', name));
+  assert.ok(healthCheck?.Test?.some((command) => command.includes('/healthz')), 'Image must include the Docker health check for /healthz');
   docker('exec', name, 'nginx', '-t');
   docker('exec', name, 'sh', '-c', 'wget -q -O /dev/null "http://127.0.0.1:${PORT}/healthz"');
 
