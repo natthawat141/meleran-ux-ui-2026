@@ -28,7 +28,7 @@
 - `npm.cmd run check:boundaries`, `npm.cmd run tokens:check`, `git diff --check` — ผ่าน.
 - `npm.cmd run build` — Web และ Admin production builds ผ่าน (`BUILD_EXIT=0`); คำเตือน `use client` และ chunk size มาจาก dependencies/bundle เดิม.
 - หลัง consumer decoupling: `npm.cmd run typecheck`, `npm.cmd test` (93/93), `npm.cmd run check:boundaries`, `npm.cmd run tokens:check`, Web/Admin production builds และ `git diff --check` ผ่าน.
-- Push checkpoint `19264f3` ผ่าน GitHub CI ทุก job: [run 37746448045](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37746448045).
+- Push checkpoint `52726f0` หลัง consumer decoupling ผ่าน GitHub CI ทุก job: [run 37748043169](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37748043169).
 - Browser spot-check: Web `/about`, `/about#our-story`, `/articles`; Admin `/admin/articles` และ `/articles/post-better-writing` แสดงเนื้อหาหลัก. อ่านอย่างเดียว; ไม่แก้/ลบ/เผยแพร่บทความ.
 - หลัง decoupling เปิด Admin `/articles/post-better-writing` โดยตรงและตรวจ header, article, related links, footer ที่ desktop; ที่ 390×844 ตรวจบทความกับ mobile menu/drawer และลิงก์เมนู. ไม่กด action ที่เปลี่ยนข้อมูล; viewport override และ temporary tab ถูกปิดหลังตรวจ.
 - ไม่รัน Docker.
