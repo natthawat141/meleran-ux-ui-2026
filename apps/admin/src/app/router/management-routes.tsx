@@ -8,6 +8,25 @@ import { AdminBlogPage, AdminBlogEditorPage } from '../../features/blog/pages/Bl
 import { ProfilePage } from '../../features/account/pages/ProfilePage';
 import { admin } from './access';
 
+const ProvisionalAccessCodesPage = import.meta.env.DEV ? React.lazy(() => import('../../features/redeem/pages/ProvisionalAccessCodesPage').then((page) => ({ default: page.ProvisionalAccessCodesPage }))) : null;
+const ProvisionalAiAdminPage = import.meta.env.DEV ? React.lazy(() => import('../../features/ai/pages/ProvisionalAiAdminPage').then((page) => ({ default: page.ProvisionalAiAdminPage }))) : null;
+const ProvisionalPaymentLookupPage = import.meta.env.DEV ? React.lazy(() => import('../../features/payment/pages/ProvisionalPaymentLookupPage').then((page) => ({ default: page.ProvisionalPaymentLookupPage }))) : null;
+function AccessCodesRoute() {
+  return import.meta.env.DEV && ProvisionalAccessCodesPage
+    ? <React.Suspense fallback={<div className="public-page">กำลังโหลดรหัสแลกคอร์ส…</div>}><ProvisionalAccessCodesPage /></React.Suspense>
+    : <AccessCodesPage />;
+}
+function AiAdminRoute() {
+  return import.meta.env.DEV && ProvisionalAiAdminPage
+    ? <React.Suspense fallback={<div className="public-page">กำลังโหลดการตั้งค่า AI…</div>}><ProvisionalAiAdminPage /></React.Suspense>
+    : <div className="public-page">หน้า AI Admin เปิดใช้เมื่อ API พร้อมเท่านั้น</div>;
+}
+function PaymentLookupRoute() {
+  return import.meta.env.DEV && ProvisionalPaymentLookupPage
+    ? <React.Suspense fallback={<div className="public-page">กำลังโหลดรายการ Payment…</div>}><ProvisionalPaymentLookupPage /></React.Suspense>
+    : <div className="public-page">หน้า Payment Admin ใช้ได้เมื่อ API พร้อมเท่านั้น</div>;
+}
+
 export const managementRoutes = (
   <>
     <Route path="/admin" element={featureElement('/admin', admin(<AdminDashboardPage />))} />
@@ -20,7 +39,9 @@ export const managementRoutes = (
     <Route path="/admin/courses" element={featureElement('/admin/courses', admin(<AdminCoursesPage />))} />
     <Route path="/admin/courses/reviews" element={featureElement('/admin/courses/reviews', admin(<CourseReviewPage />))} />
     <Route path="/admin/courses/:courseId" element={featureElement('/admin/courses/:courseId', admin(<AdminCourseDetailPage />))} />
-    <Route path="/admin/access-codes" element={featureElement('/admin/access-codes', admin(<AccessCodesPage />))} />
+    <Route path="/admin/access-codes" element={featureElement('/admin/access-codes', admin(<AccessCodesRoute />))} />
+    <Route path="/admin/payments" element={featureElement('/admin/payments', admin(<PaymentLookupRoute />))} />
+    <Route path="/admin/ai" element={featureElement('/admin/ai', admin(<AiAdminRoute />))} />
     <Route path="/account/profile" element={featureElement('/account/profile', admin(<ProfilePage />))} />
   </>
 );

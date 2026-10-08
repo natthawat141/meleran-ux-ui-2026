@@ -67,7 +67,7 @@ export function DevCourseDetailPage() {
     if (!session.user) { navigate(login); return; }
     if (enrolled) { navigate(`/learn/courses/${course.id}`); return; }
     if (isAdmin || ownsCourse) return;
-    if (course.price !== null) { setEnrollError('การชำระเงินจะเชื่อมต่อในขั้นตอน R8'); return; }
+    if (course.price !== null) { navigate(`/checkout/${encodeURIComponent(course.id)}`); return; }
     try { await enrollFree.mutateAsync(course.id); navigate(`/learn/courses/${course.id}`); }
     catch { setEnrollError('ลงเรียนไม่สำเร็จ กรุณาลองอีกครั้ง'); }
   };

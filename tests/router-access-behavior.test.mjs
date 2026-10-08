@@ -33,6 +33,7 @@ async function loadAccess(appName) {
     '@legacy/components/Shell': { PublicShell, WorkspaceShell },
     '@legacy/pages/SystemPages': { NoAccessPage },
     '../../features/auth/pages/AuthPages': { VerifyEmailPage },
+    '../../features/auth/api/AuthSessionProvider': { useAuthSession: () => ({ enabled: false, status: 'ready', user: null, logout: async () => {}, refresh: async () => null }) },
   };
   vm.runInNewContext(code, {
     module,

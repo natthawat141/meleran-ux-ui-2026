@@ -21,6 +21,20 @@ test('checkout rejects client-owned payment fields and snapshots the course pric
   assert.deepEqual(world.api.unexpectedErrors, []);
 });
 
+test('free courses cannot start Stripe checkout or receive sale redeem codes', async () => {
+  const world = createWorld();
+  const learner = await loggedIn(world);
+  const admin = await loggedIn(world, accounts.admin, { audience: 'admin' });
+  const checkout = await learner.post('me/payments/checkout', { course_id: 'crs_mock_001', request_id: 'free-checkout' });
+  assert.equal(checkout.status, 409);
+  assert.equal(checkout.body.error.details.reason, 'course_free');
+  const redeemCodes = await admin.post('admin/redeem-codes', { course_id: 'crs_mock_001', count: 1 });
+  assert.equal(redeemCodes.status, 409);
+  assert.equal(redeemCodes.body.error.details.reason, 'course_free');
+  assert.equal([...world.db.redeemCodes.values()].some((code) => code.course_id === 'crs_mock_001'), false);
+  assert.deepEqual(world.api.unexpectedErrors, []);
+});
+
 test('checkout idempotency and status reads never grant access', async () => {
   const world = createWorld();
   const browser = await loggedIn(world);

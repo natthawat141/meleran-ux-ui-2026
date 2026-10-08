@@ -8,13 +8,18 @@ import { PublicCourseDetailPage } from '../../features/courses/pages/public/Cour
 import { LandingPage } from '../../features/landing/pages/LandingPage';
 import { AboutPage } from '../../features/landing/pages/AboutPage';
 import { BlogIndexPage, BlogArticlePage } from '../../features/blog/pages/BlogPages';
+import { useAuthSession } from '../../features/auth/api/AuthSessionProvider';
 import { Public } from './access';
 
 function PublicCourseEntry({ detail = false }: { detail?: boolean }) {
   const { currentUser } = useLms();
+  const session = useAuthSession();
   const location = useLocation();
   const { slug } = useParams<{ slug?: string }>();
-  if (currentUser) {
+  // In dev, the provisional API session is authoritative and /courses stays
+  // the shared Catalog for guests and signed-in learners. Keep the legacy
+  // member-catalog redirect only for the local prototype runtime.
+  if (!session.enabled && currentUser) {
     return <Navigate to={`/explore/courses${detail && slug ? `/${encodeURIComponent(slug)}` : ''}${location.search}${location.hash}`} replace />;
   }
   return <Public>{detail ? <PublicCourseDetailPage /> : <PublicCatalogPage />}</Public>;

@@ -81,7 +81,7 @@ function requireRedeemer(context: RequestContext) {
 
 function redeemCourse(context: RequestContext, user: { id: string }, courseId: string) {
   const course = context.db.courses.get(courseId);
-  if (!course || !isPublished(course)) throw unavailable();
+  if (!course || !isPublished(course) || !course.price || course.price.amount_minor <= 0) throw unavailable();
   if (course.instructor_id === user.id) {
     throw new ApiError(403, 'enrollment_not_allowed', 'ไม่สามารถแลกรหัสคอร์สของตนเองได้', { details: { reason: 'own_course' } });
   }
@@ -177,7 +177,7 @@ export const paymentRoutes: Route[] = [
       const { user, course } = requireBuyer(context, courseId);
       const existingEnrollment = findEnrollment(context.db, user.id, course.id);
       if (existingEnrollment) return ok({ already_enrolled: true, course_id: course.id, enrollment: toEnrollment(existingEnrollment) });
-      if (course.price === null) throw new ApiError(409, 'invalid_state', 'คอร์สนี้เป็นคอร์สฟรี', { details: { reason: 'course_free' } });
+      if (!course.price || course.price.amount_minor <= 0) throw new ApiError(409, 'invalid_state', 'คอร์สนี้เป็นคอร์สฟรี', { details: { reason: 'course_free' } });
       const existing = [...context.db.payments.values()].find((payment) => payment.user_id === user.id && payment.request_id === requestId);
       if (existing) return ok({ payment_id: existing.id, checkout_url: `https://checkout.stripe.invalid/session/${existing.checkout_session_id}` });
       const payment: PaymentRecord = {
@@ -265,6 +265,7 @@ export const paymentRoutes: Route[] = [
       if (problems.length) throw validationFailed(problems);
       const course = context.db.courses.get(courseId);
       if (!course || !isPublished(course)) throw notFound();
+      if (!course.price || course.price.amount_minor <= 0) throw new ApiError(409, 'invalid_state', 'คอร์สฟรีไม่สามารถออกโค้ดขายได้', { details: { reason: 'course_free' } });
       const items: Record<string, unknown>[] = [];
       for (let index = 0; index < count; index += 1) {
         const record: RedeemCodeRecord = {

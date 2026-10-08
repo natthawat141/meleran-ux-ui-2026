@@ -42,7 +42,7 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/learn/courses', icon: <IconBook2 />, label: 'คอร์สของฉัน' },
     { key: '/learn/redeem', icon: <IconReceipt />, label: 'แลกรหัสคอร์ส' },
     { key: '/learn/ai', icon: <IconSparkles />, label: 'Melearn AI' },
-    { key: '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
+    { key: import.meta.env.DEV ? '/courses' : '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
     { key: '/account/certificates', icon: <IconCertificate />, label: 'ใบรับรอง' },
     { key: '/account/profile', icon: <IconSettings />, label: 'บัญชีของฉัน' },
   ],
@@ -53,7 +53,8 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/teach/reviews', icon: <IconClipboardCheck />, label: 'คิวตรวจคำตอบ' },
     { key: '/teach/quizzes', icon: <IconArticle />, label: 'แบบทดสอบ' },
     { key: '/teach/learners', icon: <IconUsers />, label: 'ผู้เรียน' },
-    { key: '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
+    { key: import.meta.env.DEV ? '/courses' : '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
+    { key: '/learn/ai', icon: <IconSparkles />, label: 'Melearn AI' },
     { key: '/account/profile', icon: <IconSettings />, label: 'บัญชีของฉัน' },
   ],
   admin: [
@@ -64,6 +65,8 @@ const roleMenus: Record<Role, MenuItem[]> = {
     { key: '/admin/courses/reviews', icon: <IconClipboardCheck />, label: 'คิวตรวจคอร์ส' },
     { key: '/admin/users', icon: <IconUsers />, label: 'ผู้ใช้งาน' },
     { key: '/admin/access-codes', icon: <IconReceipt />, label: 'รหัสแลกคอร์ส' },
+    ...(import.meta.env.DEV ? [{ key: '/admin/payments', icon: <IconReceipt />, label: 'ตรวจสอบ Payment' }] : []),
+    ...(import.meta.env.DEV ? [{ key: '/admin/ai', icon: <IconSparkles />, label: 'Melearn AI และ Transcript' }] : []),
     { key: '/explore/courses', icon: <IconShoppingBag />, label: 'สำรวจคอร์ส' },
   ],
 };

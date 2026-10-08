@@ -1,6 +1,6 @@
 # Feature Release Matrix — Melearn
 
-อัปเดต 7 ตุลาคม 2026 · หลัง R1 scope cleanup บน `refactor/v1-api-ready`
+อัปเดต 8 ตุลาคม 2026 · R7–R9 provisional API slices บน `refactor/v1-api-ready`
 
 ยึด [Final 1.6](MELEARN_V1_SCOPE.md) และ [execution plan](FRONTEND_REFACTOR_PLAN_TH.md) ส่วน [config](../src/config/features.ts) กำหนด runtime gates ตาม environment การอนุมัติ scope ไม่ใช่ backend readiness ทุก feature ยัง `prototype`; default production ปิด prototype routes การตรวจ build ผ่านไม่เปลี่ยนเป็น integration/released
 
@@ -22,11 +22,11 @@ Phase เป็น metadata ลำดับส่งมอบที่ source �
 | `instructorCourses` | สร้าง/แก้คอร์ส / Review / รายชื่อผู้เรียน | 2 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `assessment` | Quiz / Attempts / ตรวจคำตอบเจ้าของคอร์ส | 3 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `certificates` | ใบรับรองของบัญชีตนเอง | 3 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `payments` | Stripe Checkout / อ่านสถานะ Payment | 4 | Prototype | Final 1.6 | Client HTTP มีแล้ว; backend/webhook ไม่ได้พิสูจน์ | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `redeem` | Redeem / ออกและยกเลิกรหัสแลกคอร์ส | 4 | Prototype | Final 1.6 | Prototype adapter ใน browser; ไม่ใช่ server atomicity | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `payments` | Stripe Checkout / อ่านสถานะ Payment | 4 | Prototype | Final 1.6 | Provisional in-memory mock ใน dev; ไม่มี Stripe/backend webhook | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `redeem` | Redeem / ออกและยกเลิกรหัสแลกคอร์ส | 4 | Prototype | Final 1.6 | Web/Admin ต่อ provisional mock ใน dev; ไม่มี persistence/atomicity จริง | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `operations` | Admin users / Instructor directory / Course management | 5 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 | `blog` | Published Blog / Admin editor | 6 | Prototype | Final 1.6 | None; local prototype | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
-| `aiTeacher` | Melearn AI / AIPractice / Transcript | 6 | Prototype | Final 1.6 | Mock/local history; model/DB/quota ยังไม่เชื่อม | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
+| `aiTeacher` | Melearn AI / AIPractice / Transcript | 6 | Prototype | Final 1.6 | Web/Admin ต่อ deterministic mock ใน dev; ไม่มี model/DB/quota จริง | `prototype` | ยังไม่ผ่าน | ยังไม่พร้อม |
 
 ## ความสามารถที่ไม่มี route แยก
 
@@ -106,6 +106,8 @@ Development/preview เปิด prototype; staging ต้อง integration/rel
 | `/admin/courses/reviews` | `instructorCourses` | Admin |
 | `/admin/courses/:courseId` | `instructorCourses` | Admin |
 | `/admin/access-codes` | `redeem` | Admin |
+| `/admin/payments` | `payments` | Admin (single Payment lookup, provisional mock in dev) |
+| `/admin/ai` | `aiTeacher` | Admin (provisional mock, dev only) |
 | `/403` | — | Public / page layout |
 | `*` | — | Public / page layout |
 

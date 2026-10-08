@@ -61,6 +61,38 @@ const approvedElementMigrations = {
   ],
 };
 
+// Provisional API adapters are dev-only page implementations that retain the
+// existing production page and URL. Keep their route declarations explicit.
+const approvedProvisionalElementMigrations = {
+  web: [
+    { path: '/learn', to: "featureElement('/learn', learner(import.meta.env.DEV ? <MyCoursesPage /> : <LearnerDashboardPage />))" },
+    { path: '/learn/courses', to: "featureElement('/learn/courses', learner(import.meta.env.DEV ? <MyCoursesPage /> : <LegacyMyCoursesPage />))" },
+    { path: '/learn/redeem', to: "featureElement('/learn/redeem', learner(<RedeemRoute />))" },
+    { path: '/learn/ai', to: "featureElement('/learn/ai', <RolePage roles={['learner', 'instructor']} standalone><AiRoute /></RolePage>)" },
+    { path: '/learn/courses/:courseId', to: "featureElement('/learn/courses/:courseId', learner(import.meta.env.DEV ? <LearningCoursePage /> : <LearnerCoursePage />))" },
+    { path: '/learn/courses/:courseId/videos/:itemId', to: `featureElement('/learn/courses/:courseId/videos/:itemId', learner(import.meta.env.DEV ? <LessonPage expectedType="video" /> : <VideoLessonPage />))` },
+    { path: '/learn/courses/:courseId/articles/:itemId', to: `featureElement('/learn/courses/:courseId/articles/:itemId', learner(import.meta.env.DEV ? <LessonPage expectedType="article" /> : <ArticleLessonPage />))` },
+    { path: '/learn/courses/:courseId/quizzes/:itemId', to: "featureElement('/learn/courses/:courseId/quizzes/:itemId', learner(import.meta.env.DEV ? <QuizStartPage /> : <QuizIntroPage />))" },
+    { path: '/learn/quizzes/:quizId', to: "featureElement('/learn/quizzes/:quizId', learner(import.meta.env.DEV ? <QuizStartPage /> : <QuizIntroPage />))" },
+    { path: '/learn/attempts/:attemptId', to: "featureElement('/learn/attempts/:attemptId', learner(import.meta.env.DEV ? <QuizAttemptPage /> : <LegacyQuizAttemptPage />))" },
+    { path: '/learn/attempts/:attemptId/result', to: "featureElement('/learn/attempts/:attemptId/result', learner(import.meta.env.DEV ? <QuizResultPage /> : <LegacyQuizResultPage />))" },
+    { path: '/checkout/:courseId', to: "featureElement('/checkout/:courseId', paymentUser(<CheckoutRoute />))" },
+    { path: '/checkout/:orderId/result', to: "featureElement('/checkout/:orderId/result', paymentUser(<CheckoutRoute result />))" },
+    { path: '/account/certificates', to: "featureElement('/account/certificates', accountUser(import.meta.env.DEV ? <ServerCertificatesPage /> : <CertificatesPage />))" },
+    { path: '/account/certificates/:certificateId', to: "featureElement('/account/certificates/:certificateId', accountUser(import.meta.env.DEV ? <ServerCertificateDetailPage /> : <CertificateDetailPage />))" },
+    { path: '/teach/reviews', to: "featureElement('/teach/reviews', grader(import.meta.env.DEV ? <InstructorGradingPage /> : <LearnerReviewQueuePage />))" },
+  ],
+  admin: [
+    { path: '/admin/access-codes', to: "featureElement('/admin/access-codes', admin(<AccessCodesRoute />))" },
+  ],
+};
+const approvedRouteAdditions = {
+  admin: [
+    { path: '/admin/payments', featurePath: '/admin/payments', element: "featureElement('/admin/payments', admin(<PaymentLookupRoute />))", after: '/admin/access-codes', reason: 'R8 adds a read-only Admin lookup for one abnormal Payment' },
+    { path: '/admin/ai', featurePath: '/admin/ai', element: "featureElement('/admin/ai', admin(<AiAdminRoute />))", after: '/admin/payments', reason: 'R9 adds an Admin-owned dev-only AI and transcript control route' },
+  ],
+};
+
 test('composed modules preserve the R3b route inventory and record intentional element migrations', () => {
   for (const [appName, routes] of [['web', webRoutes], ['admin', adminRoutes]]) {
     const actual = routes.map(({ file, ...route }) => route);
@@ -71,6 +103,22 @@ test('composed modules preserve the R3b route inventory and record intentional e
       assert.equal(previous?.element, migration.from, `${appName} ${migration.path} baseline matches: ${migration.reason}`);
       assert.equal(current?.element, migration.to, `${appName} ${migration.path} uses reviewed component: ${migration.reason}`);
       previous.element = migration.to;
+    }
+    for (const migration of approvedProvisionalElementMigrations[appName] ?? []) {
+      const previous = expected.find((route) => route.path === migration.path);
+      const current = actual.find((route) => route.path === migration.path);
+      assert.ok(previous, `${appName} ${migration.path} exists in the R3b inventory`);
+      assert.ok(current, `${appName} ${migration.path} remains registered`);
+      assert.equal(current.featurePath, previous.featurePath, `${appName} ${migration.path} preserves its feature owner`);
+      assert.equal(current.element, migration.to, `${appName} ${migration.path} uses its reviewed provisional adapter`);
+      previous.element = migration.to;
+    }
+    for (const addition of approvedRouteAdditions[appName] ?? []) {
+      const current = actual.find((route) => route.path === addition.path);
+      assert.deepEqual(current, { path: addition.path, featurePath: addition.featurePath, element: addition.element }, `${appName} ${addition.path}: ${addition.reason}`);
+      const insertionPoint = expected.findIndex((route) => route.path === addition.after);
+      assert.notEqual(insertionPoint, -1, `${appName} insertion point ${addition.after} exists`);
+      expected.splice(insertionPoint + 1, 0, { path: addition.path, featurePath: addition.featurePath, element: addition.element });
     }
     assert.deepEqual(actual, expected, appName);
     assert.equal(new Set(routes.map((route) => route.path)).size, routes.length, `${appName} has unique paths`);

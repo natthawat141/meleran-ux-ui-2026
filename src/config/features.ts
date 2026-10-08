@@ -78,6 +78,8 @@ export const ROUTE_FEATURES = {
   '/checkout/:courseId': 'payments',
   '/checkout/:orderId/result': 'payments',
   '/admin/access-codes': 'redeem',
+  '/admin/payments': 'payments',
+  '/admin/ai': 'aiTeacher',
 
   '/admin': 'operations',
   '/admin/users': 'operations',

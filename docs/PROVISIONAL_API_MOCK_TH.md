@@ -108,13 +108,16 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ## 8. ที่ต่อเข้า Web/Admin แล้ว และที่ยังไม่ได้ทำ
 
-`vite dev` ของ Web/Admin เปิด dev server `tools/provisional-api/dev-server.ts` ที่ `127.0.0.1:8787` ผ่าน Vite proxy `/mock-api`. Auth `/auth/login`, `/me`, `/auth/logout` ใช้ cookie แยก app; Web Landing/Catalog/detail และ free Enrollment อ่าน mock. R7 routes ใน Web อ่าน enrolled courses, lessons, progress/resume, quiz attempts/results, instructor grading และ certificates. Query cache ถูกแยกต่อ app และเคลียร์เมื่อ sign in/out.
+`vite dev` ของ Web/Admin ใช้ dev server `tools/provisional-api/dev-server.ts` ที่ `127.0.0.1:8787` ผ่าน Vite proxy `/mock-api`. Auth `/auth/login`, `/me`, `/auth/logout` ใช้ cookie แยก app; Web Landing/Catalog/detail และ free Enrollment อ่าน mock. Web R7 routes อ่าน enrollments, lessons, progress/resume, quiz attempts/results, Instructor grading และ certificates. Web R8 เพิ่มหน้า Checkout/status/Redeem; Admin เพิ่ม lookup Payment แบบอ่านอย่างเดียวทีละ ID และจัดการ redeem codes. R9 เพิ่ม Web AI conversations/history/course context/usage/AIPractice และ Admin ตั้งค่า AI support/แก้ transcript. Query cache แยกต่อ app และเคลียร์เมื่อ sign in/out.
 
 Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](R4B_FLOW_B_CATALOG_TH.md)
 
 ยังไม่ได้ทำหรือยังไม่ยืนยัน:
 
-- `/explore`, register/verification/reset, Admin business APIs, Authoring, Payment/Redeem และ AI ยังเป็น local/demo flows; paid enrollment รอ R8
+- `/explore`, register/verification/reset, Admin business APIs และ Course Authoring ยังเป็น local/demo flows
+- หน้า Payment เป็น provisional flow: สร้างรายการและอ่าน status ได้ แต่ mock ไม่มี Stripe Checkout จริง จึงไม่ redirect ไป `checkout_url`; มีเพียง signed-webhook simulator ใน tests และไม่มีการให้สิทธิ์จาก success URL
+- Redeem codes/Enrollment/Payment/AI history/transcript อยู่ใน memory ของ mock; restart แล้วหาย และไม่มี API persistence ข้ามอุปกรณ์
+- AI ตอบด้วยข้อความ deterministic mock; ไม่มี model/provider จริง แม้ mock ทดสอบ quota, request dedupe, history ownership และ answer-key withholding
 - ยังไม่มี DTO ใน `packages/contracts` (รอ Backend freeze); TanStack Query ใช้เฉพาะ server-like state ที่ย้ายแล้ว
 - Dev session เป็นการจำลองใน memory; server restart ล้างบัญชี/Enrollment/Progress/Attempt/Certificate และไม่ยืนยัน persistence ข้ามอุปกรณ์
-- หลักฐานฝั่ง server (R10, R13) ยังรอ Backend จริง
+- R10 ทำได้เพียง automated integration กับ provisional API; ไม่มี Backend/OpenAPI, database, Stripe signing config หรือ AI provider จึงยังพิสูจน์ server permissions/persistence/operations และปิด R10/R13 ไม่ได้
