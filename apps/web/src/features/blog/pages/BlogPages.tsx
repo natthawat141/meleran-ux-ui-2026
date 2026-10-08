@@ -2,14 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, Input, Segmented, Table, type TableProps } from 'antd';
 import { AppstoreOutlined, ArrowLeftOutlined, ArrowRightOutlined, SearchOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { blogCoverFor } from '../../data';
-import { LandingHeader, LandingFooter } from '../landing/LandingChrome';
-import { RichDocument } from '@melearn/ui';
-import { landingTheme } from '@melearn/ui';
-import type { BlogPost, User } from '../../types';
-import '../landing/landing.css';
-import './blog.css';
+import { useLms } from '@legacy/store';
+import { blogCoverFor } from '@legacy/data';
+import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrome';
+import { RichDocument, landingTheme } from '@melearn/ui';
+import type { BlogPost, User } from '@legacy/types';
+import '@legacy/pages/landing/landing.css';
+import '@legacy/pages/blog/blog.css';
 
 const dateLabel = (value?: string | null) =>
   value
@@ -209,10 +208,10 @@ export function BlogIndexPage() {
 
 export function BlogArticlePage() {
   const { id } = useParams<{ id: string }>();
-  const { data, currentUser } = useLms();
+  const { data } = useLms();
   const post = data.blogPosts.find((item) => item.id === id);
 
-  if (!post || (post.status !== 'published' && currentUser?.role !== 'admin')) {
+  if (!post || post.status !== 'published') {
     return (
       <BlogShell title="ไม่พบบทความ">
         <div className="blog-container blog-missing">
@@ -239,7 +238,6 @@ export function BlogArticlePage() {
           <Link className="blog-back" to="/articles">
             <ArrowLeftOutlined aria-hidden="true" /> บทความทั้งหมด
           </Link>
-          {post.status === 'draft' && <span className="blog-draft-label">ตัวอย่างฉบับร่าง · แอดมินเท่านั้น</span>}
           <PostMeta post={post} author={author} />
           <h1>{post.title}</h1>
           <p>{post.excerpt}</p>

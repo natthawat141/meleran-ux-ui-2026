@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import { LoginPage, VerifyEmailPage, DemoAccountPage } from '@legacy/pages/AuthPages';
-import { BlogArticlePage } from '@legacy/pages/blog/BlogPages';
+import { BlogArticlePreviewPage } from '../../features/blog/pages/BlogArticlePreviewPage';
 
 export const entryRoutes = (
   <>
@@ -10,6 +10,6 @@ export const entryRoutes = (
     <Route path="/verify-email" element={<VerifyEmailPage />} />
     <Route path="/forgot-password" element={<DemoAccountPage type="forgot" />} />
     <Route path="/reset-password" element={<DemoAccountPage type="reset" />} />
-    <Route path="/articles/:id" element={<BlogArticlePage />} />
+    <Route path="/articles/:id" element={<BlogArticlePreviewPage />} />
   </>
 );

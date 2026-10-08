@@ -7,7 +7,7 @@ import { PublicCatalogPage } from '../../features/courses/pages/public/CatalogPa
 import { PublicCourseDetailPage } from '../../features/courses/pages/public/CourseDetailPage';
 import { LandingPage } from '../../features/landing/pages/LandingPage';
 import { AboutPage } from '../../features/landing/pages/AboutPage';
-import { BlogIndexPage, BlogArticlePage } from '@legacy/pages/blog/BlogPages';
+import { BlogIndexPage, BlogArticlePage } from '../../features/blog/pages/BlogPages';
 import { Public } from './access';
 
 function PublicCourseEntry({ detail = false }: { detail?: boolean }) {

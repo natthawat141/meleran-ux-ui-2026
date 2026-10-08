@@ -54,11 +54,11 @@
 | Generated CSS / Tailwind theme | `packages/ui/src/tokens.css`, `tailwind.css`; generator `scripts/generate-ui-tokens.mjs` |
 | CSS compatibility / system overrides | `src/styles.css`, `src/shadcn.css`, `src/system-theme.css` |
 | Landing/About app pages และ CSS เฉพาะหน้า | `apps/web/src/features/landing/pages/` |
-| Landing chrome/base CSS bridge | `src/pages/landing/LandingChrome.tsx`, `landing.css`; ยังมี consumer ใน legacy Shell และ Blog article preview |
+| Landing chrome/base CSS bridge | `src/pages/landing/LandingChrome.tsx`, `landing.css`; ยังมี consumer ใน legacy Shell และ Admin Blog article preview |
 | About / รายชื่อทีมร่วมกัน | `apps/web/src/features/landing/pages/AboutPage.tsx`, `BrandStory.tsx`, `brand-story.css` |
 | Auth / shadcn controls | Shared primitives: `packages/ui/src/primitives/` via `packages/ui/src/index.ts`; current legacy consumer: `src/pages/AuthPages.tsx`; compatibility styles: `src/shadcn.css` |
-| Public blog reader/article preview bridge | `src/pages/blog/` |
-| Admin blog list/editor | `apps/admin/src/features/blog/pages/BlogAdminPages.tsx`; ยังใช้ legacy store/RichTextEditor bridge |
+| Web public blog reader | `apps/web/src/features/blog/pages/BlogPages.tsx`; Published only, ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` |
+| Admin blog list/editor/article preview | `apps/admin/src/features/blog/pages/`; preview route `/articles/:id` ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` และ RichDocument จาก `packages/ui` |
 | Curriculum จริงที่ route ใช้อยู่ | `src/pages/instructor/CurriculumWorkspace.tsx`, `curriculum-workspace.css` |
 | Chapter workspace จริง | `src/pages/instructor/ChapterWorkspace.tsx`, `chapter-workspace.css` |
 | Video / article / assessment editors | `src/components/chapter/VideoEditor.tsx`, `RichTextEditor.tsx`, `AssessmentEditor.tsx`, `ChapterPreview.tsx` |
