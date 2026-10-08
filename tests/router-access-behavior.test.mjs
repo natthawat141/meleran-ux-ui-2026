@@ -32,7 +32,7 @@ async function loadAccess(appName) {
     '@legacy/store': { useLms: () => session },
     '@legacy/components/Shell': { PublicShell, WorkspaceShell },
     '@legacy/pages/SystemPages': { NoAccessPage },
-    '@legacy/pages/AuthPages': { VerifyEmailPage },
+    '../../features/auth/pages/AuthPages': { VerifyEmailPage },
   };
   vm.runInNewContext(code, {
     module,

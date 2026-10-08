@@ -8,7 +8,7 @@ import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrom
 import { RichDocument, landingTheme } from '@melearn/ui';
 import type { BlogPost, User } from '@legacy/types';
 import '@legacy/pages/landing/landing.css';
-import '@legacy/pages/blog/blog.css';
+import './blog.css';
 
 const dateLabel = (value?: string | null) =>
   value

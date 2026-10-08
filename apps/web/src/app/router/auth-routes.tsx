@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import { featureElement } from '@legacy/components/FeatureRoute';
-import { LoginPage, RegisterPage, DemoAccountPage, VerifyEmailPage } from '@legacy/pages/AuthPages';
+import { LoginPage, RegisterPage, DemoAccountPage, VerifyEmailPage } from '../../features/auth/pages/AuthPages';
 
 export const authRoutes = (
   <>

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Alert, Button, Empty, Form, Select, Space, Table, Tag, Typography, message, type TableColumnsType } from 'antd';
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons';
-import { useLms } from '../../store';
+import { useLms } from '@legacy/store';
 import { PageTitle } from '@melearn/ui';
-import type { RedeemCode } from '../../types';
+import type { RedeemCode } from '@legacy/types';
 import './access-codes.css';
 
 const { Text } = Typography;

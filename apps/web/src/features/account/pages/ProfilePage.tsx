@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Popconfirm, message } from 'antd';
 import { useLms } from '@legacy/store';
-import { ProfileSettings } from '@legacy/pages/learner/ProfileSettings';
+import { ProfileSettings } from '../components/ProfileSettings';
 
 export function ProfilePage() {
   const { currentUser, data, updateProfile, resetDemo } = useLms();

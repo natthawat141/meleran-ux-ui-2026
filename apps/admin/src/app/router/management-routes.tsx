@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom';
 import { featureElement } from '@legacy/components/FeatureRoute';
 import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorsPage, AdminCoursesPage, AdminCourseDetailPage } from '../../features/management/pages/AdminPages';
 import { CourseReviewPage } from '../../features/course-approval/pages/CourseReviewPage';
-import { AccessCodesPage } from '@legacy/pages/admin/AccessCodesPage';
+import { AccessCodesPage } from '../../features/management/pages/AccessCodesPage';
 import { AdminBlogPage, AdminBlogEditorPage } from '../../features/blog/pages/BlogAdminPages';
 import { ProfilePage } from '../../features/account/pages/ProfilePage';
 import { admin } from './access';

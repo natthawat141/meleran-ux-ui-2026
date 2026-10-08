@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
-import { ConfigProvider } from 'antd';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
 import { useLms } from '@legacy/store';
 import { blogCoverFor } from '@legacy/data';
-import { LandingHeader, LandingFooter } from '@legacy/pages/landing/LandingChrome';
-import { RichDocument, landingTheme } from '@melearn/ui';
+import { RichDocument } from '@melearn/ui';
+import { WorkspaceShell } from '@legacy/components/Shell';
 import type { BlogPost, User } from '@legacy/types';
-import '@legacy/pages/landing/landing.css';
-import '@legacy/pages/blog/blog.css';
+import './blog.css';
 
 const dateLabel = (value?: string | null) =>
   value
@@ -33,14 +31,11 @@ function BlogShell({ children, title }: { children: React.ReactNode; title: stri
   }, [title]);
 
   return (
-    <ConfigProvider theme={landingTheme}>
-      <div className="home-v3 blog-site">
-        <a className="home-skip" href="#blog-main">ข้ามไปเนื้อหาหลัก</a>
-        <LandingHeader />
+    <WorkspaceShell availableRoles={['admin']}>
+      <div className="blog-site" style={{ padding: '24px 0' }}>
         <main id="blog-main" tabIndex={-1}>{children}</main>
-        <LandingFooter />
       </div>
-    </ConfigProvider>
+    </WorkspaceShell>
   );
 }
 

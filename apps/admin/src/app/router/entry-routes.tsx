@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Route } from 'react-router-dom';
-import { LoginPage, VerifyEmailPage, DemoAccountPage } from '@legacy/pages/AuthPages';
+import { LoginPage, VerifyEmailPage, DemoAccountPage } from '../../features/auth/pages/AuthPages';
 import { BlogArticlePreviewPage } from '../../features/blog/pages/BlogArticlePreviewPage';
 
 export const entryRoutes = (

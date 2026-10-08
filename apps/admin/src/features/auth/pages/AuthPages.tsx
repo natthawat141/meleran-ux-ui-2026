@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Form, Input, Typography } from 'antd';
 import { ArrowLeftOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AuthFrame } from '../components/Shell';
-import { useLms } from '../store';
-import { DEMO_ACCOUNTS } from '../data';
-import { verificationResendRemainingMs } from '../lib/email-verification';
+import { AuthFrame } from '@legacy/components/Shell';
+import { useLms } from '@legacy/store';
+import { DEMO_ACCOUNTS } from '@legacy/data';
+import { verificationResendRemainingMs } from '@legacy/lib/email-verification';
 import {
   Alert as UiAlert,
   AlertDescription,
@@ -88,7 +88,7 @@ export interface LoginPageProps {
   audience?: 'web' | 'admin';
 }
 
-export function LoginPage({ audience = 'web' }: LoginPageProps) {
+export function LoginPage({ audience = 'admin' }: LoginPageProps) {
   const { signIn } = useLms();
   const navigate = useNavigate();
   const location = useLocation();
@@ -184,121 +184,6 @@ export function LoginPage({ audience = 'web' }: LoginPageProps) {
           ))}
         </div>
       </details>
-    </AuthPanel>
-  );
-}
-
-export function RegisterPage() {
-  const { register } = useLms();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const next = new URLSearchParams(location.search).get('next');
-  const [error, setError] = useState('');
-  const [verificationUrl, setVerificationUrl] = useState('');
-
-  const submit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const name = String(form.get('name') ?? '').trim();
-    const email = String(form.get('email') ?? '').trim();
-    const password = String(form.get('password') ?? '');
-    const confirm = String(form.get('confirm') ?? '');
-    if (password !== confirm) {
-      setError('รหัสผ่านไม่ตรงกัน');
-      return;
-    }
-    const result = register({ name, email, password });
-    if (!result.ok) {
-      setError(result.message || 'สมัครสมาชิกไม่สำเร็จ');
-      return;
-    }
-    if (result.verificationUrl) setVerificationUrl(result.verificationUrl);
-    else navigate(next || '/learn');
-  };
-
-  return (
-    <AuthPanel
-      variant="entry"
-      title="สร้างบัญชีผู้เรียน"
-      intro="เริ่มเรียนคอร์สฟรีและติดตามความคืบหน้าของคุณ"
-    >
-      {verificationUrl ? (
-        <UiAlert className="mb-5">
-          <AlertDescription>
-            <strong>สร้างบัญชีแล้ว แต่ยังไม่ได้ยืนยันอีเมล</strong>
-            <p>ต้นแบบนี้ไม่ส่งอีเมลจริง ใช้ลิงก์จำลองด้านล่างเพื่อทดลองต่อ ลิงก์มีอายุ 24 ชั่วโมงและใช้ได้ครั้งเดียว</p>
-            <Link to={verificationUrl}>เปิดลิงก์ยืนยันจำลอง</Link>
-          </AlertDescription>
-        </UiAlert>
-      ) : <>
-      {error && (
-        <UiAlert variant="destructive" className="mb-5">
-          <AlertDescription>{error}</AlertDescription>
-        </UiAlert>
-      )}
-      <form
-        className="login-form-shadcn"
-        onSubmit={submit}
-        onInput={() => error && setError('')}
-      >
-        <FieldGroup className="gap-4">
-          <Field className="gap-1.5">
-            <FieldLabel htmlFor="register-name">ชื่อที่ใช้แสดง</FieldLabel>
-            <UiInput
-              id="register-name"
-              name="name"
-              autoComplete="name"
-              placeholder="ชื่อของคุณ"
-              required
-              className="h-10 font-sans"
-            />
-          </Field>
-          <Field className="gap-1.5">
-            <FieldLabel htmlFor="register-email">อีเมล</FieldLabel>
-            <UiInput
-              id="register-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="name@example.com"
-              required
-              className="h-10 font-sans"
-            />
-          </Field>
-          <Field className="gap-1.5">
-            <FieldLabel htmlFor="register-password">รหัสผ่าน</FieldLabel>
-            <UiInput
-              id="register-password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              className="h-10 font-sans"
-            />
-            <FieldDescription className="text-xs">อย่างน้อย 8 ตัวอักษร</FieldDescription>
-          </Field>
-          <Field className="gap-1.5">
-            <FieldLabel htmlFor="register-confirm">ยืนยันรหัสผ่าน</FieldLabel>
-            <UiInput
-              id="register-confirm"
-              name="confirm"
-              type="password"
-              autoComplete="new-password"
-              required
-              className="h-10 font-sans"
-            />
-          </Field>
-          <UiButton type="submit" className="mt-1 h-10 w-full font-sans">
-            สร้างบัญชี
-          </UiButton>
-        </FieldGroup>
-      </form>
-      <GoogleAuthOption label="สมัครด้วย Google" />
-      <div className="auth-switch">
-        มีบัญชีแล้ว? <Link to={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}>เข้าสู่ระบบ</Link>
-      </div>
-      </>}
     </AuthPanel>
   );
 }

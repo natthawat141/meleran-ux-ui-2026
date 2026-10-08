@@ -98,6 +98,21 @@ test('Admin course approval route renders its app-owned feature page', async () 
   assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/CourseReviewPage/);
 });
 
+test('Admin access codes route renders its app-owned feature page', async () => {
+  const routeModule = await readFile(path.join(root, 'apps/admin/src/app/router/management-routes.tsx'), 'utf8');
+  assert.match(routeModule, /from ['"]\.\.\/\.\.\/features\/management\/pages\/AccessCodesPage['"]/);
+  assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/AccessCodesPage/);
+});
+
+test('Web and Admin auth routes render app-owned auth pages', async () => {
+  const webAuth = await readFile(path.join(root, 'apps/web/src/app/router/auth-routes.tsx'), 'utf8');
+  const adminEntry = await readFile(path.join(root, 'apps/admin/src/app/router/entry-routes.tsx'), 'utf8');
+  assert.match(webAuth, /from ['"]\.\.\/\.\.\/features\/auth\/pages\/AuthPages['"]/);
+  assert.doesNotMatch(webAuth, /@legacy\/pages\/AuthPages/);
+  assert.match(adminEntry, /from ['"]\.\.\/\.\.\/features\/auth\/pages\/AuthPages['"]/);
+  assert.doesNotMatch(adminEntry, /@legacy\/pages\/AuthPages/);
+});
+
 test('Web and Admin authoring routes render their own course editor hosts', async () => {
   const webModule = await readFile(path.join(root, 'apps/web/src/app/router/instructor-routes.tsx'), 'utf8');
   const adminModule = await readFile(path.join(root, 'apps/admin/src/app/router/authoring-routes.tsx'), 'utf8');

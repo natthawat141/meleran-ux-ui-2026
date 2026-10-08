@@ -4,7 +4,7 @@ import { PublicShell, WorkspaceShell } from '@legacy/components/Shell';
 import { useLms } from '@legacy/store';
 import { NoAccessPage } from '@legacy/pages/SystemPages';
 import type { Role } from '@legacy/types';
-import { VerifyEmailPage } from '@legacy/pages/AuthPages';
+import { VerifyEmailPage } from '../../features/auth/pages/AuthPages';
 
 export function Public({ children }: { children: React.ReactNode }) {
   return <PublicShell>{children}</PublicShell>;
