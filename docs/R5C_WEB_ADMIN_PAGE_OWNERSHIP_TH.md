@@ -1,6 +1,6 @@
 # R5c — ย้ายหน้า Web/Admin เข้า app ownership
 
-อัปเดต 8 ตุลาคม 2026 · branch `refactor/v1-api-ready`
+อัปเดต 8 ตุลาคม 2026 · branch `refactor/v1-api-ready` · code checkpoint `1786f1e`
 
 สถานะ: **ผ่าน code gate และ development preview เฉพาะ route ที่ระบุ; R5 ยังไม่เสร็จ** งานชุดนี้ย้ายหน้า retained slices ออกจาก root `src/pages` ให้แอปเจ้าของ โดยรักษา URL, markup, CSS และ demo behavior เดิม ยกเว้นลิงก์กลับจาก Admin article preview ที่ชี้ไปยังรายการบทความของ Admin เพื่อให้ไม่หลุดไป route ที่ไม่มีในแอปนั้น
 
@@ -35,6 +35,7 @@ Web/Admin route declarations ชี้เข้าไฟล์ของ app เ�
 - `npm.cmd test` — 93/93 ผ่าน; route checks อ่าน inventory ของ Web/Admin modules และเก็บ R3 baseline พร้อม allowlist การเปลี่ยน Admin Blog preview
 - `npm.cmd run check:boundaries` — ผ่าน dependency direction และ route ownership checks ที่มีอยู่
 - `npm.cmd run build` — token check และ production build ของ Web/Admin ผ่าน; มีคำเตือนเดิมจาก dependency `"use client"` และ chunk ขนาดใหญ่
+- [GitHub CI run 37754531988](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37754531988) — ผ่านทุก job บน `1786f1e` (shared checks, Web/Admin typecheck/build)
 - Development preview แบบ read-only: `/` แสดง Landing, `/about` แสดงหน้าและ founder content, `/courses` แสดงคอร์ส Published 3 รายการ, `/courses/clear-writing` แสดงรายละเอียดคอร์ส, Web `/articles/post-better-writing` และ Admin `/articles/post-better-writing` แสดงบทความ Published
 - Draft preview branch คง role check ใน source แต่ไม่มี draft seed data จึงยังไม่ได้ยืนยันผล draft ด้วย browser; ลิงก์ย้อนกลับจาก Admin preview ชี้ `/admin/articles`
 - Production preview ที่ `/` แสดง Not Found เพราะ `prototype` feature status ถูกปิดใน `production` environment ตาม `src/config/features.ts`; ไม่ใช่การตรวจว่า route หาย และไม่ถือเป็น production acceptance
