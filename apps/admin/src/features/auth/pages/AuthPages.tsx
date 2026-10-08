@@ -4,10 +4,15 @@ import { ArrowLeftOutlined, GoogleOutlined, MailOutlined } from '@ant-design/ico
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthFrame } from '@melearn/ui';
 import { useLms } from '@legacy/store';
-import { DEMO_ACCOUNTS } from '@legacy/data';
 import { verificationResendRemainingMs } from '@melearn/contracts';
 import { useAuthSession } from '../api/AuthSessionProvider';
 import { provisionalDemoAccounts, provisionalLoginError } from '../api/auth-session';
+
+const FALLBACK_DEMO_ACCOUNTS = [
+  { label: 'ผู้เรียน', email: 'learner@learn.demo', password: 'Learn123!', role: 'learner' },
+  { label: 'ผู้สอน', email: 'teacher@learn.demo', password: 'Teach123!', role: 'instructor' },
+  { label: 'แอดมิน', email: 'admin@learn.demo', password: 'Admin123!', role: 'admin' },
+];
 import {
   Alert as UiAlert,
   AlertDescription,
@@ -99,7 +104,7 @@ export function LoginPage({ audience = 'admin' }: LoginPageProps) {
   const next = new URLSearchParams(location.search).get('next');
   const loginDemoAccounts = session.enabled
     ? provisionalDemoAccounts.map((account) => ({ ...account, email: account.identifier }))
-    : DEMO_ACCOUNTS.filter((account) => account.role === 'admin');
+    : FALLBACK_DEMO_ACCOUNTS.filter((account) => account.role === 'admin');
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

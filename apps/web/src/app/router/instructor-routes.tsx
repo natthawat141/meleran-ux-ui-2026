@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { featureElement } from '@legacy/components/FeatureRoute';
-import { InstructorDashboardPage, InstructorCoursesPage } from '@legacy/pages/instructor/CoursePages';
+import { featureElement } from '@melearn/ui';
+import { InstructorDashboardPage, InstructorCoursesPage } from '../../features/instructors/pages/CoursePages';
 import { InstructorCourseEditorPage } from '../../features/course-authoring/pages/CourseEditorPage';
 import { CourseOverviewPage } from '../../features/course-authoring/pages/CourseOverviewPage';
 import { CurriculumPage } from '../../features/course-authoring/pages/CurriculumPage';
@@ -9,16 +9,15 @@ import { ChapterWorkspace as ChapterEditorPage } from '../../features/course-aut
 import { ContentEditorPage } from '../../features/course-authoring/pages/ContentEditorPage';
 import { QuizManagerPage } from '../../features/course-authoring/pages/QuizManagerPage';
 import { QuizEditorPage } from '../../features/course-authoring/pages/QuizEditorPage';
-import { QuizAttemptsPage, GradeEssayPage } from '@legacy/pages/instructor/QuizPages';
-import { CoursePreviewPage, InstructorLearnersPage } from '@legacy/pages/instructor/InsightPages';
+import { QuizAttemptsPage, GradeEssayPage } from '../../features/instructors/pages/QuizPages';
+import { CoursePreviewPage, InstructorLearnersPage } from '../../features/instructors/pages/InsightPages';
 import { InstructorGradingPage } from '../../features/assessment/pages/InstructorGradingPage';
-import { LearnerReviewQueuePage } from '@legacy/pages/instructor/LearnerReviewQueuePage';
 import { grader, instructor } from './access';
 
 export const instructorRoutes = (
   <>
     <Route path="/teach" element={featureElement('/teach', instructor(<InstructorDashboardPage />))} />
-    <Route path="/teach/reviews" element={featureElement('/teach/reviews', grader(import.meta.env.DEV ? <InstructorGradingPage /> : <LearnerReviewQueuePage />))} />
+    <Route path="/teach/reviews" element={featureElement('/teach/reviews', grader(<InstructorGradingPage />))} />
     <Route path="/teach/courses" element={featureElement('/teach/courses', instructor(<InstructorCoursesPage />))} />
     <Route path="/teach/courses/new" element={featureElement('/teach/courses/new', instructor(<InstructorCourseEditorPage />))} />
     <Route path="/teach/courses/:courseId" element={featureElement('/teach/courses/:courseId', instructor(<CourseOverviewPage />))} />

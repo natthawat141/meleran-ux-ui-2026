@@ -61,6 +61,14 @@ export {
   type StatLineProps,
 } from './components/common';
 export { NoAccessPage, NotFoundPage } from './components/SystemPages';
+export {
+  WrittenAnswerInput,
+  WrittenAnswerView,
+  writtenAnswer,
+  answerIsComplete,
+  type NormalizedWrittenAnswer,
+  type WrittenAnswerInputProps,
+} from './components/WrittenAnswer';
 export { AuthFrame, type AuthFrameProps } from './components/AuthFrame';
 export { LandingHeader, LandingFooter, MelearnLogo, MainNavigation, type LandingUser } from './components/LandingChrome';
 export {

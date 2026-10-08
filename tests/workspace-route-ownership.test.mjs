@@ -65,22 +65,22 @@ const approvedElementMigrations = {
 // existing production page and URL. Keep their route declarations explicit.
 const approvedProvisionalElementMigrations = {
   web: [
-    { path: '/learn', to: "featureElement('/learn', learner(import.meta.env.DEV ? <MyCoursesPage /> : <LearnerDashboardPage />))" },
-    { path: '/learn/courses', to: "featureElement('/learn/courses', learner(import.meta.env.DEV ? <MyCoursesPage /> : <LegacyMyCoursesPage />))" },
+    { path: '/learn', to: "featureElement('/learn', learner(<MyCoursesPage />))" },
+    { path: '/learn/courses', to: "featureElement('/learn/courses', learner(<MyCoursesPage />))" },
     { path: '/learn/redeem', to: "featureElement('/learn/redeem', learner(<RedeemRoute />))" },
     { path: '/learn/ai', to: "featureElement('/learn/ai', <RolePage roles={['learner', 'instructor']} standalone><AiRoute /></RolePage>)" },
-    { path: '/learn/courses/:courseId', to: "featureElement('/learn/courses/:courseId', learner(import.meta.env.DEV ? <LearningCoursePage /> : <LearnerCoursePage />))" },
-    { path: '/learn/courses/:courseId/videos/:itemId', to: `featureElement('/learn/courses/:courseId/videos/:itemId', learner(import.meta.env.DEV ? <LessonPage expectedType="video" /> : <VideoLessonPage />))` },
-    { path: '/learn/courses/:courseId/articles/:itemId', to: `featureElement('/learn/courses/:courseId/articles/:itemId', learner(import.meta.env.DEV ? <LessonPage expectedType="article" /> : <ArticleLessonPage />))` },
-    { path: '/learn/courses/:courseId/quizzes/:itemId', to: "featureElement('/learn/courses/:courseId/quizzes/:itemId', learner(import.meta.env.DEV ? <QuizStartPage /> : <QuizIntroPage />))" },
-    { path: '/learn/quizzes/:quizId', to: "featureElement('/learn/quizzes/:quizId', learner(import.meta.env.DEV ? <QuizStartPage /> : <QuizIntroPage />))" },
-    { path: '/learn/attempts/:attemptId', to: "featureElement('/learn/attempts/:attemptId', learner(import.meta.env.DEV ? <QuizAttemptPage /> : <LegacyQuizAttemptPage />))" },
-    { path: '/learn/attempts/:attemptId/result', to: "featureElement('/learn/attempts/:attemptId/result', learner(import.meta.env.DEV ? <QuizResultPage /> : <LegacyQuizResultPage />))" },
+    { path: '/learn/courses/:courseId', to: "featureElement('/learn/courses/:courseId', learner(<LearningCoursePage />))" },
+    { path: '/learn/courses/:courseId/videos/:itemId', to: `featureElement('/learn/courses/:courseId/videos/:itemId', learner(<LessonPage expectedType="video" />))` },
+    { path: '/learn/courses/:courseId/articles/:itemId', to: `featureElement('/learn/courses/:courseId/articles/:itemId', learner(<LessonPage expectedType="article" />))` },
+    { path: '/learn/courses/:courseId/quizzes/:itemId', to: "featureElement('/learn/courses/:courseId/quizzes/:itemId', learner(<QuizStartPage />))" },
+    { path: '/learn/quizzes/:quizId', to: "featureElement('/learn/quizzes/:quizId', learner(<QuizStartPage />))" },
+    { path: '/learn/attempts/:attemptId', to: "featureElement('/learn/attempts/:attemptId', learner(<QuizAttemptPage />))" },
+    { path: '/learn/attempts/:attemptId/result', to: "featureElement('/learn/attempts/:attemptId/result', learner(<QuizResultPage />))" },
     { path: '/checkout/:courseId', to: "featureElement('/checkout/:courseId', paymentUser(<CheckoutRoute />))" },
     { path: '/checkout/:orderId/result', to: "featureElement('/checkout/:orderId/result', paymentUser(<CheckoutRoute result />))" },
-    { path: '/account/certificates', to: "featureElement('/account/certificates', accountUser(import.meta.env.DEV ? <ServerCertificatesPage /> : <CertificatesPage />))" },
-    { path: '/account/certificates/:certificateId', to: "featureElement('/account/certificates/:certificateId', accountUser(import.meta.env.DEV ? <ServerCertificateDetailPage /> : <CertificateDetailPage />))" },
-    { path: '/teach/reviews', to: "featureElement('/teach/reviews', grader(import.meta.env.DEV ? <InstructorGradingPage /> : <LearnerReviewQueuePage />))" },
+    { path: '/account/certificates', to: "featureElement('/account/certificates', accountUser(<ServerCertificatesPage />))" },
+    { path: '/account/certificates/:certificateId', to: "featureElement('/account/certificates/:certificateId', accountUser(<ServerCertificateDetailPage />))" },
+    { path: '/teach/reviews', to: "featureElement('/teach/reviews', grader(<InstructorGradingPage />))" },
   ],
   admin: [
     { path: '/admin/access-codes', to: "featureElement('/admin/access-codes', admin(<AccessCodesRoute />))" },
@@ -193,7 +193,6 @@ test('Web and Admin authoring routes render app-owned overview and editor pages'
     assert.ok(existsSync(path.join(root, 'apps/web/src/features/course-authoring/pages', `${page}.tsx`)), `Web ${page} exists`);
     assert.ok(existsSync(path.join(root, 'apps/admin/src/features/course-authoring/pages', `${page}.tsx`)), `Admin ${page} exists`);
   }
-  assert.doesNotMatch(webModule, /@legacy\/pages\/instructor\/(?:CurriculumPages|ChapterWorkspace)/);
-  assert.doesNotMatch(adminModule, /@legacy\/pages\/instructor\/(?:CoursePages|CurriculumPages|ChapterWorkspace|QuizPages)/);
-  assert.match(webModule, /@legacy\/pages\/instructor\/QuizPages/); // learner review/grading remain a separate Web assessment slice
+  assert.doesNotMatch(webModule, /@legacy\/pages\/instructor/);
+  assert.doesNotMatch(adminModule, /@legacy\/pages\/instructor/);
 });

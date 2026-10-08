@@ -3,7 +3,7 @@ import { Alert, Button, Empty, Form, Input, Modal, Space, Table, Typography, mes
 import { Link } from 'react-router-dom';
 import { useLms } from '@legacy/store';
 import { PageTitle, StatusTag } from '@melearn/ui';
-import type { Course } from '@legacy/types';
+import type { Course } from '@melearn/contracts';
 
 export function CourseReviewPage() {
   const { data, currentUser, reviewCourse } = useLms();

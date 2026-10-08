@@ -5,9 +5,7 @@ import { AppstoreOutlined, ArrowLeftOutlined, EyeOutlined, PlusOutlined, Unorder
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { JSONContent } from '@tiptap/react';
 import { useLms } from '@legacy/store';
-import { blogCoverFor } from '@legacy/data';
-import { PageTitle, RichDocument, textDocument } from '@melearn/ui';
-import { ImageUploadField } from '@melearn/ui';
+import { ImageUploadField, PageTitle, RichDocument, blogCoverFor, textDocument } from '@melearn/ui';
 import { RichTextEditor } from '../../course-authoring/components/chapter/RichTextEditor';
 import type { BlogPost } from '@melearn/contracts';
 import '../styles/blog.css';

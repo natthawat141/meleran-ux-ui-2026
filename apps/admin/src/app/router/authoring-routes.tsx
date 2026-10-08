@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { featureElement } from '@legacy/components/FeatureRoute';
+import { featureElement } from '@melearn/ui';
 import { CourseOverviewPage } from '../../features/course-authoring/pages/CourseOverviewPage';
 import { AdminCourseEditorPage } from '../../features/course-authoring/pages/CourseEditorPage';
 import { CurriculumPage } from '../../features/course-authoring/pages/CurriculumPage';
@@ -8,7 +8,7 @@ import { ChapterWorkspace as ChapterEditorPage } from '../../features/course-aut
 import { ContentEditorPage } from '../../features/course-authoring/pages/ContentEditorPage';
 import { QuizManagerPage } from '../../features/course-authoring/pages/QuizManagerPage';
 import { QuizEditorPage } from '../../features/course-authoring/pages/QuizEditorPage';
-import { CoursePreviewPage, InstructorLearnersPage } from '@legacy/pages/instructor/InsightPages';
+import { CoursePreviewPage, InstructorLearnersPage } from '../../features/course-authoring/pages/InsightPages';
 import { admin } from './access';
 
 export const authoringRoutes = (
