@@ -6,11 +6,17 @@ import { AuthFrame } from '../components/Shell';
 import { useLms } from '../store';
 import { DEMO_ACCOUNTS } from '../data';
 import { verificationResendRemainingMs } from '../lib/email-verification';
-import { Alert as UiAlert, AlertDescription } from '../components/ui/alert';
-import { Button as UiButton } from '../components/ui/button';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '../components/ui/field';
-import { Input as UiInput } from '../components/ui/input';
-import { Separator as UiSeparator } from '../components/ui/separator';
+import {
+  Alert as UiAlert,
+  AlertDescription,
+  Button as UiButton,
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  Input as UiInput,
+  Separator as UiSeparator,
+} from '@melearn/ui';
 
 const { Title, Paragraph } = Typography;
 
