@@ -6,7 +6,7 @@ import { BlogArticlePage } from '@legacy/pages/blog/BlogPages';
 export const entryRoutes = (
   <>
     <Route path="/" element={<Navigate to="/admin" replace />} />
-    <Route path="/login" element={<LoginPage />} />
+    <Route path="/login" element={<LoginPage audience="admin" />} />
     <Route path="/verify-email" element={<VerifyEmailPage />} />
     <Route path="/forgot-password" element={<DemoAccountPage type="forgot" />} />
     <Route path="/reset-password" element={<DemoAccountPage type="reset" />} />

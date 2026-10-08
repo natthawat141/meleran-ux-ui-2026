@@ -7,6 +7,7 @@ import { canManageCourse, contentRemovalIssue } from './lib/learning-history';
 import { normalizeRedeemCode, preparePrototypeRedeem } from './lib/redeem-code';
 import { normalizePrototypeSnapshot } from './lib/prototype-snapshot';
 import { EMAIL_VERIFICATION_RESEND_COOLDOWN_MS, EMAIL_VERIFICATION_TTL_MS, verificationResendAvailable, verificationResendRemainingMs, verificationTokenState } from './lib/email-verification';
+import { authenticatePrototypeUser } from './lib/auth-identity';
 import { canEditCourse, canPublishCourse, canReviewCourse, canSubmitCourse, coursePublicationIssue, invalidateCourseReview } from './lib/course-review';
 import { preserveCourseAiMetadata, preserveVideoTranscripts, saveVideoTranscript as saveVideoTranscriptRecord, setCourseAiEnabled as setCourseAiEnabledRecord } from './lib/ai-course-support';
 import type {
@@ -197,11 +198,17 @@ export function LmsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = useCallback(
-    (email: string, password?: string): ActionResult => {
-      const user = data.users.find(
-        (item) => item.email.toLowerCase() === email.trim().toLowerCase() && item.password === password
-      );
-      if (!user) return { ok: false, message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' };
+    (identifier: string, password?: string, requiredRole?: Role): ActionResult => {
+      const auth = authenticatePrototypeUser(data.users, identifier, password, requiredRole);
+      if (!auth.ok) {
+        return {
+          ok: false,
+          message: auth.reason === 'role'
+            ? 'บัญชีนี้ไม่มีสิทธิ์เข้าสู่พื้นที่ผู้ดูแลระบบ'
+            : 'ชื่อผู้ใช้ อีเมล หรือรหัสผ่านไม่ถูกต้อง',
+        };
+      }
+      const user = auth.user;
       if (user.status === 'pending') return { ok: false, message: 'บัญชีผู้สอนยังรอแอดมินอนุมัติ' };
       update((next) => {
         next.currentUserId = user.id;

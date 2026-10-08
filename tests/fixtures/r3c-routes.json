@@ -261,7 +261,7 @@
     {
       "path": "/login",
       "featurePath": null,
-      "element": "<LoginPage />"
+      "element": "<LoginPage audience=\"admin\" />"
     },
     {
       "path": "/verify-email",

@@ -78,7 +78,11 @@ function GoogleAuthOption({ label }: GoogleAuthOptionProps) {
   );
 }
 
-export function LoginPage() {
+export interface LoginPageProps {
+  audience?: 'web' | 'admin';
+}
+
+export function LoginPage({ audience = 'web' }: LoginPageProps) {
   const { signIn } = useLms();
   const navigate = useNavigate();
   const location = useLocation();
@@ -88,29 +92,32 @@ export function LoginPage() {
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const email = String(form.get('email') ?? '').trim();
+    const identifier = String(form.get('identifier') ?? '').trim();
     const password = String(form.get('password') ?? '');
-    const result = signIn(email, password);
+    const result = signIn(identifier, password, audience === 'admin' ? 'admin' : undefined);
     if (!result.ok || !result.user) {
       setError(result.message || 'เข้าสู่ระบบไม่สำเร็จ');
       return;
     }
-    navigate(
-      next ||
+    navigate(audience === 'admin'
+      ? next || '/admin'
+      : next ||
         (result.user.role === 'learner'
           ? '/learn'
           : result.user.role === 'instructor'
           ? '/teach'
-          : '/admin')
-    );
+          : '/admin'));
   };
 
   return (
     <AuthPanel
       variant="entry"
       title="ยินดีต้อนรับกลับ"
-      intro="เข้าสู่ระบบ MeLearn เพื่อเรียนต่อจากที่ค้างไว้"
+      intro={audience === 'admin' ? 'เข้าสู่ระบบ Melearn Admin' : 'เข้าสู่ระบบ MeLearn เพื่อเรียนต่อจากที่ค้างไว้'}
     >
+      <FieldDescription className="mb-4 block">
+        ต้นแบบนี้ตรวจสอบบัญชีจากข้อมูลจำลองในเบราว์เซอร์ ยังไม่เชื่อมต่อระบบบัญชีจริง
+      </FieldDescription>
       {error && (
         <UiAlert variant="destructive" className="mb-5">
           <AlertDescription>{error}</AlertDescription>
@@ -123,13 +130,13 @@ export function LoginPage() {
       >
         <FieldGroup className="gap-4">
           <Field className="gap-1.5">
-            <FieldLabel htmlFor="login-email">อีเมล</FieldLabel>
+            <FieldLabel htmlFor="login-identifier">ชื่อผู้ใช้หรืออีเมล</FieldLabel>
             <UiInput
-              id="login-email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="name@example.com"
+              id="login-identifier"
+              name="identifier"
+              type="text"
+              autoComplete="username"
+              placeholder="ชื่อผู้ใช้หรือ name@example.com"
               required
               className="h-10 font-sans"
             />
@@ -154,9 +161,11 @@ export function LoginPage() {
         </FieldGroup>
       </form>
       <GoogleAuthOption label="เข้าสู่ระบบด้วย Google" />
-      <div className="auth-switch">
-        ยังไม่มีบัญชี? <Link to={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}>สมัครผู้เรียน</Link>
-      </div>
+      {audience === 'web' && (
+        <div className="auth-switch">
+          ยังไม่มีบัญชี? <Link to={next ? `/register?next=${encodeURIComponent(next)}` : '/register'}>สมัครผู้เรียน</Link>
+        </div>
+      )}
       <details className="login-demo-accounts">
         <summary>ดูบัญชีสำหรับทดลอง</summary>
         <div className="login-demo-list">

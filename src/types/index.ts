@@ -291,7 +291,7 @@ export interface WorkspaceSaveResult {
 export interface LmsContextType {
   data: LmsData;
   currentUser: User | null;
-  signIn: (email: string, password?: string) => ActionResult;
+  signIn: (identifier: string, password?: string, requiredRole?: Role) => ActionResult;
   signInDemo: (role: Role) => ActionResult;
   signOut: () => void;
   register: (values: { name: string; email: string; password?: string }) => ActionResult;
