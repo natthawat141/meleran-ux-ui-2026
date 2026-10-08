@@ -190,7 +190,7 @@ interface CourseDetail extends CourseSummary {
 interface Enrollment {
   id: string;
   course_id: string;
-  source: 'free' | 'payment' | 'redeem';
+  source: 'free' | 'stripe' | 'redeem';   // ตาม scope 6.5 (ฉบับร่างก่อนหน้าใช้ 'payment' ซึ่งไม่ตรง scope)
   access: 'lifetime';
   granted_at: string;
 }
@@ -283,16 +283,16 @@ FB3 ถูกปฏิเสธเพราะคอร์สไม่ฟรี:
 
 เอกสารนี้ไม่ยืนยัน Backend, session, Stripe, Resend หรือ Google OAuth ที่ใช้งานได้จริง และไม่ใช้เป็นหลักฐานปิด R10/R13
 
-## 8. สถานะ Provisional Web Course Catalog API Mock (FB1–FB2, read-only)
+## 8. สถานะ Provisional Web Course Catalog API Mock (FB1–FB2)
 
-ทำเฉพาะ `GET /courses` และ `GET /courses/{id}` ของ Web สาธารณะ ไม่มี Enroll, Auth, Admin, Instructor, payment
+ส่วนนี้อธิบายเฉพาะ `GET /courses` และ `GET /courses/{id}` สาธารณะ Mock ทั้งชุด (Flow A–H) ย้ายไป `tools/provisional-api/` แล้ว สถานะของทุก flow อยู่ใน [PROVISIONAL_API_MOCK_TH.md](PROVISIONAL_API_MOCK_TH.md)
 
 ### 8.1 อะไรเป็น mock / อะไรเป็น draft / อะไรรอ Backend
 
 | ส่วน | สถานะ | ที่อยู่ |
 | --- | --- | --- |
-| Fixtures คอร์ส 3 Published + 3 ที่ไม่ใช่ Published (มีข้อมูลลับติดป้าย SECRET เพื่อทดสอบรั่ว) | **Mock** ข้อมูลสมมติทั้งหมด | `apps/web/src/features/courses/api/provisional-mock/catalog-fixtures.ts` |
-| Fetcher จำลอง server (`createProvisionalCatalogFetcher`) | **Mock** ใช้ได้เฉพาะ environment `development`/`test`, GET เท่านั้น, ตอบ header `x-melearn-mock: provisional-catalog`, ไม่ถูก import จาก runtime ของแอป (มี test คุม) | `provisional-mock/catalog-fetcher.ts` |
+| Seed คอร์ส 3 Published + 3 ที่ไม่ใช่ Published (มีข้อมูลลับติดป้าย SECRET เพื่อทดสอบรั่ว) | **Mock** ข้อมูลสมมติทั้งหมด | `tools/provisional-api/seed.ts` |
+| Server จำลองแบบ fetch-compatible (`createProvisionalApi().createFetcher()`) | **Mock** ใช้ได้เฉพาะ environment `development`/`test`, ตอบ header `x-melearn-mock`, อยู่นอก `apps/`/`packages/` และไม่ถูก import จาก runtime ของแอป (มี test คุม) | `tools/provisional-api/server.ts` |
 | Type + decoder ของ response | **Draft** (อยู่ใน feature ของ Web ไม่ใช่ `packages/contracts`) | `catalog-provisional-contract.ts` |
 | `createCatalogApi(http)` (`listCourses`, `getCourse`) | **Draft** ใช้ `HttpClient` เดียวกับ API จริง จึงสลับ base URL ได้โดยไม่แก้ผู้เรียก; `getCourse` คืน `null` เฉพาะ 404 | `catalog-api.ts` |
 | Path, query, field, error envelope, pagination, Money | **Draft/[ข้อเสนอ]** ตาม §2 และ §4 | เอกสารนี้ |
