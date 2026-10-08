@@ -21,6 +21,7 @@
 - `npm.cmd test` — 93/93 ผ่าน.
 - `npm.cmd run check:boundaries` และ `npm.cmd run tokens:check` — ผ่าน.
 - `npm.cmd run build` — Web และ Admin production builds ผ่าน (`BUILD_EXIT=0`); มีคำเตือน `use client` จาก dependencies และ chunk ใหญ่เหมือนเดิม.
+- Push checkpoint `70411b1` ผ่าน GitHub CI ทุก job: [run 37745502655](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37745502655) (shared checks, Web/Admin typecheck/build/artifact upload และ final validation).
 - `git diff --check` — ผ่าน.
 - Browser: Admin `/login` แสดง form และข้อความชัดเจนว่ายังเป็น prototype/local demo; ไม่ส่งฟอร์ม. Web preview ที่ `127.0.0.1:5173` ถูก browser block (`ERR_BLOCKED_BY_CLIENT`) จึงไม่มี Web browser-render evidence ใน slice นี้; Web typecheck/build ผ่าน.
 - ไม่รัน Docker ตามคำสั่งผู้ใช้.
