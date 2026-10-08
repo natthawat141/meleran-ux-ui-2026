@@ -22,6 +22,7 @@
 - `npm.cmd test` — 93/93 ผ่าน.
 - `npm.cmd run check:boundaries`, `npm.cmd run tokens:check` และ `git diff --check` — ผ่าน.
 - `npm.cmd run build` — Web และ Admin ผ่าน; มี dependency `use client` และ chunk-size warnings เดิม.
+- Push checkpoint `e81acc2` ผ่าน GitHub CI ทุก job: [run 37748971907](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37748971907).
 - ไม่ได้ login, submit form, กด reset demo หรือทำ browser mutation; ไม่รัน Docker.
 
 R5 page migration ยังเปิดอยู่ โดยเฉพาะ Auth/Profile/Blog ที่ Web และ Admin ใช้ legacy consumers ร่วมกัน ต้องตัดสิน ownership/compatibility และ API contract ต่อ flow ก่อนย้ายออกจาก legacy.
