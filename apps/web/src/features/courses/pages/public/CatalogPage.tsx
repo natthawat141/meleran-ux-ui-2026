@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { Button, Col, Input, Row, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useLms } from '@legacy/store';
 import { CourseCard, PageTitle } from '@legacy/components/common';
 import { matchesDirectorySearch } from '@legacy/components/DirectorySearch';
 
+const DevPublicCatalogPage = import.meta.env.DEV
+  ? lazy(() => import('./DevCatalogPage.tsx').then((module) => ({ default: module.DevPublicCatalogPage })))
+  : null;
+
 export function PublicCatalogPage() {
+  if (import.meta.env.DEV && DevPublicCatalogPage) {
+    return (
+      <Suspense fallback={<div className="public-page"><Typography.Text>กำลังโหลดคอร์ส</Typography.Text></div>}>
+        <DevPublicCatalogPage />
+      </Suspense>
+    );
+  }
+  return <LocalPublicCatalogPage />;
+}
+
+function LocalPublicCatalogPage() {
   const { data } = useLms();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('ทั้งหมด');

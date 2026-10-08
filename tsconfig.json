@@ -25,5 +25,5 @@
       "@melearn/course-authoring": ["./packages/course-authoring/src/index.ts"]
     }
   },
-  "include": ["src", "vite.config.ts", "tests/**/*.ts"]
+  "include": ["src", "vite.config.ts", "tests/**/*.ts", "tools/provisional-api/**/*.ts"]
 }

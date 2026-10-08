@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Alert, Button, Space, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -8,7 +8,22 @@ import { CourseOutline } from '@legacy/components/CourseOutline';
 import { UserAvatar } from '@legacy/components/UserAvatar';
 import { formatPrice, instructorFor } from '@legacy/data';
 
+const DevCourseDetailPage = import.meta.env.DEV
+  ? lazy(() => import('./DevCourseDetailPage.tsx').then((module) => ({ default: module.DevCourseDetailPage })))
+  : null;
+
 export function PublicCourseDetailPage() {
+  if (import.meta.env.DEV && DevCourseDetailPage) {
+    return (
+      <Suspense fallback={<div className="public-page"><Typography.Text>กำลังโหลดคอร์ส</Typography.Text></div>}>
+        <DevCourseDetailPage />
+      </Suspense>
+    );
+  }
+  return <LocalCourseDetailPage />;
+}
+
+function LocalCourseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { data, currentUser, enrollFree } = useLms();
