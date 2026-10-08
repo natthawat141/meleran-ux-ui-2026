@@ -55,7 +55,7 @@
 | CSS compatibility / system overrides | `src/styles.css`, `src/shadcn.css`, `src/system-theme.css` |
 | Landing/public brand chrome | `src/pages/landing/LandingPage.tsx`, `LandingChrome.tsx`, `landing.css` |
 | About / รายชื่อทีมร่วมกัน | `src/pages/landing/AboutPage.tsx`, `BrandStory.tsx`, `brand-story.css` |
-| Auth / shadcn controls | `src/pages/AuthPages.tsx`, `src/components/ui/`, `src/shadcn.css` |
+| Auth / shadcn controls | Shared primitives: `packages/ui/src/primitives/` via `packages/ui/src/index.ts`; current legacy consumer: `src/pages/AuthPages.tsx`; compatibility styles: `src/shadcn.css` |
 | Public blog / admin blog editor | `src/pages/blog/`, `src/pages/admin/BlogAdminPages.tsx` |
 | Curriculum จริงที่ route ใช้อยู่ | `src/pages/instructor/CurriculumWorkspace.tsx`, `curriculum-workspace.css` |
 | Chapter workspace จริง | `src/pages/instructor/ChapterWorkspace.tsx`, `chapter-workspace.css` |
@@ -95,7 +95,7 @@
 - Mantine ดูแล `WorkspaceShell` / navigation; Ant Design ดูแล form/table/modal/CRUD; auth ใช้ shadcn/Base UI ที่ติดตั้งแล้ว ไม่เปลี่ยนทุกพื้นที่ไป library เดียวระหว่างแก้งานย่อย
 - Sidebar desktop ของ `WorkspaceShell` เปลี่ยนความกว้าง 258/72px ผ่าน AppShell navbar offsets โดยไม่ซ่อน navbar ทั้งหมด ปุ่มพับอยู่ในแถว “เมนูหลัก” ของ navbar ใช้ `useMediaQuery` แยกโหมดไอคอนจากเมนูเต็มของมือถือ มีชื่อ accessible/tooltip และ logo action ขยายผ่าน click/keyboard; ไม่เปลี่ยน permission หรือรายชื่อเมนูตามการพับ
 - Reuse `ImageUploadField`, rich editor, video/assessment editor, shared titles และ existing controls ก่อนสร้างใหม่
-- shadcn configuration อยู่ที่ `components.json` (`base-nova`, TSX, Base UI); code components อยู่ใน `src/components/ui/` อย่า scaffold ชุดใหม่ทับ component ที่ customize แล้ว
+- shadcn configuration อยู่ที่ `components.json` (`base-nova`, TSX, Base UI) และยังมี scaffolding alias `@/components/ui`; implementation ที่ Auth ใช้อยู่ย้ายไป `packages/ui/src/primitives/` และ export ผ่าน `@melearn/ui` แล้ว อย่า generate component ใหม่จนกว่าจะ align alias นี้โดยตั้งใจ เพื่อไม่สร้าง implementation ซ้ำใน legacy path
 - ผู้ใช้ยืนยันให้ใช้ Tailwind มากขึ้นสำหรับ layout/spacing/responsive และ styling ของ shared UI ตาม tokens กลาง ไม่สร้าง design system อีกชุดจาก utility class และไม่ hard-code สี/ขนาด control ซ้ำทั่ว page; ในช่วงย้ายให้รักษา Ant Design/Mantine/Base UI ที่ยังใช้และเชื่อม theme ผ่าน adapter
 - สำหรับ animation ใช้ `motion/react` ที่มีอยู่ ไม่ติดตั้ง Framer Motion เพิ่มซ้ำเพื่อ feature เดียวกัน
 - ถ้าจำเป็นต้องเพิ่ม component/library ให้ตรวจของที่มี ก่อนใช้ source/CLI จากผู้พัฒนาอย่างเป็นทางการ ตรวจ compatibility/license และบันทึกเหตุผลกับไฟล์ lock ที่เปลี่ยน ห้าม copy paid block หรือ dependency โดยไม่ตรวจที่มา

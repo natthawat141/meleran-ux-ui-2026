@@ -21,6 +21,7 @@
 - `npm.cmd test` — 93/93 ผ่าน.
 - `npm.cmd run check:boundaries`, `npm.cmd run tokens:check`, `git diff --check` — ผ่าน.
 - `npm.cmd run build` — Web และ Admin production builds ผ่าน (`BUILD_EXIT=0`); คำเตือน `use client` และ chunk size มาจาก dependencies/bundle เดิม.
+- Push checkpoint `19264f3` ผ่าน GitHub CI ทุก job: [run 37746448045](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37746448045).
 - Browser spot-check: Web `/about`, `/about#our-story`, `/articles`; Admin `/admin/articles` และ `/articles/post-better-writing` แสดงเนื้อหาหลัก. อ่านอย่างเดียว; ไม่แก้/ลบ/เผยแพร่บทความ.
 - ไม่รัน Docker.
 

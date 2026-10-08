@@ -81,7 +81,7 @@ Melearn เป็นพื้นที่เรียนด้วยตนเอ
 | --- | --- |
 | Workspace shell/sidebar/profile menu | Mantine + Tabler icons ใน `src/components/Shell.tsx` |
 | CRUD, form, table, upload, modal, dropdown | Ant Design + `@ant-design/icons` |
-| Login/register inputs, fields, buttons | shadcn/Base UI ใน `src/components/ui/` |
+| Login/register inputs, fields, buttons | shadcn/Base UI primitives ที่ export จาก `@melearn/ui` (`packages/ui/src/primitives/`); `src/pages/AuthPages.tsx` ยังเป็น legacy consumer ระหว่าง migration |
 | Rich content | Tiptap ใน `src/components/chapter/RichTextEditor.tsx` |
 | Motion/parallax | `motion/react` และ component เดิมใน Landing |
 
