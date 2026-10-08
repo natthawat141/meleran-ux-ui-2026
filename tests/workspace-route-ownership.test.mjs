@@ -53,6 +53,12 @@ test('Admin management routes render pages owned by the Admin app', async () => 
   assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/AdminPages/);
 });
 
+test('Admin course approval route renders its app-owned feature page', async () => {
+  const routeModule = await readFile(path.join(root, 'apps/admin/src/app/router/management-routes.tsx'), 'utf8');
+  assert.match(routeModule, /from ['"]\.\.\/\.\.\/features\/course-approval\/pages\/CourseReviewPage['"]/);
+  assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/CourseReviewPage/);
+});
+
 test('Web and Admin have distinct canonical route ownership', () => {
   const webPaths = webRoutes.map((route) => route.path);
   const adminPaths = adminRoutes.map((route) => route.path);
