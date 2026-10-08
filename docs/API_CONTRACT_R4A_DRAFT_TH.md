@@ -4,6 +4,8 @@
 
 เอกสารนี้เตรียมข้อกำหนด API จาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) เพื่อให้ Frontend และ Backend ตกลงทีละ flow ก่อนสร้าง types/hooks ใน `packages/contracts` และ `packages/api-client` ปัจจุบัน repository นี้ยังไม่มี Backend หรือ OpenAPI ให้ตรวจ จึงห้ามนำ candidate path/payload ด้านล่างไปเรียกว่า frozen contract หรือใช้สร้าง production integration โดยไม่ผ่านการยืนยันร่วมกัน
 
+รายละเอียด request/response/error ของ Flow A และ B อยู่ใน [Flow A/B Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) (ยังเป็น draft เช่นกัน)
+
 ## วิธีอ่านสถานะ
 
 - **ยืนยันแล้ว** — business behavior/permission ที่ Final 1.6 กำหนด
