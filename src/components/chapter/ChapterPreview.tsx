@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Empty, Modal, Radio, Space, Tag } from 'antd';
-import { RichDocument } from './RichTextEditor';
+import { RichDocument } from '@melearn/ui';
 import type { Chapter, EssayQuestion, Quiz } from '../../types';
 
 export interface ChapterPreviewProps {

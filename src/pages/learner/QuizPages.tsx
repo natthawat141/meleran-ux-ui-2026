@@ -4,7 +4,7 @@ import { ArrowLeftOutlined, CheckCircleOutlined, ClockCircleOutlined, SendOutlin
 import { IconSparkles } from '@tabler/icons-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
-import { RichDocument } from '../../components/chapter/RichTextEditor';
+import { RichDocument } from '@melearn/ui';
 import { PageTitle } from '../../components/common';
 import { answerIsComplete, WrittenAnswerInput, WrittenAnswerView } from '../../components/WrittenAnswer';
 import type { QuizAnswerValue } from '../../types';

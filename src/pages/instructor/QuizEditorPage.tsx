@@ -5,7 +5,8 @@ import { ArrowDownOutlined, ArrowLeftOutlined, ArrowUpOutlined, CheckCircleOutli
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { createId } from '../../data';
-import { RichDocument, RichTextEditor } from '../../components/chapter/RichTextEditor';
+import { RichDocument } from '@melearn/ui';
+import { RichTextEditor } from '../../components/chapter/RichTextEditor';
 import type { Question, Quiz } from '../../types';
 import './quiz-editor-workspace.css';
 

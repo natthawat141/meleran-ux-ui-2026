@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useLms } from '../../store';
 import { blogCoverFor } from '../../data';
 import { LandingHeader, LandingFooter } from '../landing/LandingChrome';
-import { RichDocument } from '../../components/chapter/RichTextEditor';
+import { RichDocument } from '@melearn/ui';
 import { landingTheme } from '../landing/LandingPage';
 import type { BlogPost, User } from '../../types';
 import './blog.css';

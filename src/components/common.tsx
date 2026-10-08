@@ -5,7 +5,7 @@ import { IconBook2, IconFileText, IconInbox, IconPlayerPlay, IconRocket, IconRos
 import { Link } from 'react-router-dom';
 export { PageTitle, type PageTitleProps, StatusTag, type StatusTagProps } from '@melearn/ui';
 import { formatPrice, instructorFor } from '../data';
-import { RichDocument } from './chapter/RichTextEditor';
+import { RichDocument } from '@melearn/ui';
 import type { Course, LmsData, Role } from '../types';
 
 export interface SectionHeadingProps {
