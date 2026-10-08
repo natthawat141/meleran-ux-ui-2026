@@ -17,7 +17,7 @@
 
 การยืนยันนี้เป็น architecture ของ Frontend และแผนงาน ไม่ใช่หลักฐานว่า API พร้อม ดูลำดับงานและเกณฑ์รับที่ [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md)
 
-- ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก R2b สร้าง workspace/entry/build และ route owners แล้ว; source ปัจจุบันใต้ `src/` ยังเป็น transitional prototype ที่เรียกผ่าน alias `@legacy` และต้องย้ายตาม feature phases
+- ใช้สอง React apps ใน repository เดียว: `apps/web` รวม Guest/Learner/Instructor; `apps/admin` เป็นงานดูแลระบบ แต่ละแอปมี entry, router, providers, layouts, build และ config ของตัวเอง รองรับ deployment แยก R2b สร้าง workspace/entry/build และ route owners แล้ว; R5c ย้าย Web public/account slices กับ Admin Blog list/editor ชุดแรกเข้า app; modules ใต้ root `src/` ที่ยังเหลือเป็น transitional bridge ผ่าน alias `@legacy` ไม่ใช่ app runtime
 - ภายในแต่ละแอปใช้ `app/`, `layouts/`, `features/`, `shared/`; feature เก็บ `api/`, `hooks/`, `components/`, `pages/` และ types ใกล้กันตามที่ใช้จริง ไม่สร้างโฟลเดอร์ว่างทุกชนิดเป็นข้อบังคับ
 - `courses` รับผิดชอบ Catalog/รายละเอียดคอร์สและ presentation ที่เกี่ยวข้อง; `course-authoring` รับผิดชอบ Course Editor, Curriculum, Chapter/Content Editor และ Quiz Editor; การทำข้อสอบ/ผล/ตรวจคะแนนเป็น `assessment` ไม่ใส่ใน editor
 - แต่ละแอปมี page/route orchestration ของตนเอง `course-authoring` เป็น feature ที่ยืนยันแล้ว แต่ `packages/course-authoring` เป็น candidate for extraction ไม่ใช่ package บังคับตั้งแต่แรก ให้ R0/R6 ตรวจผู้ใช้ร่วมและ dependencies แล้ว extract เฉพาะส่วนที่มี interface ชัด หาก split apps ต้องใช้ร่วมทันทีให้ตัดสินส่วนขั้นต่ำจากหลักฐานใน R0 ไม่ copy editor ทั้งก้อนเป็นสองชุดหรือ import source ข้ามแอป ส่วนร่วมรับข้อมูล draft/capabilities/คำสั่ง ไม่ผูก `useLms()`, layout หรือ route เฉพาะแอป
@@ -36,7 +36,7 @@
 - ลำดับแผนใหม่คือ R0 inventory → R1 scope cleanup → R2 split apps/basic CI → R3 shared UI/router → R4a contract → R4b API/Query → migrate features; cleanup ถอดตามความสามารถ/dependency ไม่ลบตามชื่อโฟลเดอร์ analytics จน grading/learner list หาย
 - แผนมี Containerization และ CI/CD เป็นงานอนาคตพร้อมเกณฑ์ตรวจแยกจาก integration ใช้ build context ที่ monorepo root; shared packages/root lockfile/config เปลี่ยนต้องตรวจ apps ที่ได้รับผล Cloud Run เป็น hosting candidate ยังไม่เลือกปลายทางหรืออนุญาต deploy ดู R11–R13 ในแผน
 
-ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source prototype ปัจจุบัน; `apps/web`/`apps/admin` มี route owners แยกแล้ว แต่ pages, store, types และ CSS ส่วนใหญ่ยังรอ feature migration กติกา prototype ที่ระบุ `store.tsx` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่ API contract
+ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source prototype ปัจจุบัน; `apps/web`/`apps/admin` มี route owners แยกและมีหน้า app-owned ชุดแรกแล้ว แต่ Auth, Blog article/read, ProfileSettings, store, types และ CSS บางส่วนยังเป็น bridge รอ feature migration กติกา prototype ที่ระบุ `store.tsx` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่ API contract
 
 ## 2. แผนที่ code ที่ต้องหาให้ถูก
 
@@ -44,7 +44,7 @@
 | --- | --- |
 | Web entry/providers/routes | `apps/web/src/main.tsx`, `apps/web/src/App.tsx` |
 | Admin entry/providers/routes | `apps/admin/src/main.tsx`, `apps/admin/src/App.tsx` |
-| Transitional single-app prototype entry/routes | `src/main.tsx`, `src/App.tsx` (ใช้เทียบ migration เท่านั้น) |
+| Root legacy entry | ถอดใน R5c (`index.html`, `src/main.tsx`, `src/App.tsx`); root `src/` ยังมี transitional modules ไม่ได้เป็น runnable app |
 | Shared shell/navigation/profile | `src/components/Shell.tsx` |
 | Shared profile image/default avatar | `src/components/UserAvatar.tsx`, `user-avatar.css` |
 | Workspace notification menu | `src/components/WorkspaceNotifications.tsx`, `workspace-notifications.css` |
@@ -53,10 +53,12 @@
 | Tokens / light-dark foundation | `packages/ui/src/design-tokens.json`, `design-tokens.ts`, `theme.ts` |
 | Generated CSS / Tailwind theme | `packages/ui/src/tokens.css`, `tailwind.css`; generator `scripts/generate-ui-tokens.mjs` |
 | CSS compatibility / system overrides | `src/styles.css`, `src/shadcn.css`, `src/system-theme.css` |
-| Landing/public brand chrome | `src/pages/landing/LandingPage.tsx`, `LandingChrome.tsx`, `landing.css` |
-| About / รายชื่อทีมร่วมกัน | `src/pages/landing/AboutPage.tsx`, `BrandStory.tsx`, `brand-story.css` |
+| Landing/About app pages และ CSS เฉพาะหน้า | `apps/web/src/features/landing/pages/` |
+| Landing chrome/base CSS bridge | `src/pages/landing/LandingChrome.tsx`, `landing.css`; ยังมี consumer ใน legacy Shell และ Blog article preview |
+| About / รายชื่อทีมร่วมกัน | `apps/web/src/features/landing/pages/AboutPage.tsx`, `BrandStory.tsx`, `brand-story.css` |
 | Auth / shadcn controls | Shared primitives: `packages/ui/src/primitives/` via `packages/ui/src/index.ts`; current legacy consumer: `src/pages/AuthPages.tsx`; compatibility styles: `src/shadcn.css` |
-| Public blog / admin blog editor | `src/pages/blog/`, `src/pages/admin/BlogAdminPages.tsx` |
+| Public blog reader/article preview bridge | `src/pages/blog/` |
+| Admin blog list/editor | `apps/admin/src/features/blog/pages/BlogAdminPages.tsx`; ยังใช้ legacy store/RichTextEditor bridge |
 | Curriculum จริงที่ route ใช้อยู่ | `src/pages/instructor/CurriculumWorkspace.tsx`, `curriculum-workspace.css` |
 | Chapter workspace จริง | `src/pages/instructor/ChapterWorkspace.tsx`, `chapter-workspace.css` |
 | Video / article / assessment editors | `src/components/chapter/VideoEditor.tsx`, `RichTextEditor.tsx`, `AssessmentEditor.tsx`, `ChapterPreview.tsx` |

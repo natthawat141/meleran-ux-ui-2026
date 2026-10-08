@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Form, Input, type InputRef } from 'antd';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import newsletterBackground from '../../assets/generated/melearn-brand-pattern.webp';
+import newsletterBackground from '@legacy/assets/generated/melearn-brand-pattern.webp';
 import './newsletter.css';
 
 interface NewsletterFormValues {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Avatar, Col, Row, Tag, Typography } from 'antd';
 import { useParams } from 'react-router-dom';
-import { useLms } from '../store';
-import { CourseCard, PageTitle, SectionHeading } from '../components/common';
+import { useLms } from '@legacy/store';
+import { CourseCard, PageTitle, SectionHeading } from '@legacy/components/common';
 
 const { Title, Paragraph } = Typography;
 

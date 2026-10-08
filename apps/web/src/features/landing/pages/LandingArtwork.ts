@@ -1,6 +1,6 @@
-import writing from '../../assets/generated/landing-writing-photo.webp';
-import data from '../../assets/generated/landing-data-photo.webp';
-import focus from '../../assets/generated/landing-focus-photo.webp';
+import writing from '@legacy/assets/generated/landing-writing-photo.webp';
+import data from '@legacy/assets/generated/landing-data-photo.webp';
+import focus from '@legacy/assets/generated/landing-focus-photo.webp';
 
 const artwork: Record<string, string> = { writing, data, focus };
 

@@ -9,7 +9,8 @@ import { LearnerCoursePage, VideoLessonPage, ArticleLessonPage } from '@legacy/p
 import { QuizIntroPage, QuizAttemptPage, QuizResultPage } from '@legacy/pages/learner/QuizPages';
 import { RedeemCourseCodePage } from '@legacy/pages/learner/RedeemCourseCodePage';
 import { CheckoutPage, CheckoutResultPage } from '@legacy/pages/learner/PaymentPages';
-import { CertificatesPage, CertificateDetailPage, ProfilePage } from '@legacy/pages/learner/AccountPages';
+import { CertificatesPage, CertificateDetailPage } from '../../features/certificate/pages/AccountPages';
+import { ProfilePage } from '../../features/account/pages/ProfilePage';
 import { RolePage, learner, accountUser, paymentUser } from './access';
 
 const LearnerAiPage = React.lazy(() => import('@legacy/pages/learner/LearnerAiPage').then((page) => ({ default: page.LearnerAiPage })));

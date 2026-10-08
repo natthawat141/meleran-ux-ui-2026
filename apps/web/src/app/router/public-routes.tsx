@@ -2,11 +2,11 @@ import React from 'react';
 import { Navigate, Route, useLocation, useParams } from 'react-router-dom';
 import { featureElement } from '@legacy/components/FeatureRoute';
 import { useLms } from '@legacy/store';
-import { InstructorProfilePage } from '@legacy/pages/PublicPages';
-import { PublicCatalogPage } from '@legacy/pages/public/CatalogPage';
-import { PublicCourseDetailPage } from '@legacy/pages/public/CourseDetailPage';
-import { LandingPage } from '@legacy/pages/landing/LandingPage';
-import { AboutPage } from '@legacy/pages/landing/AboutPage';
+import { InstructorProfilePage } from '../../features/instructors/pages/InstructorProfilePage';
+import { PublicCatalogPage } from '../../features/courses/pages/public/CatalogPage';
+import { PublicCourseDetailPage } from '../../features/courses/pages/public/CourseDetailPage';
+import { LandingPage } from '../../features/landing/pages/LandingPage';
+import { AboutPage } from '../../features/landing/pages/AboutPage';
 import { BlogIndexPage, BlogArticlePage } from '@legacy/pages/blog/BlogPages';
 import { Public } from './access';
 

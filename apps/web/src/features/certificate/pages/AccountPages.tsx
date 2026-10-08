@@ -2,12 +2,10 @@ import React from 'react';
 import { Button, Empty, Table, Typography, type TableProps } from 'antd';
 import { PrinterOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { PageTitle } from '../../components/common';
-import { flattenItems } from '../../data';
-import type { Certificate } from '../../types';
-
-export { ProfilePage } from './ProfilePage';
+import { useLms } from '@legacy/store';
+import { PageTitle } from '@legacy/components/common';
+import { flattenItems } from '@legacy/data';
+import type { Certificate } from '@legacy/types';
 
 const { Text } = Typography;
 

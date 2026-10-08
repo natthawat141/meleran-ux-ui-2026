@@ -4,8 +4,8 @@ import { featureElement } from '@legacy/components/FeatureRoute';
 import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructorsPage, AdminCoursesPage, AdminCourseDetailPage } from '@legacy/pages/admin/AdminPages';
 import { CourseReviewPage } from '@legacy/pages/admin/CourseReviewPage';
 import { AccessCodesPage } from '@legacy/pages/admin/AccessCodesPage';
-import { AdminBlogPage, AdminBlogEditorPage } from '@legacy/pages/admin/BlogAdminPages';
-import { ProfilePage } from '@legacy/pages/learner/AccountPages';
+import { AdminBlogPage, AdminBlogEditorPage } from '../../features/blog/pages/BlogAdminPages';
+import { ProfilePage } from '@legacy/pages/learner/ProfilePage';
 import { admin } from './access';
 
 export const managementRoutes = (

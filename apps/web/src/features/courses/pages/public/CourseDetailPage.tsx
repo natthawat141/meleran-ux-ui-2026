@@ -2,11 +2,11 @@ import React from 'react';
 import { Alert, Button, Space, Tag, Typography, message } from 'antd';
 import { ArrowRightOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { PageTitle } from '../../components/common';
-import { CourseOutline } from '../../components/CourseOutline';
-import { UserAvatar } from '../../components/UserAvatar';
-import { formatPrice, instructorFor } from '../../data';
+import { useLms } from '@legacy/store';
+import { PageTitle } from '@legacy/components/common';
+import { CourseOutline } from '@legacy/components/CourseOutline';
+import { UserAvatar } from '@legacy/components/UserAvatar';
+import { formatPrice, instructorFor } from '@legacy/data';
 
 export function PublicCourseDetailPage() {
   const { slug } = useParams<{ slug: string }>();

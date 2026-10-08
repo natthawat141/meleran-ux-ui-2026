@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Col, Input, Row, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { useLms } from '../../store';
-import { CourseCard, PageTitle } from '../../components/common';
-import { matchesDirectorySearch } from '../../components/DirectorySearch';
+import { useLms } from '@legacy/store';
+import { CourseCard, PageTitle } from '@legacy/components/common';
+import { matchesDirectorySearch } from '@legacy/components/DirectorySearch';
 
 export function PublicCatalogPage() {
   const { data } = useLms();

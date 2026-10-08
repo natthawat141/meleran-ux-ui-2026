@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Button } from 'antd';
 import { ArrowRightOutlined, BookOutlined, BulbOutlined, CloseOutlined, LineChartOutlined, PlayCircleFilled, SoundOutlined, TeamOutlined } from '@ant-design/icons';
 import { motion, useReducedMotion, useScroll, useTransform, type Variants } from 'motion/react';
-import heroImage from '../../assets/generated/melearn-student-hero.webp';
+import heroImage from '@legacy/assets/generated/melearn-student-hero.webp';
 
 const reveal: Variants = {
   // Copy stays readable while the entrance motion runs.

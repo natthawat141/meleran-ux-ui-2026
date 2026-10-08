@@ -1,9 +1,9 @@
 import React from 'react';
 import { ArrowRightOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { formatPrice, instructorFor, flattenItems } from '../../data';
+import { formatPrice, instructorFor, flattenItems } from '@legacy/data';
 import { landingCover } from './LandingArtwork';
-import type { Course, LmsData } from '../../types';
+import type { Course, LmsData } from '@legacy/types';
 
 interface LandingCourseCardProps {
   course: Course;
