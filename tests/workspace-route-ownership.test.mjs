@@ -12,12 +12,38 @@ const adminRoutes = readAppRouteInventory(root, 'admin');
 // Fixed R3b checkpoint declarations; this records the migration behavior, not a generated current expectation.
 const baseline = JSON.parse(await readFile(new URL('./fixtures/r3c-routes.json', import.meta.url), 'utf8'));
 const approvedElementMigrations = {
+  web: [
+    {
+      path: '/teach/courses/new',
+      from: "featureElement('/teach/courses/new', instructor(<CourseEditorPage />))",
+      to: "featureElement('/teach/courses/new', instructor(<InstructorCourseEditorPage />))",
+      reason: 'R6 gives Web its own Instructor course editor host',
+    },
+    {
+      path: '/teach/courses/:courseId/settings',
+      from: "featureElement('/teach/courses/:courseId/settings', instructor(<CourseEditorPage />))",
+      to: "featureElement('/teach/courses/:courseId/settings', instructor(<InstructorCourseEditorPage />))",
+      reason: 'R6 gives Web its own Instructor course editor host',
+    },
+  ],
   admin: [
     {
       path: '/articles/:id',
       from: '<BlogArticlePage />',
       to: '<BlogArticlePreviewPage />',
       reason: 'R5 gives Admin its own article preview page',
+    },
+    {
+      path: '/admin/courses/new',
+      from: "featureElement('/teach/courses/new', admin(<CourseEditorPage />))",
+      to: "featureElement('/teach/courses/new', admin(<AdminCourseEditorPage />))",
+      reason: 'R6 gives Admin its own course editor host',
+    },
+    {
+      path: '/admin/courses/:courseId/settings',
+      from: "featureElement('/teach/courses/:courseId/settings', admin(<CourseEditorPage />))",
+      to: "featureElement('/teach/courses/:courseId/settings', admin(<AdminCourseEditorPage />))",
+      reason: 'R6 gives Admin its own course editor host',
     },
   ],
 };
@@ -57,6 +83,15 @@ test('Admin course approval route renders its app-owned feature page', async () 
   const routeModule = await readFile(path.join(root, 'apps/admin/src/app/router/management-routes.tsx'), 'utf8');
   assert.match(routeModule, /from ['"]\.\.\/\.\.\/features\/course-approval\/pages\/CourseReviewPage['"]/);
   assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/CourseReviewPage/);
+});
+
+test('Web and Admin authoring routes render their own course editor hosts', async () => {
+  const webModule = await readFile(path.join(root, 'apps/web/src/app/router/instructor-routes.tsx'), 'utf8');
+  const adminModule = await readFile(path.join(root, 'apps/admin/src/app/router/authoring-routes.tsx'), 'utf8');
+  assert.match(webModule, /from ['"]\.\.\/\.\.\/features\/course-authoring\/pages\/CourseEditorPage['"]/);
+  assert.match(adminModule, /from ['"]\.\.\/\.\.\/features\/course-authoring\/pages\/CourseEditorPage['"]/);
+  assert.doesNotMatch(webModule, /@legacy\/pages\/instructor\/CoursePages.*CourseEditorPage/);
+  assert.doesNotMatch(adminModule, /@legacy\/pages\/instructor\/CoursePages.*CourseEditorPage/);
 });
 
 test('Web and Admin have distinct canonical route ownership', () => {

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import { featureElement } from '@legacy/components/FeatureRoute';
-import { CourseEditorPage, InstructorCourseOverviewPage } from '@legacy/pages/instructor/CoursePages';
+import { InstructorCourseOverviewPage } from '@legacy/pages/instructor/CoursePages';
+import { AdminCourseEditorPage } from '../../features/course-authoring/pages/CourseEditorPage';
 import { CurriculumPage, ContentEditorPage } from '@legacy/pages/instructor/CurriculumPages';
 import { ChapterWorkspace as ChapterEditorPage } from '@legacy/pages/instructor/ChapterWorkspace';
 import { QuizManagerPage, QuizEditorPage } from '@legacy/pages/instructor/QuizPages';
@@ -10,8 +11,8 @@ import { admin } from './access';
 
 export const authoringRoutes = (
   <>
-    <Route path="/admin/courses/new" element={featureElement('/teach/courses/new', admin(<CourseEditorPage />))} />
-    <Route path="/admin/courses/:courseId/settings" element={featureElement('/teach/courses/:courseId/settings', admin(<CourseEditorPage />))} />
+    <Route path="/admin/courses/new" element={featureElement('/teach/courses/new', admin(<AdminCourseEditorPage />))} />
+    <Route path="/admin/courses/:courseId/settings" element={featureElement('/teach/courses/:courseId/settings', admin(<AdminCourseEditorPage />))} />
     <Route path="/admin/courses/:courseId/overview" element={featureElement('/teach/courses/:courseId', admin(<InstructorCourseOverviewPage />))} />
     <Route path="/admin/courses/:courseId/curriculum" element={featureElement('/teach/courses/:courseId/curriculum', admin(<CurriculumPage />))} />
     <Route path="/admin/courses/:courseId/chapters/:chapterId" element={featureElement('/teach/courses/:courseId/chapters/:chapterId', admin(<ChapterEditorPage />))} />
