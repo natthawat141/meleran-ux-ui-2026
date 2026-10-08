@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { ConfigProvider, type ThemeConfig } from 'antd';
+import { Alert, ConfigProvider, type ThemeConfig } from 'antd';
 import { LandingFooter, LandingHeader, designTokens, landingTheme } from '@melearn/ui';
 export { landingTheme } from '@melearn/ui';
-import { useLms } from '@melearn/store';
+import { usePublicBlog } from '../../blog/hooks/usePublicBlog';
+import { useAuthSession } from '../../auth/api/AuthSessionProvider';
 import { CourseCollection } from './CourseCollection';
 import { LandingFaq } from './LearningSections';
 import { LearningStart } from './LearningStart';
@@ -31,8 +32,8 @@ const homePageTheme: ThemeConfig = {
 };
 
 export function LandingPage() {
-  const { data } = useLms();
-  const courses = data.courses.filter((course) => course.status === 'published');
+  const blog = usePublicBlog();
+  const { user } = useAuthSession();
 
   useEffect(() => {
     const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
@@ -48,12 +49,13 @@ export function LandingPage() {
       <div className="home-v3">
         <a className="home-skip" href="#home-main">ข้ามไปเนื้อหาหลัก</a>
         <LandingAnnouncement />
-        <LandingHeader />
+        <LandingHeader currentUser={user ? { id: user.id, name: user.display_name, role: user.roles.includes('instructor') ? 'instructor' : 'learner' } : null} />
         <main id="home-main" tabIndex={-1}>
           <LandingHero />
-          <CourseCollection courses={courses} data={data} />
+          <CourseCollection />
           <InstructorSpotlight />
-          <ReadingCollection posts={data.blogPosts.filter((post) => post.status === 'published')} />
+          <ReadingCollection posts={blog.data ?? []} />
+          {blog.isError && <Alert type="warning" message="โหลดบทความไม่ได้" action={<button onClick={() => void blog.refetch()}>ลองอีกครั้ง</button>} />}
           <LearningStart />
           <LandingFaq />
           <FounderPreview />

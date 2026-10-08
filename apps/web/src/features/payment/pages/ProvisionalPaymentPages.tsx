@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiConfig } from '../../../shared/api/client';
 import { Alert, Button, Card, Form, Input, Result, Space, Spin, Typography, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -44,8 +45,8 @@ export function ProvisionalPaymentResultPage() {
         : ['info', 'รอผลจาก Stripe', 'รายการ mock จะคงสถานะรอ จนกว่าจะมี webhook ที่ผ่านการตรวจลายเซ็น'] as const;
   const pending = payment.status === 'pending' || payment.status === 'processing';
   return <div className="public-page"><PageTitle eyebrow="ผลรายการ · โหมดพัฒนา" title="สถานะการชำระเงิน" />
-    {pending && <Alert className="top-space" showIcon type="warning" message="โหมดพัฒนา: ยังไม่มี Stripe จริง" description="ปุ่มจำลองจะส่ง signed event ผ่าน webhook handler ของ provisional API เพื่อทดสอบ flow เท่านั้น ไม่ได้เรียกเก็บเงินจริงหรือยืนยันระบบ Production" />}
-    <Result status={state[0]} title={state[1]} subTitle={state[2]} extra={enrolled ? <Link to={`/learn/courses/${payment.course_id}`}><Button type="primary">เริ่มเรียน</Button></Link> : pending ? <Space><Button onClick={() => void query.refetch()}>ตรวจสถานะอีกครั้ง</Button><Button type="primary" loading={simulate.isPending} onClick={() => simulate.mutate()}>จำลอง Stripe ยืนยันชำระ (mock)</Button></Space> : <Button onClick={() => void query.refetch()}>ตรวจสถานะอีกครั้ง</Button>} />
+    {pending && apiConfig.mock && <Alert className="top-space" showIcon type="warning" message="โหมดพัฒนา: ยังไม่มี Stripe จริง" description="ปุ่มจำลองจะส่ง signed event ผ่าน webhook handler ของ provisional API เพื่อทดสอบ flow เท่านั้น ไม่ได้เรียกเก็บเงินจริงหรือยืนยันระบบ Production" />}
+    <Result status={state[0]} title={state[1]} subTitle={state[2]} extra={enrolled ? <Link to={`/learn/courses/${payment.course_id}`}><Button type="primary">เริ่มเรียน</Button></Link> : pending ? <Space><Button onClick={() => void query.refetch()}>ตรวจสถานะอีกครั้ง</Button>{apiConfig.mock && <Button type="primary" loading={simulate.isPending} onClick={() => simulate.mutate()}>จำลอง Stripe ยืนยันชำระ (mock)</Button>}</Space> : <Button onClick={() => void query.refetch()}>ตรวจสถานะอีกครั้ง</Button>} />
     {simulate.isError && <Alert type="error" showIcon message="จำลอง webhook ไม่สำเร็จ" description={simulate.error.message} />}
     <Typography.Text type="secondary">รายการ {payment.payment_id} · {payment.fulfillment_status === 'granted' ? 'เปิดสิทธิ์แล้ว' : 'ยังไม่เปิดสิทธิ์'}</Typography.Text>
   </div>;

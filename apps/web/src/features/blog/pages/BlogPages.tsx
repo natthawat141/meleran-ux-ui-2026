@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ConfigProvider, Input, Segmented, Table, type TableProps } from 'antd';
+import { Alert, ConfigProvider, Input, Segmented, Spin, Table, type TableProps } from 'antd';
 import { AppstoreOutlined, ArrowLeftOutlined, ArrowRightOutlined, SearchOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router-dom';
-import { useLms } from '@melearn/store';
+import { usePublicBlog, usePublicBlogDetail, type BlogCardView } from '../hooks/usePublicBlog';
 import { LandingFooter, LandingHeader, RichDocument, blogCoverFor, landingTheme } from '@melearn/ui';
-import type { BlogPost, User } from '@melearn/contracts';
+import { useAuthSession } from '../../auth/api/AuthSessionProvider';
 import '@melearn/ui/styles/landing.css';
 import '../styles/blog.css';
 
@@ -17,9 +17,8 @@ const dateLabel = (value?: string | null) =>
       })
     : '';
 
-const newestFirst = (a: BlogPost, b: BlogPost) =>
-  new Date(b.publishedAt ?? b.updatedAt ?? 0).getTime() -
-  new Date(a.publishedAt ?? a.updatedAt ?? 0).getTime();
+const newestFirst = (a: BlogCardView, b: BlogCardView) =>
+  new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime();
 
 interface BlogShellProps {
   children: React.ReactNode;
@@ -27,6 +26,7 @@ interface BlogShellProps {
 }
 
 function BlogShell({ children, title }: BlogShellProps) {
+  const { user } = useAuthSession();
   useEffect(() => {
     const previous = document.title;
     document.title = `${title} | melearn`;
@@ -39,7 +39,7 @@ function BlogShell({ children, title }: BlogShellProps) {
     <ConfigProvider theme={landingTheme}>
       <div className="home-v3 blog-site">
         <a className="home-skip" href="#blog-main">ข้ามไปเนื้อหาหลัก</a>
-        <LandingHeader />
+        <LandingHeader currentUser={user ? { id: user.id, name: user.display_name, role: user.roles.includes('instructor') ? 'instructor' : 'learner' } : null} />
         <main id="blog-main" tabIndex={-1}>{children}</main>
         <LandingFooter />
       </div>
@@ -48,11 +48,10 @@ function BlogShell({ children, title }: BlogShellProps) {
 }
 
 interface PostMetaProps {
-  post: BlogPost;
-  author?: User;
+  post: BlogCardView;
 }
 
-function PostMeta({ post, author }: PostMetaProps) {
+function PostMeta({ post }: PostMetaProps) {
   return (
     <div className="blog-post-meta">
       <span>{post.category}</span>
@@ -60,24 +59,19 @@ function PostMeta({ post, author }: PostMetaProps) {
       <span>{dateLabel(post.publishedAt)}</span>
       <span aria-hidden="true">·</span>
       <span>อ่าน {post.readingMinutes ?? 3} นาที</span>
-      {author && (
-        <>
-          <span aria-hidden="true">·</span>
-          <span>โดย {author.name}</span>
-        </>
-      )}
+
     </div>
   );
 }
 
 export function BlogIndexPage() {
-  const { data } = useLms();
+  const blog = usePublicBlog();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('ทั้งหมด');
   const [view, setView] = useState<'card' | 'table'>('card');
   const posts = useMemo(
-    () => [...data.blogPosts.filter((post) => post.status === 'published')].sort(newestFirst),
-    [data.blogPosts]
+    () => [...(blog.data ?? [])].sort(newestFirst),
+    [blog.data]
   );
   const categories = ['ทั้งหมด', ...new Set(posts.map((post) => post.category))];
   const filtered = posts.filter(
@@ -90,7 +84,7 @@ export function BlogIndexPage() {
   const featured = view === 'card' && !query && category === 'ทั้งหมด' ? filtered[0] : null;
   const rest = featured ? filtered.slice(1) : filtered;
 
-  const tableColumns: TableProps<BlogPost>['columns'] = [
+  const tableColumns: TableProps<BlogCardView>['columns'] = [
     {
       title: 'บทความ',
       render: (_, post) => <Link to={`/articles/${post.id}`}>{post.title}</Link>,
@@ -114,6 +108,8 @@ export function BlogIndexPage() {
           <h1>บทความสำหรับทุกความอยากรู้</h1>
           <p>ไอเดียและวิธีคิดสั้น ๆ ที่อ่านได้เลย ไม่ต้องสมัครสมาชิก</p>
         </header>
+        {blog.isPending && <Spin aria-label="กำลังโหลดบทความ" />}
+        {blog.isError && <Alert type="error" message="โหลดบทความไม่ได้" action={<button onClick={() => void blog.refetch()}>ลองอีกครั้ง</button>} />}
         {featured && (
           <Link to={`/articles/${featured.id}`} className="blog-featured">
             <div className="blog-featured-image">
@@ -206,10 +202,14 @@ export function BlogIndexPage() {
 
 export function BlogArticlePage() {
   const { id } = useParams<{ id: string }>();
-  const { data } = useLms();
-  const post = data.blogPosts.find((item) => item.id === id);
+  const blog = usePublicBlog();
+  const summary = blog.data?.find((item) => item.id === id || item.slug === id);
+  const detail = usePublicBlogDetail(summary?.slug);
+  const post = detail.data;
+  if (blog.isPending || (summary && detail.isPending)) return <BlogShell title="กำลังโหลดบทความ"><Spin aria-label="กำลังโหลดบทความ" /></BlogShell>;
+  if (blog.isError || detail.isError) return <BlogShell title="โหลดบทความไม่ได้"><Alert type="error" message="โหลดบทความไม่ได้ กรุณาลองใหม่" action={<button onClick={() => { if (blog.isError) void blog.refetch(); if (summary && detail.isError) void detail.refetch(); }}>ลองอีกครั้ง</button>} /></BlogShell>;
 
-  if (!post || post.status !== 'published') {
+  if (!post) {
     return (
       <BlogShell title="ไม่พบบทความ">
         <div className="blog-container blog-missing">
@@ -223,9 +223,8 @@ export function BlogArticlePage() {
     );
   }
 
-  const author = data.users.find((user) => user.id === post.authorId);
-  const related = data.blogPosts
-    .filter((item) => item.status === 'published' && item.id !== id)
+  const related = (blog.data ?? [])
+    .filter((item) => item.id !== post.id)
     .sort(newestFirst)
     .slice(0, 2);
 
@@ -236,7 +235,7 @@ export function BlogArticlePage() {
           <Link className="blog-back" to="/articles">
             <ArrowLeftOutlined aria-hidden="true" /> บทความทั้งหมด
           </Link>
-          <PostMeta post={post} author={author} />
+          <PostMeta post={post} />
           <h1>{post.title}</h1>
           <p>{post.excerpt}</p>
         </div>
@@ -244,7 +243,7 @@ export function BlogArticlePage() {
           <img src={post.cover || blogCoverFor(post.coverKey)} alt="" />
         </div>
         <div className="blog-article-body">
-          <RichDocument document={post.bodyDoc} text={post.body} />
+          <RichDocument text={post.body} />
         </div>
         <div className="blog-article-end">
           <span>อ่านจบแล้ว ลองนำหนึ่งไอเดียไปใช้ในวันนี้</span>

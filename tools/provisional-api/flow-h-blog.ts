@@ -5,6 +5,7 @@
 // - A published post cannot change its slug in this mock; clients must create a new post instead.
 
 import type { BlogPostRecord } from './db.ts';
+import type { PublicBlogSummary, PublicBlogDetail } from '../../packages/contracts/src/blog.ts';
 import { iso, nextId } from './db.ts';
 import {
   ApiError, created, notFound, ok, paginate, queryProblems, readObject, rejectUnknownFields, requireRole,
@@ -12,10 +13,10 @@ import {
 } from './http.ts';
 import type { FieldError, Route } from './http.ts';
 
-const publicView = (post: BlogPostRecord) => ({
+const publicView = (post: BlogPostRecord): PublicBlogSummary => ({
   id: post.id, slug: post.slug, title: post.title, cover_url: post.cover_url, excerpt: post.excerpt, published_at: post.published_at,
 });
-const detailView = (post: BlogPostRecord) => ({ ...publicView(post), content: post.content });
+const detailView = (post: BlogPostRecord): PublicBlogDetail => ({ ...publicView(post), content: post.content });
 const slugPattern = /^[a-z0-9-]{3,80}$/;
 const adminView = (post: BlogPostRecord) => ({
   id: post.id, slug: post.slug, title: post.title, cover_url: post.cover_url, excerpt: post.excerpt, content: post.content,

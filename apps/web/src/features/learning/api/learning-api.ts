@@ -1,30 +1,13 @@
-import { createHttpClient } from '@melearn/api-client';
+import type { WireLearningEnrollment as LearningEnrollment, WireLearningItem as LearningItem, WireLearningCourse as LearningCourse, WireLearningItemContent as LearningItemContent } from '@melearn/contracts';
+export type { WireLearningEnrollment as LearningEnrollment, WireLearningItem as LearningItem, WireLearningCourse as LearningCourse, WireLearningItemContent as LearningItemContent } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
 
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'web' }, credentials: 'same-origin', timeoutMs: 8_000 });
 const object = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid provisional learning response');
   return value as Record<string, unknown>;
 };
 const text = (value: unknown): string => typeof value === 'string' ? value : (() => { throw new TypeError('Invalid provisional learning response'); })();
 const nullableText = (value: unknown): string | null => value === null ? null : text(value);
-
-export interface LearningEnrollment {
-  enrollment: { id: string; course_id: string; source: string; access: string; granted_at: string };
-  course: { id: string; title: string; subtitle: string | null; cover_url: string | null; category: string; level: string; instructor: { id: string; display_name: string } };
-  progress: { completed_items: number; total_items: number; completed_at: string | null };
-}
-export interface LearningItem {
-  id: string; type: 'video' | 'article' | 'quiz'; title: string; completed_at: string | null;
-  resume: { position_seconds: number; updated_at: string } | null;
-}
-export interface LearningCourse {
-  id: string; title: string; subtitle: string | null; cover_url: string | null; category: string; level: string;
-  instructor: { id: string; display_name: string };
-  access: { mode: 'enrolled'; enrollment: LearningEnrollment['enrollment'] };
-  outline: Array<{ id: string; title: string; items: LearningItem[] }>;
-  progress: LearningEnrollment['progress']; resume_item_id: string | null; certificate_id: string | null;
-}
-export interface LearningItemContent { id: string; type: LearningItem['type']; title: string; video_url?: string | null; body?: string | null; quiz?: { question_count: number; max_score: number } }
 
 function decodeEnrollmentList(value: unknown): LearningEnrollment[] {
   const list = object(value).items;

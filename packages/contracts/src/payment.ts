@@ -19,11 +19,15 @@ export interface PaymentIntent {
 
 export interface CreatePaymentRequest {
   course_id: string;
+  request_id: string;
 }
 
 export interface CheckoutStatusResponse {
-  payment: PaymentIntent;
-  enrollment_id?: string | null;
+  payment_id: string;
+  course_id: string;
+  status: PaymentStatus;
+  fulfillment_status: FulfillmentStatus;
+  enrollment: { id: string; course_id: string; source: string } | null;
 }
 
 export interface RedeemCode {
@@ -53,10 +57,8 @@ export interface RedeemRequest {
 }
 
 export interface RedeemResponse {
-  ok: boolean;
-  enrollment_id?: string;
-  already_enrolled?: boolean;
-  message?: string;
+  already_enrolled: boolean;
+  enrollment: { id: string; course_id: string; source: string; access: string; granted_at: string };
 }
 
 export type RedeemCourseCodeResult =

@@ -1,6 +1,6 @@
 # เอกสาร Melearn Frontend
 
-เริ่มที่ไฟล์นี้ · อัปเดต 8 ตุลาคม 2026
+เริ่มที่ไฟล์นี้ · อัปเดต 9 ตุลาคม 2026
 
 ## เอกสารหลักที่ใช้ทำงาน
 
@@ -29,7 +29,7 @@
 
 ## สถานะปัจจุบัน
 
-Frontend ยังไม่เสร็จตามเป้าหมายเลิกใช้ legacy: Web/Admin ยังพึ่ง `src/` กลาง หลาย API routes เปิดเฉพาะ dev และ contract ราย flow ยังไม่ครบ. Mock/tests และ Docker Web/Admin มีหลักฐานตรวจผ่านบางชุด แต่ไม่แทนการตรวจ Frontend ทุก flow หรือ Backend จริง. ใช้แผนและ acceptance matrix ด้านบนสำหรับงานที่เหลือ
+ไม่มี root `src/` หรือ `@legacy` แล้ว แต่การเลิกใช้ข้อมูลต้นแบบยังไม่ครบ: Course Authoring, Instructor management/grading บางหน้า และ Admin management/Blog ยังใช้ `packages/store` กับ localStorage. Auth/Profile/Catalog/Public Blog และ learner API flows แยกจาก provider นี้แล้ว. Draft HTTP DTO อยู่ใน `packages/contracts`; adapter เลือก mock/remote ผ่าน config ของแต่ละ app โดยไม่ fallback ไป store. Dockerfile ไม่ COPY `src` แล้ว; รอบปัจจุบันตรวจ build context แบบ static ส่วน Docker runtime ยังไม่ได้รันทดสอบใหม่เพราะ daemon ไม่พร้อม. สถานะและงานค้างอยู่ใน [progress](R7_API_MOCK_PROGRESS_TH.md).
 
 ## เอกสารย้อนหลัง
 

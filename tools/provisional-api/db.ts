@@ -18,6 +18,7 @@ export interface Clock {
 }
 
 export interface UserRecord {
+  profile?: import('../../packages/contracts/src/profile.ts').AccountProfile;
   id: string;
   display_name: string;
   username: string | null;

@@ -1,6 +1,6 @@
 # R4a — Contract Draft ละเอียด Flow A (Auth/Account) และ Flow B (Catalog/Enrollment)
 
-วันที่ 8 ตุลาคม 2026 · สถานะ **Draft — ยังไม่มี Backend owner ยืนยัน** · ต่อจาก [R4a API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md) และใช้ขอบเขตจาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) บท 1.2, 2.1, 5.1, 5.3, 5.8, 6.2, 6.3 และ 9.1/9.3
+วันที่ 9 ตุลาคม 2026 · สถานะ **Draft — ยังไม่มี Backend owner ยืนยัน** · ต่อจาก [R4a API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md) และใช้ขอบเขตจาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) บท 1.2, 2.1, 5.1, 5.3, 5.8, 6.2, 6.3 และ 9.1/9.3
 
 เอกสารนี้ลงรายละเอียด request/response/error ของสอง flow แรกตามลำดับที่เสนอไว้ เพื่อให้ Backend owner ตอบทีละข้อและให้ Frontend ทำ mock adapter ที่รูปร่างตรงกัน **ไม่ใช่ contract ที่ frozen** และไม่ใช่การเลือก Backend stack
 
@@ -10,7 +10,7 @@
 - **[ข้อเสนอ]** — ค่าเริ่มต้นที่ Frontend เสนอ Backend เปลี่ยนได้ แต่ต้องแจ้งเพื่อแก้ mock/test พร้อมกัน
 - **[รอ Backend]** — ยังไม่มีข้อมูลพอ ห้ามเดา
 - Path ในหัวข้อ Flow อ้างตาม scope บท 6 เป็นชื่ออ้างอิง Backend ปรับรูปแบบ URL ได้โดยรักษาสิทธิ์และพฤติกรรม
-- DTO ด้านล่างเป็น TypeScript sketch เพื่อคุย **ไม่เพิ่มลง `packages/contracts`** จนกว่า flow จะผ่าน gate ใน [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md) และ [รายงาน R4b-prep](archive/reports/R4B_PREP_REPORT_TH.md); ห้ามสร้าง Query hooks จากเอกสารนี้
+- DTO และ Query hooks ทำเป็น Draft เพื่อใช้กับ mock ได้ตามคำสั่งผู้ใช้ล่าสุด; source ที่ใช้จริงอยู่ใน `packages/contracts` และแต่ละ feature. Backend ต้อง review รูปแบบ/error/session ก่อน freeze และเชื่อม Production. อย่าใช้ snapshot ของ `packages/store` เป็น contract
 - ฟิลด์ใช้ `snake_case` ตามตัวอย่างใน scope (`course_id`, `email_verified`)
 - รหัสกรณีตรวจรับ เช่น A01, C09, E01 หมายถึงตารางใน scope บท 9; รหัส operation ของเอกสารนี้ขึ้นต้นด้วย `FA` (Flow A) และ `FB` (Flow B) เพื่อไม่ให้ซ้ำกัน
 
@@ -76,12 +76,33 @@ interface CurrentUser {
   origin: AccountOrigin;
   auth_methods: AuthMethod[];    // วิธี Login ที่เชื่อมไว้
   learning_eligible: boolean;    // ผ่านเงื่อนไขบัญชีสำหรับ Enroll/ซื้อ/Redeem (scope 2.1) — ใช้แสดง UX เท่านั้น
+  profile: AccountProfile;       // object เสมอ; บัญชีใหม่คืน {}
 }
 ```
 
 - **[ยืนยัน]** ไม่ส่งรหัสผ่านหรือ hash กลับ และ Role/User ID ที่ Client ส่งมาไม่ใช้เพิ่มสิทธิ์
 - `learning_eligible` เป็นค่าที่ Server คำนวณ: จริงเมื่อ `origin` เป็น `google` หรือ `admin_created` หรือ `email_verified=true` ส่วนการบังคับใช้จริงอยู่ที่ endpoint ที่เกี่ยวข้อง
-- ชื่อ field ที่แก้ได้ใน `PATCH /me` และรูปแบบรูปโปรไฟล์ **[รอ Backend]** (prototype มี `name`, `bio`, `avatar`; การอัปโหลดรูปเป็นขอบเขตแยก)
+- **[Draft ที่ implement/mock ตรวจแล้ว]** `PATCH /me` ใช้ `UpdateProfileRequest` ด้านล่าง; upload/Google OAuth จริงยังไม่มี endpoint/runtime พร้อมใช้
+
+```json
+{
+  "display_name": "สมชาย",
+  "username": "somchai.learn",
+  "avatar_url": null,
+  "profile": {
+    "firstName": "สมชาย",
+    "lastName": "เรียนดี",
+    "certificateName": "สมชาย เรียนดี",
+    "birthDate": "2000-01-01",
+    "interests": ["คณิตศาสตร์"],
+    "learningGoals": ["สอบ TGAT"]
+  }
+}
+```
+
+Response เป็น `CurrentUser` ตรง ๆ และ `GET /me` คืนค่าเดียวกัน. Nested profile ปัจจุบันใช้ camelCase โดยตั้งใจตาม form mapping; root identity ใช้ snake_case. ฟิลด์เพิ่มเติมที่แก้ได้คือ `bio`, `firstNameEnglish`, `lastNameEnglish`, `phone`, `school`, `educationLevel`. ไม่ส่ง field ที่ไม่ต้องการแก้; string ใน profile ที่ส่ง null/ว่างถูก normalize เป็น string ว่าง, arrays เป็น `string[]`. Mock ตรวจ username unique แบบ case-insensitive, วันเกิดจริงและไม่เป็นอนาคต และปฏิเสธ roles/email_verified/googleLinkedEmail. ชื่อใบรับรองอ่านจาก profile ตอนออกและเก็บ snapshot; การเปลี่ยนชื่อภายหลังไม่เปลี่ยนใบรับรองเก่า. ยังเป็น in-memory mock ไม่ได้พิสูจน์ database persistence.
+
+`POST /auth/login` รับ `{ "identifier": "learner@example.test", "password": "…", "audience": "web" }` และคืน `{ "user": CurrentUser }`; ไม่ใช้ `username_or_email`. Register คืน user และ queued verification แต่ไม่สร้าง session; email verification/reset ใช้ token จากอีเมล/outbox ของ mock เท่านั้น.
 
 ### 3.2 รายการ operation
 

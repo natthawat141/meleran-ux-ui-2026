@@ -10,6 +10,7 @@ import type {
 } from './db.ts';
 import { iso, nextId } from './db.ts';
 import { isLearningEligible } from './http.ts';
+import type { CurrentUser, CourseSummary, CourseDetail } from '../../packages/contracts/src/index.ts';
 
 export const mockCurrency = 'THB';
 
@@ -18,7 +19,7 @@ export function toInstructorSummary(db: Db, instructorId: string) {
   return { id: instructorId, display_name: instructor?.display_name ?? 'ผู้สอน', avatar_url: instructor?.avatar_url ?? null };
 }
 
-export function toCourseSummary(db: Db, course: CourseRecord) {
+export function toCourseSummary(db: Db, course: CourseRecord): CourseSummary {
   return {
     id: course.id,
     slug: course.slug,
@@ -33,7 +34,7 @@ export function toCourseSummary(db: Db, course: CourseRecord) {
   };
 }
 
-export function toCourseDetail(db: Db, course: CourseRecord) {
+export function toCourseDetail(db: Db, course: CourseRecord): CourseDetail {
   return {
     ...toCourseSummary(db, course),
     description: course.description,
@@ -46,7 +47,7 @@ export function toCourseDetail(db: Db, course: CourseRecord) {
   };
 }
 
-export function toCurrentUser(user: UserRecord) {
+export function toCurrentUser(user: UserRecord): CurrentUser {
   return {
     id: user.id,
     display_name: user.display_name,
@@ -56,8 +57,9 @@ export function toCurrentUser(user: UserRecord) {
     avatar_url: user.avatar_url,
     roles: [...user.roles],
     origin: user.origin,
-    auth_methods: [...(user.password ? ['password'] : []), ...(user.google_subject ? ['google'] : [])],
+    auth_methods: [...(user.password ? ['password' as const] : []), ...(user.google_subject ? ['google' as const] : [])],
     learning_eligible: isLearningEligible(user),
+    profile: structuredClone(user.profile ?? {}),
   };
 }
 
@@ -160,7 +162,10 @@ function issueCertificate(db: Db, clock: Clock, enrollment: EnrollmentRecord): C
   const id = nextId(db, 'cert');
   const certificate: CertificateRecord = {
     id, code: `MLN-${id.slice(5)}`, enrollment_id: enrollment.id, user_id: enrollment.user_id, course_id: enrollment.course_id,
-    learner_name: learner?.display_name ?? '', course_title: course?.title ?? '', issued_at: iso(clock.now()),
+    learner_name: learner?.profile?.certificateName?.trim()
+      || [learner?.profile?.firstName, learner?.profile?.lastName].map((part) => part?.trim()).filter(Boolean).join(' ')
+      || learner?.display_name || '',
+    course_title: course?.title ?? '', issued_at: iso(clock.now()),
   };
   db.certificates.set(id, certificate);
   return certificate;

@@ -1,6 +1,7 @@
-import { createHttpClient } from '@melearn/api-client';
+import type { WirePaymentView as PaymentView, WireCheckoutResult as CheckoutResult, WireRedeemResult as RedeemResult } from '@melearn/contracts';
+export type { WirePaymentView as PaymentView, WireCheckoutResult as CheckoutResult, WireRedeemResult as RedeemResult } from '@melearn/contracts';
+import { apiClient as http, apiConfig } from '../../../shared/api/client';
 
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'web' }, credentials: 'same-origin', timeoutMs: 8_000 });
 const object = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid provisional payment response');
   return value as Record<string, unknown>;
@@ -9,13 +10,6 @@ const string = (value: unknown): string => {
   if (typeof value !== 'string') throw new TypeError('Invalid provisional payment response');
   return value;
 };
-
-export interface PaymentView {
-  payment_id: string; course_id: string; status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired';
-  fulfillment_status: 'pending' | 'granted' | 'failed'; enrollment: { id: string; course_id: string; source: string } | null;
-}
-export interface CheckoutResult { payment_id: string; checkout_url: string; already_enrolled?: false }
-export interface RedeemResult { already_enrolled: boolean; enrollment: { id: string; course_id: string; source: string; access: string; granted_at: string } }
 
 function decodeWebhookReceipt(value: unknown): { received: true } {
   const row = object(value);
@@ -54,6 +48,9 @@ function decodeRedeem(value: unknown): RedeemResult {
 export const paymentApi = {
   checkout: (courseId: string, requestId: string) => http.request('me/payments/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ course_id: courseId, request_id: requestId }), decoder: decodeCheckout }),
   status: (paymentId: string, signal?: AbortSignal) => http.request(`me/payments/${encodeURIComponent(paymentId)}`, { method: 'GET', signal, decoder: decodePayment }),
-  simulateStripeCompletion: (paymentId: string) => http.request(`dev/mock-stripe/payments/${encodeURIComponent(paymentId)}/complete`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', decoder: decodeWebhookReceipt }),
+  simulateStripeCompletion: (paymentId: string) => {
+    if (!apiConfig.mock) throw new Error('Stripe simulation is available only in mock mode');
+    return http.request(`dev/mock-stripe/payments/${encodeURIComponent(paymentId)}/complete`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}', decoder: decodeWebhookReceipt });
+  },
   redeem: (code: string) => http.request('me/redeem', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code }), decoder: decodeRedeem }),
 };

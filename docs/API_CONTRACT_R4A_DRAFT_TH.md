@@ -1,8 +1,8 @@
 # R4a — API Contract Draft สำหรับคุยกับ Backend
 
-วันที่ 8 ตุลาคม 2026 · สถานะ **Draft — ยังไม่มี Backend owner ยืนยัน**
+วันที่ 9 ตุลาคม 2026 · สถานะ **Draft — ยังไม่มี Backend owner ยืนยัน**
 
-เอกสารนี้เตรียมข้อกำหนด API จาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) เพื่อให้ Frontend และ Backend ตกลงทีละ flow ก่อนสร้าง types/hooks ใน `packages/contracts` และ `packages/api-client` ปัจจุบัน repository นี้ยังไม่มี Backend หรือ OpenAPI ให้ตรวจ จึงห้ามนำ candidate path/payload ด้านล่างไปเรียกว่า frozen contract หรือใช้สร้าง production integration โดยไม่ผ่านการยืนยันร่วมกัน
+เอกสารนี้เตรียมข้อกำหนด API จาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) เพื่อให้ Frontend และ Backend ตกลงทีละ flow; ผู้ใช้อนุญาตให้ Frontend ทำ Draft types/mock/hooks ต่อได้ก่อน Backend พร้อม ปัจจุบัน repository นี้ยังไม่มี Backend หรือ OpenAPI ให้ตรวจ จึงห้ามนำ candidate path/payload ด้านล่างไปเรียกว่า frozen contract หรือใช้สร้าง production integration โดยไม่ผ่านการยืนยันร่วมกัน
 
 รายละเอียด request/response/error ของ Flow A และ B อยู่ใน [Flow A/B Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) (ยังเป็น draft เช่นกัน) และ Mock API ทุก flow สำหรับ dev/test อยู่ใน [Provisional API Mock](PROVISIONAL_API_MOCK_TH.md) (ไม่ใช่ contract)
 
@@ -12,7 +12,7 @@
 - **ข้อเสนอ** — รูปแบบ API ที่เสนอเพื่อคุย ไม่ใช่ข้อบังคับต่อ Backend
 - **รอ Backend/เจ้าของระบบ** — decision หรือ evidence ที่ยังไม่มี ห้ามเดาแทน
 
-`packages/contracts` และ `packages/api-client` ยังคงเป็น public export ว่างจนกว่า flow แรกจะได้รับการยืนยันเป็นลายลักษณ์อักษรพร้อมผู้รับผิดชอบ
+`packages/contracts` มี Draft HTTP DTO แล้ว: Auth (`CurrentUser`, `LoginRequest`, `UpdateProfileRequest`), Catalog, Public Blog และ response DTO ที่ API clients ใช้ใน `http-responses.ts`. `packages/api-client` เป็น generic HTTP transport; business endpoints/decoders/config อยู่ใน feature/app. การทำ Draft ไม่ต้องรอ Backend แต่การ freeze และ production integration ยังต้องตกลงร่วมกัน. `User`, `Course`, `QuizAttempt` และโมเดลต้นแบบที่ยัง export เพื่อ compatibility ไม่ใช่ HTTP DTO และห้ามนำมาเป็นแบบสร้าง database/API.
 
 ## หลักร่วมที่ยืนยันแล้ว
 

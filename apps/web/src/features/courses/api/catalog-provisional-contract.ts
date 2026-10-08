@@ -1,62 +1,6 @@
-// PROVISIONAL / DRAFT — not a frozen API contract.
-//
-// These types and decoders mirror the Flow B sketch in docs/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md so the Web
-// catalog can be developed before a Backend owner exists. They deliberately live inside the Web feature and are
-// NOT exported from packages/contracts: R4a requires Backend confirmation before DTOs move there. Every field
-// below can still change; update the draft document, the mock and its tests together when it does.
-
-export interface ProvisionalMoney {
-  /** Integer minor units; currency and unit conventions are still waiting for Backend/Stripe decisions. */
-  amount_minor: number;
-  currency: string;
-}
-
-export interface ProvisionalInstructorSummary {
-  id: string;
-  display_name: string;
-  avatar_url: string | null;
-}
-
-export interface ProvisionalCourseSummary {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string | null;
-  cover_url: string | null;
-  category: string;
-  level: string;
-  /** null means a free course. */
-  price: ProvisionalMoney | null;
-  instructor: ProvisionalInstructorSummary;
-  published_at: string;
-}
-
-export type ProvisionalOutlineItemType = 'video' | 'article' | 'quiz';
-
-export interface ProvisionalOutlineItem {
-  id: string;
-  type: ProvisionalOutlineItemType;
-  title: string;
-}
-
-export interface ProvisionalOutlineChapter {
-  id: string;
-  title: string;
-  items: ProvisionalOutlineItem[];
-}
-
-export interface ProvisionalCourseDetail extends ProvisionalCourseSummary {
-  description: string | null;
-  outcomes: string[];
-  /** Titles and item types only. Whether item titles are public is an open Backend question. */
-  outline: ProvisionalOutlineChapter[];
-}
-
-export interface ProvisionalCoursePage {
-  items: ProvisionalCourseSummary[];
-  /** Opaque cursor for the next page, or null on the last page. */
-  next_cursor: string | null;
-}
+// Draft catalog payload decoders. DTOs are owned by packages/contracts.
+import type { Money as ProvisionalMoney, InstructorSummary as ProvisionalInstructorSummary, CourseSummary as ProvisionalCourseSummary, CourseDetail as ProvisionalCourseDetail, CoursePage as ProvisionalCoursePage, CourseItemType as ProvisionalOutlineItemType, CourseOutlineItemSummary as ProvisionalOutlineItem, CourseOutlineChapterSummary as ProvisionalOutlineChapter } from '@melearn/contracts';
+export type { Money as ProvisionalMoney, InstructorSummary as ProvisionalInstructorSummary, CourseSummary as ProvisionalCourseSummary, CourseDetail as ProvisionalCourseDetail, CoursePage as ProvisionalCoursePage, CourseItemType as ProvisionalOutlineItemType } from '@melearn/contracts';
 
 const outlineItemTypes: readonly string[] = ['video', 'article', 'quiz'];
 

@@ -1,11 +1,10 @@
-import { createHttpClient } from '@melearn/api-client';
+import type { WireRedeemAdminCourse as RedeemAdminCourse, WireAdminRedeemCode as AdminRedeemCode } from '@melearn/contracts';
+export type { WireRedeemAdminCourse as RedeemAdminCourse, WireAdminRedeemCode as AdminRedeemCode } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
 
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'admin' }, credentials: 'same-origin', timeoutMs: 8_000 });
 const record = (value: unknown): Record<string, unknown> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid redeem-code response'); return value as Record<string, unknown>; };
 const string = (value: unknown): string => { if (typeof value !== 'string') throw new TypeError('Invalid redeem-code response'); return value; };
 const status = (value: unknown): AdminRedeemCode['status'] => { if (value !== 'unused' && value !== 'used' && value !== 'revoked') throw new TypeError('Invalid redeem-code response'); return value; };
-export interface RedeemAdminCourse { id: string; title: string; price: { amount_minor: number; currency: string } }
-export interface AdminRedeemCode { id: string; code_masked: string; course_id: string; status: 'unused' | 'used' | 'revoked'; created_at: string; used_by: string | null; used_at: string | null; revoked_at: string | null }
 
 export const redeemAdminApi = {
   courses: () => http.request('courses?price_type=paid&limit=50', { method: 'GET', decoder: (value) => {

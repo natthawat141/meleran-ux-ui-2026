@@ -1,7 +1,6 @@
 import React from 'react';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { NoAccessPage, PublicShell, WorkspaceShell } from '@melearn/ui';
-import { useLms } from '@melearn/store';
 import type { Role } from '@melearn/contracts';
 import { VerifyEmailPage } from '../../features/auth/pages/AuthPages';
 import { useAuthSession } from '../../features/auth/api/AuthSessionProvider';
@@ -13,49 +12,27 @@ function sessionIdentity(user: ApiSessionUser, role: Role) {
 }
 
 export function Public({ children }: { children: React.ReactNode }) {
-  return <PublicShell>{children}</PublicShell>;
+  const session = useAuthSession();
+  const user = session.user;
+  return <PublicShell currentUser={user ? { id: user.id, name: user.display_name, role: user.roles.includes('instructor') ? 'instructor' : 'learner' } : null}>{children}</PublicShell>;
 }
 
 export function RolePage({ roles, children, standalone = false }: { roles: Role[]; children: React.ReactNode; standalone?: boolean }) {
-  const { currentUser, data } = useLms();
   const session = useAuthSession();
   const location = useLocation();
-  const params = useParams<{ courseId?: string; quizId?: string; attemptId?: string }>();
-  if (session.enabled) {
-    if (session.status === 'loading') return <div className="public-page" aria-live="polite">กำลังตรวจสอบบัญชี</div>;
-    if (session.status === 'error') return <div className="public-page" role="alert">เชื่อมต่อระบบบัญชีจำลองไม่ได้ กรุณาลองเปิดหน้าใหม่</div>;
-    if (!session.user) return <Navigate to={`/login?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`} replace />;
-    const user = session.user;
-    const role: Role = user.roles.includes('admin') ? 'admin'
-      : location.pathname.startsWith('/teach') && user.roles.includes('instructor') ? 'instructor' : 'learner';
-    if (!roles.includes(role) || !user.roles.includes(role)) {
-      return <WorkspaceShell identity={sessionIdentity(user, role)} availableRoles={roles.filter((value) => user.roles.includes(value))} onLogout={session.logout}><NoAccessPage /></WorkspaceShell>;
-    }
-    const needsEmailVerification = role !== 'admin' && !user.email_verified;
-    const learningPath = location.pathname === '/learn' || location.pathname.startsWith('/learn/') || location.pathname === '/learn/redeem' || location.pathname.startsWith('/checkout/');
-    if (needsEmailVerification && learningPath) return <Public><VerifyEmailPage /></Public>;
-    return standalone ? <>{children}</> : <WorkspaceShell identity={sessionIdentity(user, role)} availableRoles={roles.filter((value) => user.roles.includes(value))} onLogout={session.logout}>{children}</WorkspaceShell>;
+  if (session.status === 'loading') return <div className="public-page" aria-live="polite">กำลังตรวจสอบบัญชี</div>;
+  if (session.status === 'error') return <div className="public-page" role="alert">เชื่อมต่อระบบบัญชีไม่ได้ กรุณาลองเปิดหน้าใหม่</div>;
+  if (!session.user) return <Navigate to={`/login?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`} replace />;
+  const user = session.user;
+  const role: Role = user.roles.includes('admin') ? 'admin'
+    : location.pathname.startsWith('/teach') && user.roles.includes('instructor') ? 'instructor' : 'learner';
+  if (!roles.includes(role) || !user.roles.includes(role)) {
+    return <WorkspaceShell identity={sessionIdentity(user, role)} availableRoles={roles.filter((value) => user.roles.includes(value))} onLogout={session.logout}><NoAccessPage /></WorkspaceShell>;
   }
-  if (!currentUser) return <Navigate to={`/login?next=${encodeURIComponent(`${location.pathname}${location.search}${location.hash}`)}`} replace />;
-  if (!roles.includes(currentUser.role)) return <WorkspaceShell availableRoles={['learner', 'instructor']}><NoAccessPage /></WorkspaceShell>;
-  const needsEmailVerification = currentUser.role !== 'admin' && currentUser.emailVerified === false;
-  const learningPath = location.pathname === '/learn'
-    || location.pathname === '/learn/courses'
-    || location.pathname.startsWith('/learn/courses/')
-    || location.pathname === '/learn/redeem'
-    || location.pathname.startsWith('/learn/quizzes/')
-    || location.pathname.startsWith('/learn/attempts/')
-    || location.pathname.startsWith('/checkout/');
+  const needsEmailVerification = role !== 'admin' && !user.learning_eligible;
+  const learningPath = location.pathname === '/learn' || location.pathname.startsWith('/learn/') || location.pathname === '/learn/redeem' || location.pathname.startsWith('/checkout/');
   if (needsEmailVerification && learningPath) return <Public><VerifyEmailPage /></Public>;
-  if (currentUser.role === 'instructor' && location.pathname.startsWith('/teach/')) {
-    const attempt = data.attempts.find((item) => item.id === params.attemptId);
-    const quiz = data.quizzes.find((item) => item.id === params.quizId);
-    const query = new URLSearchParams(location.search);
-    const courseId = params.courseId ?? quiz?.courseId ?? attempt?.courseId ?? query.get('course') ?? query.get('courseId');
-    const course = data.courses.find((item) => item.id === courseId);
-    if (course && course.instructorId !== currentUser.id) return <WorkspaceShell availableRoles={['learner', 'instructor']}><NoAccessPage /></WorkspaceShell>;
-  }
-  return standalone ? <>{children}</> : <WorkspaceShell availableRoles={['learner', 'instructor']}>{children}</WorkspaceShell>;
+  return standalone ? <>{children}</> : <WorkspaceShell identity={sessionIdentity(user, role)} availableRoles={roles.filter((value) => user.roles.includes(value))} onLogout={session.logout}>{children}</WorkspaceShell>;
 }
 
 export const learner = (element: React.ReactNode) => <RolePage roles={['learner', 'instructor']}>{element}</RolePage>;

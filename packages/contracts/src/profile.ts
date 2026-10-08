@@ -1,4 +1,5 @@
 export interface ProfileDetails {
+  bio?: string;
   username?: string;
   firstName?: string;
   lastName?: string;
@@ -14,11 +15,22 @@ export interface ProfileDetails {
   googleLinkedEmail?: string;
 }
 
+/** HTTP account profile excludes root identity and OAuth state. */
+export type AccountProfile = Omit<ProfileDetails, 'username' | 'googleLinkedEmail'>;
+
 export type ProfileValues = ProfileDetails & {
   name: string;
   bio?: string;
   avatar?: string;
 };
+
+/** Draft editable profile fields. Identity, roles and verification are server controlled. */
+export interface UpdateProfileRequest {
+  display_name?: string;
+  avatar_url?: string | null;
+  username?: string;
+  profile?: AccountProfile;
+}
 
 export interface ProfileUserLike extends ProfileDetails {
   id: string;

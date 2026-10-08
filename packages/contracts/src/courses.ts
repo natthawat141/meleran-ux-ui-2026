@@ -83,7 +83,7 @@ export interface CourseSummary {
   id: string;
   slug: string;
   title: string;
-  subtitle?: string;
+  subtitle: string | null;
   cover_url: string | null;
   category: string;
   level: string;
@@ -105,7 +105,9 @@ export interface CourseOutlineChapterSummary {
 }
 
 export interface CourseDetail extends CourseSummary {
-  description: string;
+  description: string | null;
   outcomes: string[];
   outline: CourseOutlineChapterSummary[];
 }
+
+export interface CoursePage { items: CourseSummary[]; next_cursor: string | null }

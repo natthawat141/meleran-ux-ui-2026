@@ -4,7 +4,7 @@
 
 ปรับแผนตาม [ผล R0 Inventory และ Lead Architecture Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md): inventory ครบ 89 routes, แยก retained dependencies ก่อน scope cleanup, เตรียม authoring interface ก่อน split apps และแยก functional acceptance ออกจาก structural migration
 
-สถานะ: **R5a–R5e และ R6a–R6d ปิด migration gates แล้ว; R7–R9 มี Web/Admin provisional API slices ใน dev; R10 ทำได้บางส่วนด้วย automated/browser mock integration และยังไม่สมบูรณ์เพราะไม่มี Backend/OpenAPI.** Browser ยืนยัน R7 learner→assessment→Instructor grading→certificate และ R8 checkout→signed mock webhook→Admin lookup แล้ว; R9 pages ยังทดสอบ interaction ไม่ครบ. R11 build และ local runtime smoke ของ Web/Admin ผ่านแล้ว; ดู [รายงาน R11 container verification](archive/reports/R11_CONTAINER_VERIFICATION_TH.md). `npm.cmd test` 175/175, typecheck และ boundary checks ผ่านใน checkpoint ล่าสุด; ดู [รายงาน R7–R10 provisional progress](R7_API_MOCK_PROGRESS_TH.md). Auth Web/Admin ใช้ `/auth/login`, `/me`, `/auth/logout` ด้วย cookie แยก app; Landing/Catalog/detail และ free Enrollment ใช้ mock. R4a ยัง Draft; ไม่มี Backend owner/OpenAPI, Stripe webhook หรือ AI provider จึงไม่มี production/API acceptance. R13 responsive/accessibility และ API/server acceptance ยังไม่ครบ; R12 ยังไม่มี registry/deployment workflow. ไม่มีการ deploy/merge `main`.
+สถานะล่าสุด 9 ต.ค. 2026: โครงสร้าง Web/Admin และ root legacy sunset ทำแล้ว แต่ **API migration ยังไม่ครบ** เพราะ Authoring/Instructor/Admin management กับ Blog editor ยังใช้ `packages/store`/localStorage. Auth/Profile/Catalog/Public Blog และ learner API flows ต่อผ่าน client และไม่ mount prototype provider แล้ว; response DTO ที่ใช้จริงอยู่ใน `packages/contracts` แบบ Draft. Remote transport ใช้ได้ผ่าน config แต่ไม่เท่ากับ production integration. R7–R10 ยังมี acceptance ค้าง; ผลปัจจุบันดู [progress](R7_API_MOCK_PROGRESS_TH.md). Dockerfile แก้ source/manifests หลัง sunset แล้ว; รายงาน R11 เก่าเป็นหลักฐานของ revision เก่าและต้องตรวจ Docker ใหม่เมื่อ daemon พร้อม. R12 deployment/R13 และ Backend/OpenAPI/Stripe/AI provider ยังไม่ปิด. ไม่มี deploy หรือ merge `main`.
 
 ## 1. ผลลัพธ์ที่ต้องการและสิ่งที่ยังไม่สรุป
 
@@ -12,7 +12,7 @@
 - Feature-first + route boundary + server state แยกจาก UI state; `App.tsx` มีหน้าที่ประกอบ providers/router
 - `courses` ดู Catalog/รายละเอียด; `course-authoring` เป็น feature สร้าง/แก้คอร์ส รวม Curriculum/Quiz Editor ที่ยืนยันแล้ว; R6b extract เฉพาะ controlled Course Metadata Editor UI ไป `packages/course-authoring` หลังยืนยันการใช้จาก Web/Admin และผ่าน dependency boundary ส่วน host, Curriculum/Chapter/Content/Quiz ยังเป็นงานย้าย/แยกใน R6
 - TanStack Query ดูแลข้อมูลจาก API; Tailwind ดูแล layout/spacing/responsive; shared UI และ library providers อ่าน theme tokens ชุดเดียว
-- API contract และข้อผิดพลาดตกลงร่วมกับ backend ต่อ flow ก่อนทำ hooks ของ flow นั้น ไม่เอา mock schema/localStorage เป็นข้อกำหนด server และไม่รอ freeze ทุก endpoint พร้อมกัน
+- Frontend ทำ Draft contract/mock/hooks ต่อ flow ได้ก่อน Backend พร้อมตามคำสั่งผู้ใช้; Backend review ก่อน freeze/production integration. ห้ามเอา snapshot localStorage เป็น server schema และไม่รอ freeze ทุก endpoint พร้อมกัน
 - ลำดับคือ inventory → retained-dependency prep → scope cleanup → authoring boundary → split apps → shared UI/router → contract → API/Query → migrate features; รักษาหน้าตา/flow ที่ยังอยู่ใน scope และตรวจ/ย้อนแต่ละชุดได้ ไม่เสียเวลาย้ายฟีเจอร์ที่ตกลงว่าจะถอน
 - เริ่ม basic CI หลัง split apps; เพิ่ม Containerization และ deployment pipeline ช่วงเตรียมส่งมอบ โดยเก็บงาน Integration/Acceptance แยกไว้
 
@@ -36,7 +36,7 @@ R0 ตรวจ `npm.cmd run typecheck`, native tests 51/51 และ `npm.cmd r
 | `src/theme.ts`, `src/shadcn.css`, `src/styles.css`, `src/system-theme.css`, `src/workspace-responsive.css` | Tokens/providers/overrides หลายแหล่ง ต้องรวม owner และตรวจ cascade |
 | `src/config/features.ts`, `docs/FEATURE_RELEASE_MATRIX.md`, `tests/` | Feature/runtime/route inventory ต้องปรับพร้อม source/test ของชุดนั้น ไม่เปิด released จากการย้ายไฟล์ |
 
-ตารางนี้เป็นภาพรวม; รายงาน R0 §§3–7 และ 13 มี matrix, route ครบทุก declaration, state, active implementation และ CSS/authoring consumer chains ก่อนลงมือแต่ละชุดต้องตรวจ source/branch/dirty work อีกครั้ง
+ตารางนี้เป็นภาพรวมย้อนหลังจาก R0; `src/` paths ไม่ใช่ตำแหน่งไฟล์ปัจจุบันแล้ว; รายงาน R0 §§3–7 และ 13 มี matrix, route ครบทุก declaration, state, active implementation และ CSS/authoring consumer chains ก่อนลงมือแต่ละชุดต้องตรวจ source/branch/dirty work อีกครั้ง
 
 ## 3. โครงสร้างเป้าหมาย
 

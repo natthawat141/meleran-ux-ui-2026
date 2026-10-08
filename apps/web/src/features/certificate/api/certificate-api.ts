@@ -1,6 +1,7 @@
-import { createHttpClient } from '@melearn/api-client';
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'web' }, credentials: 'same-origin', timeoutMs: 8_000 });
-export interface ServerCertificate { id: string; code: string; course_id: string; course_title: string; learner_name: string; issued_at: string; enrollment_id: string }
+import type { WireServerCertificate as ServerCertificate } from '@melearn/contracts';
+export type { WireServerCertificate as ServerCertificate } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
+
 function decodeCertificate(value: unknown): ServerCertificate {
   if (!value || typeof value !== 'object') throw new TypeError('Invalid certificate');
   const v = value as Record<string, unknown>;

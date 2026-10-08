@@ -1,5 +1,22 @@
 export type BlogPostStatus = 'draft' | 'published';
 
+/** Draft HTTP contract, distinct from the prototype editor's BlogPost model. */
+export interface PublicBlogSummary {
+  id: string;
+  slug: string;
+  title: string;
+  cover_url: string | null;
+  excerpt: string | null;
+  published_at: string | null;
+}
+export interface PublicBlogDetail extends PublicBlogSummary {
+  content: string;
+}
+export interface PublicBlogPage {
+  items: PublicBlogSummary[];
+  next_cursor: string | null;
+}
+
 export interface BlogPost {
   id: string;
   title: string;

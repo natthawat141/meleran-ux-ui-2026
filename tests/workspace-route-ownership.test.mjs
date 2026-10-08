@@ -148,7 +148,8 @@ test('Admin course approval route renders its app-owned feature page', async () 
 
 test('Admin access codes route renders its app-owned feature page', async () => {
   const routeModule = await readFile(path.join(root, 'apps/admin/src/app/router/management-routes.tsx'), 'utf8');
-  assert.match(routeModule, /from ['"]\.\.\/\.\.\/features\/management\/pages\/AccessCodesPage['"]/);
+  assert.match(routeModule, /import\(['"]\.\.\/\.\.\/features\/redeem\/pages\/ProvisionalAccessCodesPage['"]\)/);
+  assert.doesNotMatch(routeModule, /import\.meta\.env\.DEV|<AccessCodesPage \/>/);
   assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/AccessCodesPage/);
 });
 

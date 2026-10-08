@@ -18,6 +18,7 @@ import {
 } from './http.ts';
 import type { FieldError, HandlerResult, MockConfig, RequestContext, Route } from './http.ts';
 import { sessionCookieNameForApp } from './http.ts';
+import type { AccountProfile } from '../../packages/contracts/src/profile.ts';
 
 const sessionCookie = 'melearn_mock_session';
 const minPasswordLength = 8;
@@ -329,16 +330,49 @@ export const authRoutes: Route[] = [
     handler: (context) => {
       const user = requireUser(context);
       const body = readObject(context);
-      rejectUnknownFields(body, ['display_name', 'avatar_url']);
+      rejectUnknownFields(body, ['display_name', 'avatar_url', 'username', 'profile']);
       const problems: FieldError[] = [];
       let displayName: string | undefined;
       if ('display_name' in body) {
         displayName = requiredString(body, 'display_name', problems, { max: 80 });
       }
       const avatar = optionalString(body, 'avatar_url', problems, { max: 2048 });
+      const username = optionalString(body, 'username', problems, { max: 30 });
+      if (username !== undefined && (!username || !/^[A-Za-z0-9_.]{3,30}$/.test(username))) problems.push({ field: 'username', code: 'invalid' });
+      if (username && [...context.db.users.values()].some((entry) => entry.id !== user.id && entry.username?.toLowerCase() === username.toLowerCase())) {
+        throw new ApiError(409, 'username_taken', 'ชื่อผู้ใช้นี้ถูกใช้แล้ว');
+      }
+      const profile: AccountProfile = { ...user.profile };
+      if ('profile' in body) {
+        if (!body.profile || typeof body.profile !== 'object' || Array.isArray(body.profile)) throw validationFailed([{ field: 'profile', code: 'invalid' }]);
+        const fields = body.profile as Record<string, unknown>;
+        const textFields = ['bio', 'firstName', 'lastName', 'firstNameEnglish', 'lastNameEnglish', 'certificateName', 'birthDate', 'phone', 'school', 'educationLevel'] as const;
+        rejectUnknownFields(fields, [...textFields, 'interests', 'learningGoals']);
+        for (const key of textFields) {
+          if (key in fields) {
+            const value = optionalString(fields, key, problems, { max: key === 'bio' ? 2000 : 200 });
+            if (value !== undefined) profile[key] = value ?? '';
+          }
+        }
+        for (const key of ['interests', 'learningGoals'] as const) {
+          const values = fields[key];
+          if (values !== undefined) {
+            if (!Array.isArray(values) || values.length > 30 || !values.every((value): value is string => typeof value === 'string' && value.length <= 200)) problems.push({ field: key, code: 'invalid' });
+            else profile[key] = [...values];
+          }
+        }
+        if (profile.birthDate) {
+          const date = new Date(profile.birthDate + 'T00:00:00.000Z');
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(profile.birthDate) || !Number.isFinite(date.getTime())
+            || date.toISOString().slice(0, 10) !== profile.birthDate
+            || profile.birthDate > context.clock.now().toISOString().slice(0, 10)) problems.push({ field: 'birthDate', code: 'invalid' });
+        }
+      }
       if (problems.length) throw validationFailed(problems);
       if (displayName !== undefined) user.display_name = displayName;
       if (avatar !== undefined) user.avatar_url = avatar;
+      if (typeof username === 'string') user.username = username;
+      user.profile = profile;
       return ok(toCurrentUser(user));
     },
   },

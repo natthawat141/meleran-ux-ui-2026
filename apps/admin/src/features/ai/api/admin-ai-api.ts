@@ -1,12 +1,9 @@
-import { createHttpClient } from '@melearn/api-client';
+import type { WireAdminAiCourse as AdminAiCourse, WireAdminAiVideo as AdminAiVideo, WireAdminAiAuthoring as AdminAiAuthoring, WireAdminTranscript as AdminTranscript } from '@melearn/contracts';
+export type { WireAdminAiCourse as AdminAiCourse, WireAdminAiVideo as AdminAiVideo, WireAdminAiAuthoring as AdminAiAuthoring, WireAdminTranscript as AdminTranscript } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
 
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'admin' }, credentials: 'same-origin', timeoutMs: 8_000 });
 const record = (value: unknown): Record<string, unknown> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid provisional AI admin response'); return value as Record<string, unknown>; };
 const string = (value: unknown): string => { if (typeof value !== 'string') throw new TypeError('Invalid provisional AI admin response'); return value; };
-export interface AdminAiCourse { id: string; title: string; status: string }
-export interface AdminAiVideo { id: string; title: string; type: 'video' | 'article' | 'quiz'; has_ai_transcript: boolean }
-export interface AdminAiAuthoring { id: string; title: string; status: string; ai_enabled: boolean; chapters: Array<{ id: string; title: string; items: AdminAiVideo[] }> }
-export interface AdminTranscript { item_id: string; text: string; edited_by: string | null; edited_at: string | null }
 
 export const adminAiApi = {
   courses: (signal?: AbortSignal) => http.request('admin/courses?limit=50', { method: 'GET', signal, decoder: (value) => {

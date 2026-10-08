@@ -1,7 +1,5 @@
 import React from 'react';
-import { Button, Form, Input, Select, Typography, message } from 'antd';
-import { LinkOutlined } from '@ant-design/icons';
-import { ImageUploadField } from '@melearn/ui';
+import { Avatar, Button, Form, Input, Select, Typography, message } from 'antd';
 import { defaultUsername, validateProfile, type ProfileUserLike, type ProfileValues } from '@melearn/contracts';
 import './profile-settings.css';
 
@@ -12,18 +10,19 @@ const goals = ['เรียนเสริมที่โรงเรียน'
 interface Props {
   user: ProfileUserLike & { email: string; role: string; bio?: string; avatar?: string };
   users: ProfileUserLike[];
-  updateProfile: (values: ProfileValues) => { ok: boolean; message?: string };
+  updateProfile: (values: ProfileValues) => Promise<{ ok: boolean; message?: string }>;
+  saving: boolean;
 }
 
-export function ProfileSettings({ user, users, updateProfile }: Props) {
+export function ProfileSettings({ user, users, updateProfile, saving }: Props) {
   const [form] = Form.useForm<ProfileValues>();
   const values = Form.useWatch([], form) || {};
   const today = new Date();
   const localToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const save = (next: ProfileValues) => {
+  const save = async (next: ProfileValues) => {
     const error = validateProfile(next, users, user.id);
     if (error) { message.error(error); return; }
-    const result = updateProfile({
+    const result = await updateProfile({
       ...next,
       name: next.name.trim(),
       username: next.username?.trim(),
@@ -43,7 +42,7 @@ export function ProfileSettings({ user, users, updateProfile }: Props) {
       <Form.Item name="googleLinkedEmail" hidden><Input /></Form.Item>
       <header className="profile-v2-header">
         <div className="profile-v2-heading"><Text className="profile-v2-eyebrow">บัญชีของฉัน</Text><h1>โปรไฟล์ของฉัน</h1><Text type="secondary">ตั้งค่าข้อมูลที่ใช้ระหว่างเรียนและบนใบรับรอง</Text></div>
-        <div className="profile-v2-upload"><Form.Item name="avatar" noStyle><ImageUploadField avatar /></Form.Item></div>
+        <div className="profile-v2-upload"><Avatar size={72} src={values.avatar || user.avatar}>{user.name.slice(0, 1)}</Avatar></div>
       </header>
 
       <div className="profile-v2-sections">
@@ -51,6 +50,7 @@ export function ProfileSettings({ user, users, updateProfile }: Props) {
           <div className="profile-v2-section-title"><div><h2>บัญชีและตัวตน</h2><Text type="secondary">ชื่อผู้ใช้ใช้ระบุตัวตนในต้นแบบนี้</Text></div></div>
           <div className="profile-v2-fields">
             <Form.Item name="username" label="ชื่อผู้ใช้" required extra="3–30 ตัวอักษร: a-z, 0-9, จุด หรือขีดล่าง"><Input placeholder="เช่น somchai.learn" autoComplete="username" /></Form.Item>
+            <Form.Item name="avatar" label="URL รูปโปรไฟล์" extra="ใช้ URL รูปภาพได้; การอัปโหลดไฟล์รอ Media API"><Input placeholder="https://…" aria-label="URL รูปโปรไฟล์" /></Form.Item>
             <Form.Item name="name" label="ชื่อที่แสดง" rules={[{ required: true, whitespace: true, message: 'กรอกชื่อที่แสดง' }]}><Input autoComplete="nickname" /></Form.Item>
             <Form.Item label="อีเมลบัญชี" extra="อีเมลนี้ใช้เข้าสู่ระบบและแก้ไขในหน้านี้ไม่ได้"><Input value={user.email} readOnly /></Form.Item>
           </div>
@@ -86,15 +86,12 @@ export function ProfileSettings({ user, users, updateProfile }: Props) {
         </section>
 
         <section className="profile-v2-section profile-v2-google">
-          <div className="profile-v2-section-title"><div><h2>บัญชี Google</h2><Text type="secondary">เชื่อมบัญชีเพื่อทดลองแสดงสถานะในต้นแบบ</Text></div></div>
-          <div className="profile-v2-google-state"><div><Text strong>{googleEmail || 'ยังไม่ได้เชื่อมบัญชี'}</Text><br/><Text type="secondary">{googleEmail ? 'สถานะเดโม: เชื่อมแล้ว' : 'จำลองการเชื่อมต่อเท่านั้น ไม่มีการเข้าสู่ระบบ Google จริง'}</Text></div>
-            {googleEmail ? <Button htmlType="button" onClick={() => form.setFieldValue('googleLinkedEmail', '')}>ยกเลิกการเชื่อมต่อ</Button> : <Button htmlType="button" icon={<LinkOutlined />} onClick={() => { form.setFieldValue('googleLinkedEmail', user.email); message.info('บันทึกเป็นสถานะการเชื่อมต่อจำลอง'); }}>ทดลองเชื่อมต่อ Google</Button>}
-          </div>
-          <div className="profile-v2-demo-tag">สถานะเชื่อมต่อจำลองสำหรับต้นแบบ · ยังไม่มีการเชื่อมต่อ Google จริง</div>
-          <div className="profile-v2-demo-tag">กดบันทึกโปรไฟล์เพื่อเก็บสถานะนี้</div>
+          <div className="profile-v2-section-title"><div><h2>บัญชี Google</h2><Text type="secondary">สถานะจากระบบบัญชี</Text></div></div>
+          <Text>{googleEmail ? 'เชื่อมบัญชี Google แล้ว' : 'ยังไม่ได้เชื่อมบัญชี Google'}</Text>
+          <div className="profile-v2-demo-tag">การเชื่อมบัญชีต้องผ่าน Google OAuth ของ Backend ไม่สามารถเปลี่ยนสถานะด้วยการบันทึกโปรไฟล์</div>
         </section>
       </div>
-      <div className="profile-v2-save"><Button type="primary" htmlType="submit" size="large">บันทึกโปรไฟล์</Button></div>
+      <div className="profile-v2-save"><Button type="primary" htmlType="submit" size="large" loading={saving}>บันทึกโปรไฟล์</Button></div>
     </Form>
   );
 }

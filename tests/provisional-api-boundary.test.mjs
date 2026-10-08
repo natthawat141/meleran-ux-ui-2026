@@ -34,11 +34,17 @@ test('app runtime code and shared packages never reference the mock', () => {
   }
 });
 
-test('the mock depends on nothing from apps or packages and stays deterministic', () => {
+test('the mock may share canonical DTOs but never imports apps or implementation packages', () => {
   for (const file of sourceFiles(path.join(root, 'tools/provisional-api'))) {
     const source = readFileSync(file, 'utf8');
     const label = path.relative(root, file);
-    assert.ok(!/from\s+['"](?:@melearn\/|@legacy\/|[^'"]*\/apps\/|[^'"]*\/packages\/)/.test(source), `${label} imports app or package code`);
+    for (const match of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+      const dependency = match[1];
+      if (/@melearn\/|@legacy\/|\/apps\/|\/packages\//.test(dependency)) {
+        assert.match(dependency, /^\.\.\/\.\.\/packages\/contracts\/src\//, `${label} imports runtime implementation`);
+        assert.ok(source.slice(0, match.index).split('\n').at(-1).includes('import type') || /import type[\s\S]*$/.test(source.slice(Math.max(0, match.index - 180), match.index)), 'Only DTO type imports are allowed');
+      }
+    }
     assert.ok(!/Math\.random\s*\(/.test(source), `${label} uses Math.random; IDs and codes must be deterministic`);
     assert.ok(!/Date\.now\s*\(|new Date\(\s*\)/.test(source), `${label} reads the system clock; use context.clock`);
     assert.ok(!/\bprocess\.env\b|\bimport\.meta\.env\b/.test(source), `${label} reads environment variables`);

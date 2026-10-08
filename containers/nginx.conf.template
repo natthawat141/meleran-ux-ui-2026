@@ -25,6 +25,8 @@ server {
     # This image serves frontend files only. API proxying needs an agreed backend.
     location = /api { return 404; }
     location ^~ /api/ { return 404; }
+    location = /mock-api { return 404; }
+    location ^~ /mock-api/ { return 404; }
     location ~ /\. { return 404; }
 
     # Public files do not have content hashes, so use a short cache lifetime.

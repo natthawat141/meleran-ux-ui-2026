@@ -1,23 +1,10 @@
-import { createHttpClient } from '@melearn/api-client';
+import type { WireAdminPayment as AdminPayment } from '@melearn/contracts';
+export type { WireAdminPayment as AdminPayment } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
 
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'admin' }, credentials: 'same-origin', timeoutMs: 8_000 });
 const record = (value: unknown): Record<string, unknown> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid Admin payment response'); return value as Record<string, unknown>; };
 const text = (value: unknown): string => { if (typeof value !== 'string') throw new TypeError('Invalid Admin payment response'); return value; };
 const nullableText = (value: unknown): string | null => value === null ? null : text(value);
-
-export interface AdminPayment {
-  payment_id: string;
-  course_id: string;
-  user_id: string;
-  request_id: string;
-  checkout_session_id: string;
-  amount: { amount_minor: number; currency: string };
-  status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired';
-  fulfillment_status: 'pending' | 'granted' | 'failed';
-  enrollment: { id: string; course_id: string; source: string } | null;
-  created_at: string;
-  events: Array<{ event_id: string; type: string; received_at: string; processed_at: string | null; outcome: string }>;
-}
 
 function decodePayment(value: unknown): AdminPayment {
   const row = record(value); const amount = record(row.amount);

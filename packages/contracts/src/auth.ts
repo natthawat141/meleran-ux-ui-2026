@@ -1,5 +1,6 @@
 export type Role = 'learner' | 'instructor' | 'admin';
 
+/** Prototype/UI compatibility model; never use this as an HTTP user DTO. */
 export interface User {
   id: string;
   name: string;
@@ -18,19 +19,21 @@ export interface User {
 export interface CurrentUser {
   id: string;
   display_name: string;
-  username: string;
+  username: string | null;
   email: string | null;
   email_verified: boolean;
   avatar_url: string | null;
   roles: Role[];
-  origin: 'self' | 'google' | 'admin';
+  origin: 'self_email' | 'google' | 'admin_created';
   auth_methods: ('password' | 'google')[];
   learning_eligible: boolean;
+  profile: import('./profile.ts').AccountProfile;
 }
 
 export interface LoginRequest {
-  username_or_email: string;
-  password?: string;
+  identifier: string;
+  password: string;
+  audience: 'web' | 'admin';
 }
 
 export interface LoginResponse {
@@ -39,8 +42,8 @@ export interface LoginResponse {
 
 export interface RegisterRequest {
   email: string;
-  password?: string;
-  display_name?: string;
+  password: string;
+  display_name: string;
 }
 
 export interface VerifyEmailRequest {
@@ -48,12 +51,12 @@ export interface VerifyEmailRequest {
 }
 
 export interface PasswordResetRequest {
-  email: string;
+  identifier: string;
 }
 
 export interface PasswordResetConfirmRequest {
   token: string;
-  new_password?: string;
+  new_password: string;
 }
 
 export const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;

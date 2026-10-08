@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import { transformWithEsbuild } from 'vite';
 
 const require = createRequire(import.meta.url);
+const apiSession = { enabled: true, status: 'ready', user: null, logout: async () => {}, refresh: async () => null };
 const session = {
   currentUser: null,
   data: {
@@ -35,7 +36,7 @@ async function loadAccess(appName) {
     '@legacy/pages/SystemPages': { NoAccessPage },
     '@melearn/ui': { NoAccessPage, PublicShell, WorkspaceShell },
     '../../features/auth/pages/AuthPages': { VerifyEmailPage },
-    '../../features/auth/api/AuthSessionProvider': { useAuthSession: () => ({ enabled: false, status: 'ready', user: null, logout: async () => {}, refresh: async () => null }) },
+    '../../features/auth/api/AuthSessionProvider': { useAuthSession: () => apiSession },
   };
   vm.runInNewContext(code, {
     module,
@@ -55,7 +56,8 @@ const admin = await loadAccess('admin');
 const child = 'protected-page';
 
 function setContext(user, pathname, search = '', hash = '', routeParams = {}) {
-  session.currentUser = user;
+  session.currentUser = { id: 'stale-local-user', role: 'admin' };
+  apiSession.user = user ? { id: user.id, display_name: user.id, email: null, roles: user.role === 'instructor' ? ['learner', 'instructor'] : [user.role], email_verified: user.emailVerified !== false, learning_eligible: user.learningEligible ?? user.emailVerified !== false } : null;
   location = { pathname, search, hash };
   params = routeParams;
 }
@@ -69,6 +71,13 @@ test('both access boundaries retain the complete internal login return path', ()
   }
 });
 
+test('server-eligible admin-created accounts can learn without an email verification detour', () => {
+  setContext({ id: 'admin-created', role: 'learner', emailVerified: false, learningEligible: true }, '/learn');
+  const result = web.RolePage({ roles: ['learner', 'instructor'], children: child });
+  assert.equal(result.type, WorkspaceShell);
+  assert.equal(result.props.children, child);
+});
+
 test('Instructor can use learner flows and Web still rejects Admin', () => {
   setContext({ id: 'teacher', role: 'instructor', emailVerified: true }, '/learn/courses/other');
   const allowed = web.learner(child);
@@ -77,7 +86,7 @@ test('Instructor can use learner flows and Web still rejects Admin', () => {
   const denied = web.RolePage(allowed.props);
   assert.equal(denied.type, WorkspaceShell);
   assert.equal(denied.props.children.type, NoAccessPage);
-  assert.deepEqual(Array.from(denied.props.availableRoles), ['learner', 'instructor']);
+  assert.deepEqual(Array.from(denied.props.availableRoles), []);
 });
 
 test('existing email verification route scope remains unchanged', () => {
@@ -88,29 +97,19 @@ test('existing email verification route scope remains unchanged', () => {
     assert.equal(result.type, web.Public, pathname);
     assert.equal(result.props.children.type, VerifyEmailPage, pathname);
   }
-  for (const pathname of ['/explore/courses', '/account/profile', '/learn/ai']) {
+  for (const pathname of ['/explore/courses', '/account/profile']) {
     setContext(unverified, pathname);
     assert.equal(web.RolePage({ roles: ['learner', 'instructor'], children: child }).props.children, child, pathname);
   }
 });
 
-test('Instructor ownership stays scoped through course, quiz, attempt and queue context', () => {
-  const teacher = { id: 'teacher', role: 'instructor', emailVerified: true };
-  const contexts = [
-    ['/teach/courses/other/settings', '', { courseId: 'other' }],
-    ['/teach/quizzes/quiz-other/attempts', '?course=owned', { quizId: 'quiz-other' }],
-    ['/teach/attempts/attempt-other/grade', '?course=owned', { attemptId: 'attempt-other' }],
-    ['/teach/reviews', '?course=other&mode=pending&q=test', {}],
-    ['/teach/reviews', '?courseId=other&returnTo=%2Fteach%2Freviews', {}],
-  ];
-  for (const [pathname, search, routeParams] of contexts) {
-    setContext(teacher, pathname, search, '#context', routeParams);
-    assert.equal(web.RolePage({ roles: ['instructor'], children: child }).props.children.type, NoAccessPage, pathname);
-  }
-  setContext(teacher, '/teach/courses/owned/settings', '?course=other', '', { courseId: 'owned' });
-  assert.equal(web.RolePage({ roles: ['instructor'], children: child }).props.children, child);
-  setContext(teacher, '/teach/courses/missing/settings', '', '', { courseId: 'missing' });
-  assert.equal(web.RolePage({ roles: ['instructor'], children: child }).props.children, child, 'missing resources remain page-owned');
+test('Instructor ownership is enforced by the API, without trusting local prototype users', async () => {
+  const { createWorld, accounts } = await import('./support/provisional-api.mjs');
+  const client = createWorld().browser(); await client.login(accounts.instructorA);
+  assert.equal((await client.get('courses/crs_mock_002/authoring')).status, 404);
+  assert.equal((await client.get('courses/crs_mock_001/authoring')).status, 200);
+  setContext(null, '/teach/courses/owned/settings');
+  assert.equal(web.RolePage({ roles: ['instructor'], children: child }).type, Navigate);
 });
 
 test('standalone Web access keeps AI outside WorkspaceShell after guards pass', () => {
@@ -124,9 +123,19 @@ test('Admin shell admits only Admin while preserving existing denial and public 
   setContext({ id: 'teacher', role: 'instructor' }, '/admin/courses/owned/settings');
   const denied = admin.AdminPage({ children: child });
   assert.equal(denied.type, WorkspaceShell);
-  assert.deepEqual(Array.from(denied.props.availableRoles), ['admin']);
+  assert.deepEqual(Array.from(denied.props.availableRoles), []);
   assert.equal(denied.props.children.type, NoAccessPage);
   setContext({ id: 'admin', role: 'admin', emailVerified: false }, '/admin/courses/owned/settings');
   assert.equal(admin.AdminPage({ children: child }).props.children, child);
   assert.equal(web.Public({ children: child }).type, PublicShell);
+});
+
+test('API session loading and errors do not fall back to local identity', () => {
+  setContext(null, '/learn');
+  for (const status of ['loading', 'error']) {
+    apiSession.status = status;
+    assert.equal(web.RolePage({ roles: ['learner'], children: child }).type, 'div');
+    assert.equal(admin.AdminPage({ children: child }).type, 'div');
+  }
+  apiSession.status = 'ready';
 });

@@ -3,10 +3,10 @@ import { Tabs } from 'antd';
 import { ArrowRightOutlined, BookOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { landingCover } from './LandingArtwork';
-import type { BlogPost } from '@melearn/contracts';
+import type { BlogCardView } from '../../blog/hooks/usePublicBlog';
 
 export interface ReadingCollectionProps {
-  posts: BlogPost[];
+  posts: BlogCardView[];
 }
 
 export function ReadingCollection({ posts }: ReadingCollectionProps) {

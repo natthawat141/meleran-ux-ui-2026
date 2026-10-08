@@ -1,5 +1,6 @@
+import { PrototypeDataBoundary } from './app/providers/PrototypeDataBoundary';
 import { WebRouter } from './app/router';
 
 export function WebRoutes() {
-  return <WebRouter />;
+  return <PrototypeDataBoundary><WebRouter /></PrototypeDataBoundary>;
 }

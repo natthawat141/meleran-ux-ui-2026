@@ -14,7 +14,7 @@ function PublicCourseEntry({ detail = false }: { detail?: boolean }) {
   const session = useAuthSession();
   const location = useLocation();
   const { slug } = useParams<{ slug?: string }>();
-  if (!session.enabled && session.user) {
+  if (session.user) {
     return <Navigate to={`/explore/courses${detail && slug ? `/${encodeURIComponent(slug)}` : ''}${location.search}${location.hash}`} replace />;
   }
   return <Public>{detail ? <PublicCourseDetailPage /> : <PublicCatalogPage />}</Public>;

@@ -6,17 +6,14 @@ export interface Money {
   currency: string;
 }
 
-export interface ApiSuccess<T> {
-  ok: true;
-  data: T;
-}
+/** Success payloads are returned directly, without a data/ok wrapper. */
+export type ApiSuccess<T> = T;
 
 export interface ApiErrorEnvelope {
-  ok: false;
   error: {
     code: string;
     message: string;
-    request_id?: string;
+    request_id: string;
     details?: unknown;
   };
 }
@@ -24,7 +21,5 @@ export interface ApiErrorEnvelope {
 export type ApiResponse<T> = ApiSuccess<T> | ApiErrorEnvelope;
 
 export interface PaginationCursor {
-  next_cursor?: string | null;
-  has_more: boolean;
-  total?: number;
+  next_cursor: string | null;
 }

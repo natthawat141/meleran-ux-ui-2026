@@ -1,18 +1,12 @@
-import { createHttpClient } from '@melearn/api-client';
+import type { WireAiConversation as AiConversation, WireAiOption as AiOption, WireAiPracticeQuestion as AiPracticeQuestion, WireAiMessage as AiMessage, WireAiUsage as AiUsage, WireAiContextCourse as AiContextCourse, WireAiPracticeAnswer as AiPracticeAnswer } from '@melearn/contracts';
+export type { WireAiConversation as AiConversation, WireAiOption as AiOption, WireAiPracticeQuestion as AiPracticeQuestion, WireAiMessage as AiMessage, WireAiUsage as AiUsage, WireAiContextCourse as AiContextCourse, WireAiPracticeAnswer as AiPracticeAnswer } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
 import type { ApiSessionUser } from '../../auth/api/auth-session';
 
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'web' }, credentials: 'same-origin', timeoutMs: 8_000 });
 const record = (value: unknown): Record<string, unknown> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid provisional AI response'); return value as Record<string, unknown>; };
 const text = (value: unknown): string => { if (typeof value !== 'string') throw new TypeError('Invalid provisional AI response'); return value; };
 const count = (value: unknown): number => { if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) throw new TypeError('Invalid provisional AI response'); return value; };
 const boolean = (value: unknown): boolean => { if (typeof value !== 'boolean') throw new TypeError('Invalid provisional AI response'); return value; };
-export interface AiConversation { id: string; title: string; course_id: string | null; created_at: string; updated_at: string }
-export interface AiOption { id: string; text: string }
-export interface AiPracticeQuestion { id: string; prompt: string; options: AiOption[]; answered: boolean; my_option_id?: string; result?: { correct: boolean; explanation: string } }
-export interface AiMessage { id: string; role: 'user' | 'assistant'; kind: string; content: string; status: string; request_id: string; created_at: string; completed_at: string | null; error_code: string | null; practice: { topic_id: string; questions: AiPracticeQuestion[] } | null }
-export interface AiUsage { limit: number; used: number; remaining: number; reset_at: string }
-export interface AiContextCourse { id: string; title: string }
-export interface AiPracticeAnswer { question_id: string; correct: boolean; explanation: string; summary: { answered: number; total: number; correct_count: number } | null }
 
 function decodeUsage(value: unknown): AiUsage {
   const row = record(value); return { limit: count(row.limit), used: count(row.used), remaining: count(row.remaining), reset_at: text(row.reset_at) };

@@ -9,14 +9,19 @@ COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/api-client/package.json ./packages/api-client/package.json
 COPY packages/contracts/package.json ./packages/contracts/package.json
+COPY packages/course-authoring/package.json ./packages/course-authoring/package.json
+COPY packages/store/package.json ./packages/store/package.json
 RUN npm ci --no-audit --no-fund
 
 COPY tsconfig.json ./
-COPY src ./src
 COPY public ./public
 COPY scripts ./scripts
 COPY packages ./packages
 COPY apps/web ./apps/web
+ARG VITE_API_BASE_URL=/api/v1
+ARG VITE_API_MODE=remote
+ARG VITE_APP_ENV=production
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL} VITE_API_MODE=${VITE_API_MODE} VITE_APP_ENV=${VITE_APP_ENV}
 RUN npm run build:web
 
 FROM nginxinc/nginx-unprivileged:stable-alpine@sha256:15c994d10d6d78658721c3bcafff14cb281fba2a4bdf9d5ba92c416a472516e3 AS runtime

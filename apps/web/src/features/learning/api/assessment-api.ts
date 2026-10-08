@@ -1,19 +1,9 @@
-import { createHttpClient } from '@melearn/api-client';
-const http = createHttpClient({ baseUrl: '/mock-api/v1', fetcher: globalThis.fetch.bind(globalThis), headers: { accept: 'application/json', 'x-melearn-app': 'web' }, credentials: 'same-origin', timeoutMs: 8_000 });
+import type { WireAttemptQuestion as AttemptQuestion, WireAttemptView as AttemptView, WireGradingQueueItem as GradingQueueItem } from '@melearn/contracts';
+export type { WireAttemptQuestion as AttemptQuestion, WireAttemptView as AttemptView, WireGradingQueueItem as GradingQueueItem } from '@melearn/contracts';
+import { apiClient as http } from '../../../shared/api/client';
 const record = (value: unknown): Record<string, unknown> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid assessment response'); return value as Record<string, unknown>; };
 const str = (value: unknown): string => { if (typeof value !== 'string') throw new TypeError('Invalid assessment response'); return value; };
-export interface AttemptQuestion { id: string; type: 'single_choice' | 'multiple_choice' | 'essay' | 'image'; prompt: string; points: number; options: Array<{ id: string; text: string }> }
-export interface AttemptView {
-  id: string; item_id: string; course_id: string; number: number;
-  status: 'in_progress' | 'pending_review' | 'graded'; started_at: string; submitted_at: string | null; graded_at: string | null;
-  questions: AttemptQuestion[]; answers: Record<string, { option_ids?: string[]; text?: string; image_url?: string }>;
-  max: number; earned: number | null; percent: number | null; passed: boolean | null;
-  question_results: Array<{ question_id: string; score: number; max: number; comment: string | null }> | null;
-}
-export interface GradingQueueItem {
-  attempt_id: string; course_id: string; item_id: string; learner_display_name: string; submitted_at: string;
-  questions_to_grade: Array<{ question_id: string; type: 'essay' | 'image'; prompt: string; max: number; answer: { text?: string; image_url?: string } }>;
-}
+
 function decodeAttempt(value: unknown): AttemptView {
   const a = record(value);
   if (!Array.isArray(a.questions) || !Array.isArray(a.answers) && (a.answers === null || typeof a.answers !== 'object')) throw new TypeError('Invalid attempt');

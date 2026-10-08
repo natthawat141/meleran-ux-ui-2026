@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { LmsProvider } from '@melearn/store';
 import { MelearnUiProvider, defaultColorMode } from '@melearn/ui';
 import { WebRoutes } from './App';
 import { AuthSessionProvider } from './features/auth/api/AuthSessionProvider';
@@ -20,7 +19,7 @@ if (rootElement) {
     <React.StrictMode>
       <MelearnUiProvider>
         <QueryProvider><BrowserRouter>
-          <LmsProvider><AuthSessionProvider><WebRoutes /></AuthSessionProvider></LmsProvider>
+          <AuthSessionProvider><WebRoutes /></AuthSessionProvider>
         </BrowserRouter></QueryProvider>
       </MelearnUiProvider>
     </React.StrictMode>

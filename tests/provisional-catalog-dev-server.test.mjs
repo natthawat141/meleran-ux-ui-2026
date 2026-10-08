@@ -47,15 +47,14 @@ test('the dev HTTP server publishes only the public catalog and hides private fi
   }
 });
 
-test('guest catalog dev pages read the HTTP API and production keeps the local catalog', () => {
+test('guest catalog uses HTTP API pages in all build environments without local fallback', () => {
   const read = (relative) => readFileSync(path.join(root, relative), 'utf8');
   const catalog = read('apps/web/src/features/courses/pages/public/CatalogPage.tsx');
   const detail = read('apps/web/src/features/courses/pages/public/CourseDetailPage.tsx');
-  assert.match(catalog, /import\.meta\.env\.DEV/);
+  assert.doesNotMatch(catalog, /import\.meta\.env\.DEV|LocalPublicCatalogPage|useLms/);
   assert.match(catalog, /import\('\.\/DevCatalogPage\.tsx'\)/);
-  assert.match(catalog, /function LocalPublicCatalogPage/);
   assert.match(detail, /import\('\.\/DevCourseDetailPage\.tsx'\)/);
-  assert.match(detail, /function LocalCourseDetailPage/);
+  assert.doesNotMatch(detail, /import\.meta\.env\.DEV|LocalCourseDetailPage|useLms/);
   for (const relative of [
     'apps/web/src/features/courses/pages/public/DevCatalogPage.tsx',
     'apps/web/src/features/courses/pages/public/DevCourseDetailPage.tsx',
