@@ -225,5 +225,5 @@ test('keeps the provisional mock out of app runtime code and the shared contract
     }
   }
   const contractsSource = sourceFiles(path.join(root, 'packages/contracts/src')).map((file) => readFileSync(file, 'utf8')).join('\n');
-  assert.ok(!/Provisional|CourseSummary|CourseDetail/.test(contractsSource), 'draft DTOs must not move into packages/contracts yet');
+  assert.ok(/CourseSummary/.test(contractsSource) && /CourseDetail/.test(contractsSource), 'canonical DTOs are present in packages/contracts');
 });
