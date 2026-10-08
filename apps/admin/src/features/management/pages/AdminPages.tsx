@@ -3,12 +3,12 @@ import { Alert, Avatar, Button, Descriptions, Empty, Pagination, Popconfirm, Seg
 import type { TableProps } from 'antd';
 import { AppstoreOutlined, ArrowRightOutlined, PlusOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useLms } from '../../store';
-import { CourseProgress } from '../../components/common';
+import { useLms } from '@legacy/store';
+import { CourseProgress } from '@legacy/components/common';
 import { PageTitle, StatusTag } from '@melearn/ui';
-import { formatPrice, flattenItems, instructorFor } from '../../data';
-import { DirectorySearch, matchesDirectorySearch, useDirectorySearch } from '../../components/DirectorySearch';
-import type { Course, QuizAttempt, User } from '../../types';
+import { formatPrice, flattenItems, instructorFor } from '@legacy/data';
+import { DirectorySearch, matchesDirectorySearch, useDirectorySearch } from '@legacy/components/DirectorySearch';
+import type { Course, QuizAttempt, User } from '@legacy/types';
 import './admin-courses.css';
 import './admin-users.css';
 

@@ -47,6 +47,12 @@ test('each app registers its feature routes against the release registry', () =>
   }
 });
 
+test('Admin management routes render pages owned by the Admin app', async () => {
+  const routeModule = await readFile(path.join(root, 'apps/admin/src/app/router/management-routes.tsx'), 'utf8');
+  assert.match(routeModule, /from ['"]\.\.\/\.\.\/features\/management\/pages\/AdminPages['"]/);
+  assert.doesNotMatch(routeModule, /@legacy\/pages\/admin\/AdminPages/);
+});
+
 test('Web and Admin have distinct canonical route ownership', () => {
   const webPaths = webRoutes.map((route) => route.path);
   const adminPaths = adminRoutes.map((route) => route.path);
