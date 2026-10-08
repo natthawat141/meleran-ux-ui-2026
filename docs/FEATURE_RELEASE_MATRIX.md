@@ -4,7 +4,7 @@
 
 ยึด [Final 1.6](MELEARN_V1_SCOPE.md) และ [execution plan](FRONTEND_REFACTOR_PLAN_TH.md) ส่วน [config](../src/config/features.ts) กำหนด runtime gates ตาม environment การอนุมัติ scope ไม่ใช่ backend readiness ทุก feature ยัง `prototype`; default production ปิด prototype routes การตรวจ build ผ่านไม่เปลี่ยนเป็น integration/released
 
-R1a แยก Payment/Redeem/roster ออกจาก legacy gates แล้ว R1b/R1c ถอน Cart/Orders/Finance/Inbox/Assignment/comparison dashboards/request/invite/public full lesson preview/public certificate verification/global Admin certificate viewer และ Admin grading ก่อน deep refactor รายงานผลและข้อจำกัดอยู่ใน [R1 report](R1_SCOPE_CLEANUP_REPORT_TH.md)
+R1a แยก Payment/Redeem/roster ออกจาก legacy gates แล้ว R1b/R1c ถอน Cart/Orders/Finance/Inbox/Assignment/comparison dashboards/request/invite/public full lesson preview/public certificate verification/global Admin certificate viewer และ Admin grading ก่อน deep refactor รายงานผลและข้อจำกัดอยู่ใน [R1 report](archive/reports/R1_SCOPE_CLEANUP_REPORT_TH.md)
 
 Source แยกเป็น Web/Admin apps และยังเป็น browser-local prototype; การย้าย feature slices, Query/contracts และ server integration ยังดำเนินต่อ Runtime status ต้องมีหลักฐานตรง revision ก่อนเลื่อน ตาม CODE_SPEC ไม่เปิดทุกอย่างเพื่อให้ demo ทำงานใน production
 

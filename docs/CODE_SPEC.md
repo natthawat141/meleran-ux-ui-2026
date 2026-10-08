@@ -77,7 +77,7 @@
 
 ## 3. โครงสร้างและรูปแบบการเขียน
 
-- R1 ถอน Assignment/Inbox/Cart/Orders/Finance/comparison dashboards/request/invite จาก active source ตาม Final 1.6 แล้ว ดู [ผล R1](R1_SCOPE_CLEANUP_REPORT_TH.md) และ R0 baseline สำหรับ historical implementation; learning-history guards และ learner roster/owner grading ยังอยู่
+- R1 ถอน Assignment/Inbox/Cart/Orders/Finance/comparison dashboards/request/invite จาก active source ตาม Final 1.6 แล้ว ดู [ผล R1](archive/reports/R1_SCOPE_CLEANUP_REPORT_TH.md) และ R0 baseline สำหรับ historical implementation; learning-history guards และ learner roster/owner grading ยังอยู่
 
 - คอร์ส public อยู่ `src/pages/public/` และคอร์สสำหรับผู้ล็อกอินอยู่ `src/pages/member/` ผ่าน routes `/courses[/:slug]` และ `/explore/courses[/:slug]` ตามลำดับ ห้ามนำ page เดียวมาใช้สองบริบท รายการโครงสร้างบทที่เป็น presentation ใช้ `CourseOutline` ร่วมได้
 - `PublicCourseEntry` ส่งสมาชิกที่เปิด URL public ไปยัง URL สมาชิกของคอร์สเดียวกัน รายการ/รายละเอียดทั้งสองแบบแสดงเฉพาะคอร์ส published; ไม่ใช้ catalog เปิด draft แทนหน้าจัดการ/preview
@@ -127,7 +127,7 @@
 - หน้าตรวจงานเก็บเฉพาะ draft คะแนน/feedback ใน `sessionStorage` ตาม user/attempt เพื่อกลับมาต่อในแท็บเดิมได้; ใช้ `gradeAttempt` เดิมเมื่อบันทึกและล้าง draft จากแท็บเมื่อเสร็จ ไม่ใช้ draft เปลี่ยนผลคะแนนหรือ Analytics ล่วงหน้า
 - คิวตรวจเก็บ course/courseId, mode และคำค้น `q` ใน URL; ส่ง `returnTo` ให้หน้าตรวจ และใช้บริบทเดียวกันสำหรับงานก่อนหน้า/ถัดไป โดยคง role scoping และลำดับ FIFO
 - แจ้งเตือน prototype อยู่ใน `data.notifications` ของ store เดิม สร้างจาก `submitAttempt`, `gradeAttempt` และ `saveAssignment`; เมนูกรอง recipient ตามบัญชีปัจจุบัน และ `markNotificationRead` แก้เฉพาะรายการของบัญชีนั้น ไม่สร้างแจ้งเตือนซ้ำเมื่อส่ง/ตรวจ attempt เดิม
-- Inbox ยังไม่ทำในรอบแรก เอกสาร INBOX_PERMISSION_SPEC เป็นทางเข้าประวัติ ไม่ใช้เป็นกติกาใหม่
+- Inbox ยังไม่ทำในรอบแรก เอกสาร [Inbox เดิม](archive/pre-final-20261006/INBOX_PERMISSION_SPEC.md) อยู่ใน archive ไม่ใช้เป็นกติกาใหม่
 - รักษา `courseId`, `chapterId`, `itemId`, `quizId` และการเชื่อมกัน ตรวจว่าการเพิ่ม/ลบเนื้อหาไม่ทิ้ง reference ที่ใช้ไม่ได้
 - การบันทึกบทและแบบฝึกหัดร่วมกันใช้ action เดิม เช่น `saveChapterWorkspace` ตรวจสิทธิ์/validation/result จาก action ไม่เขียน path แยกที่บันทึกเพียงครึ่งหนึ่ง
 - ให้ `saved`/success feedback หลัง action สำเร็จ ไม่ใช้ timeout สุ่มเพื่อแกล้งบันทึกสำเร็จ หาก browser storage เต็ม ต้องแจ้งผู้ใช้ ไม่กล่าวว่าข้อมูลถูกเก็บแล้ว

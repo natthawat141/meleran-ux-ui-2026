@@ -6,7 +6,7 @@
 
 เอกสารนี้เดิมเป็นคำสั่งสำหรับงานในอนาคต ต่อมาผู้ใช้สั่งดำเนิน migration และรวมงานค้างขึ้น Git แล้ว เอกสารกำหนดขอบเขตการย้ายภาษาเท่านั้น ไม่อนุมัติ backend, API contract, deployment หรือกติกาธุรกิจเพิ่มเติม
 
-การเก็บ checkpoint ใช้ [GIT_CHECKPOINT_POLICY_TH.md](GIT_CHECKPOINT_POLICY_TH.md): ผู้ใช้ยืนยันภายหลังให้ commit และ push อัตโนมัติหลังแต่ละชุดผ่านการตรวจ กติกานี้แทนข้อความเดิมที่ต้องรอคำสั่ง commit/push แยก ห้ามรวมงานค้างผู้อื่นหรือเปลี่ยน checkout ของ agent ที่กำลังทำงาน
+การเก็บ checkpoint ใช้ [GIT_CHECKPOINT_POLICY_TH.md](../../GIT_CHECKPOINT_POLICY_TH.md): ผู้ใช้ยืนยันภายหลังให้ commit และ push อัตโนมัติหลังแต่ละชุดผ่านการตรวจ กติกานี้แทนข้อความเดิมที่ต้องรอคำสั่ง commit/push แยก ห้ามรวมงานค้างผู้อื่นหรือเปลี่ยน checkout ของ agent ที่กำลังทำงาน
 
 ## 1. เป้าหมายและนิยามคำว่า “ทั้งหมด”
 
@@ -23,8 +23,8 @@
 
 ## 2. อ่านก่อนลงมือและเก็บ baseline
 
-1. ยืนยัน absolute path และอ่าน [AGENTS.md](../AGENTS.md), [UI_SPEC.md](UI_SPEC.md), [CODE_SPEC.md](CODE_SPEC.md) และเอกสารนี้
-2. อ่าน [INBOX_PERMISSION_SPEC.md](INBOX_PERMISSION_SPEC.md) เพื่อเข้าใจความต่างระหว่างกติกาที่ตกลงกับ implementation ปัจจุบัน **ไม่ implement ความต่างนั้นในงานย้ายภาษา**
+1. ยืนยัน absolute path และอ่าน [AGENTS.md](../../../AGENTS.md), [UI_SPEC.md](../../UI_SPEC.md), [CODE_SPEC.md](../../CODE_SPEC.md) และเอกสารนี้
+2. อ่าน [INBOX_PERMISSION_SPEC.md](../pre-final-20261006/INBOX_PERMISSION_SPEC.md) เพื่อเข้าใจความต่างระหว่างกติกาที่ตกลงกับ implementation ปัจจุบัน **ไม่ implement ความต่างนั้นในงานย้ายภาษา**
 3. ตรวจ `git status --short` และ diff ปัจจุบัน รวมไฟล์ untracked ก่อนแก้ มีงานค้างเดิมอยู่มาก ห้ามถือว่า diff ทั้งหมดเป็นงาน migration
 4. ทำ inventory source, import paths, scripts, package versions และ storage keys จาก source ล่าสุด อย่าใช้จำนวนไฟล์ในรายงานเก่าเป็นรายการตายตัว
 5. เก็บรายการไฟล์ที่จะเปลี่ยน และ baseline ของ build, routes, UI desktop/mobile และ critical flows ก่อนเปลี่ยน ถ้ามีเครื่องมือไม่พร้อมให้บันทึกข้อจำกัดตามจริง
@@ -166,7 +166,7 @@ Vite build อย่างเดียวไม่ยืนยันว่า ty
 
 คัดลอกข้อความนี้เมื่อผู้ใช้พร้อมเริ่ม migration:
 
-> ทำงานเฉพาะ `D:\code\elearn-prod\elearning-ux-v2` อ่าน AGENTS.md, docs/UI_SPEC.md, docs/CODE_SPEC.md, docs/GIT_CHECKPOINT_POLICY_TH.md และ docs/TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md ให้ครบก่อนลงมือ ย้าย JavaScript/JSX ทั้งหมดตามขอบเขตในเอกสารเป็น TypeScript แบบ strict โดยรักษา UI และ runtime behavior เดิม เริ่มจาก inventory, dirty-work baseline และแผนไฟล์แต่ละชุด แล้วดำเนินงานและตรวจทีละชุดตามเอกสาร ห้ามแก้ CSS/JSON/assets/markup/ข้อความ/สูตรคะแนน/permission ห้ามต่อ API หรือ refactor ระบบใหม่ ห้ามปิด types ด้วย any หรือ suppression ห้าม reset storage หรือทับงานเดิม รัน typecheck/build และตรวจ regression พร้อมหลักฐานก่อนสรุป หากแก้ type error แล้วต้องเปลี่ยนพฤติกรรมหรือขอบเขต ให้แจ้งจุดนั้นและรอคำตัดสิน โดยทำส่วนอิสระอื่นต่อได้ Commit/push อัตโนมัติเมื่อแต่ละชุดผ่านการตรวจ โดยรักษางานผู้อื่นและรายงาน SHA/branch/ผล push ห้าม deploy
+> ทำงานเฉพาะ `D:\code\elearn-prod\elearning-ux-v2` อ่าน AGENTS.md, docs/UI_SPEC.md, docs/CODE_SPEC.md, docs/GIT_CHECKPOINT_POLICY_TH.md และ docs/archive/reports/TYPESCRIPT_MIGRATION_INSTRUCTIONS_TH.md ให้ครบก่อนลงมือ ย้าย JavaScript/JSX ทั้งหมดตามขอบเขตในเอกสารเป็น TypeScript แบบ strict โดยรักษา UI และ runtime behavior เดิม เริ่มจาก inventory, dirty-work baseline และแผนไฟล์แต่ละชุด แล้วดำเนินงานและตรวจทีละชุดตามเอกสาร ห้ามแก้ CSS/JSON/assets/markup/ข้อความ/สูตรคะแนน/permission ห้ามต่อ API หรือ refactor ระบบใหม่ ห้ามปิด types ด้วย any หรือ suppression ห้าม reset storage หรือทับงานเดิม รัน typecheck/build และตรวจ regression พร้อมหลักฐานก่อนสรุป หากแก้ type error แล้วต้องเปลี่ยนพฤติกรรมหรือขอบเขต ให้แจ้งจุดนั้นและรอคำตัดสิน โดยทำส่วนอิสระอื่นต่อได้ Commit/push อัตโนมัติเมื่อแต่ละชุดผ่านการตรวจ โดยรักษางานผู้อื่นและรายงาน SHA/branch/ผล push ห้าม deploy
 
 สำหรับโมเดลขนาดเล็ก ให้ส่งเฉพาะชุดไฟล์ที่มี types กลางและตัวอย่างที่ตรวจผ่านแล้ว พร้อมข้อจำกัดในเอกสาร อย่าให้ตีความ domain หรือเปลี่ยน store/permissions ทั้งระบบเอง ผู้ตรวจต้องดู diff และผลทดสอบ ไม่ตัดสินจากคำว่า “เสร็จแล้ว” ของโมเดล
 

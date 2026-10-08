@@ -69,7 +69,7 @@ npm.cmd run check:boundaries
 
 The boundary check prevents cross-app source imports and package-to-app dependencies. The current `@legacy/*` alias is a temporary bridge to the remaining prototype source under `src/`; it does not indicate shared backend state or API readiness.
 
-Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
+Application source and Vite configuration use strict TypeScript. Native Node `.mjs` test harnesses are not browser application source. See [integration evidence](docs/archive/reports/WORKSPACE_INTEGRATION_20261004.md) for scope and verification limits.
 
 ## Email verification and course review prototype
 
@@ -79,6 +79,6 @@ Google mode only simulates linking a matching email to the currently signed-in a
 
 Courses follow `draft → pending_review → approved → published`. The owner Instructor or Admin submits a draft, Admin approves or returns it with a reason at `/admin/courses/reviews`, and the owner or Admin publishes an approved course. Editing an approved or pending course returns it to draft; published edits remain published.
 
-Checks and browser walkthrough results: [Email verification and course review](docs/EMAIL_VERIFICATION_COURSE_REVIEW_20261006.md).
+Checks and browser walkthrough results: [Email verification and course review](docs/archive/reports/EMAIL_VERIFICATION_COURSE_REVIEW_20261006.md).
 
 `/learn/ai` is a standalone chat page for learners, instructors and admins. Learners must be enrolled in an AI-enabled course; instructors can use their own enabled courses or courses they are enrolled in, and admins can inspect enabled courses. It stores account-scoped chat history locally and renders demo responses, math and interactive response blocks; no real model or course-document retrieval is connected yet.

@@ -10,7 +10,7 @@
 - **[ข้อเสนอ]** — ค่าเริ่มต้นที่ Frontend เสนอ Backend เปลี่ยนได้ แต่ต้องแจ้งเพื่อแก้ mock/test พร้อมกัน
 - **[รอ Backend]** — ยังไม่มีข้อมูลพอ ห้ามเดา
 - Path ในหัวข้อ Flow อ้างตาม scope บท 6 เป็นชื่ออ้างอิง Backend ปรับรูปแบบ URL ได้โดยรักษาสิทธิ์และพฤติกรรม
-- DTO ด้านล่างเป็น TypeScript sketch เพื่อคุย **ไม่เพิ่มลง `packages/contracts`** จนกว่า flow จะผ่าน gate ใน [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md) และ [รายงาน R4b-prep](R4B_PREP_REPORT_TH.md); ห้ามสร้าง Query hooks จากเอกสารนี้
+- DTO ด้านล่างเป็น TypeScript sketch เพื่อคุย **ไม่เพิ่มลง `packages/contracts`** จนกว่า flow จะผ่าน gate ใน [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md) และ [รายงาน R4b-prep](archive/reports/R4B_PREP_REPORT_TH.md); ห้ามสร้าง Query hooks จากเอกสารนี้
 - ฟิลด์ใช้ `snake_case` ตามตัวอย่างใน scope (`course_id`, `email_verified`)
 - รหัสกรณีตรวจรับ เช่น A01, C09, E01 หมายถึงตารางใน scope บท 9; รหัส operation ของเอกสารนี้ขึ้นต้นด้วย `FA` (Flow A) และ `FB` (Flow B) เพื่อไม่ให้ซ้ำกัน
 
