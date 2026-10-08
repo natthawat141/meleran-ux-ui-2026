@@ -36,7 +36,7 @@
 - ลำดับแผนใหม่คือ R0 inventory → R1 scope cleanup → R2 split apps/basic CI → R3 shared UI/router → R4a contract → R4b API/Query → migrate features; cleanup ถอดตามความสามารถ/dependency ไม่ลบตามชื่อโฟลเดอร์ analytics จน grading/learner list หาย
 - แผนมี Containerization และ CI/CD เป็นงานอนาคตพร้อมเกณฑ์ตรวจแยกจาก integration ใช้ build context ที่ monorepo root; shared packages/root lockfile/config เปลี่ยนต้องตรวจ apps ที่ได้รับผล Cloud Run เป็น hosting candidate ยังไม่เลือกปลายทางหรืออนุญาต deploy ดู R11–R13 ในแผน
 
-ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source prototype ปัจจุบัน; `apps/web`/`apps/admin` มี route owners แยกและมีหน้า app-owned ชุดแรกแล้ว แต่ Auth, Blog article/read, ProfileSettings, store, types และ CSS บางส่วนยังเป็น bridge รอ feature migration กติกา prototype ที่ระบุ `store.tsx` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่ API contract
+ข้อ 2–10 ด้านล่างยังบอกตำแหน่งและวิธีดูแล source prototype ปัจจุบัน; `apps/web`/`apps/admin` มี route owners และ page slices แยกแล้วบางส่วน แต่ Auth pages, `ProfileSettings`, blog CSS/chrome, store/data และ types บางส่วนยังเป็น `@legacy` bridge รอ feature migration กติกา prototype ที่ระบุ `store.tsx` ใช้เฉพาะช่วงก่อนย้าย slice นั้น ไม่ใช่ API contract
 
 ## 2. แผนที่ code ที่ต้องหาให้ถูก
 
@@ -59,6 +59,7 @@
 | Auth / shadcn controls | Shared primitives: `packages/ui/src/primitives/` via `packages/ui/src/index.ts`; current legacy consumer: `src/pages/AuthPages.tsx`; compatibility styles: `src/shadcn.css` |
 | Web public blog reader | `apps/web/src/features/blog/pages/BlogPages.tsx`; Published only, ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` |
 | Admin blog list/editor/article preview | `apps/admin/src/features/blog/pages/`; preview route `/articles/:id` ยังใช้ legacy store/data/types, `blog.css`, `LandingChrome` และ RichDocument จาก `packages/ui` |
+| Web/Admin profile pages | `apps/web/src/features/account/pages/ProfilePage.tsx`, `apps/admin/src/features/account/pages/ProfilePage.tsx`; `ProfileSettings` form และ profile state ยังเป็น legacy bridge |
 | Curriculum จริงที่ route ใช้อยู่ | `src/pages/instructor/CurriculumWorkspace.tsx`, `curriculum-workspace.css` |
 | Chapter workspace จริง | `src/pages/instructor/ChapterWorkspace.tsx`, `chapter-workspace.css` |
 | Video / article / assessment editors | `src/components/chapter/VideoEditor.tsx`, `RichTextEditor.tsx`, `AssessmentEditor.tsx`, `ChapterPreview.tsx` |

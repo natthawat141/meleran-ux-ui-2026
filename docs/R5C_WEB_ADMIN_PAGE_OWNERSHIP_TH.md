@@ -15,6 +15,7 @@
 | Web | `/account/certificates`, `/account/certificates/:certificateId` | `apps/web/src/features/certificate/pages/AccountPages.tsx` |
 | Web | `/account/profile` page wrapper | `apps/web/src/features/account/pages/ProfilePage.tsx` |
 | Admin | `/admin/articles`, `/admin/articles/new`, `/admin/articles/:id/edit`, `/articles/:id` preview | `apps/admin/src/features/blog/pages/BlogAdminPages.tsx` และ `BlogArticlePreviewPage.tsx` พร้อม `blog-editor.css` |
+| Admin | `/account/profile` page wrapper | `apps/admin/src/features/account/pages/ProfilePage.tsx` |
 
 Web/Admin route declarations ชี้เข้าไฟล์ของ app เจ้าของแล้ว ลบ root `index.html`, `src/main.tsx` และ `src/App.tsx` เพราะ root package ใช้ Web workspace เป็น `dev` entry อยู่แล้วและไม่ควรมี runnable app ที่สาม โค้ดใต้ root `src/` ที่ยังถูกใช้เป็น compatibility bridge ยังคงอยู่
 
@@ -23,7 +24,7 @@ Web/Admin route declarations ชี้เข้าไฟล์ของ app เ�
 - หน้าใหม่ยังใช้ `@legacy/store`, `@legacy/data`, `@legacy/types` และ shared widgets บางตัว เป็น demo adapter ชั่วคราว ไม่ใช่ server state หรือ API contract
 - Web Blog และ Admin article preview ย้ายเข้า app แล้ว แต่ยังใช้ `@legacy/store`, `@legacy/data`, `@legacy/types`, `blog.css`, `LandingChrome` และ `landing.css` เป็น compatibility bridge; Admin preview แสดง Published ได้ และมี branch สำหรับ draft ของ Admin
 - `LandingChrome` และ base `landing.css` ยังอยู่ใต้ `src/pages/landing/` เพราะ legacy `Shell` และ Admin article preview ใช้ร่วมอยู่; `blog.css` ยังอยู่ใต้ `src/pages/blog/` การย้าย/ทำสำเนาตอนนี้จะสร้าง cross-app import หรือ duplicate styles
-- `AuthPages` ยังถูกใช้ทั้ง Web และ Admin; Profile settings form ยังเป็น legacy consumer ของทั้งสอง app
+- `AuthPages` ยังถูกใช้ทั้ง Web และ Admin; profile page wrappers แยก app แล้ว แต่ `ProfileSettings` form ยังเป็น legacy consumer ของทั้งสอง app
 - ดังนั้น root `src` ไม่ใช่ app runtime แล้ว แต่ยังเป็น module bridge ที่ต้องทยอยถอน การผ่าน boundary checker ไม่ได้แปลว่า bridge เหล่านี้หายไป
 
 ยังไม่ได้ต่อ API, เพิ่ม Query hooks, เปลี่ยน feature status หรือเปลี่ยนพฤติกรรมการเข้าสู่ระบบ/โปรไฟล์/บทความ ข้อมูล localStorage ยังคงแยกตาม origin ของแต่ละ app
@@ -31,6 +32,7 @@ Web/Admin route declarations ชี้เข้าไฟล์ของ app เ�
 ## หลักฐานตรวจ
 
 - `npm.cmd run typecheck` — ผ่าน Web, Admin และ legacy TypeScript projects
+- `npm.cmd test` — 93/93 ผ่าน; route checks อ่าน inventory ของ Web/Admin modules และเก็บ R3 baseline พร้อม allowlist การเปลี่ยน Admin Blog preview
 - `npm.cmd run check:boundaries` — ผ่าน dependency direction และ route ownership checks ที่มีอยู่
 - `npm.cmd run build` — token check และ production build ของ Web/Admin ผ่าน; มีคำเตือนเดิมจาก dependency `"use client"` และ chunk ขนาดใหญ่
 - Development preview แบบ read-only: `/` แสดง Landing, `/about` แสดงหน้าและ founder content, `/courses` แสดงคอร์ส Published 3 รายการ, `/courses/clear-writing` แสดงรายละเอียดคอร์ส, Web `/articles/post-better-writing` และ Admin `/articles/post-better-writing` แสดงบทความ Published
@@ -42,7 +44,7 @@ Web/Admin route declarations ชี้เข้าไฟล์ของ app เ�
 
 - ย้าย Auth pages ให้ Web/Admin มี host boundary โดยไม่ import app ข้ามกันหรือใช้ prototype account state เป็น auth contract
 - ถอน `@legacy` adapters, `LandingChrome`, `landing.css` และ `blog.css` จาก Blog slices หลังมี owner/interfaces ที่ยืนยันแล้ว; ตรวจ navigation ของ Admin preview ให้ครบใน visual acceptance
-- ย้าย shared profile form และ legacy store/data adapters ตามลำดับเมื่อมี owner/interface ที่ยืนยันได้
+- ย้าย `ProfileSettings` form และ legacy store/data adapters ตามลำดับเมื่อมี owner/interface ที่ยืนยันได้
 - ตรวจ route ที่ย้ายครบขึ้นใน responsive/visual acceptance รอบ R13 และตรวจบน revision เดียวกับผล CI
 
 R6 Course Authoring/Review ยังไม่เริ่มตามคำสั่งผู้ใช้ให้หยุดคุยก่อน เอกสารฉบับนี้ไม่ได้ตัดสิน extraction ของ `packages/course-authoring` แทนผู้ใช้

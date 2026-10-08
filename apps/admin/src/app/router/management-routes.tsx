@@ -5,7 +5,7 @@ import { AdminDashboardPage, AdminUsersPage, AdminUserDetailPage, AdminInstructo
 import { CourseReviewPage } from '@legacy/pages/admin/CourseReviewPage';
 import { AccessCodesPage } from '@legacy/pages/admin/AccessCodesPage';
 import { AdminBlogPage, AdminBlogEditorPage } from '../../features/blog/pages/BlogAdminPages';
-import { ProfilePage } from '@legacy/pages/learner/ProfilePage';
+import { ProfilePage } from '../../features/account/pages/ProfilePage';
 import { admin } from './access';
 
 export const managementRoutes = (
