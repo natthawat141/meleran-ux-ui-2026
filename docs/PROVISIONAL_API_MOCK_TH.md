@@ -98,7 +98,7 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ## 7. สิ่งที่ตรวจแล้ว
 
-ชุดเต็ม `node --test` ผ่าน 163 tests (ไฟล์ mock ใหม่: auth 18, boundary 4, integration 8, learning 8, payments 7, authoring 6, ai 6, catalog 12)
+ชุดเต็ม `node --test` ผ่าน 166 tests (ไฟล์ mock: auth 18, boundary 4, integration 8, learning 8, payments 7, authoring 6, ai 6, catalog 12, dev server 3)
 
 - integration คุมการทำงานข้าม flow: คอร์สฟรี (enroll → เรียน → ผ่านควิซ → จบครั้งเดียว → ใบรับรองเดียว), attempt สูงสุดตัดสิน, คอร์สเสียเงิน (checkout ไม่ให้สิทธิ์, webhook เท่านั้น), redeem ไม่รั่วและมีผู้ชนะเดียว, response ฝั่งผู้เรียนไม่มีเฉลย/หมายเหตุ/transcript, authoring→catalog (สาธารณะหลัง Admin publish เท่านั้น), AI quota/transcript, blog
 - boundary คุม: environment guard, ไม่มี reference จาก `apps/`/`packages/`, ไม่มี `Math.random`/`Date.now`/`process.env`/network ใน mock, `@melearn/api-client` ไม่รู้จัก mock
@@ -106,9 +106,15 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ข้อจำกัด: test พิสูจน์ว่า mock สอดคล้องกันเองและกับ Scope เท่านั้น ไม่พิสูจน์ว่า Backend จริงจะตอบเหมือนกัน
 
-## 8. ที่ยังไม่ได้ทำ
+## 8. ที่ต่อเข้า Web แล้ว และที่ยังไม่ได้ทำ
 
-- ยังไม่ต่อ mock เข้ากับ `apps/web`/`apps/admin` (ต้องใช้ R4b: Query hooks และ API adapter ต่อ flow)
-- ยังไม่มี DTO ใน `packages/contracts`
-- ยังไม่มี HTTP server จริงสำหรับให้เบราว์เซอร์เรียก (mock เป็น fetcher ในโปรเซสเดียว)
+`vite dev` ของ Web เปิด guest `/courses` และ `/courses/:id` จาก API จำลองผ่าน `tools/provisional-api/dev-server.ts` (127.0.0.1:8787, Vite proxy ที่ `/mock-api`) โค้ดใน `apps/web/src` ไม่ import mock ถ้าโหลดไม่สำเร็จหน้าแสดงข้อผิดพลาดและปุ่มลองใหม่ ไม่กลับไปใช้คอร์สใน local store
+
+Build production ยังใช้แคตตาล็อกเดิมในเครื่อง เพื่อไม่ให้ตัวอย่าง UX พังเมื่อไม่มีเซิร์ฟเวอร์นี้ รายละเอียดอยู่ใน [R4b Flow B](R4B_FLOW_B_CATALOG_TH.md)
+
+ยังไม่ได้ทำ:
+
+- หน้าแรก, `/explore` ของผู้ที่ล็อกอิน, การสมัครเรียน, Admin และ flow C–H ยังไม่อ่าน API นี้
+- ยังไม่มี TanStack Query และยังไม่มี DTO ใน `packages/contracts` (รอ Backend freeze)
+- dev server ใช้ cookie jar เดียวของโปรเซส ยังไม่แมป cookie ของเบราว์เซอร์เป็น session ของ mock
 - หลักฐานฝั่ง server (R10, R13) ยังรอ Backend จริง
