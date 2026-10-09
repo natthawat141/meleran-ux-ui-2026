@@ -6,6 +6,8 @@
 
 ปิด Self-audit findings ทั้ง 4 ของ `dd9aaf7` แล้ว: owner-Instructor submit-review/ถอน Admin action, canonical THB Money, full already-enrolled checkout validation และ Blog revision ทุก mutation. Regression tests + successful request-body/response schema checks ผ่าน 172/172; typecheck และ boundaries ผ่าน. ดู [ผล/ขอบเขตที่ยังเปิด](R7_API_MOCK_PROGRESS_TH.md). การปิด findings นี้ไม่ปิด browser หรือ Backend/provider acceptance.
 
+CI ของ code commit `968e49f2ece83d120e1bcff67aad6bae2e6f0632`: [GitHub run 37869243362](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37869243362) **success** — shared checks, Web/Admin build และ container smoke ทั้งสอง apps ผ่าน. ไม่รัน Docker ในเครื่อง.
+
 ## Contract evidence — 9 ต.ค. 2026
 
 [OpenAPI Draft](../packages/contracts/openapi/openapi.json) กำหนด 86 operations และแยก 5 provider operations ไว้ pending; route inventory รวม 91 ตรงกับ mock. Generated HTTP types drift check, schema/examples และ malformed/public-field tests ผ่าน. Login/session Web/Admin แยกกันตามที่ผู้ใช้ยืนยัน; mock tests ตรวจ Login audience mismatch, session audience binding และ Logout เฉพาะแอป. Actual learning/payment adapters รักษา course/enrollment fields ครบ.

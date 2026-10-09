@@ -10,6 +10,8 @@
 
 Tests **172/172**, typecheck Web/Admin/packages, contracts:check, boundaries และ build Web/Admin ผ่าน (warnings use-client/chunk size เดิม). Browser/mobile/keyboard acceptance และ real Backend/provider integration ยังเปิด; course return-review ยังใช้ current pending state และยังไม่มี explicit client revision precondition; publish ตรวจ approved review ตรง current revision แต่ยังรับ `{}` ตาม Draft. ทั้งสองเรื่องยังต้อง review ก่อน freeze ไม่รวมเป็น Blog bypass ที่ปิดแล้ว.
 
+CI ของ code commit `968e49f2ece83d120e1bcff67aad6bae2e6f0632`: [GitHub run 37869243362](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37869243362) **success** — shared checks, Web/Admin build และ container smoke ทั้งสอง apps ผ่าน. ไม่รัน Docker ในเครื่อง.
+
 ## Self-audit — 9 ต.ค. 2026 หลัง checkpoint `2224714`
 
 **ข้อสรุป: Contract Draft foundation ผ่าน แต่ยังปิด Frontend/API readiness ทั้งหมดไม่ได้.** รอบนี้ตรวจ source + adversarial mock/client payloads, rerun contracts:check, tests 166/166 และ typecheck ผ่าน. ยืนยัน hosted CI run 37866894259 ของ code `4f0416b` success; HEAD `2224714` เพิ่มเอกสารเท่านั้น. ไม่รัน build/Docker ซ้ำเมื่อ source ไม่เปลี่ยน; ไม่ได้ตรวจ browser/mobile/keyboard ใหม่. ผล tests ผ่านไม่ปิด findings ด้านล่าง.
