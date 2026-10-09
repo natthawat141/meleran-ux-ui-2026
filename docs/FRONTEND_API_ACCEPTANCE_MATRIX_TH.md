@@ -10,6 +10,8 @@
 
 Tests 166/166, typecheck Web/Admin/packages และ dependency boundaries/build Web/Admin ผ่าน (มี chunk-size/use-client warnings เดิม). ยังไม่ปิด real cookie/CORS/CSRF, provider integration หรือ browser/mobile/keyboard acceptance. Permission gap: mock Admin submit-review ยังไม่ตรง owner-Instructor rule ใน Final 1.6; publish/return/Blog revision enforcement บางรูปแบบยังต้องตกลง. รายละเอียดใน `x-pending-decisions` และ [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ไม่ใช้ผลตรวจเก่าปิดช่องว่างปัจจุบัน.
 
+หลักฐาน CI ของ code commit `4f0416bc56460d07bdb7477d5763abbbec175ba5`: [GitHub run 37866894259](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37866894259) **success** — changes/shared-checks, Web/Admin typecheck/build, container smoke ของทั้งสอง apps และ final validate ผ่าน. รัน containers บน GitHub runner; ไม่รัน Docker ในเครื่อง. ไม่ยืนยัน Backend/provider integration หรือ browser acceptance.
+
 ## หลักการเก็บหลักฐาน
 
 | ชั้นหลักฐาน | ยืนยันอะไรได้ | ยืนยันอะไรไม่ได้ |

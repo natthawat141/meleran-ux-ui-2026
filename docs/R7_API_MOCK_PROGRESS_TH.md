@@ -6,6 +6,8 @@
 
 OpenAPI 86 app operations + 5 provider-deferred, generated HTTP types, schema/mock/examples checks และ CI drift gate เพิ่มแล้ว. Tests 166/166, typecheck ทั้งสอง apps/packages และ boundaries/build Web/Admin ผ่าน (มี warnings เดิม); Login/session/logout Web/Admin แยกตามที่ผู้ใช้ยืนยัน. รักษา full enrollment projection ใน Learning/Payment/Admin และแก้ nullable article resume. Backend review/freeze, provider protocols และ browser acceptance ยังเปิด; permission/revision gaps อยู่ใน [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ตัวเลข tests 159 ด้านล่างเป็นผลชุด migration ก่อนหน้านี้.
 
+หลักฐาน CI ของ code commit `4f0416bc56460d07bdb7477d5763abbbec175ba5`: [GitHub run 37866894259](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37866894259) **success** — changes/shared-checks, Web/Admin typecheck/build, container smoke ของทั้งสอง apps และ final validate ผ่าน. รัน containers บน GitHub runner; ไม่รัน Docker ในเครื่อง. ไม่ยืนยัน Backend/provider integration หรือ browser acceptance.
+
 ## ผลชุดย้าย business state
 
 Authoring, Instructor และ Admin management/Blog ที่เหลือย้ายผ่าน app-owned HTTP client และ TanStack Query แล้ว. ถอน `packages/store`, dependencies/aliases, prototype providers และ business localStorage ใน active source. ไม่มี LmsData snapshot endpoint หรือ fallback ไป store เมื่อ API ล้มเหลว. โครงสร้างนี้พร้อมทำ Backend ตาม Draft contract แต่ยังไม่ใช่ Production integration.
