@@ -4,6 +4,8 @@
 
 นี่คือรายการหลักฐานสำหรับปิด R5–R10 และ R13 ไม่ใช่ผลตรวจว่าระบบผ่านแล้ว สถานะก่อนมี Backend คือ source/mock/browser evidence เท่านั้น; ไม่มีแถว API/server ที่ปิดได้จาก Vite build หรือ localStorage
 
+Self-audit หลัง `2224714` พบ 4 gaps ที่ทำซ้ำได้ (Admin submit-review permission, price schema, already-enrolled checkout decoder และ Blog revision bypass); ดู [findings/evidence](R7_API_MOCK_PROGRESS_TH.md). Tests/CI ผ่านยังไม่ปิด gaps เหล่านี้. รอบ audit ไม่แก้ source และไม่ปิด browser/Backend acceptance.
+
 ## Contract evidence — 9 ต.ค. 2026
 
 [OpenAPI Draft](../packages/contracts/openapi/openapi.json) กำหนด 86 operations และแยก 5 provider operations ไว้ pending; route inventory รวม 91 ตรงกับ mock. Generated HTTP types drift check, schema/examples และ malformed/public-field tests ผ่าน. Login/session Web/Admin แยกกันตามที่ผู้ใช้ยืนยัน; mock tests ตรวจ Login audience mismatch, session audience binding และ Logout เฉพาะแอป. Actual learning/payment adapters รักษา course/enrollment fields ครบ.

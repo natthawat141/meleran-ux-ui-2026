@@ -2,6 +2,21 @@
 
 อัปเดต 9 ตุลาคม 2026 · `refactor/v1-api-ready` · Final 1.6
 
+## Self-audit — 9 ต.ค. 2026 หลัง checkpoint `2224714`
+
+**ข้อสรุป: Contract Draft foundation ผ่าน แต่ยังปิด Frontend/API readiness ทั้งหมดไม่ได้.** รอบนี้ตรวจ source + adversarial mock/client payloads, rerun contracts:check, tests 166/166 และ typecheck ผ่าน. ยืนยัน hosted CI run 37866894259 ของ code `4f0416b` success; HEAD `2224714` เพิ่มเอกสารเท่านั้น. ไม่รัน build/Docker ซ้ำเมื่อ source ไม่เปลี่ยน; ไม่ได้ตรวจ browser/mobile/keyboard ใหม่. ผล tests ผ่านไม่ปิด findings ด้านล่าง.
+
+| Priority | Finding / หลักฐานทำซ้ำ | งานที่ต้องปิด |
+| --- | --- | --- |
+| P1 | `POST /courses/{id}/submit-review` ใช้ `canManage`; Admin ส่งคอร์ส Instructor และได้ 201 (`submitted_by: usr_admin`). ขัด Final 1.6 `course.submit_review` ซึ่งเป็น owner Instructor; OpenAPI แสดง owner permission แต่ security ยังมี AdminSession | บังคับ permission ตาม scope ใน mock, ปรับ Admin affordance/contract security และเพิ่ม negative permission test; Backend ต้อง enforce อีกครั้ง |
+| P2 | `CoursePatchRequest.price`/create/authoring price ฝัง `{amount_minor: number, currency: string}` แยกจาก `Money`. Payload `{expected_revision:1,price:{amount_minor:0.5,currency:"USD"}}` ผ่าน schema แต่ mock ตอบ 422; mock ต้องจำนวนเต็มไม่ติดลบและ THB | ใช้ canonical money schema และ constraint ของ request ที่ตรงกับ Draft behavior; ตรวจ fractional/negative/currency ทุก price projection |
+| P2 | Actual `paymentApi.checkout` เมื่อมี Enrollment แล้ว คืนเพียง `already_enrolled, course_id` ทั้งที่ wire/`AlreadyEnrolledCheckout` ต้องมี `enrollment`. Decoder ยังรับ malformed response ที่ขาด enrollment ได้ | ใช้ generated union ครบ, decode entitlement ทั้งสองสาขา และเพิ่ม actual-client tests สำหรับ already-enrolled/malformed payload |
+| P2 | `checkBlogRevision` ตรวจเฉพาะเมื่อมี field. PATCH Blog ที่ไม่มี expected_revision ได้ 200 แต่ OpenAPI BlogPatchRequest กำหนด required; return-review ยังไม่เทียบ revision และ publish รับ body ว่างตาม Draft ปัจจุบัน | เลิก Blog revision compatibility bypass พร้อมอัปเดต callers/tests; ตกลงและทดสอบ stale return/publish strategy ก่อน freeze |
+
+Coverage gap: helper ปัจจุบันตรวจ **response** ของ mock; ไม่ตรวจ request schema ของทุก successful call. ตัวอย่าง success ของทั้ง 86 operations มีแล้ว แต่ empty-body action 5 รายการยังไม่มี request example: enroll, complete item, create attempt, submit attempt, revoke redeem code. อย่านับจำนวน tests เป็นหลักฐานว่าตรวจทุก field/negative case ครบ.
+
+รายการเหล่านี้เป็น findings ของรอบ audit **ยังไม่ได้แก้ source ในรอบนี้**. Known pending: Google/Stripe real-provider operations 5 รายการ, production session/CORS/CSRF/TTL และ durable integration; UI/mobile/keyboard/loading/error/draft acceptance ยังเปิด. เริ่ม Backend จาก Draft ทีละ flow ได้ แต่ยังไม่ใช้คำว่า frozen/Production-ready.
+
 ## ผลชุด Contract Draft ล่าสุด — 9 ต.ค. 2026
 
 OpenAPI 86 app operations + 5 provider-deferred, generated HTTP types, schema/mock/examples checks และ CI drift gate เพิ่มแล้ว. Tests 166/166, typecheck ทั้งสอง apps/packages และ boundaries/build Web/Admin ผ่าน (มี warnings เดิม); Login/session/logout Web/Admin แยกตามที่ผู้ใช้ยืนยัน. รักษา full enrollment projection ใน Learning/Payment/Admin และแก้ nullable article resume. Backend review/freeze, provider protocols และ browser acceptance ยังเปิด; permission/revision gaps อยู่ใน [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ตัวเลข tests 159 ด้านล่างเป็นผลชุด migration ก่อนหน้านี้.
