@@ -17,18 +17,8 @@ export interface PaymentIntent {
   completed_at?: string | null;
 }
 
-export interface CreatePaymentRequest {
-  course_id: string;
-  request_id: string;
-}
-
-export interface CheckoutStatusResponse {
-  payment_id: string;
-  course_id: string;
-  status: PaymentStatus;
-  fulfillment_status: FulfillmentStatus;
-  enrollment: { id: string; course_id: string; source: string } | null;
-}
+export type CreatePaymentRequest = import('./generated/types.gen.ts').CheckoutRequest;
+export type CheckoutStatusResponse = import('./generated/types.gen.ts').WirePaymentView;
 
 export interface RedeemCode {
   id: string;
@@ -52,14 +42,8 @@ export interface RedeemCode {
   revoked_at?: string;
 }
 
-export interface RedeemRequest {
-  code: string;
-}
-
-export interface RedeemResponse {
-  already_enrolled: boolean;
-  enrollment: { id: string; course_id: string; source: string; access: string; granted_at: string };
-}
+export type RedeemRequest = import('./generated/types.gen.ts').RedeemRequest;
+export type RedeemResponse = import('./generated/types.gen.ts').WireRedeemResult;
 
 export type RedeemCourseCodeResult =
   | { ok: true; enrollmentId: string; redeemCodeId: string; alreadyEnrolled: boolean }

@@ -4,6 +4,12 @@
 
 นี่คือรายการหลักฐานสำหรับปิด R5–R10 และ R13 ไม่ใช่ผลตรวจว่าระบบผ่านแล้ว สถานะก่อนมี Backend คือ source/mock/browser evidence เท่านั้น; ไม่มีแถว API/server ที่ปิดได้จาก Vite build หรือ localStorage
 
+## Contract evidence — 9 ต.ค. 2026
+
+[OpenAPI Draft](../packages/contracts/openapi/openapi.json) กำหนด 86 operations และแยก 5 provider operations ไว้ pending; route inventory รวม 91 ตรงกับ mock. Generated HTTP types drift check, schema/examples และ malformed/public-field tests ผ่าน. Login/session Web/Admin แยกกันตามที่ผู้ใช้ยืนยัน; mock tests ตรวจ Login audience mismatch, session audience binding และ Logout เฉพาะแอป. Actual learning/payment adapters รักษา course/enrollment fields ครบ.
+
+Tests 166/166, typecheck Web/Admin/packages และ dependency boundaries/build Web/Admin ผ่าน (มี chunk-size/use-client warnings เดิม). ยังไม่ปิด real cookie/CORS/CSRF, provider integration หรือ browser/mobile/keyboard acceptance. Permission gap: mock Admin submit-review ยังไม่ตรง owner-Instructor rule ใน Final 1.6; publish/return/Blog revision enforcement บางรูปแบบยังต้องตกลง. รายละเอียดใน `x-pending-decisions` และ [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ไม่ใช้ผลตรวจเก่าปิดช่องว่างปัจจุบัน.
+
 ## หลักการเก็บหลักฐาน
 
 | ชั้นหลักฐาน | ยืนยันอะไรได้ | ยืนยันอะไรไม่ได้ |

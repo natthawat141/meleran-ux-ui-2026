@@ -1,5 +1,8 @@
 // Test helpers for the provisional API mock (tools/provisional-api). Tests only.
 import { createProvisionalApi, mockPassword } from '../../tools/provisional-api/index.ts';
+import { assertContractResponse } from './contract-validator.mjs';
+import { appendFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 export const basePath = '/mock-api/v1';
 export { mockPassword };
@@ -20,7 +23,14 @@ export function createBrowser(api) {
     const text = await response.text();
     let json;
     try { json = text ? JSON.parse(text) : undefined; } catch { json = undefined; }
-    return { status: response.status, headers: response.headers, text, body: json };
+    const result = { status: response.status, headers: response.headers, text, body: json };
+    assertContractResponse(method,path,result);
+    // Opt-in extraction from synthetic test fixtures only. Never capture cookies/headers.
+    if (process.env.MELEARN_CONTRACT_FIXTURES) {
+      appendFileSync(join(process.env.MELEARN_CONTRACT_FIXTURES,`${process.pid}.jsonl`),
+        JSON.stringify({ method,path,request:body,response:json,status:response.status })+'\n');
+    }
+    return result;
   };
   return {
     fetcher,

@@ -1,6 +1,7 @@
 import type { WirePaymentView as PaymentView, WireCheckoutResult as CheckoutResult, WireRedeemResult as RedeemResult } from '@melearn/contracts';
 export type { WirePaymentView as PaymentView, WireCheckoutResult as CheckoutResult, WireRedeemResult as RedeemResult } from '@melearn/contracts';
 import { apiClient as http, apiConfig } from '../../../shared/api/client';
+import { decodeEnrollmentDto } from '@melearn/contracts';
 
 const object = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid provisional payment response');
@@ -26,7 +27,7 @@ function decodePayment(value: unknown): PaymentView {
   return {
     payment_id: string(row.payment_id), course_id: string(row.course_id), status: row.status as PaymentView['status'],
     fulfillment_status: row.fulfillment_status as PaymentView['fulfillment_status'],
-    enrollment: enrollment ? { id: string(enrollment.id), course_id: string(enrollment.course_id), source: string(enrollment.source) } : null,
+    enrollment: enrollment ? decodeEnrollmentDto(enrollment) : null,
   };
 }
 
@@ -39,10 +40,7 @@ function decodeCheckout(value: unknown): CheckoutResult | { already_enrolled: tr
 function decodeRedeem(value: unknown): RedeemResult {
   const row = object(value); const enrollment = object(row.enrollment);
   if (typeof row.already_enrolled !== 'boolean') throw new TypeError('Invalid redeem response');
-  return { already_enrolled: row.already_enrolled, enrollment: {
-    id: string(enrollment.id), course_id: string(enrollment.course_id), source: string(enrollment.source),
-    access: string(enrollment.access), granted_at: string(enrollment.granted_at),
-  } };
+  return { already_enrolled: row.already_enrolled, enrollment: decodeEnrollmentDto(enrollment) };
 }
 
 export const paymentApi = {

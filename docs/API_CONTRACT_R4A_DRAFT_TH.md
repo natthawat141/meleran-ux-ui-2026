@@ -2,9 +2,42 @@
 
 วันที่ 9 ตุลาคม 2026 · สถานะ **Draft — ยังไม่มี Backend owner ยืนยัน**
 
-เอกสารนี้เตรียมข้อกำหนด API จาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) เพื่อให้ Frontend และ Backend ตกลงทีละ flow; ผู้ใช้อนุญาตให้ Frontend ทำ Draft types/mock/hooks ต่อได้ก่อน Backend พร้อม ปัจจุบัน repository นี้ยังไม่มี Backend หรือ OpenAPI ให้ตรวจ จึงห้ามนำ candidate path/payload ด้านล่างไปเรียกว่า frozen contract หรือใช้สร้าง production integration โดยไม่ผ่านการยืนยันร่วมกัน
+เอกสารนี้เตรียมข้อกำหนด API จาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) เพื่อให้ Frontend และ Backend ตกลงทีละ flow; ผู้ใช้อนุญาตให้ Frontend ทำ Draft types/mock/hooks ต่อได้ก่อน Backend พร้อม ปัจจุบันมี Frontend OpenAPI Draft ให้ตรวจแล้ว แต่ยังไม่มี Backend implementation/owner จึงห้ามนำ candidate path/payload ด้านล่างไปเรียกว่า frozen contract หรือใช้สร้าง production integration โดยไม่ผ่านการยืนยันร่วมกัน
 
 รายละเอียด request/response/error ของ Flow A และ B อยู่ใน [Flow A/B Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) (ยังเป็น draft เช่นกัน) และ Mock API ทุก flow สำหรับ dev/test อยู่ใน [Provisional API Mock](PROVISIONAL_API_MOCK_TH.md) (ไม่ใช่ contract)
+
+## Contract source และผลตรวจ 9 ต.ค. 2026
+
+แหล่ง schema ของ HTTP คือ [OpenAPI 3.1 Draft](../packages/contracts/openapi/openapi.json) version `1.0.0-draft.1`: 86 operations มี request/response schema, required/optional/null, enum, permission, validation/error envelope และ JSON examples จาก synthetic fixtures. Inventory รวม 91 operations; อีก 5 รายการแยกไว้ใน `x-deferred-operations`. ทุก operation ที่กำหนดมีตัวอย่าง success (204 ไม่มี body); video upload มีตัวอย่าง 503 ตาม scope. ไม่ใช้ seed/database model หรือ UI compatibility types เป็น contract.
+
+**ยืนยันจากผู้ใช้:** บัญชี/identity ชุดเดียว แต่ Login และ session ของ Web/Admin แยกกัน; Logout ปิดเฉพาะ session ของแอปนั้น. `audience` และ `x-melearn-app` เลือกพื้นที่แอป ไม่ใช่หลักฐาน permission. Backend ต้องผูก audience กับ session และตรวจ role/ownership/state เอง. Cookie names ใน OpenAPI เป็นตัวอย่าง; transport, domain/path, CORS, CSRF, TTL/revocation ยังต้องตกลงก่อน freeze.
+
+TypeScript สำหรับ Backend handoff ใช้ `@melearn/contracts/http` ซึ่ง generate จาก OpenAPI. ไฟล์ `src/generated/` ห้ามแก้มือ; `http-responses.ts`, `management-http.ts` และ DTO exports เดิมเป็น compatibility aliases. `User`, `Course`, `PaymentIntent`, `QuizAttempt` และ presentation models ที่ root export ไม่ใช่ wire DTO หรือ database blueprint. ถ้า JSON/nullable/enum ในตัวอย่าง Markdown เก่าขัดกับ OpenAPI ให้ยึด schema และ examples ใน OpenAPI ฉบับนี้ แล้วปรับพร้อมกันเมื่อ Backend review.
+
+```powershell
+npm.cmd ci
+npm.cmd run contracts:setup
+npm.cmd run contracts:validate
+npm.cmd run contracts:generate
+npm.cmd run contracts:check
+npm.cmd test
+```
+
+`contracts:check` ตรวจ generated types ไม่ drift และ mapping ของ mock operations; CI เรียกก่อน tests. `contracts:examples` รัน tests เพื่ออัปเดต examples จาก synthetic fixtures ที่ผ่าน JSON Schema เท่านั้น ไม่เก็บ cookies/headers หรืออ่านบัญชีจริง. Generator แยก dependencies ใน `tools/contract-codegen` เพื่อไม่เปลี่ยน compiler ของ Web/Admin; ไม่มี generated SDK หรือ transport ตัวใหม่.
+
+ผลตรวจ request/response ใช้ Ajv ใน tests; ไม่ใส่ Ajv ทั้งชุดลง browser bundle. Integration helper ตรวจ payload ของ mock ตาม schema รวมกรณีผิดชนิด/unknown request fields/private fields ใน public response. Actual learning/payment adapters ตรวจว่ารักษา course/enrollment projections ครบ รวม `access`, `source`, `granted_at`; Free course ใช้ `price: null`. ไม่ใช่หลักฐานว่า runtime decoder ทุกหน้าตรวจครบทุก field หรือ Backend จริงผ่านแล้ว.
+
+### ขอบเขตที่เริ่ม Backend ได้และเรื่องที่ยังเปิด
+
+เริ่ม Auth/Profile, Catalog/Enrollment, Learning/Assessment, Authoring/Review, Management/Blog และ app-side Payment/Redeem/AI ตาม Draft ได้ทีละ flow. ก่อน freeze ให้ผู้รับผิดชอบ Backend review success/error examples และ tests ร่วมกัน.
+
+- Google sign-in/link start/callback และ Stripe webhook (5 operations) ยังไม่มี provider protocol ที่ยืนยัน: ห้ามนำ `mock_google_*`, mock signature หรือ flat mock event ไปสร้าง Production handler. App-side checkout/status DTO มีแล้ว; event/version/signature ของ provider ต้องกำหนดแยก.
+- `x-pending-decisions` ระบุ session deployment, username validation ที่ยังต่างกัน, pagination/search, rich documents/media, idempotency และการจัดการ conflict/delete/audit/visibility.
+- Publish ปัจจุบันรับ `{}` และ server ตรวจ approved review ตรง current course revision; explicit client revision guard ยังต้องตกลง. Review return และ Blog compatibility writes บางรูปแบบยังไม่บังคับ revision ทุกกรณี.
+- Mock submit-review ยังเปิด Admin ตาม `canManage` แต่ Final 1.6 กำหนด owner Instructor; เป็น permission gap ที่ต้องแก้และตรวจต่อก่อนปิด acceptance ไม่ถือเป็นกติกาที่ผู้ใช้อนุมัติ.
+- Certificate download ใน mock เป็น text fixture, AI เป็น synchronous fake และ video upload ตอบ unavailable. ต้องตกลง real media/download/async protocols.
+
+OpenAPI นี้เป็น **Frontend Draft** ไม่ใช่ Backend-approved contract; browser/mobile/keyboard และ durable Backend/provider integration ยังเป็น acceptance ที่เปิดอยู่. การเปลี่ยน base URL อย่างเดียวไม่รับประกันว่าเชื่อมระบบจริงผ่าน.
 
 ## วิธีอ่านสถานะ
 
@@ -40,7 +73,7 @@
 | Success envelope | **Draft implemented** — คืน resource โดยตรงตาม HTTP mock/client; ตัวอย่างในภาคผนวก. Backend review ก่อน freeze |
 | Error envelope | **ข้อเสนอ** — มี machine-readable `code`, safe user-facing `message` และ `request_id`; Backend ยืนยัน HTTP status/code mapping |
 | Pagination/filter/sort | **รอ Backend** — รูปแบบ cursor/offset, default/max page size และ allowlist ของ sort/filter |
-| Session transport | **รอ decision** — cookie/session หรือ bearer, CSRF/CORS, refresh/logout behavior และการใช้ identity ข้าม origin ของ Web/Admin |
+| Session transport | **ยืนยันแยก Login/session Web/Admin** — transport, cookie attributes, CSRF/CORS, TTL/revocation และ origins ยังรอ Backend |
 | Concurrency | **ข้อเสนอ** — mutation ที่แก้ resource ใช้ `version`/`If-Match` หรือกลไกเทียบเท่า; conflict ต้องไม่เขียนทับเงียบ ๆ |
 | Retry/idempotency | **ข้อเสนอ** — ระบุ operation ที่ต้องรับ idempotency key และพฤติกรรมเมื่อ key เดิมใช้กับ payload ต่างกัน |
 | PII และ field visibility | **รอ Backend** — ระบุ field ที่คืนได้ในแต่ละ capability; ไม่คืนข้อมูลเพียงเพราะ UI ซ่อนคอลัมน์ |

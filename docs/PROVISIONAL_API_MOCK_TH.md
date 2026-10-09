@@ -9,7 +9,7 @@
 - ธุรกิจยึด `MELEARN_V1_SCOPE.md` Final 1.6; รูปแบบ API (path, field, error, pagination, Money) ยึด [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md) ซึ่งเป็น **[ข้อเสนอ]** ที่ Backend ยังไม่ยืนยัน
 - ใช้ได้เฉพาะ environment `development`/`test` (ถ้าเรียกใน environment อื่นจะ throw) ทุก response มี header `x-melearn-mock: provisional-api`
 - ไม่ใช่ fallback: โค้ดแอปห้าม import mock และห้ามสลับไปใช้เมื่อ API จริงล้มเหลว (มี test คุม)
-- ไม่มี DTO ใน `packages/contracts` จนกว่า Backend freeze
+- มี Frontend OpenAPI Draft และ generated HTTP DTO ใน `packages/contracts`; ยังไม่ freeze กับ Backend
 - เป็น server จำลองใน memory แบบ fetch-compatible: เสียบเข้า `createHttpClient({ fetcher })` ของ `@melearn/api-client` ได้โดยไม่แก้ client
 - Deterministic: นาฬิกาและ id ถูกฉีดได้ (ไม่มี `Math.random`, `Date.now`, `process.env`, network ใน mock) ทำให้ test ซ้ำได้
 - session ของ `createFetcher()` แยก cookie jar ต่อ caller; dev HTTP server รับ/ส่ง cookie ของ browser และแยกชื่อ cookie Web/Admin (`x-melearn-app`) เพื่อให้สอง Vite app ใช้ session คนละชุด; Base path ใน test คือ `/mock-api/v1`
@@ -24,7 +24,9 @@ await learner.login(accounts.learner);
 const response = await learner.post('courses/crs_mock_002/enroll');
 ```
 
-## 2. Routes ที่มี (76 routes)
+OpenAPI ตรวจ mapping ของ route arrays ครบ; dev Stripe simulator ไม่ใช่ Backend contract. Mock ตรวจ session audience เทียบ app header และ Login audience mismatch แล้ว; provider OAuth/webhook ยังคงเป็น fake. ดู [schema/examples](../packages/contracts/openapi/openapi.json).
+
+## 2. Routes ที่มี (91 operations: 86 Draft + 5 provider-deferred)
 
 | Flow | จำนวน | Routes |
 | --- | --- | --- |
@@ -83,7 +85,7 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 ## 6. คำถามสำหรับ Backend owner
 
-1. Session: cookie หรือ token, SameSite, CSRF, อายุ session, การแยก audience Web/Admin ที่ระดับ session หรือ endpoint
+1. Session: ผู้ใช้ยืนยัน Login/session Web/Admin แยกกันแล้ว; cookie/token transport, SameSite, CSRF, อายุ session และ deployment attributes ยังรอ Backend
 2. นโยบายรหัสผ่านและ rate limit ของ login, สมัคร, ส่งอีเมลซ้ำ, รีเซ็ตรหัสผ่าน (รูป 429 และ `Retry-After`)
 3. Google OAuth: การจับคู่บัญชีเดิม, การลิงก์/ยกเลิกลิงก์, ข้อมูลที่รับกลับมา
 4. สิทธิ์ที่ยังขัดกัน: ใครดู/แก้รายการผู้ใช้และ Instructor ได้ (ข้อเสนอ `GET admin/users`)

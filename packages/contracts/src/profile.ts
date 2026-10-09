@@ -16,7 +16,7 @@ export interface ProfileDetails {
 }
 
 /** HTTP account profile excludes root identity and OAuth state. */
-export type AccountProfile = Omit<ProfileDetails, 'username' | 'googleLinkedEmail'>;
+export type AccountProfile = import('./generated/types.gen.ts').AccountProfile;
 
 export type ProfileValues = ProfileDetails & {
   name: string;
@@ -25,12 +25,7 @@ export type ProfileValues = ProfileDetails & {
 };
 
 /** Draft editable profile fields. Identity, roles and verification are server controlled. */
-export interface UpdateProfileRequest {
-  display_name?: string;
-  avatar_url?: string | null;
-  username?: string;
-  profile?: AccountProfile;
-}
+export type UpdateProfileRequest = import('./generated/types.gen.ts').UpdateProfileRequest;
 
 export interface ProfileUserLike extends ProfileDetails {
   id: string;

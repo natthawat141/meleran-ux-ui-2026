@@ -4,6 +4,8 @@
 
 เอกสารนี้ลงรายละเอียด request/response/error ของสอง flow แรกตามลำดับที่เสนอไว้ เพื่อให้ Backend owner ตอบทีละข้อและให้ Frontend ทำ mock adapter ที่รูปร่างตรงกัน **ไม่ใช่ contract ที่ frozen** และไม่ใช่การเลือก Backend stack
 
+HTTP schema/types/examples ล่าสุดอยู่ใน [OpenAPI Draft](../packages/contracts/openapi/openapi.json); Markdown นี้อธิบาย flow/decisions. หากตัวอย่างเดิมขัดกันให้ยึด OpenAPI ที่ผ่าน schema tests แล้ว และ review ร่วมกับ Backend ก่อน freeze.
+
 ## 0. ข้อตกลงการอ่านเอกสาร
 
 - **[ยืนยัน]** — มาจาก Final 1.6 โดยตรง
@@ -19,7 +21,7 @@
 | ID | หัวข้อ | ข้อเสนอเริ่มต้น | ทางเลือก | ผลต่อ Frontend |
 | --- | --- | --- | --- | --- |
 | D1 | Session transport | [ข้อเสนอ] Cookie session แบบ `HttpOnly; Secure; SameSite=Lax` และ mutation ส่ง CSRF header | Bearer token อายุสั้น + refresh | ใช้ `credentials`/headers ที่แอป inject เข้า `createHttpClient` ต่อคำขอ ห้ามเก็บ password/token ใน localStorage หรือ query cache |
-| D2 | Identity ข้าม Web/Admin | [ข้อเสนอ] บัญชีและกติกา server ชุดเดียว; Login ส่ง `audience` (`web` หรือ `admin`) และ audience `admin` ปฏิเสธบัญชีที่ไม่มีบทบาท Admin ตรงกับพฤติกรรมที่ prototype ทดสอบไว้ | Session แยกตามแอป หรือใช้ cookie ร่วม | ต้องรู้ว่า Admin เปิดด้วย session ของ Web ได้หรือไม่ และ CORS/cookie domain ของสอง origin |
+| D2 | Identity ข้าม Web/Admin | **[ยืนยันผู้ใช้ 9 ต.ค. 2026]** บัญชีชุดเดียว แต่ Login/session แยก Web/Admin; Logout เฉพาะแอปนั้น | Cookie transport/domain/path/CSRF ยังรอ Backend | Admin ใช้ Web session แทนไม่ได้; audience/header ไม่ใช่ permission proof |
 | D3 | Base path/version | [รอ Backend] `/api/v1` เป็นตัวอย่าง | — | ใส่ใน `baseUrl` ของแอป ไม่ฝังใน client กลาง |
 | D4 | ID | [ข้อเสนอ] string ทึบ (opaque) Frontend ไม่แยกส่วนประกอบ | — | ใช้เป็นคีย์ query/route ได้ |
 | D5 | Success shape | [ข้อเสนอ] คืน resource ตรง ๆ ไม่ห่อ `data`; list คืน `{ items, next_cursor }` | ห่อ `data` | Decoder ต่อ endpoint ง่ายและไม่ซ้ำชั้น |

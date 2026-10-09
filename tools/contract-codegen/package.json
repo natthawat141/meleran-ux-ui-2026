@@ -1,0 +1,13 @@
+{
+  "name": "melearn-contract-codegen",
+  "private": true,
+  "type": "module",
+  "description": "Isolated development-only compiler API for OpenAPI types; never included in app runtime",
+  "overrides": {
+    "js-yaml": "4.3.2"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0",
+    "typescript": "5.9.3"
+  }
+}

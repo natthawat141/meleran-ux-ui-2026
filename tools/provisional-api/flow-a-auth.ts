@@ -207,6 +207,10 @@ export const authRoutes: Route[] = [
       const audience = body.audience;
       if (audience !== 'web' && audience !== 'admin') problems.push({ field: 'audience', code: 'invalid' });
       if (problems.length) throw validationFailed(problems);
+      const selectedApp = context.headers.get('x-melearn-app');
+      if ((selectedApp === 'web' || selectedApp === 'admin') && audience !== selectedApp) {
+        throw new ApiError(403, 'audience_not_allowed', 'ช่องทางเข้าสู่ระบบไม่ตรงกับแอป');
+      }
       const user = findByIdentifier(db, identifier);
       // The same answer whether the account exists, has no password, or the password is wrong.
       if (!user || user.password === null || user.password !== password) throw new ApiError(401, 'credentials_invalid', 'ข้อมูลเข้าสู่ระบบไม่ถูกต้อง');

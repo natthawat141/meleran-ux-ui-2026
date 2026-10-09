@@ -195,3 +195,32 @@ test('actual Admin management client reads account roles/profile and adds instru
   assert.equal(updated.role, 'instructor');
   assert.deepEqual(h.w.api.unexpectedErrors, []);
 });
+
+
+test('actual learning/payment adapters retain canonical course and entitlement fields', async () => {
+  const world = createWorld(), browser = world.browser();
+  await browser.login(accounts.learner);
+  await browser.post('courses/crs_mock_001/enroll');
+  const apiClient = createHttpClient({baseUrl:'/mock-api/v1',fetcher:browser.fetcher,credentials:'include',timeoutMs:8000,headers:{}});
+  const {decodeEnrollmentDto} = await import('../packages/contracts/src/enrollment-decoder.ts');
+  const catalog = await module('apps/web/src/features/courses/api/catalog-provisional-contract.ts',{});
+  const learning = await module('apps/web/src/features/learning/api/learning-api.ts',{
+    '../../../shared/api/client':{apiClient},'@melearn/contracts':{decodeEnrollmentDto},
+    '../../courses/api/catalog-provisional-contract.ts':catalog,
+  });
+  const enrollments = await learning.learningApi.myEnrollments();
+  assert.ok(enrollments.some(row => row.course.slug && row.enrollment.access==='lifetime' && row.enrollment.granted_at));
+  const course = await learning.learningApi.course('crs_mock_001');
+  assert.equal(course.access.enrollment.source,'free');
+  assert.equal(course.access.enrollment.access,'lifetime');
+  assert.ok(course.slug);assert.equal(course.price,null);
+  const payment = await module('apps/web/src/features/payment/api/payment-api.ts',{
+    '../../../shared/api/client':{apiClient,apiConfig:{mock:true}},'@melearn/contracts':{decodeEnrollmentDto},
+  });
+  const checkout = await payment.paymentApi.checkout('crs_mock_002','contract-client-test');
+  const event = world.api.stripe.completed(checkout.payment_id,{eventId:'contract-adapter-event'});
+  assert.equal((await browser.post('webhooks/stripe',event.body,event.headers)).status,200);
+  const paid = await payment.paymentApi.status(checkout.payment_id);
+  assert.equal(paid.enrollment.access,'lifetime');assert.equal(paid.enrollment.source,'stripe');
+  assert.ok(paid.enrollment.granted_at);
+});

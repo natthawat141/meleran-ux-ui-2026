@@ -61,7 +61,7 @@ export function LessonPage({ expectedType }: { expectedType: 'video' | 'article'
   const complete = useCompleteLearningItem(courseId); const saveResume = useSaveLearningResume(courseId);
   const [position, setPosition] = useState(0);
   const savedPosition = course.data?.outline.flatMap((chapter) => chapter.items).find((entry) => entry.id === itemId)?.resume?.position_seconds;
-  React.useEffect(() => { if (savedPosition !== undefined) setPosition(savedPosition); }, [savedPosition]);
+  React.useEffect(() => { if (savedPosition !== undefined) setPosition(savedPosition ?? 0); }, [savedPosition]);
   if (course.isPending || item.isPending || course.isError || item.isError) return <div className="public-page"><QueryState loading={course.isPending || item.isPending} error={course.isError || item.isError} retry={() => { void course.refetch(); void item.refetch(); }} /></div>;
   if (item.data.type !== expectedType) return <div className="public-page"><Alert type="warning" message="รายการนี้เป็นเนื้อหาคนละประเภท" action={<Link to={`/learn/courses/${courseId}`}>กลับไปที่คอร์ส</Link>} /></div>;
   const youtubeId = item.data.type === 'video' ? item.data.video_url?.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|watch\?v=))([\w-]{11})/)?.[1] : undefined;

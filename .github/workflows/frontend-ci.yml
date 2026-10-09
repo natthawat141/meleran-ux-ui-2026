@@ -40,6 +40,7 @@ jobs:
             shared:
               - 'packages/**'
               - 'tools/provisional-api/**'
+              - 'tools/contract-codegen/**'
               - 'public/**'
               - 'scripts/**'
               - 'tests/**'
@@ -65,6 +66,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run contracts:setup
+      - run: npm run contracts:check
       - run: npm run tokens:check
       - run: npm run typecheck:packages
       - run: npm test

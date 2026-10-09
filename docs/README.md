@@ -27,6 +27,8 @@
 | ดูเหตุผลการตัดสิน architecture | [R0 Inventory/Review](R0_INVENTORY_ARCHITECTURE_REVIEW_TH.md) |
 | การมอบหมายงาน AI | [AI_DELEGATION_POLICY_TH.md](AI_DELEGATION_POLICY_TH.md) — ยึดคำสั่งล่าสุดของผู้ใช้ก่อน |
 
+HTTP schemas และ JSON examples ล่าสุด: [OpenAPI Draft](../packages/contracts/openapi/openapi.json); workflow generate/check และเรื่องที่รอยืนยันอยู่ใน [API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md). Login/session Web/Admin แยกตามที่ผู้ใช้ยืนยัน; deployment attributes ยังเปิด.
+
 ## สถานะปัจจุบัน
 
 อัปเดต 9 ต.ค. 2026: ย้าย Authoring, Instructor dashboard/roster/attempt/grading/public profile, Admin management/review และ Blog editor/preview ไป HTTP mock แล้ว ถอน `packages/store` และ prototype persistence provider แล้ว. UI draft อยู่ในหน้าจอหรือ sessionStorage ต่อบัญชี; business state อ่านจาก API. Contracts เป็น Draft ยังไม่ freeze กับ Backend. ดู [progress และข้อจำกัด](R7_API_MOCK_PROGRESS_TH.md).

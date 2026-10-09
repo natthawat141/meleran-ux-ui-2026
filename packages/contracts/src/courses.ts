@@ -73,41 +73,14 @@ export interface Course {
   aiEnabled?: boolean;
 }
 
-export interface InstructorSummary {
-  id: string;
-  display_name: string;
-  avatar_url: string | null;
-}
+export type InstructorSummary = import('./generated/types.gen.ts').InstructorSummary;
 
-export interface CourseSummary {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string | null;
-  cover_url: string | null;
-  category: string;
-  level: string;
-  price: Money | null;
-  instructor: InstructorSummary;
-  published_at: string;
-}
+export type CourseSummary = import('./generated/types.gen.ts').CourseSummary;
 
-export interface CourseOutlineItemSummary {
-  id: string;
-  type: CourseItemType;
-  title: string;
-}
+export type CourseOutlineItemSummary = import('./generated/types.gen.ts').CourseOutlineItemSummary;
 
-export interface CourseOutlineChapterSummary {
-  id: string;
-  title: string;
-  items: CourseOutlineItemSummary[];
-}
+export type CourseOutlineChapterSummary = import('./generated/types.gen.ts').CourseOutlineChapterSummary;
 
-export interface CourseDetail extends CourseSummary {
-  description: string | null;
-  outcomes: string[];
-  outline: CourseOutlineChapterSummary[];
-}
+export type CourseDetail = import('./generated/types.gen.ts').CourseDetail;
 
-export interface CoursePage { items: CourseSummary[]; next_cursor: string | null }
+export type CoursePage = import('./generated/types.gen.ts').CoursePage;

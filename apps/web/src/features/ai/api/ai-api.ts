@@ -38,7 +38,9 @@ function decodeMessage(value: unknown): AiMessage {
   }
   const roles = ['user', 'assistant'];
   if (!roles.includes(String(row.role))) throw new TypeError('Invalid provisional AI message role');
-  return { id: text(row.id), role: row.role as AiMessage['role'], kind: text(row.kind), content: text(row.content), status: text(row.status), request_id: text(row.request_id), created_at: text(row.created_at), completed_at: row.completed_at === null ? null : text(row.completed_at), error_code: row.error_code === null ? null : text(row.error_code), practice };
+  if (row.kind !== 'text' && row.kind !== 'practice_set') throw new TypeError('Invalid AI message kind');
+  if (row.status !== 'pending' && row.status !== 'succeeded' && row.status !== 'failed') throw new TypeError('Invalid AI message state');
+  return { id: text(row.id), role: row.role as AiMessage['role'], kind: row.kind, content: text(row.content), status: row.status, request_id: text(row.request_id), created_at: text(row.created_at), completed_at: row.completed_at === null ? null : text(row.completed_at), error_code: row.error_code === null ? null : text(row.error_code), practice };
 }
 function decodePage<T>(value: unknown, decoder: (entry: unknown) => T) {
   const row = record(value); if (!Array.isArray(row.items)) throw new TypeError('Invalid provisional AI page');

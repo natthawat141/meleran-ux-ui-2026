@@ -2,6 +2,10 @@
 
 อัปเดต 9 ตุลาคม 2026 · `refactor/v1-api-ready` · Final 1.6
 
+## ผลชุด Contract Draft ล่าสุด — 9 ต.ค. 2026
+
+OpenAPI 86 app operations + 5 provider-deferred, generated HTTP types, schema/mock/examples checks และ CI drift gate เพิ่มแล้ว. Tests 166/166, typecheck ทั้งสอง apps/packages และ boundaries/build Web/Admin ผ่าน (มี warnings เดิม); Login/session/logout Web/Admin แยกตามที่ผู้ใช้ยืนยัน. รักษา full enrollment projection ใน Learning/Payment/Admin และแก้ nullable article resume. Backend review/freeze, provider protocols และ browser acceptance ยังเปิด; permission/revision gaps อยู่ใน [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ตัวเลข tests 159 ด้านล่างเป็นผลชุด migration ก่อนหน้านี้.
+
 ## ผลชุดย้าย business state
 
 Authoring, Instructor และ Admin management/Blog ที่เหลือย้ายผ่าน app-owned HTTP client และ TanStack Query แล้ว. ถอน `packages/store`, dependencies/aliases, prototype providers และ business localStorage ใน active source. ไม่มี LmsData snapshot endpoint หรือ fallback ไป store เมื่อ API ล้มเหลว. โครงสร้างนี้พร้อมทำ Backend ตาม Draft contract แต่ยังไม่ใช่ Production integration.
@@ -20,7 +24,7 @@ Authoring, Instructor และ Admin management/Blog ที่เหลือ�
 
 ## Contract ส่งต่อ Backend
 
-ดู [API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md) ภาคผนวก Screen HTTP Draft และ [Auth/Profile/Catalog Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md). Canonical wire types อยู่ `packages/contracts/src/management-http.ts`, `blog.ts`, `http-responses.ts`. ครอบคลุม request/response, nullable fields, generated IDs, validation, conflict/history errors และ ownership ของหน้าที่ย้าย.
+ดู [API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md) ภาคผนวก Screen HTTP Draft และ [Auth/Profile/Catalog Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md). Canonical HTTP schema อยู่ [OpenAPI Draft](../packages/contracts/openapi/openapi.json); `@melearn/contracts/http` generate จาก schema, DTO exports เดิมเป็น aliases. ครอบคลุม request/response, nullable fields, generated IDs, validation, conflict/history errors และ ownership ของหน้าที่ย้าย.
 
 DTO ยัง **Draft** ตามคำสั่งผู้ใช้. การตกลงกับ Backend ต้องตรวจ OpenAPI, authentication/cookie/CORS/CSRF, transactions, persistence, uploads, delete retention และ provider errors. Management/Authoring/Blog resources ใช้ canonical runtime decoders ตรวจ nested fields, enum/nullability, IDs, finite numbers, timestamps, rich JSON และ pagination ตาม operation; unknown operation ปฏิเสธ. ยังต้องเทียบ real Backend/OpenAPI ก่อน freeze.
 

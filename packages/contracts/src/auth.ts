@@ -16,48 +16,19 @@ export interface User {
   email_verified?: boolean;
 }
 
-export interface CurrentUser {
-  id: string;
-  display_name: string;
-  username: string | null;
-  email: string | null;
-  email_verified: boolean;
-  avatar_url: string | null;
-  roles: Role[];
-  origin: 'self_email' | 'google' | 'admin_created';
-  auth_methods: ('password' | 'google')[];
-  learning_eligible: boolean;
-  profile: import('./profile.ts').AccountProfile;
-}
+export type CurrentUser = import('./generated/types.gen.ts').CurrentUser;
 
-export interface LoginRequest {
-  identifier: string;
-  password: string;
-  audience: 'web' | 'admin';
-}
+export type LoginRequest = import('./generated/types.gen.ts').LoginRequest;
 
-export interface LoginResponse {
-  user: CurrentUser;
-}
+export type LoginResponse = import('./generated/types.gen.ts').LoginResponse;
 
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  display_name: string;
-}
+export type RegisterRequest = import('./generated/types.gen.ts').RegisterRequest;
 
-export interface VerifyEmailRequest {
-  token: string;
-}
+export type VerifyEmailRequest = import('./generated/types.gen.ts').VerifyEmailRequest;
 
-export interface PasswordResetRequest {
-  identifier: string;
-}
+export type PasswordResetRequest = import('./generated/types.gen.ts').PasswordResetRequest;
 
-export interface PasswordResetConfirmRequest {
-  token: string;
-  new_password: string;
-}
+export type PasswordResetConfirmRequest = import('./generated/types.gen.ts').PasswordResetConfirmRequest;
 
 export const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 export const EMAIL_VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000;

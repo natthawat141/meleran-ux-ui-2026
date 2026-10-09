@@ -134,7 +134,12 @@ export function createProvisionalApi(options: ProvisionalApiOptions): Provisiona
       }
 
       const sessionId = jar.get(sessionCookieNameForApp(request.headers.get('x-melearn-app'))) ?? null;
-      const session = sessionId ? db.sessions.get(sessionId) ?? null : null;
+      const candidateSession = sessionId ? db.sessions.get(sessionId) ?? null : null;
+      const app = request.headers.get('x-melearn-app');
+      // Cookie names alone are not a session boundary: validate the stored audience too.
+      // Headerless fetch fixtures keep their legacy mock jar; actual apps always select an app.
+      const session = candidateSession && (app !== 'web' && app !== 'admin' || candidateSession.audience === app)
+        ? candidateSession : null;
       const principal = session ? db.users.get(session.user_id) ?? null : null;
       const context: RequestContext = {
         db, clock, config, basePath: prefix, method: request.method, path: url.pathname, query: url.searchParams, params,

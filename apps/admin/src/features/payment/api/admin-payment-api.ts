@@ -1,6 +1,7 @@
 import type { WireAdminPayment as AdminPayment } from '@melearn/contracts';
 export type { WireAdminPayment as AdminPayment } from '@melearn/contracts';
 import { apiClient as http } from '../../../shared/api/client';
+import { decodeEnrollmentDto } from '@melearn/contracts';
 
 const record = (value: unknown): Record<string, unknown> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid Admin payment response'); return value as Record<string, unknown>; };
 const text = (value: unknown): string => { if (typeof value !== 'string') throw new TypeError('Invalid Admin payment response'); return value; };
@@ -19,7 +20,7 @@ function decodePayment(value: unknown): AdminPayment {
     payment_id: text(row.payment_id), course_id: text(row.course_id), user_id: text(row.user_id), request_id: text(row.request_id),
     checkout_session_id: text(row.checkout_session_id), amount: { amount_minor: amountMinor, currency: text(amount.currency) },
     status: row.status as AdminPayment['status'], fulfillment_status: row.fulfillment_status as AdminPayment['fulfillment_status'],
-    enrollment: enrollment ? { id: text(enrollment.id), course_id: text(enrollment.course_id), source: text(enrollment.source) } : null,
+    enrollment: enrollment ? decodeEnrollmentDto(enrollment) : null,
     created_at: text(row.created_at), events: row.events.map((entry) => {
       const event = record(entry); return { event_id: text(event.event_id), type: text(event.type), received_at: text(event.received_at), processed_at: nullableText(event.processed_at), outcome: text(event.outcome) };
     }),

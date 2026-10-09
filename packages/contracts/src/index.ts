@@ -15,3 +15,4 @@ export * from './http-responses.ts';
 export * from './management-http.ts';
 
 export { decodeManagementResponse } from './management-decoders.ts';
+export { decodeEnrollmentDto } from './enrollment-decoder.ts';
