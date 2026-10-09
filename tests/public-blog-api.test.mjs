@@ -33,7 +33,8 @@ test('public blog reads all API pages, resolves stable IDs to slugs, and never e
   assert.equal(article.content, template.content);
   await assert.rejects(blogApi.detail('mock-secret-draft-post'), (error) => error.status === 404);
   const admin = world.browser(); await admin.login(accounts.admin, { audience: 'admin' });
-  assert.equal((await admin.post('admin/blog/blg_mock_draft/publish', {})).status, 200);
+  const draft = await admin.get('admin/blog/blg_mock_draft/preview');
+  assert.equal((await admin.post('admin/blog/blg_mock_draft/publish', {expected_revision:draft.body.revision})).status, 200);
   assert.equal((await blogApi.list()).length, 56);
 });
 

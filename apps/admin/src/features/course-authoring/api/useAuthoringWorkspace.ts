@@ -357,12 +357,6 @@ export function useAuthoringWorkspace() {
         return { ok: false, message: e instanceof Error ? e.message : 'ลบไม่สำเร็จ' };
       }
     },
-    submitCourseForReview: (courseId: string) =>
-      mutate(() =>
-        resource('courses/' + id(courseId) + '/submit-review', 'POST', {
-          expected_revision: detailFor(courseId).revision,
-        }),
-      ),
     publishCourse: (courseId: string) =>
       mutate(() => resource('courses/' + id(courseId) + '/publish', 'POST', {})),
     setCourseAiEnabled: (courseId: string, enabled: boolean) =>

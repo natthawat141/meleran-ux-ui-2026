@@ -2625,12 +2625,12 @@
                 "example": {
                   "id": "crs_0001",
                   "slug": "course-crs_0001",
-                  "title": "ฉบับใหม่",
+                  "title": "Prices",
                   "subtitle": null,
                   "description": null,
                   "cover_url": null,
-                  "category": "การเรียนรู้",
-                  "level": "เริ่มต้น",
+                  "category": "",
+                  "level": "",
                   "price": null,
                   "outcomes": [],
                   "instructor": {
@@ -2640,7 +2640,7 @@
                   },
                   "chapters": [],
                   "status": "draft",
-                  "revision": 2,
+                  "revision": 3,
                   "published_at": null,
                   "published_by": null,
                   "created_by": "usr_instructor_a",
@@ -2738,12 +2738,12 @@
                   "error": {
                     "code": "validation_failed",
                     "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
-                    "request_id": "mock-request-8",
+                    "request_id": "mock-request-6",
                     "details": {
                       "fields": [
                         {
-                          "field": "has_history",
-                          "code": "unsupported"
+                          "field": "price",
+                          "code": "invalid"
                         }
                       ]
                     }
@@ -3008,7 +3008,8 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EmptyRequest"
-              }
+              },
+              "example": {}
             }
           }
         }
@@ -3932,7 +3933,8 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EmptyRequest"
-              }
+              },
+              "example": {}
             }
           }
         }
@@ -4312,7 +4314,8 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EmptyRequest"
-              }
+              },
+              "example": {}
             }
           }
         }
@@ -4784,7 +4787,8 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EmptyRequest"
-              }
+              },
+              "example": {}
             }
           }
         }
@@ -6193,8 +6197,8 @@
                     "details": {
                       "fields": [
                         {
-                          "field": "status",
-                          "code": "unsupported"
+                          "field": "price",
+                          "code": "invalid"
                         }
                       ]
                     }
@@ -6677,6 +6681,21 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-5",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "price",
+                          "code": "invalid"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -7670,13 +7689,10 @@
         "tags": [
           "authoring"
         ],
-        "description": "Review tied to current revision. Current mock canManage also permits Admin; this discrepancy must be resolved against Final1.6 before freeze.",
+        "description": "Only the owner Instructor can submit a draft at the current revision. Admin cannot submit on behalf of the Instructor.",
         "security": [
           {
             "WebSession": []
-          },
-          {
-            "AdminSession": []
           }
         ],
         "parameters": [
@@ -7727,6 +7743,13 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "unauthenticated",
+                    "message": "กรุณาเข้าสู่ระบบ",
+                    "request_id": "mock-request-10"
+                  }
                 }
               }
             }
@@ -7737,6 +7760,13 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "forbidden",
+                    "message": "ไม่มีสิทธิ์ใช้งานส่วนนี้",
+                    "request_id": "mock-request-7"
+                  }
                 }
               }
             }
@@ -7747,6 +7777,13 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "ไม่พบข้อมูลที่ขอ",
+                    "request_id": "mock-request-8"
+                  }
                 }
               }
             }
@@ -8870,7 +8907,8 @@
                 },
                 "example": {
                   "payment_id": "pay_0001",
-                  "checkout_url": "https://checkout.stripe.invalid/session/cs_0001"
+                  "checkout_url": "https://checkout.stripe.invalid/session/cs_0001",
+                  "already_enrolled": false
                 }
               }
             }
@@ -8884,7 +8922,8 @@
                 },
                 "example": {
                   "payment_id": "pay_0001",
-                  "checkout_url": "https://checkout.stripe.invalid/session/cs_0001"
+                  "checkout_url": "https://checkout.stripe.invalid/session/cs_0001",
+                  "already_enrolled": false
                 }
               }
             }
@@ -9040,7 +9079,7 @@
               },
               "example": {
                 "course_id": "crs_mock_002",
-                "request_id": "no-dev-route"
+                "request_id": "r-1"
               }
             }
           }
@@ -10078,7 +10117,8 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EmptyRequest"
-              }
+              },
+              "example": {}
             }
           }
         }
@@ -12056,6 +12096,13 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "revision_conflict",
+                    "message": "บทความเปลี่ยนแปลงแล้ว กรุณาโหลดล่าสุด",
+                    "request_id": "mock-request-29"
+                  }
                 }
               }
             }
@@ -12076,6 +12123,21 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-24",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "expected_revision",
+                          "code": "required"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -12135,7 +12197,7 @@
         "tags": [
           "blog"
         ],
-        "description": "Revision guard; published slug stable. Mock permits omitted revision for old compatibility, client supplies it and Draft requires it. Save/publish are two commands: preserve saved ID/revision if publish fails after successful save.",
+        "description": "Revision guard; published slug stable. Mock and clients require a positive integer expected_revision; missing/invalid returns 422 and stale returns 409. Save/publish are two commands: preserve saved ID/revision if publish fails after successful save.",
         "security": [
           {
             "AdminSession": []
@@ -12162,21 +12224,21 @@
                 },
                 "example": {
                   "id": "blg_0001",
-                  "slug": "new-post",
-                  "title": "บทความใหม่",
+                  "slug": "revision-regression",
+                  "title": "Saved",
                   "cover_url": null,
                   "excerpt": null,
-                  "published_at": "2026-10-08T09:00:00Z",
+                  "published_at": null,
                   "category": "บทความ",
                   "reading_minutes": 2,
                   "author": {
                     "id": "usr_admin",
                     "display_name": "ผู้ดูแลตัวอย่าง"
                   },
-                  "content": "แก้แล้ว",
+                  "content": "Saved body",
                   "content_doc": null,
-                  "revision": 3,
-                  "status": "published",
+                  "revision": 2,
+                  "status": "draft",
                   "author_id": "usr_admin",
                   "editor_id": "usr_admin",
                   "created_at": "2026-10-08T09:00:00Z",
@@ -12258,6 +12320,21 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-3",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "body",
+                          "code": "object_required"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -12305,8 +12382,8 @@
                 "$ref": "#/components/schemas/BlogPatchRequest"
               },
               "example": {
-                "expected_revision": 1,
-                "title": "Updated sample post"
+                "expected_revision": 2,
+                "content": "แก้แล้ว"
               }
             }
           }
@@ -12347,49 +12424,20 @@
                 },
                 "example": {
                   "id": "blg_0001",
-                  "slug": "rich-article",
-                  "title": "บทความ",
+                  "slug": "revision-regression",
+                  "title": "Saved",
                   "cover_url": null,
                   "excerpt": null,
                   "published_at": "2026-10-08T09:00:00Z",
-                  "category": "การเรียนรู้",
+                  "category": "บทความ",
                   "reading_minutes": 2,
                   "author": {
                     "id": "usr_admin",
                     "display_name": "ผู้ดูแลตัวอย่าง"
                   },
-                  "content": "หัวเรื่อง",
-                  "content_doc": {
-                    "type": "doc",
-                    "content": [
-                      {
-                        "type": "heading",
-                        "attrs": {
-                          "level": 2
-                        },
-                        "content": [
-                          {
-                            "type": "text",
-                            "text": "หัวเรื่อง",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "type": "image",
-                        "attrs": {
-                          "src": "https://example.test/image.png",
-                          "align": "wide",
-                          "alt": "ภาพ"
-                        }
-                      }
-                    ]
-                  },
-                  "revision": 3,
+                  "content": "Saved body",
+                  "content_doc": null,
+                  "revision": 4,
                   "status": "draft",
                   "author_id": "usr_admin",
                   "editor_id": "usr_admin",
@@ -12445,6 +12493,13 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "revision_conflict",
+                    "message": "บทความเปลี่ยนแปลงแล้ว กรุณาโหลดล่าสุด",
+                    "request_id": "mock-request-22"
+                  }
                 }
               }
             }
@@ -12465,6 +12520,21 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-17",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "body",
+                          "code": "object_required"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -13365,49 +13435,20 @@
                 },
                 "example": {
                   "id": "blg_0001",
-                  "slug": "rich-article",
-                  "title": "บทความ",
+                  "slug": "revision-regression",
+                  "title": "Saved",
                   "cover_url": null,
                   "excerpt": null,
                   "published_at": null,
-                  "category": "การเรียนรู้",
+                  "category": "บทความ",
                   "reading_minutes": 2,
                   "author": {
                     "id": "usr_admin",
                     "display_name": "ผู้ดูแลตัวอย่าง"
                   },
-                  "content": "หัวเรื่อง",
-                  "content_doc": {
-                    "type": "doc",
-                    "content": [
-                      {
-                        "type": "heading",
-                        "attrs": {
-                          "level": 2
-                        },
-                        "content": [
-                          {
-                            "type": "text",
-                            "text": "หัวเรื่อง",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "type": "image",
-                        "attrs": {
-                          "src": "https://example.test/image.png",
-                          "align": "wide",
-                          "alt": "ภาพ"
-                        }
-                      }
-                    ]
-                  },
-                  "revision": 1,
+                  "content": "Saved body",
+                  "content_doc": null,
+                  "revision": 2,
                   "status": "draft",
                   "author_id": "usr_admin",
                   "editor_id": "usr_admin",
@@ -13634,6 +13675,13 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "revision_conflict",
+                    "message": "บทความเปลี่ยนแปลงแล้ว กรุณาโหลดล่าสุด",
+                    "request_id": "mock-request-15"
+                  }
                 }
               }
             }
@@ -13654,6 +13702,21 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-10",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "body",
+                          "code": "object_required"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -15985,7 +16048,8 @@
           },
           "currency": {
             "type": "string",
-            "pattern": "^[A-Z]{3}$"
+            "const": "THB",
+            "description": "Current Frontend Draft/mock supports THB only; additional currencies require contract review."
           }
         },
         "required": [
@@ -17827,7 +17891,8 @@
         },
         "required": [
           "payment_id",
-          "checkout_url"
+          "checkout_url",
+          "already_enrolled"
         ],
         "additionalProperties": false
       },
@@ -18314,20 +18379,7 @@
             "type": "string"
           },
           "price": {
-            "type": "object",
-            "properties": {
-              "amount_minor": {
-                "type": "number"
-              },
-              "currency": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "amount_minor",
-              "currency"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/Money"
           }
         },
         "required": [
@@ -18422,20 +18474,7 @@
             "type": "string"
           },
           "amount": {
-            "type": "object",
-            "properties": {
-              "amount_minor": {
-                "type": "number"
-              },
-              "currency": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "amount_minor",
-              "currency"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/Money"
           },
           "status": {
             "type": "string",
@@ -18878,20 +18917,7 @@
                 "type": "null"
               },
               {
-                "type": "object",
-                "properties": {
-                  "amount_minor": {
-                    "type": "number"
-                  },
-                  "currency": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "amount_minor",
-                  "currency"
-                ],
-                "additionalProperties": false
+                "$ref": "#/components/schemas/Money"
               }
             ]
           },
@@ -19146,20 +19172,7 @@
                 "type": "null"
               },
               {
-                "type": "object",
-                "properties": {
-                  "amount_minor": {
-                    "type": "number"
-                  },
-                  "currency": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "amount_minor",
-                  "currency"
-                ],
-                "additionalProperties": false
+                "$ref": "#/components/schemas/Money"
               }
             ]
           },
@@ -19336,20 +19349,7 @@
                 "type": "null"
               },
               {
-                "type": "object",
-                "properties": {
-                  "amount_minor": {
-                    "type": "number"
-                  },
-                  "currency": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "amount_minor",
-                  "currency"
-                ],
-                "additionalProperties": false
+                "$ref": "#/components/schemas/Money"
               }
             ]
           },
@@ -19655,20 +19655,7 @@
                 "type": "null"
               },
               {
-                "type": "object",
-                "properties": {
-                  "amount_minor": {
-                    "type": "number"
-                  },
-                  "currency": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "amount_minor",
-                  "currency"
-                ],
-                "additionalProperties": false
+                "$ref": "#/components/schemas/Money"
               }
             ]
           },
@@ -21078,20 +21065,7 @@
                 "type": "null"
               },
               {
-                "type": "object",
-                "properties": {
-                  "amount_minor": {
-                    "type": "number"
-                  },
-                  "currency": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "amount_minor",
-                  "currency"
-                ],
-                "additionalProperties": false
+                "$ref": "#/components/schemas/Money"
               }
             ]
           },
@@ -21883,7 +21857,7 @@
           },
           "request_id": {
             "type": "string",
-            "minLength": 8,
+            "minLength": 1,
             "maxLength": 64
           }
         },
@@ -22397,7 +22371,7 @@
   "x-pending-decisions": [
     "Cookie transport/names/domain/CSRF/TTL and environment origins (separate login/session confirmed)",
     "Username pattern mismatch Admin create vs profile edit; unify or document compatibility",
-    "Revision enforcement on return-review and historical Blog calls",
+    "Revision enforcement on return-review; Blog mutations now require expected_revision",
     "Idempotency key lifetime and payload mismatch/create/grade partial success behavior",
     "Pagination cursor expiry/search/sort/filter limits",
     "Rich document version, safe URL policy, size/depth/node limits and upload/storage",
@@ -22405,7 +22379,6 @@
     "Real OAuth handshake/callback and Stripe webhook/provider API version",
     "AI sync JSON vs async/streaming, retries/cancellation",
     "Deletion/retention/audit and visibility/PII scopes",
-    "Admin submit-review mismatch with Final1.6 owner-Instructor permission",
     "Publish currently accepts an empty request and checks approved review/current revision server-side; agree whether client expected_revision is also required before freeze."
   ]
 }

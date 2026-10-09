@@ -11,7 +11,7 @@ const { Text, Title } = Typography;
 
 export function CoursePreviewPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, currentUser, submitCourseForReview, publishCourse } = useAuthoringWorkspace();
+  const { data, publishCourse } = useAuthoringWorkspace();
   const course = data.courses.find((item) => item.id === courseId);
 
   if (!course) return <Empty description="ไม่พบคอร์สนี้" />;
@@ -95,15 +95,14 @@ export function CoursePreviewPage() {
             className="top-space"
             block
             type="primary"
-            disabled={!ready || (course.status !== 'draft' && course.status !== 'approved') || (course.status === 'draft' && currentUser?.role !== 'instructor' && currentUser?.role !== 'admin')}
+            disabled={!ready || course.status !== 'approved'}
             onClick={async () => {
-              const result = course.status === 'approved'
-                ? await publishCourse(course.id)
-                : await submitCourseForReview(course.id);
+              if (course.status !== 'approved') return;
+              const result = await publishCourse(course.id);
               if (result.ok) message.success(result.message); else message.error(result.message);
             }}
           >
-            {course.status === 'published' ? 'เผยแพร่แล้ว' : course.status === 'approved' ? 'เผยแพร่คอร์ส' : course.status === 'pending_review' ? 'รอแอดมินตรวจ' : 'ส่งตรวจคอร์ส'}
+            {course.status === 'published' ? 'เผยแพร่แล้ว' : course.status === 'approved' ? 'เผยแพร่คอร์ส' : course.status === 'pending_review' ? 'รอตรวจคอร์ส' : 'รอผู้สอนส่งตรวจ'}
           </Button>
         </aside>
       </div>

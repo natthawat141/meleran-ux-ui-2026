@@ -41,3 +41,18 @@ export function assertContractResponse(method, path, response) {
   const validate = schemaValidator(declared.content['application/json'].schema);
   if (!validate(response.body)) throw new Error(`Contract mismatch ${method} ${path} ${response.status}: ${ajv.errorsText(validate.errors)}`);
 }
+
+// Successful calls must also satisfy the request contract. Negative tests may send invalid input.
+export function assertContractRequest(method, path, body) {
+  const operation = findOperation(method, path);
+  if (!operation) return; // Provider handshakes are explicitly deferred.
+  const request = operation.requestBody;
+  if (body === undefined) {
+    if (request?.required) throw new Error(`Missing contract request body ${method} ${path}`);
+    return;
+  }
+  if (!request) throw new Error(`Unexpected contract request body ${method} ${path}`);
+  const value = typeof body === 'string' ? JSON.parse(body) : body;
+  const validate = schemaValidator(request.content['application/json'].schema);
+  if (!validate(value)) throw new Error(`Contract request mismatch ${method} ${path}: ${ajv.errorsText(validate.errors)}`);
+}

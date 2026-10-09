@@ -4,13 +4,13 @@
 
 นี่คือรายการหลักฐานสำหรับปิด R5–R10 และ R13 ไม่ใช่ผลตรวจว่าระบบผ่านแล้ว สถานะก่อนมี Backend คือ source/mock/browser evidence เท่านั้น; ไม่มีแถว API/server ที่ปิดได้จาก Vite build หรือ localStorage
 
-Self-audit หลัง `2224714` พบ 4 gaps ที่ทำซ้ำได้ (Admin submit-review permission, price schema, already-enrolled checkout decoder และ Blog revision bypass); ดู [findings/evidence](R7_API_MOCK_PROGRESS_TH.md). Tests/CI ผ่านยังไม่ปิด gaps เหล่านี้. รอบ audit ไม่แก้ source และไม่ปิด browser/Backend acceptance.
+ปิด Self-audit findings ทั้ง 4 ของ `dd9aaf7` แล้ว: owner-Instructor submit-review/ถอน Admin action, canonical THB Money, full already-enrolled checkout validation และ Blog revision ทุก mutation. Regression tests + successful request-body/response schema checks ผ่าน 172/172; typecheck และ boundaries ผ่าน. ดู [ผล/ขอบเขตที่ยังเปิด](R7_API_MOCK_PROGRESS_TH.md). การปิด findings นี้ไม่ปิด browser หรือ Backend/provider acceptance.
 
 ## Contract evidence — 9 ต.ค. 2026
 
 [OpenAPI Draft](../packages/contracts/openapi/openapi.json) กำหนด 86 operations และแยก 5 provider operations ไว้ pending; route inventory รวม 91 ตรงกับ mock. Generated HTTP types drift check, schema/examples และ malformed/public-field tests ผ่าน. Login/session Web/Admin แยกกันตามที่ผู้ใช้ยืนยัน; mock tests ตรวจ Login audience mismatch, session audience binding และ Logout เฉพาะแอป. Actual learning/payment adapters รักษา course/enrollment fields ครบ.
 
-Tests 166/166, typecheck Web/Admin/packages และ dependency boundaries/build Web/Admin ผ่าน (มี chunk-size/use-client warnings เดิม). ยังไม่ปิด real cookie/CORS/CSRF, provider integration หรือ browser/mobile/keyboard acceptance. Permission gap: mock Admin submit-review ยังไม่ตรง owner-Instructor rule ใน Final 1.6; publish/return/Blog revision enforcement บางรูปแบบยังต้องตกลง. รายละเอียดใน `x-pending-decisions` และ [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ไม่ใช้ผลตรวจเก่าปิดช่องว่างปัจจุบัน.
+Tests 166/166, typecheck Web/Admin/packages และ dependency boundaries/build Web/Admin ผ่าน (มี chunk-size/use-client warnings เดิม). ยังไม่ปิด real cookie/CORS/CSRF, provider integration หรือ browser/mobile/keyboard acceptance. Admin submit-review และ Blog revision bypass ปิดแล้วในชุดแก้ถัดจากผล CI นี้; course publish/return explicit revision preconditions ยังต้องตกลง. รายละเอียดใน `x-pending-decisions` และ [R4a Draft](API_CONTRACT_R4A_DRAFT_TH.md). ไม่ใช้ผลตรวจเก่าปิดช่องว่างปัจจุบัน.
 
 หลักฐาน CI ของ code commit `4f0416bc56460d07bdb7477d5763abbbec175ba5`: [GitHub run 37866894259](https://github.com/natthawat141/meleran-ux-ui-2026/actions/runs/37866894259) **success** — changes/shared-checks, Web/Admin typecheck/build, container smoke ของทั้งสอง apps และ final validate ผ่าน. รัน containers บน GitHub runner; ไม่รัน Docker ในเครื่อง. ไม่ยืนยัน Backend/provider integration หรือ browser acceptance.
 

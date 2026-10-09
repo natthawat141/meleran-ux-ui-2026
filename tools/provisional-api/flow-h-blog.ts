@@ -55,7 +55,9 @@ export const adminBlogView = (post: BlogPostRecord): AdminBlogDto => ({
 });
 
 function checkBlogRevision(body: Record<string, unknown>, post: BlogPostRecord) {
-  if ('expected_revision' in body && body.expected_revision !== (post.revision ?? 1))
+  if (!Number.isInteger(body.expected_revision) || (body.expected_revision as number) < 1)
+    throw validationFailed([{ field: 'expected_revision', code: 'required' }]);
+  if (body.expected_revision !== (post.revision ?? 1))
     throw new ApiError(409, 'revision_conflict', 'บทความเปลี่ยนแปลงแล้ว กรุณาโหลดล่าสุด');
 }
 
@@ -116,9 +118,7 @@ export const blogRoutes: Route[] = [
       requireRole(c, 'admin');
       const p = blogOr404(c, c.params.id);
       const body = c.body === undefined ? {} : readObject(c);
-      rejectUnknownFields(body, ['expected_updated_at', 'expected_revision']);
-      if ('expected_updated_at' in body && body.expected_updated_at !== p.updated_at)
-        throw new ApiError(409, 'revision_conflict', 'บทความเปลี่ยนแปลงแล้ว');
+      rejectUnknownFields(body, ['expected_revision']);
       checkBlogRevision(body, p);
       c.db.blogPosts.delete(p.id);
       return ok({ id: p.id, deleted: true });
@@ -130,11 +130,9 @@ export const blogRoutes: Route[] = [
     handler: (c) => {
       const a = requireRole(c, 'admin');
       const p = blogOr404(c, c.params.id);
-      if (c.body !== undefined) {
-        const body = readObject(c);
-        rejectUnknownFields(body, ['expected_revision']);
-        checkBlogRevision(body, p);
-      }
+      const body = readObject(c);
+      rejectUnknownFields(body, ['expected_revision']);
+      checkBlogRevision(body, p);
       p.revision = (p.revision ?? 1) + 1;
       p.status = 'draft';
       p.editor_id = a.id;
@@ -196,8 +194,6 @@ export const blogRoutes: Route[] = [
         'content',
         'content_doc',
         'category',
-        'expected_updated_at',
-        'expected_revision',
       ]);
       const problems = validateText(
         body,
@@ -252,7 +248,6 @@ export const blogRoutes: Route[] = [
         'content',
         'content_doc',
         'category',
-        'expected_updated_at',
         'expected_revision',
       ]);
       const problems = validateText(body, ['title', 'content', 'category', 'cover_url', 'excerpt']);
@@ -261,8 +256,6 @@ export const blogRoutes: Route[] = [
       if (problems.length) throw validationFailed(problems);
       checkBlogRevision(body, post);
       const doc = 'content_doc' in body ? richDocument(body.content_doc, 'content_doc') : undefined;
-      if ('expected_updated_at' in body && body.expected_updated_at !== post.updated_at)
-        throw new ApiError(409, 'revision_conflict', 'บทความเปลี่ยนแปลงแล้ว กรุณาโหลดล่าสุด');
       if (
         'category' in body &&
         (typeof body.category !== 'string' || !body.category.trim() || body.category.length > 40)
@@ -301,11 +294,9 @@ export const blogRoutes: Route[] = [
     handler: (context) => {
       const admin = requireRole(context, 'admin');
       const post = blogOr404(context, context.params.id);
-      if (context.body !== undefined) {
-        const body = readObject(context);
-        rejectUnknownFields(body, ['expected_revision']);
-        checkBlogRevision(body, post);
-      }
+      const body = readObject(context);
+      rejectUnknownFields(body, ['expected_revision']);
+      checkBlogRevision(body, post);
       if (
         !post.title.trim() ||
         (!post.content.trim() && !JSON.stringify(post.content_doc ?? null).includes('\"image\"'))

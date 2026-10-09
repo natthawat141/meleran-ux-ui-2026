@@ -38,7 +38,8 @@ function decodeMoney(value: unknown): ProvisionalMoney | null {
   const record = requireRecord(value);
   const amount = record.amount_minor;
   if (typeof amount !== 'number' || !Number.isInteger(amount) || amount < 0) invalid();
-  return { amount_minor: amount, currency: requireString(record.currency) };
+  if (record.currency !== 'THB') invalid();
+  return { amount_minor: amount, currency: record.currency };
 }
 
 function decodeInstructor(value: unknown): ProvisionalInstructorSummary {

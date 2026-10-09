@@ -204,6 +204,9 @@ test('actual learning/payment adapters retain canonical course and entitlement f
   const apiClient = createHttpClient({baseUrl:'/mock-api/v1',fetcher:browser.fetcher,credentials:'include',timeoutMs:8000,headers:{}});
   const {decodeEnrollmentDto} = await import('../packages/contracts/src/enrollment-decoder.ts');
   const catalog = await module('apps/web/src/features/courses/api/catalog-provisional-contract.ts',{});
+  const paidSummary = (await browser.get('courses/crs_mock_002')).body;
+  assert.throws(()=>catalog.decodeCourseSummary({...paidSummary,price:{amount_minor:100,currency:'USD'}}),/catalog contract/);
+  assert.throws(()=>catalog.decodeCourseSummary({...paidSummary,price:{amount_minor:0.5,currency:'THB'}}),/catalog contract/);
   const learning = await module('apps/web/src/features/learning/api/learning-api.ts',{
     '../../../shared/api/client':{apiClient},'@melearn/contracts':{decodeEnrollmentDto},
     '../../courses/api/catalog-provisional-contract.ts':catalog,
@@ -218,9 +221,53 @@ test('actual learning/payment adapters retain canonical course and entitlement f
     '../../../shared/api/client':{apiClient,apiConfig:{mock:true}},'@melearn/contracts':{decodeEnrollmentDto},
   });
   const checkout = await payment.paymentApi.checkout('crs_mock_002','contract-client-test');
+  assert.equal(checkout.already_enrolled,false);
+  const repeated = await payment.paymentApi.checkout('crs_mock_002','contract-client-test');
+  assert.equal(repeated.payment_id,checkout.payment_id);
   const event = world.api.stripe.completed(checkout.payment_id,{eventId:'contract-adapter-event'});
   assert.equal((await browser.post('webhooks/stripe',event.body,event.headers)).status,200);
   const paid = await payment.paymentApi.status(checkout.payment_id);
   assert.equal(paid.enrollment.access,'lifetime');assert.equal(paid.enrollment.source,'stripe');
   assert.ok(paid.enrollment.granted_at);
+  const enrolled = await payment.paymentApi.checkout('crs_mock_002','already-enrolled-client-test');
+  assert.equal(enrolled.already_enrolled,true);
+  assert.deepEqual(enrolled.enrollment,paid.enrollment);
+  assert.equal(enrolled.course_id,paid.course_id);
+  const admin=world.browser(); await admin.login(accounts.admin,{audience:'admin'});
+  const adminHttp=createHttpClient({baseUrl:'/mock-api/v1',fetcher:admin.fetcher,credentials:'include',timeoutMs:8000,headers:{}});
+  const {adminPaymentApi}=await module('apps/admin/src/features/payment/api/admin-payment-api.ts',{
+    '../../../shared/api/client':{apiClient:adminHttp},'@melearn/contracts':{decodeEnrollmentDto},
+  });
+  const adminPayment=await adminPaymentApi.get(checkout.payment_id);
+  assert.equal(adminPayment.amount.currency,'THB');
+  const invalidAdmin=await module('apps/admin/src/features/payment/api/admin-payment-api.ts',{
+    '../../../shared/api/client':{apiClient:{request:async (_path,options)=>options.decoder({...adminPayment,amount:{...adminPayment.amount,currency:'USD'}})}},
+    '@melearn/contracts':{decodeEnrollmentDto},
+  });
+  await assert.rejects(invalidAdmin.adminPaymentApi.get(checkout.payment_id),/Invalid Admin payment currency/);
+});
+
+test('actual checkout decoder rejects incomplete or contradictory enrollment and checkout branches', async () => {
+  let fixture;
+  const {decodeEnrollmentDto} = await import('../packages/contracts/src/enrollment-decoder.ts');
+  const {paymentApi} = await module('apps/web/src/features/payment/api/payment-api.ts',{
+    '../../../shared/api/client':{apiClient:{request:async (_path,options)=>options.decoder(fixture)},apiConfig:{mock:true}},
+    '@melearn/contracts':{decodeEnrollmentDto},
+  });
+  const enrollment={id:'enr_1',course_id:'crs_1',source:'free',access:'lifetime',granted_at:'2026-10-09T00:00:00.000Z'};
+  for(const invalid of [
+    {already_enrolled:true,course_id:'crs_1'},
+    {already_enrolled:true,course_id:'crs_1',enrollment:null},
+    {already_enrolled:true,course_id:'crs_1',enrollment:{...enrollment,course_id:'crs_other'}},
+    {already_enrolled:true,course_id:'crs_1',enrollment:{...enrollment,source:'client-granted'}},
+    {already_enrolled:true,course_id:'crs_1',enrollment:{...enrollment,granted_at:'invalid'}},
+    {payment_id:'pay_1',checkout_url:'https://checkout.stripe.invalid/1'},
+    {already_enrolled:'false',payment_id:'pay_1',checkout_url:'https://checkout.stripe.invalid/1'},
+    {already_enrolled:false,checkout_url:'https://checkout.stripe.invalid/1'},
+  ]) {
+    fixture=invalid;
+    await assert.rejects(paymentApi.checkout('crs_1','decoder-regression'),/Invalid/);
+  }
+  fixture={already_enrolled:true,course_id:'crs_1',enrollment};
+  assert.equal((await paymentApi.checkout('crs_1','decoder-regression')).enrollment.id,'enr_1');
 });

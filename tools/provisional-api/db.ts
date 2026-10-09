@@ -7,7 +7,8 @@
 export type Role = 'learner' | 'instructor' | 'admin';
 export type AccountOrigin = 'self_email' | 'google' | 'admin_created';
 
-export interface Money { amount_minor: number; currency: string }
+// Current mock supports THB only. This internal record is not the API schema source.
+export interface Money { amount_minor: number; currency: 'THB' }
 
 export interface Clock {
   now(): Date;

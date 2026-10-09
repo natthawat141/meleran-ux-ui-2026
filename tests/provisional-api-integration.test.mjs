@@ -329,9 +329,11 @@ test('Blog: only published posts are public and only Admin writes', async () => 
   assert.equal(draft.status, 201);
   assert.equal((await guest.get('blog/new-post')).status, 404);
   assert.equal((await admin.post('admin/blog', { title: 'ซ้ำ', slug: 'new-post', content: 'c' })).status, 409);
-  assert.equal((await admin.post(`admin/blog/${draft.body.id}/publish`, {})).status, 200);
+  const published = await admin.post(`admin/blog/${draft.body.id}/publish`, { expected_revision: draft.body.revision });
+  assert.equal(published.status, 200);
   assert.equal((await guest.get('blog/new-post')).body.content, 'เนื้อหา');
-  await admin.patch(`admin/blog/${draft.body.id}`, { content: 'แก้แล้ว' });
+  const edited = await admin.patch(`admin/blog/${draft.body.id}`, { expected_revision: published.body.revision, content: 'แก้แล้ว' });
+  assert.equal(edited.status, 200);
   assert.equal((await guest.get('blog/new-post')).body.content, 'แก้แล้ว');
   noUnexpected(world);
 });

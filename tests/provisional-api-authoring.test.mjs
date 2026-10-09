@@ -131,7 +131,7 @@ test('admin can create on behalf of an instructor and blog drafts stay private',
   assert.equal(draft.status, 201);
   assert.equal((await world.browser().get('blog/draft-post')).status, 404);
   assert.equal((await world.browser().get('blog')).body.items.some((item) => item.slug === 'draft-post'), false);
-  assert.equal((await admin.post(`admin/blog/${draft.body.id}/publish`, {})).status, 200);
+  assert.equal((await admin.post(`admin/blog/${draft.body.id}/publish`, { expected_revision: draft.body.revision })).status, 200);
   assert.equal((await world.browser().get('blog/draft-post')).status, 200);
   assert.deepEqual(world.api.unexpectedErrors, []);
 });

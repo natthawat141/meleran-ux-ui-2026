@@ -26,6 +26,8 @@ const response = await learner.post('courses/crs_mock_002/enroll');
 
 OpenAPI ตรวจ mapping ของ route arrays ครบ; dev Stripe simulator ไม่ใช่ Backend contract. Mock ตรวจ session audience เทียบ app header และ Login audience mismatch แล้ว; provider OAuth/webhook ยังคงเป็น fake. ดู [schema/examples](../packages/contracts/openapi/openapi.json).
 
+Self-audit fixes: submit-review เฉพาะ owner Instructor; Money THB จำนวนเต็มไม่ติดลบ; checkout คืน explicit already_enrolled และ full enrollment เมื่อมีสิทธิ์แล้ว; Blog PATCH/publish/unpublish/delete ต้องส่ง expected_revision. Request-body/response schema checks ใน test helper และ regression tests ผ่าน.
+
 ## 2. Routes ที่มี (91 operations: 86 Draft + 5 provider-deferred)
 
 | Flow | จำนวน | Routes |

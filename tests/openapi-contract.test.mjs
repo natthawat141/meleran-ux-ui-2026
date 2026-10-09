@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { validateContract } from '../scripts/contracts.mjs';
-import { contract, schemaValidator, assertContractResponse } from './support/contract-validator.mjs';
+import { contract, schemaValidator, assertContractRequest, assertContractResponse } from './support/contract-validator.mjs';
 import { createWorld, accounts, mockPassword } from './support/provisional-api.mjs';
 import { decodeEnrollmentDto } from '../packages/contracts/src/enrollment-decoder.ts';
 
@@ -109,4 +109,82 @@ test('one browser keeps Web/Admin cookies independent and per-app logout preserv
   const forged=world.api.createFetcher({cookieHeader:`melearn_mock_session_admin=${token}`});
   const response=await forged('/mock-api/v1/me',{headers:adminHeaders});
   assert.equal(response.status,401);
+});
+
+test('only the owner Instructor can submit review; denied actors leave the draft and review history unchanged', async () => {
+  const world=createWorld(), owner=world.browser(), admin=world.browser(), other=world.browser(), learner=world.browser();
+  await owner.login(accounts.instructorA); await admin.login(accounts.admin,{audience:'admin'});
+  await other.login(accounts.instructorB); await learner.login(accounts.learner);
+  const created=await owner.post('instructor/courses',{title:'Review permissions',category:'General',level:'beginner'});
+  const saved=await owner.patch(`courses/${created.body.id}`,{expected_revision:1,chapters:[{title:'Chapter',items:[{type:'article',title:'Article',body:'Text'}]}]});
+  const path=`courses/${created.body.id}/submit-review`, body={expected_revision:saved.body.revision};
+  for (const [actor,status] of [[admin,403],[other,404],[learner,403],[world.browser(),401]]) {
+    assert.equal((await actor.post(path,body)).status,status);
+    assert.equal(world.db.courses.get(created.body.id).status,'draft');
+    assert.equal(world.db.reviews.size,0);
+  }
+  assert.equal((await owner.post(path,body)).status,201);
+  assert.deepEqual(contract.paths['/courses/{id}/submit-review'].post.security,[{WebSession:[]}]);
+});
+
+test('money schemas and mock writes agree on integer nonnegative THB prices across create and patch', async () => {
+  const world=createWorld(), owner=world.browser(), admin=world.browser();
+  await owner.login(accounts.instructorA); await admin.login(accounts.admin,{audience:'admin'});
+  const created=await owner.post('instructor/courses',{title:'Prices'});
+  for(const price of [{amount_minor:0.5,currency:'THB'},{amount_minor:-1,currency:'THB'},
+    {amount_minor:100,currency:'USD'},{amount_minor:'100',currency:'THB'}]) {
+    for(const [actor,path,body,schema] of [
+      [owner,'instructor/courses',{title:'Invalid price',price},'CourseMetadataRequest'],
+      [admin,'admin/courses',{title:'Invalid price',price,instructor_id:'usr_instructor_a'},'AdminCourseCreateRequest'],
+      [owner,`courses/${created.body.id}`,{expected_revision:1,price},'CoursePatchRequest'],
+    ]) {
+      assert.equal(schemaValidator({$ref:'#/components/schemas/'+schema})(body),false);
+      const response=path.startsWith('courses/')?await actor.patch(path,body):await actor.post(path,body);
+      assert.equal(response.status,422);
+    }
+  }
+  assert.equal(world.db.courses.get(created.body.id).revision,1);
+  const paid=await owner.patch(`courses/${created.body.id}`,{expected_revision:1,price:{amount_minor:100,currency:'THB'}});
+  assert.equal(paid.status,200); assert.equal(paid.body.price.amount_minor,100);
+  const free=await owner.patch(`courses/${created.body.id}`,{expected_revision:2,price:{amount_minor:0,currency:'THB'}});
+  assert.equal(free.status,200); assert.equal(free.body.price,null);
+});
+
+test('all Blog mutations require revision and stale concurrent writes preserve saved content and state', async () => {
+  const world=createWorld(), admin=world.browser(); await admin.login(accounts.admin,{audience:'admin'});
+  const created=await admin.post('admin/blog',{title:'Original',slug:'revision-regression',content:'Original body'});
+  const id=created.body.id, path=`admin/blog/${id}`;
+  for(const [method,target] of [['PATCH',path],['POST',path+'/publish'],['POST',path+'/unpublish'],['DELETE',path]]) {
+    for(const body of [undefined,{}, {expected_revision:'1'},{expected_revision:0},{expected_revision:1.5}])
+      assert.equal((await admin.call(method,target,body)).status,422,`${method} ${target}`);
+    assert.equal((await admin.call(method,target,{expected_revision:2})).status,409);
+    assert.equal((await admin.get(path+'/preview')).body.revision,1);
+  }
+  const saved=await admin.patch(path,{expected_revision:1,title:'Saved',content:'Saved body'});
+  assert.equal(saved.status,200); assert.equal(saved.body.revision,2);
+  assert.equal((await admin.patch(path,{expected_revision:1,title:'Lost update',content:'Wrong'})).status,409);
+  const retained=await admin.get(path+'/preview'); assert.equal(retained.body.content,'Saved body');
+  const published=await admin.post(path+'/publish',{expected_revision:2}); assert.equal(published.body.revision,3);
+  assert.equal((await admin.post(path+'/unpublish',{expected_revision:2})).status,409);
+  assert.equal((await admin.get(path+'/preview')).body.status,'published');
+  const unpublished=await admin.post(path+'/unpublish',{expected_revision:3}); assert.equal(unpublished.body.revision,4);
+  assert.equal((await admin.call('DELETE',path,{expected_revision:3})).status,409);
+  assert.equal((await admin.call('DELETE',path,{expected_revision:4})).status,200);
+});
+
+test('successful-request contract assertions catch missing revisions and invalid price/idempotency fields', () => {
+  assert.throws(()=>assertContractRequest('PATCH','admin/blog/blg_1',{title:'Overwrite'}),/request mismatch/);
+  assert.throws(()=>assertContractRequest('POST','admin/blog/blg_1/publish',undefined),/Missing contract/);
+  assert.throws(()=>assertContractRequest('PATCH','courses/crs_1',{expected_revision:1,price:{amount_minor:0.5,currency:'THB'}}),/request mismatch/);
+  assert.throws(()=>assertContractRequest('POST','me/payments/checkout',{course_id:'crs_1',request_id:'x'.repeat(65)}),/request mismatch/);
+  assert.doesNotThrow(()=>assertContractRequest('POST','me/payments/checkout',{course_id:'crs_1',request_id:'x'}));
+});
+
+test('checkout idempotency request IDs accept 1..64 characters and reject empty/oversized input without creating payments', async () => {
+  const world=createWorld(), learner=world.browser(); await learner.login(accounts.learner);
+  for(const request_id of ['', 'x'.repeat(65)])
+    assert.equal((await learner.post('me/payments/checkout',{course_id:'crs_mock_002',request_id})).status,422);
+  assert.equal(world.db.payments.size,0);
+  for(const request_id of ['x','x'.repeat(64)])
+    assert.equal((await learner.post('me/payments/checkout',{course_id:'crs_mock_002',request_id})).status,201);
 });

@@ -14,11 +14,12 @@ function decodePayment(value: unknown): AdminPayment {
   if (!statuses.includes(String(row.status)) || !fulfillmentStates.includes(String(row.fulfillment_status))) throw new TypeError('Invalid Admin payment state');
   const amountMinor = amount.amount_minor;
   if (typeof amountMinor !== 'number' || !Number.isSafeInteger(amountMinor) || amountMinor < 0) throw new TypeError('Invalid Admin payment amount');
+  if (amount.currency !== 'THB') throw new TypeError('Invalid Admin payment currency');
   const enrollment = row.enrollment === null ? null : record(row.enrollment);
   if (!Array.isArray(row.events)) throw new TypeError('Invalid Admin payment events');
   return {
     payment_id: text(row.payment_id), course_id: text(row.course_id), user_id: text(row.user_id), request_id: text(row.request_id),
-    checkout_session_id: text(row.checkout_session_id), amount: { amount_minor: amountMinor, currency: text(amount.currency) },
+    checkout_session_id: text(row.checkout_session_id), amount: { amount_minor: amountMinor, currency: amount.currency },
     status: row.status as AdminPayment['status'], fulfillment_status: row.fulfillment_status as AdminPayment['fulfillment_status'],
     enrollment: enrollment ? decodeEnrollmentDto(enrollment) : null,
     created_at: text(row.created_at), events: row.events.map((entry) => {

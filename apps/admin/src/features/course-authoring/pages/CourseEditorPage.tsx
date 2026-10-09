@@ -12,7 +12,7 @@ const { Title } = Typography;
 
 export function AdminCourseEditorPage() {
   const { courseId } = useParams<{ courseId: string }>();
-  const { data, saveCourse, submitCourseForReview, publishCourse, setCourseAiEnabled, currentUser } =
+  const { data, saveCourse, publishCourse, setCourseAiEnabled, currentUser } =
     useAuthoringWorkspace();
   const navigate = useNavigate();
   const course = data.courses.find((item) => item.id === courseId);
@@ -112,7 +112,7 @@ export function AdminCourseEditorPage() {
         canAssignInstructor={currentUser?.role === 'admin'}
         instructors={currentUser?.role === 'admin' ? instructors : []}
         returnedReason={latestReturn?.reason}
-        canSubmitForReview={course?.status === 'draft' && currentUser?.role === 'admin'}
+        canSubmitForReview={false}
         canPublish={course?.status === 'approved'}
         adminExtension={
           !isNew && currentUser?.role === 'admin' && course ? (
@@ -145,12 +145,7 @@ export function AdminCourseEditorPage() {
         ImageUploadField={ImageUploadField}
         StatusTag={StatusTag}
         onFinish={submit}
-        onSubmitForReview={async () => {
-          if (!course) return;
-          const result = await submitCourseForReview(course.id);
-          if (result.ok) message.success(result.message);
-          else message.error(result.message);
-        }}
+        onSubmitForReview={() => {}}
         onPublish={async () => {
           if (!course) return;
           const result = await publishCourse(course.id);

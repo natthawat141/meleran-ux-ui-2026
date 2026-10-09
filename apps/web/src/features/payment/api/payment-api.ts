@@ -2,6 +2,7 @@ import type { WirePaymentView as PaymentView, WireCheckoutResult as CheckoutResu
 export type { WirePaymentView as PaymentView, WireCheckoutResult as CheckoutResult, WireRedeemResult as RedeemResult } from '@melearn/contracts';
 import { apiClient as http, apiConfig } from '../../../shared/api/client';
 import { decodeEnrollmentDto } from '@melearn/contracts';
+import type { AlreadyEnrolledCheckout } from '@melearn/contracts/http';
 
 const object = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Invalid provisional payment response');
@@ -31,9 +32,15 @@ function decodePayment(value: unknown): PaymentView {
   };
 }
 
-function decodeCheckout(value: unknown): CheckoutResult | { already_enrolled: true; course_id: string } {
+function decodeCheckout(value: unknown): CheckoutResult | AlreadyEnrolledCheckout {
   const row = object(value);
-  if (row.already_enrolled === true) return { already_enrolled: true, course_id: string(row.course_id) };
+  if (row.already_enrolled === true) {
+    const courseId = string(row.course_id);
+    const enrollment = decodeEnrollmentDto(row.enrollment);
+    if (enrollment.course_id !== courseId) throw new TypeError('Invalid checkout enrollment course');
+    return { already_enrolled: true, course_id: courseId, enrollment };
+  }
+  if (row.already_enrolled !== false) throw new TypeError('Invalid checkout state');
   return { payment_id: string(row.payment_id), checkout_url: string(row.checkout_url), already_enrolled: false };
 }
 

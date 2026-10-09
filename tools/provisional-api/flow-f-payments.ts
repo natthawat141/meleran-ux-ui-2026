@@ -43,6 +43,7 @@ function parseCheckout(context: RequestContext): { courseId: string; requestId: 
   const problems: FieldError[] = [];
   const courseId = requiredString(body, 'course_id', problems);
   const requestId = requiredString(body, 'request_id', problems);
+  if (requestId.length > 64) problems.push({ field: 'request_id', code: 'too_long' });
   if (problems.length) throw validationFailed(problems);
   return { courseId, requestId };
 }
@@ -179,14 +180,14 @@ export const paymentRoutes: Route[] = [
       if (existingEnrollment) return ok({ already_enrolled: true, course_id: course.id, enrollment: toEnrollment(existingEnrollment) });
       if (!course.price || course.price.amount_minor <= 0) throw new ApiError(409, 'invalid_state', 'คอร์สนี้เป็นคอร์สฟรี', { details: { reason: 'course_free' } });
       const existing = [...context.db.payments.values()].find((payment) => payment.user_id === user.id && payment.request_id === requestId);
-      if (existing) return ok({ payment_id: existing.id, checkout_url: `https://checkout.stripe.invalid/session/${existing.checkout_session_id}` });
+      if (existing) return ok({ already_enrolled: false, payment_id: existing.id, checkout_url: `https://checkout.stripe.invalid/session/${existing.checkout_session_id}` });
       const payment: PaymentRecord = {
         id: nextId(context.db, 'pay'), user_id: user.id, course_id: course.id, request_id: requestId,
         amount: { ...course.price }, status: 'pending', fulfillment_status: 'pending', enrollment_id: null,
         checkout_session_id: nextId(context.db, 'cs'), created_at: iso(context.clock.now()), events: [],
       };
       context.db.payments.set(payment.id, payment);
-      return created({ payment_id: payment.id, checkout_url: `https://checkout.stripe.invalid/session/${payment.checkout_session_id}` });
+      return created({ already_enrolled: false, payment_id: payment.id, checkout_url: `https://checkout.stripe.invalid/session/${payment.checkout_session_id}` });
     },
   },
   {

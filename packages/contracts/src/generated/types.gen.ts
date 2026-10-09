@@ -15,7 +15,10 @@ export type ErrorEnvelope = {
 
 export type Money = {
     amount_minor: number;
-    currency: string;
+    /**
+     * Current Frontend Draft/mock supports THB only; additional currencies require contract review.
+     */
+    currency: 'THB';
 };
 
 export type EmptyRequest = {
@@ -366,7 +369,7 @@ export type WirePaymentView = {
 export type WireCheckoutResult = {
     payment_id: string;
     checkout_url: string;
-    already_enrolled?: false;
+    already_enrolled: false;
 };
 
 export type WireRedeemResult = {
@@ -483,10 +486,7 @@ export type WireAdminTranscript = {
 export type WireRedeemAdminCourse = {
     id: string;
     title: string;
-    price: {
-        amount_minor: number;
-        currency: string;
-    };
+    price: Money;
 };
 
 export type WireAdminRedeemCode = {
@@ -506,10 +506,7 @@ export type WireAdminPayment = {
     user_id: string;
     request_id: string;
     checkout_session_id: string;
-    amount: {
-        amount_minor: number;
-        currency: string;
-    };
+    amount: Money;
     status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired';
     fulfillment_status: 'pending' | 'failed' | 'granted';
     enrollment: EnrollmentDto | null;
@@ -587,10 +584,7 @@ export type AuthoringCourseDto = {
     cover_url: null | string;
     category: string;
     level: string;
-    price: null | {
-        amount_minor: number;
-        currency: string;
-    };
+    price: null | Money;
     outcomes: Array<string>;
     instructor: {
         id: string;
@@ -634,10 +628,7 @@ export type ManagedCourseSummaryDto = {
     cover_url: null | string;
     category: string;
     level: string;
-    price: null | {
-        amount_minor: number;
-        currency: string;
-    };
+    price: null | Money;
     outcomes: Array<string>;
     instructor: {
         id: string;
@@ -663,10 +654,7 @@ export type CourseMetadataRequest = {
     cover_url?: null | string;
     category?: string;
     level?: string;
-    price?: null | {
-        amount_minor: number;
-        currency: string;
-    };
+    price?: null | Money;
     outcomes?: Array<string>;
 };
 
@@ -722,10 +710,7 @@ export type CoursePatchRequest = {
     cover_url?: null | string;
     category?: string;
     level?: string;
-    price?: null | {
-        amount_minor: number;
-        currency: string;
-    };
+    price?: null | Money;
     outcomes?: Array<string>;
 };
 
@@ -1004,10 +989,7 @@ export type AdminCourseCreateRequest = {
     cover_url?: null | string;
     category?: string;
     level?: string;
-    price?: null | {
-        amount_minor: number;
-        currency: string;
-    };
+    price?: null | Money;
     outcomes?: Array<string>;
     instructor_id: string;
 };

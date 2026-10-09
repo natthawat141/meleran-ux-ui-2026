@@ -25,7 +25,9 @@ npm.cmd test
 
 `contracts:check` ตรวจ generated types ไม่ drift และ mapping ของ mock operations; CI เรียกก่อน tests. `contracts:examples` รัน tests เพื่ออัปเดต examples จาก synthetic fixtures ที่ผ่าน JSON Schema เท่านั้น ไม่เก็บ cookies/headers หรืออ่านบัญชีจริง. Generator แยก dependencies ใน `tools/contract-codegen` เพื่อไม่เปลี่ยน compiler ของ Web/Admin; ไม่มี generated SDK หรือ transport ตัวใหม่.
 
-ผลตรวจ request/response ใช้ Ajv ใน tests; ไม่ใส่ Ajv ทั้งชุดลง browser bundle. Integration helper ตรวจ payload ของ mock ตาม schema รวมกรณีผิดชนิด/unknown request fields/private fields ใน public response. Actual learning/payment adapters ตรวจว่ารักษา course/enrollment projections ครบ รวม `access`, `source`, `granted_at`; Free course ใช้ `price: null`. ไม่ใช่หลักฐานว่า runtime decoder ทุกหน้าตรวจครบทุก field หรือ Backend จริงผ่านแล้ว.
+ผลตรวจ request/response ใช้ Ajv ใน tests; ไม่ใส่ Ajv ทั้งชุดลง browser bundle. Integration helper ตรวจ response และ successful request body ของ mock ตาม schema; negative tests ส่ง invalid body ได้. ครอบคลุมกรณีผิดชนิด/unknown request fields/private fields ใน public response. Actual learning/payment adapters ตรวจว่ารักษา course/enrollment projections ครบ รวม `access`, `source`, `granted_at`; Free course ใช้ `price: null`. ไม่ใช่หลักฐานว่า runtime decoder ทุกหน้าตรวจครบทุก field หรือ Backend จริงผ่านแล้ว.
+
+Price ใช้ canonical `Money` (`amount_minor` จำนวนเต็มไม่ติดลบ, `currency: THB`) ทั้ง request/response. เป็น Frontend Draft/mock ปัจจุบัน; สกุลเงินเพิ่มต้อง review contract. Checkout response ต้องมี `already_enrolled` boolean: false มี payment_id/checkout_url; true มี course_id/full enrollment. `request_id` รับ 1–64 ตัวอักษร และยังกำหนด lifetime/payload-conflict policy ร่วมกับ Backend.
 
 ### ขอบเขตที่เริ่ม Backend ได้และเรื่องที่ยังเปิด
 
@@ -33,8 +35,8 @@ npm.cmd test
 
 - Google sign-in/link start/callback และ Stripe webhook (5 operations) ยังไม่มี provider protocol ที่ยืนยัน: ห้ามนำ `mock_google_*`, mock signature หรือ flat mock event ไปสร้าง Production handler. App-side checkout/status DTO มีแล้ว; event/version/signature ของ provider ต้องกำหนดแยก.
 - `x-pending-decisions` ระบุ session deployment, username validation ที่ยังต่างกัน, pagination/search, rich documents/media, idempotency และการจัดการ conflict/delete/audit/visibility.
-- Publish ปัจจุบันรับ `{}` และ server ตรวจ approved review ตรง current course revision; explicit client revision guard ยังต้องตกลง. Review return และ Blog compatibility writes บางรูปแบบยังไม่บังคับ revision ทุกกรณี.
-- Mock submit-review ยังเปิด Admin ตาม `canManage` แต่ Final 1.6 กำหนด owner Instructor; เป็น permission gap ที่ต้องแก้และตรวจต่อก่อนปิด acceptance ไม่ถือเป็นกติกาที่ผู้ใช้อนุมัติ.
+- Course publish ปัจจุบันรับ `{}` และ server ตรวจ approved review ตรง current course revision; explicit client revision guard รวม return-review ยังต้องตกลง. Blog PATCH/publish/unpublish/delete บังคับ expected_revision ทุกกรณีแล้ว; missing/invalid 422, stale 409.
+- Submit-review บังคับ owner Instructor ตาม Final 1.6 แล้ว; Admin action ถอนและ AdminSession ไม่ใช่ security ของ operation นี้. Backend ต้อง enforce ซ้ำ.
 - Certificate download ใน mock เป็น text fixture, AI เป็น synchronous fake และ video upload ตอบ unavailable. ต้องตกลง real media/download/async protocols.
 
 OpenAPI นี้เป็น **Frontend Draft** ไม่ใช่ Backend-approved contract; browser/mobile/keyboard และ durable Backend/provider integration ยังเป็น acceptance ที่เปิดอยู่. การเปลี่ยน base URL อย่างเดียวไม่รับประกันว่าเชื่อมระบบจริงผ่าน.

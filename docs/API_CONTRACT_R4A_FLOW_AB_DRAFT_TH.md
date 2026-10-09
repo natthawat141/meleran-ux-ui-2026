@@ -31,7 +31,7 @@ HTTP schema/types/examples ล่าสุดอยู่ใน [OpenAPI Draft](
 | D9 | Idempotency | [ข้อเสนอ] คำสั่งที่ซ้ำได้ตามธรรมชาติ (เช่น Enroll) ใช้คีย์ (user, course); คำสั่งที่สร้างผลข้างเคียงรับ `Idempotency-Key` ถ้า Backend ต้องการ | — | ปุ่มกดซ้ำ/รีเฟรชไม่สร้างผลซ้ำ |
 | D10 | ตอบแบบไม่เปิดเผยการมีอยู่ของบัญชี | [ข้อเสนอ] Forgot password และ Resend ตอบ `202` เหมือนเดิมไม่ว่าบัญชีมีอยู่หรือไม่ | แยกข้อความตามกรณี | หน้า UI ใช้ข้อความกลาง เช่น “ถ้าบัญชีนี้พร้อมรับอีเมล เราได้ส่งลิงก์แล้ว” พร้อมคำอธิบายเงื่อนไขอยู่บนหน้า |
 | D11 | Rate limit | [ข้อเสนอ] `429` พร้อม `Retry-After` และ `code=rate_limited` | — | แสดงเวลารอ ไม่ retry อัตโนมัติ |
-| D12 | ราคา | [ข้อเสนอ] `{ amount_minor: integer, currency: string }` ไม่ใช้ทศนิยม | จำนวนเต็มบาท | ต้องตกลงสกุลเงินกับ Stripe; prototype ใช้ `price: number` เท่านั้น |
+| D12 | ราคา | [ข้อเสนอ] `{ amount_minor: integer, currency: string }` ไม่ใช้ทศนิยม | จำนวนเต็มบาท | Draft/mock ปัจจุบันใช้ THB และ amount_minor จำนวนเต็มไม่ติดลบ; รองรับสกุลเงินเพิ่มต้อง review กับ Backend/Stripe |
 | D13 | Capabilities ฝั่ง UX | [ข้อเสนอ] `GET /me` คืน `roles[]` และ `learning_eligible` เท่านั้น สิทธิ์ที่ผูกกับเจ้าของ/สถานะอ่านจากผลของแต่ละ resource | รายการ permission ทั้งหมด | Guard ใน UI เป็น UX เท่านั้น Backend ตรวจซ้ำทุก endpoint |
 
 ## 2. รหัส error กลาง (ข้อเสนอ)

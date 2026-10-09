@@ -851,8 +851,9 @@ export const authoringRoutes: Route[] = [
     method: 'POST',
     path: 'courses/:id/submit-review',
     handler: (context) => {
+      const instructor = requireRole(context, 'instructor');
       const course = courseOr404(context.db, context.params.id);
-      canManage(context, course);
+      if (course.instructor_id !== instructor.id) throw notFound();
       const body = readObject(context);
       rejectUnknownFields(body, ['expected_revision']);
       checkRevision(course, requiredRevision(body));
