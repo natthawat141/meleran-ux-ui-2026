@@ -26,3 +26,5 @@ Frontend harness imports the unchanged Admin redeemAdminApi/decoder and only inj
 Remaining: REDEEM-01 issue/list and reviewed generation/query/visibility; REDEEM-02 exact public input normalization and allowed Course-state mapping vs prototype Published-only behavior, fresh HTTP eligibility/owner checks, public 200/201 decoder integration; Course/Auth prerequisites; payment interaction/provider and full G-REDEEM delivered together with G-AI. Public HTTP stays absent until those prerequisites are concrete, rather than copying mock behavior into business requirements. Existing planning task scopes are preserved.
 
 Current verification/SHA/CI lives in EXECUTION_STATUS.json. No STG, deploy, live migration or cloud resource changes.
+
+Verified code SHA: `371a0304148910fa87cd5fe6b15cc342f6b4b996`; [hosted Nest CI 38084954707](https://github.com/natthawat141/meleran-tutor/actions/runs/38084954707) ผ่าน 211 tests + 31 client checks, build/smoke/blueprint/boundaries. Public Redeem/issue/list and full browser/provider gates remain unverified.
