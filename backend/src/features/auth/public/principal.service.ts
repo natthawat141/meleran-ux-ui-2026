@@ -76,4 +76,19 @@ export class PrincipalService {
     if (!principal.roles.includes('admin')) throw ApiException.forbidden();
     return principal;
   }
+
+  /** Authoring/preview authority, separate from enrollment eligibility. */
+  async requireAuthoring(tx: Prisma.TransactionClient, reference: VerifiedSessionReference): Promise<AuthPrincipal> {
+    if (!['web', 'admin'].includes(reference.audience)) throw ApiException.unauthorized();
+    const accounts = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT a.id FROM app_sessions s JOIN accounts a ON a.id=s."accountId"
+      WHERE s."tokenHash"=${reference.tokenHash} FOR SHARE OF s,a`);
+    if (!accounts.length) throw ApiException.unauthorized();
+    await tx.$queryRaw(Prisma.sql`SELECT role FROM user_roles WHERE "accountId"=${accounts[0].id} ORDER BY role FOR SHARE`);
+    const principal = await this.resolveHash(tx, reference);
+    if (!principal) throw ApiException.unauthorized();
+    if (reference.audience === 'admin' && !principal.roles.includes('admin')) throw ApiException.forbidden();
+    if (!principal.roles.some(role => role === 'admin' || role === 'instructor')) throw ApiException.forbidden();
+    return principal;
+  }
 }

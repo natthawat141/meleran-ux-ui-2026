@@ -9,6 +9,7 @@ import {
 import { Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import { ApiException } from './api-exception';
+import { VideoUploadUnavailableException } from './video-upload-unavailable.exception';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
@@ -20,6 +21,14 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const requestId: string = typeof response.locals.requestId === 'string'
       ? response.locals.requestId : randomUUID();
     response.setHeader('x-request-id', requestId);
+
+    // Only the fixed, deliberate V1 unavailable capability is a public 5xx.
+    // Arbitrary HttpException/ApiException diagnostics remain hidden below.
+    if (exception instanceof VideoUploadUnavailableException) {
+      response.status(503).json({ error: { code: 'video_upload_not_available',
+        message: 'ขออภัย ระบบนี้ยังไม่พร้อมใช้งาน', request_id: requestId } });
+      return;
+    }
 
     if (exception instanceof ApiException && exception.getStatus() < 500) {
       response.status(exception.getStatus()).json({

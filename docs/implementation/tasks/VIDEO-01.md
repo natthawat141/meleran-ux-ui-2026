@@ -6,6 +6,13 @@ Status: **BLOCKED** · Priority: P1 · Module: courses
 
 ## Read set และ traceability
 
+Execution 11 ต.ค. 2026: the canonical unavailable operation now has fresh
+normalized owner/Admin authority, fixed safe 503 and 14 HTTP/PG tests.
+[VIDEO_UNAVAILABLE_COMPONENT](../VIDEO_UNAVAILABLE_COMPONENT.md) records
+multi-audience binding, generic-client transport scope and no-write evidence.
+Whole task still waits for full Auth/editor/browser gates; no video provider or
+image capability is implemented by this unavailable endpoint.
+
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.3 (line 243); §6.5 (line 1228)

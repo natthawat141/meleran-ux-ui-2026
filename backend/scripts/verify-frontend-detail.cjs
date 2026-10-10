@@ -242,12 +242,37 @@ async function main() {
     await assert.rejects(wrongAppCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.status === 403);
     await assert.rejects(anonymousCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.status === 401);
     assert.deepEqual(await db.redeemCode.findUniqueOrThrow({ where: { id: usedCode.id } }), usedRow);
+    phase = 'frontend-video-unavailable-transport';
+    let uploadSuccessDecodes = 0;
+    const uploadRequest = (http, id = ids.published) => http.request(`courses/${encodeURIComponent(id)}/videos/uploads`, {
+      method: 'POST', decoder: value => { uploadSuccessDecodes++; return value; },
+    });
+    const ownerUploadClient = createHttpClient({ baseUrl: `http://127.0.0.1:${port}/api/v1`,
+      fetcher: globalThis.fetch.bind(globalThis), credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'web', Cookie: `melearn_web_session=${sessions.owner}` } });
+    const learnerUploadClient = createHttpClient({ baseUrl: `http://127.0.0.1:${port}/api/v1`,
+      fetcher: globalThis.fetch.bind(globalThis), credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'web', Cookie: `melearn_web_session=${sessions.learner}` } });
+    const anonymousUploadClient = createHttpClient({ baseUrl: `http://127.0.0.1:${port}/api/v1`,
+      fetcher: globalThis.fetch.bind(globalThis), credentials: 'omit', timeoutMs: 5000, headers: { 'x-melearn-app': 'web' } });
+    const beforeUploads = await counts(), originalCourse = await db.course.findUniqueOrThrow({ where: { id: ids.published } });
+    const originalItems = await db.courseItem.findMany({ where: { courseId: ids.published }, orderBy: { id: 'asc' } });
+    await assert.rejects(uploadRequest(ownerUploadClient), error => error instanceof HttpClientError && error.status === 503);
+    await assert.rejects(uploadRequest(adminHttp('admin')), error => error instanceof HttpClientError && error.status === 503);
+    await assert.rejects(uploadRequest(learnerUploadClient), error => error instanceof HttpClientError && error.status === 403);
+    await assert.rejects(uploadRequest(anonymousUploadClient), error => error instanceof HttpClientError && error.status === 401);
+    await assert.rejects(uploadRequest(adminHttp('admin'), randomUUID()), error => error instanceof HttpClientError && error.status === 404);
+    assert.deepEqual(await counts(), beforeUploads);
+    assert.deepEqual(await db.course.findUniqueOrThrow({ where: { id: ids.published } }), originalCourse);
+    assert.deepEqual(await db.courseItem.findMany({ where: { courseId: ids.published }, orderBy: { id: 'asc' } }), originalItems);
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
     await assert.rejects(api.getCourse(ids.published), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(learning.course(ids.published), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(adminCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(uploadRequest(ownerUploadClient), error => error instanceof HttpClientError && error.kind === 'network');
+    assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
     const result = { component: 'INTEGRATION-01 course detail', database: 'melearn_test', checks: 6,
@@ -267,6 +292,10 @@ async function main() {
       realTransportWithFixtureConfiguration: true, canonicalRevokeAndPersistence: true, originalAuditOnReplayAndReconnect: true,
       used409: true, unknown404: true, wrongAudience403: true, anonymous401: true, networkFailure: true,
       actualInternalRedeemWriter: true, publicRedeemMutationGate: false, loginProviderGate: false, browserAcceptance: false };
+    result.videoUnavailableTransport = { component: 'VIDEO-01', checks: 6, unchangedGenericHttpClient: true,
+      actualNestAndPostgres: true, owner503: true, admin503: true, learner403: true, anonymous401: true,
+      unknown404: true, networkFailure: true, successDecoderNeverCalled: true, noUploadOrCourseMutation: true,
+      frontendAuthoringHandlerGate: false, loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');

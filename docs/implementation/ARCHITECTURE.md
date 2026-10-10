@@ -125,6 +125,14 @@ Firebase/Stripe/Resend/OpenRouter/R2/PDF adaptersหรือSDKยังไม�
 
 ## 7. Test / change gates
 
+VIDEO-01 execution: Courses owns the unavailable route; Auth requireAuthoring
+holds fresh normalized authority separately from learning eligibility. Explicit
+either-audience metadata selects a bound session namespace, never role claims.
+Course shared ownership read then fixed canonical 503; no storage/write.
+Only the dedicated fixed capability exception is a public 5xx; generic failures
+retain diagnostic masking. See VIDEO_UNAVAILABLE_COMPONENT.md; full Auth/editor
+gates remain open and existing single-audience behavior is retained.
+
 Redeem execution component: Redeem owns Code audit through feature-local
 RedeemWriter; caller transactions use Auth → Course shared → Code exclusive →
 EntitlementWriter, with original grant preserved. Admin revoke uses fresh held

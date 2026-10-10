@@ -19,7 +19,8 @@ export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
 
 export const AUTHORITATIVE_AUDIENCE_KEY = 'authoritative_audience';
 /** Opt-in verified feature boundary; legacy transport remains pending D01. */
-export const AuthoritativeAudience = (audience: AppAudience) => SetMetadata(AUTHORITATIVE_AUDIENCE_KEY, audience);
+export const AuthoritativeAudience = (audience: AppAudience, ...additional: AppAudience[]) =>
+  SetMetadata(AUTHORITATIVE_AUDIENCE_KEY, additional.length ? [audience, ...additional] : audience);
 export interface PrincipalRequest extends Request { principal?: AuthPrincipal }
 
 @Injectable()
@@ -37,10 +38,16 @@ export class SessionGuard implements CanActivate {
     ]);
 
     const request = context.switchToHttp().getRequest<Request>();
-    const verifiedAudience = this.reflector.getAllAndOverride<AppAudience>(AUTHORITATIVE_AUDIENCE_KEY, [
+    const configuredAudience = this.reflector.getAllAndOverride<AppAudience | AppAudience[]>(AUTHORITATIVE_AUDIENCE_KEY, [
       context.getHandler(), context.getClass(),
     ]);
-    if (verifiedAudience) {
+    if (configuredAudience) {
+      // For a canonical either-audience route, the app header selects only the
+      // cookie/session namespace. Stored normalized roles still decide rights.
+      const header = request.headers['x-melearn-app'];
+      const verifiedAudience = Array.isArray(configuredAudience)
+        ? configuredAudience.find(audience => audience === header) ?? configuredAudience[0]
+        : configuredAudience;
       // Reuse only the current cookie names; no new lifetime/CSRF/issue policy.
       const principal = await this.principals.resolve(request.cookies?.[`melearn_${verifiedAudience}_session`], verifiedAudience);
       if (!principal) throw ApiException.unauthorized();
