@@ -1,0 +1,12 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: [build, '-f', containers/Dockerfile.mock, '--build-arg=APP_NAME=web', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/melearn-frontend/web:${_TAG}', .]
+  - name: gcr.io/cloud-builders/docker
+    args: [build, '-f', containers/Dockerfile.mock, '--build-arg=APP_NAME=admin', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/melearn-frontend/admin:${_TAG}', .]
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/melearn-frontend/web:${_TAG}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/melearn-frontend/admin:${_TAG}'
+substitutions:
+  _REGION: asia-southeast3
+  _TAG: mock-preview
+timeout: 1200s

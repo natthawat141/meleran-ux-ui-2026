@@ -1,7 +1,8 @@
 param(
     [string]$Project = 'melearn-tutor',
     [string]$Region = 'asia-southeast3',
-    [string]$ApiBaseUrl = '/api/v1'
+    [string]$ApiBaseUrl = '/api/v1',
+    [switch]$MockPreview
 )
 
 $ErrorActionPreference = 'Stop'
@@ -25,7 +26,10 @@ try {
         gcloud artifacts repositories create $repository --repository-format=docker --location=$Region --project=$Project --quiet
         if ($LASTEXITCODE -ne 0) { throw 'Creating image repository failed.' }
     }
-    gcloud builds submit . --config=containers/cloudbuild.yaml --ignore-file=.gcloudignore --project=$Project --region=$Region "--substitutions=_TAG=$imageTag,_REGION=$Region,_REPOSITORY=$repository,_API_BASE_URL=$ApiBaseUrl" --quiet
+    $buildConfig = if ($MockPreview) { 'containers/cloudbuild.mock.yaml' } else { 'containers/cloudbuild.yaml' }
+    $ignoreFile = if ($MockPreview) { '.gcloudignore.mock' } else { '.gcloudignore' }
+    $substitutions = if ($MockPreview) { "_TAG=$imageTag,_REGION=$Region" } else { "_TAG=$imageTag,_REGION=$Region,_REPOSITORY=$repository,_API_BASE_URL=$ApiBaseUrl" }
+    gcloud builds submit . --config=$buildConfig --ignore-file=$ignoreFile --project=$Project --region=$Region "--substitutions=$substitutions" --quiet
     if ($LASTEXITCODE -ne 0) { throw 'Cloud Build failed; services were not updated.' }
 
     # Static containers use an identity with no project roles, separate from the build identity.
@@ -38,7 +42,13 @@ try {
     }
     foreach ($app in @('web', 'admin')) {
         $image = "$Region-docker.pkg.dev/$Project/$repository/${app}:$imageTag"
-        gcloud run deploy "melearn-$app" --image=$image --service-account=$runtimeAccount --project=$Project --region=$Region --port=8080 --cpu=1 --memory=256Mi --execution-environment=gen1 --concurrency=80 --min=0 --max=1 --min-instances=0 --max-instances=1 --cpu-throttling --no-cpu-boost --allow-unauthenticated --quiet
+        $runtimeArgs = @()
+        if ($MockPreview -and $app -eq 'admin') {
+            $mockUpstream = gcloud run services describe melearn-web --project=$Project --region=$Region --format='value(status.url)' --quiet
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve shared Web mock service.' }
+            $runtimeArgs = @("--set-env-vars=MOCK_UPSTREAM=$mockUpstream")
+        }
+        gcloud run deploy "melearn-$app" --image=$image --service-account=$runtimeAccount --project=$Project --region=$Region --port=8080 --cpu=1 --memory=256Mi --execution-environment=gen1 --concurrency=80 --min=0 --max=1 --min-instances=0 --max-instances=1 --cpu-throttling --no-cpu-boost --allow-unauthenticated @runtimeArgs --quiet
         if ($LASTEXITCODE -ne 0) { throw "Deployment failed for $app." }
         $serviceUrl = gcloud run services describe "melearn-$app" --project=$Project --region=$Region --format='value(status.url)' --quiet
         if ($LASTEXITCODE -ne 0) { throw "Cannot resolve $app service URL." }
