@@ -23,3 +23,5 @@
 - Remaining: full Auth/normalized writer cutover, actual editor/browser V02 and G-COURSE. Upload is not a future video provider implementation; image upload/D09 remains a separate pending capability. V02 is still tracked, no full business case marked accepted from component tests.
 
 Current counts/SHA/CI are recorded in EXECUTION_STATUS.json after verification. No dependency/schema/contract/cloud/STG/deploy change.
+
+Verified code SHA: `78aee05c5d85828041c83e48b0ca428913e35c34`; [hosted Nest CI 38085878574](https://github.com/natthawat141/meleran-tutor/actions/runs/38085878574) passed 225 tests + 37 client checks, build/smoke/blueprint/boundaries. The six video checks cover generic transport only; authoring UI/browser/provider/full acceptance gates remain unverified.
