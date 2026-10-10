@@ -28,14 +28,39 @@ try {
     gcloud builds submit . --config=containers/cloudbuild.yaml --ignore-file=.gcloudignore --project=$Project --region=$Region "--substitutions=_TAG=$imageTag,_REGION=$Region,_REPOSITORY=$repository,_API_BASE_URL=$ApiBaseUrl" --quiet
     if ($LASTEXITCODE -ne 0) { throw 'Cloud Build failed; services were not updated.' }
 
+    # Static containers use an identity with no project roles, separate from the build identity.
+    $runtimeAccount = "melearn-frontend-runtime@$Project.iam.gserviceaccount.com"
+    $accounts = gcloud iam service-accounts list --project=$Project --format='value(email)' --quiet
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect runtime service accounts.' }
+    if ($runtimeAccount -notin $accounts) {
+        gcloud iam service-accounts create melearn-frontend-runtime --display-name='Melearn frontend static runtime' --project=$Project --quiet
+        if ($LASTEXITCODE -ne 0) { throw 'Creating runtime identity failed.' }
+    }
     foreach ($app in @('web', 'admin')) {
         $image = "$Region-docker.pkg.dev/$Project/$repository/${app}:$imageTag"
-        gcloud run deploy "melearn-$app" --image=$image --project=$Project --region=$Region --port=8080 --cpu=1 --memory=256Mi --execution-environment=gen1 --concurrency=80 --min=0 --max=1 --min-instances=0 --max-instances=1 --cpu-throttling --no-cpu-boost --allow-unauthenticated --quiet
+        gcloud run deploy "melearn-$app" --image=$image --service-account=$runtimeAccount --project=$Project --region=$Region --port=8080 --cpu=1 --memory=256Mi --execution-environment=gen1 --concurrency=80 --min=0 --max=1 --min-instances=0 --max-instances=1 --cpu-throttling --no-cpu-boost --allow-unauthenticated --quiet
         if ($LASTEXITCODE -ne 0) { throw "Deployment failed for $app." }
         $serviceUrl = gcloud run services describe "melearn-$app" --project=$Project --region=$Region --format='value(status.url)' --quiet
         if ($LASTEXITCODE -ne 0) { throw "Cannot resolve $app service URL." }
-        $health = Invoke-WebRequest -Uri "$serviceUrl/healthz" -UseBasicParsing -TimeoutSec 60
-        if ($health.StatusCode -ne 200 -or $health.Content.Trim() -ne 'ok') { throw "Health check failed for $app." }
         Write-Output "$app : $serviceUrl (source $imageTag)"
+    }
+    # New service URLs can take several minutes to propagate after Ready=True.
+    foreach ($app in @('web', 'admin')) {
+        $serviceUrl = gcloud run services describe "melearn-$app" --project=$Project --region=$Region --format='value(status.url)' --quiet
+        if ($LASTEXITCODE -ne 0) { throw "Cannot resolve $app health URL." }
+        $healthy = $false
+        for ($attempt = 1; $attempt -le 30; $attempt++) {
+            try {
+                $health = Invoke-WebRequest -Uri "$serviceUrl/health" -UseBasicParsing -TimeoutSec 30
+                $healthy = $health.StatusCode -eq 200 -and $health.Content.Trim() -eq 'ok'
+            } catch { $healthy = $false }
+            if ($healthy) { break }
+            if ($attempt -lt 30) {
+                Write-Output "Waiting for $app URL propagation ($attempt/30)."
+                Start-Sleep -Seconds 10
+            }
+        }
+        if (-not $healthy) { throw "Health check failed for $app after URL propagation retries." }
+        Write-Output "$app health: ok"
     }
 } finally { Pop-Location }

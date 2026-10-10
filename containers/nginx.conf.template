@@ -12,6 +12,14 @@ server {
         return 200 "ok\n";
     }
 
+    # Public Cloud Run health URL; /healthz can be intercepted before the container.
+    location = /health {
+        access_log off;
+        default_type text/plain;
+        add_header Cache-Control "no-store" always;
+        return 200 "ok\n";
+    }
+
     location = /index.html {
         add_header Cache-Control "no-store" always;
     }
