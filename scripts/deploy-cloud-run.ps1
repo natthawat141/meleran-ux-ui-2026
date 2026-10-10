@@ -21,7 +21,7 @@ try {
     $repository = 'melearn-frontend'
     $existing = gcloud artifacts repositories list --project=$Project --location=$Region --format='value(name)' --quiet
     if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect Artifact Registry.' }
-    if (-not ($existing | Where-Object { $_ -match "/repositories/$repository$" })) {
+    if (-not ($existing | Where-Object { $_ -eq $repository -or $_ -match "/repositories/$repository$" })) {
         gcloud artifacts repositories create $repository --repository-format=docker --location=$Region --project=$Project --quiet
         if ($LASTEXITCODE -ne 0) { throw 'Creating image repository failed.' }
     }
