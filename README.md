@@ -32,6 +32,10 @@ Copy-Item -LiteralPath .env.example -Destination .env # เฉพาะเมื
 
 ASP.NET Core อ่าน process environment แต่ไม่อ่าน `.env` โดยอัตโนมัติ. Script นี้โหลดค่าแล้วเรียก `dotnet run --no-launch-profile` เพื่อให้ URL/environment จากไฟล์มีผล; หลังหยุด process จะคืนค่า environment เดิม. Blank placeholders ไม่ทับค่าที่ตั้งไว้ภายนอก. ไม่รองรับ multiline, variable interpolation หรือ inline comments; syntax check ไม่ได้ตรวจว่า key/model/sender ใช้งานกับ provider ได้จริง.
 
+OpenRouter key/model/base URL ตั้งผ่าน `OpenRouter__ApiKey`, `OpenRouter__Model`, `OpenRouter__BaseUrl` ใน `.env` ฝั่ง Backend เมื่อรันด้วย script หรือ process environment/secret configuration บน hosting. `appsettings*.json` ไม่มี OpenRouter model fallback; ไม่เลือก paid model โดยอัตโนมัติ. การรัน `dotnet run` ตรง ๆ ไม่โหลด `.env`.
+
+`bin/` และ `obj/` เป็น generated build output ที่ Git ignore. `bin/Release/net10.0` มี DLL ของแอป/dependencies, EXE app host, PDB debug symbols, deps/runtimeconfig JSON และสำเนา appsettings ตามปกติ. แก้ source/config ที่อยู่ใต้ `src/` แล้ว build ใหม่; ไม่แก้สำเนาใน bin. Deployment ใช้ผล `dotnet publish`.
+
 ชื่อ `OpenRouter__ApiKey` map เป็น configuration `OpenRouter:ApiKey` ตาม [ASP.NET environment configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-10.0). ค่า base URL อิง [OpenRouter API](https://openrouter.ai/docs/api/api-reference/models/get-models) และ [Resend API](https://resend.com/docs/api-reference/emails/send-email). AI/อีเมล/Firebase/R2 adapters ยังไม่ implement. Database ใช้ ConnectionStrings__Melearn; session/CORS/bootstrap ดูเอกสารสถานะ feature.
 
 | Endpoint | ผลที่คาดหวัง | ความหมาย |
