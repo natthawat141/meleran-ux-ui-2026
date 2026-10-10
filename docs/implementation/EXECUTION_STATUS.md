@@ -8,7 +8,7 @@
 - Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 193/193; feature-local units 22/22; รวม 264 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration มี 6 Catalog + 7 Free Enroll + 11 Learning + 7 Admin Revoke + 6 generic Video unavailable + 7 Certificate detail + 8 AI Practice answer checks (52 รวม) แยกจาก Jest count.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
-- CI-01 DONE: hosted Nest CI [38086767802](https://github.com/natthawat141/meleran-tutor/actions/runs/38086767802) ผ่านบน 5142d75 รวม 238 tests, build/smoke และ 44 client checks (6 Catalog + 7 Free Enroll + 11 Learning + 7 Admin Revoke + 6 generic Video unavailable + 7 Certificate detail). Frontend source ไม่เปลี่ยน; full Frontend CI [38076634194](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194) เป็นหลักฐานเดิมบน ea942cb (172 tests/Web/Admin containers). D13 ปิดแล้ว.
+- CI-01 DONE: hosted Nest CI [38088612736](https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736) ผ่านบน 926c1eb รวม 264 tests, build/smoke และ 52 client checks. Frontend source ไม่เปลี่ยน; full Frontend CI [38076634194](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194) เป็นหลักฐานเดิมบน ea942cb (172 tests/Web/Admin containers). D13 ปิดแล้ว.
 - COMPLETION-01 เป็น NEEDS_DECISION: dependencies จริงคือ DB-02/DB-03 ที่ผ่านแล้ว และ D06 สำหรับ best result ข้ามคะแนนเต็มต่างกัน.
 
 ## Checkout และ Git
@@ -37,6 +37,8 @@ Instance เดิม melearn-infra-prod:asia-southeast3:melearn-tutor-db; Postg
 | 20261011020000_db05 | 5c8c27e078e013aea95a8d59b5d9675b37beeb1f28c71f9df6b29d26c55930e9 |
 | 20261011030000_db03 | 726de5121ced61057fe4f43e9a2427743c043a10f6d30ae582b13b078aa85648 |
 | 20261011040000_db04 | 684d41199be93bac7f368c8723cd89ec04cd9f46a360afe5b315152c8cb4d180 |
+| 20261011043000_db05_practice_message | 612266c0df0d4c516cbd1546cc5ded6f875d8b243d318b55d8cf66dd7ab974be |
+| 20261011044000_db05_practice_message_lock | 3a23c0e8a4eccc4b7e16494e08f3990b4f05430241aea580f384f4524d632605 |
 
 DB-04 follow-up history guard: 20261011041000_db04_history_guard, SHA256 e58bdf0cf2b13cb6dce3647597e3b205ffee4a75299fc8dcc4ed04f5c814f9e4. Granted fulfillment และ verified event identity เปลี่ยนย้อนหลังไม่ได้; ไม่ rewrite migration เดิม.
 
@@ -129,4 +131,4 @@ Canonical GET /me/certificates/{id} has fresh bound self authority and owner-fil
 
 ## AI practice answer checkpoint — 11 ต.ค. 2026
 
-Canonical PUT practice/answers implemented with immutable owned assistant-message linkage, private validated snapshot, DB-clock latest answers/activity and no provider/quota/academic writes. 14 HTTP/PG + 6 snapshot units + 6 schema PG tests and 8 unchanged aiApi.answerPractice client checks passed. Actual role/link concurrency tested both orders; appended migrations 7/8 applied only to isolated melearn_test, all 27-table DDL rollback and physical Prisma parity passed. Local aggregate 264 tests + 52 client checks/build/smoke/gates passed. Latest hosted checkpoint pending; previous CI above is historical evidence. อ่าน [AI_PRACTICE_ANSWER_COMPONENT](AI_PRACTICE_ANSWER_COMPONENT.md). AI-03 generation/history/Auth/browser and D11/D12 remain open, whole AI-04 BLOCKED and 0/113 full acceptance. No canonical contract/dependency/STG/deploy change.
+Canonical PUT practice/answers implemented with immutable owned assistant-message linkage, private validated snapshot, DB-clock latest answers/activity and no provider/quota/academic writes. 14 HTTP/PG + 6 snapshot units + 6 schema PG tests and 8 unchanged aiApi.answerPractice client checks passed. Actual role/link concurrency tested both orders; appended migrations 7/8 applied only to isolated melearn_test, all 27-table DDL rollback and physical Prisma parity passed. Local aggregate 264 tests + 52 client checks/build/smoke/gates passed. Hosted Nest CI [38088612736](https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736) ผ่านบน code SHA `926c1eb5f51accc353415146a86b0b3f787cc6f2`: 49 foundation + 22 feature units + 193 PG/HTTP = 264 tests, build/smoke/blueprint/boundaries และ 52 client checks. อ่าน [AI_PRACTICE_ANSWER_COMPONENT](AI_PRACTICE_ANSWER_COMPONENT.md). AI-03 generation/history/Auth/browser and D11/D12 remain open, whole AI-04 BLOCKED and 0/113 full acceptance. No canonical contract/dependency/STG/deploy change.

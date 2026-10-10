@@ -31,3 +31,5 @@ Internal **technical serialization**, ไม่ใช่ provider/business contr
 - Whole 113-case acceptance ยัง 0/113. Full AI-04 ต้อง AI-03 generation, AI history read/reconnect, full Auth และ authenticated browser G-AI. D11/D12/provider lifecycle ยังเปิด; task status ไม่เปลี่ยนเป็น DONE จาก fixture tests.
 
 Verification: foundation/component/database configs ใน `backend/test/`, `typecheck`, `check:blueprint`, `check:boundaries`, Nest build, `scripts/smoke-test-api.cjs` และ `scripts/verify-frontend-detail.cjs`; schema parity ตรวจจริงบน Test PostgreSQL. Tests ใช้ isolated target/explicit reset opt-in และล้างเฉพาะ fixtures ของตน.
+
+Verified code SHA: `926c1eb5f51accc353415146a86b0b3f787cc6f2`; [hosted Nest CI 38088612736](https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736) passed 264 tests + 52 client checks, build/smoke/blueprint/boundaries and all 8 migrations on ephemeral CI PostgreSQL. Provider generation/login/browser and full acceptance remain unverified.
