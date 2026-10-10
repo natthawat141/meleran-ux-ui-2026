@@ -5,7 +5,7 @@
 ## ผลที่ตรวจแล้ว
 
 - DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).
-- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 60/60; feature-local units 11/11; รวม 120 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
+- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 70/70; feature-local units 16/16; รวม 135 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
 - CI-01 DONE: hosted Nest CI [38076634181](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634181) ผ่านบน ea942cb รวมทุก component/real-client checks; Frontend CI [38076634194](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194) ผ่าน 172 tests และ Web/Admin container checks. D13 ปิดแล้ว.
@@ -94,3 +94,7 @@ This proves the detail component's real Frontend → Nest → PostgreSQL path;
 list/search/cursor, authenticated learning and full G-COURSE acceptance remain
 pending. The original 113 acceptance cases remain mapped and none is marked
 complete from this component check.
+
+## Stripe receiver checkpoint — 11 ต.ค. 2026
+
+POST /api/v1/webhooks/stripe มี original-byte signature verification และ durable deduplicated receipt บน PaymentEvent เดิม: 5 unit + 10 actual HTTP/PostgreSQL tests. รวม backend regression 135 tests. รายละเอียด local protocol และข้อจำกัดอยู่ [STRIPE_WEBHOOK_RECEIVER](STRIPE_WEBHOOK_RECEIVER.md). Canonical webhook ยัง deferred; full PROVIDER-STRIPE-01 ยัง NEEDS_DECISION/PAY-01 dependency. Signing secret ยังว่าง; ไม่มี actual Stripe delivery หรือ worker/payment processor/grant. Unprocessed receipts ตอบ 503 ให้ retry; ไม่ ACK เงินหรืออ้างผ่าน business acceptance. ไม่มี dependency/schema/migration/cloud/deploy change. Hosted CI ของ code checkpoint ใหม่นี้จะบันทึกหลัง push; SHA/CI ของ checkpoint ก่อนหน้าเป็น historical evidence.

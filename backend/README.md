@@ -30,6 +30,8 @@ Public CourseDetail and Instructor profile have verified actual HTTP projections
 
 ## Environment and remaining work
 
+Stripe receiver component: `POST /api/v1/webhooks/stripe` verifies original bytes and durably deduplicates verified receipts. Set the ignored ENV `STRIPE_WEBHOOK_SECRET` to this endpoint/listener's signing secret and `STRIPE_WEBHOOK_MODE=test`. Unprocessed receipts deliberately return 503 for provider retry; this component does not process payment money or grant enrollments. See [receiver protocol/status](../docs/implementation/STRIPE_WEBHOOK_RECEIVER.md). The canonical webhook contract remains deferred and no real Stripe delivery has been verified.
+
 Prepared .env contains Firebase public Web config and server project ID plus mapped OpenRouter/Resend/R2/Stripe settings. Public Web config is not an Admin credential. Explicit process environment takes precedence over local .env; no secrets or provider payloads are logged. Missing sender, Firebase server identity, Stripe webhook configuration and D01–D16 decisions remain visible in the plan. No provider smoke calls have been made.
 
 The authoritative Nest target is this fullstack backend on backend/v1-foundation. D13 is confirmed; root Nest CI is configured, and hosted results are tracked separately. The source-only pre-execution snapshot is in ../artifacts/nest-wave1-baseline-20261011 (ENV/databases excluded).

@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: payments
 
 ต้องปิด D08, D10
 
+Execution checkpoint 11 ต.ค. 2026: ผู้ใช้สั่งทำ receiver แล้ว. Raw signature + durable receipt component มี implementation/tests; ดู [STRIPE_WEBHOOK_RECEIVER](../STRIPE_WEBHOOK_RECEIVER.md) และ current EXECUTION_STATUS. Task ยัง NEEDS_DECISION: payment processor/fulfillment/real provider contract ไม่เสร็จ; planning baseline ด้านล่างไม่ใช่รายการ work ที่เสร็จแล้ว.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

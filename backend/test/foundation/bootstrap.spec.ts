@@ -9,7 +9,7 @@ describe('FOUNDATION-01 runtime bootstrap', () => {
 
   it('uses the shared HTTP bootstrap and never seeds or migrates', async () => {
     const app = {
-      use: jest.fn(), setGlobalPrefix: jest.fn(), enableCors: jest.fn(),
+      use: jest.fn(), useBodyParser: jest.fn(), setGlobalPrefix: jest.fn(), enableCors: jest.fn(),
       useGlobalPipes: jest.fn(), useGlobalFilters: jest.fn(), enableShutdownHooks: jest.fn(),
       listen: jest.fn().mockResolvedValue(undefined), close: jest.fn().mockResolvedValue(undefined),
     };
@@ -24,6 +24,7 @@ describe('FOUNDATION-01 runtime bootstrap', () => {
     expect(app.setGlobalPrefix).toHaveBeenCalledWith('api/v1');
     expect(app.useGlobalPipes).toHaveBeenCalledTimes(1);
     expect(app.useGlobalFilters).toHaveBeenCalledTimes(1);
+    expect(app.useBodyParser).toHaveBeenCalledWith('raw', expect.objectContaining({ inflate: false, limit: '100kb' }));
     expect(app.listen).toHaveBeenCalledWith(4000);
     expect(seedCall).not.toHaveBeenCalled();
   });

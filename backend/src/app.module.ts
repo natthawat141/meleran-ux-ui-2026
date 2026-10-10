@@ -6,6 +6,7 @@ import { AccountsModule } from './features/accounts/accounts.module';
 import { CoursesModule } from './features/courses/courses.module';
 import { EnrollmentsModule } from './features/enrollments/enrollments.module';
 import { ManagementModule } from './features/management/management.module';
+import { PaymentsModule } from './features/payments/payments.module';
 import { SessionGuard } from './shared/auth/session.guard';
 
 @Module({
@@ -16,6 +17,7 @@ import { SessionGuard } from './shared/auth/session.guard';
     CoursesModule,
     EnrollmentsModule,
     ManagementModule,
+    PaymentsModule,
   ],
   providers: [
     {
