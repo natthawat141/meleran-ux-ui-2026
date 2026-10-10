@@ -30,7 +30,8 @@
     "frontend_targeted_tests": 31,
     "frontend_typecheck": "PASS_WEB_ADMIN_PACKAGES",
     "frontend_build": "PASS_WEB_ADMIN_LOCAL_PREVIEW",
-    "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500"
+    "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500",
+    "frontend_hosted_tests": 172
   },
   "environment": {
     "staging": false,
@@ -763,7 +764,7 @@
         "DB-01"
       ],
       "decision_ids": [],
-      "evidence": "Previous hosted CI 38074542071 passed; new component verification checkpoint pending hosted run."
+      "evidence": "Hosted Nest CI 38076634181 success on ea942cb: 49 foundation + 11 feature units + 60 PostgreSQL/HTTP; 6 real frontend-client integration checks. Frontend CI 38076634194: 172 tests, contracts/tokens/boundaries/typecheck/build and both container smoke jobs passed."
     },
     {
       "id": "AUTH-BASE-01",
@@ -797,9 +798,11 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "5d9be36bbf8a8c29c19e90a9d6709dc2476f885c",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38074542071",
-    "latest_component_ci": "PENDING_NEW_CHECKPOINT"
+    "verified_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634181",
+    "latest_component_ci": "PASS",
+    "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
+    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194"
   },
   "remaining_decisions": [
     "D01",

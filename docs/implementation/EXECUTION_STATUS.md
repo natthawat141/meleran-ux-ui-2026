@@ -8,7 +8,7 @@
 - Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 60/60; feature-local units 11/11; รวม 120 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
-- CI-01 DONE: hosted CI [38074542071](https://github.com/natthawat141/meleran-tutor/actions/runs/38074542071) ผ่านบน 5d9be36 รวม Catalog detail component. D13 ปิดแล้ว.
+- CI-01 DONE: hosted Nest CI [38076634181](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634181) ผ่านบน ea942cb รวมทุก component/real-client checks; Frontend CI [38076634194](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194) ผ่าน 172 tests และ Web/Admin container checks. D13 ปิดแล้ว.
 - COMPLETION-01 เป็น NEEDS_DECISION: dependencies จริงคือ DB-02/DB-03 ที่ผ่านแล้ว และ D06 สำหรับ best result ข้ามคะแนนเต็มต่างกัน.
 
 ## Checkout และ Git
@@ -60,7 +60,7 @@ node scripts/check-blueprint.cjs ผ่าน: canonical 86 operations, 5 deferr
 
 GET /courses/{id} / get_courses_id ผ่าน real Nest HTTP+PostgreSQL 6 tests: explicit public select, canonical nullable/THB/date/outline, hidden/unknown 404, no private fields/body/keys, reconnect, corrupt outcomes fail closed, startup/read no session/grant/progress writes. Typed CourseDetail DTO separates storage from wire shape. Also fixed nested ApiException message propagation; Foundation regression passed. GET /courses search/sort/cursor still awaits D16; whole task and Frontend gate remain incomplete.
 
-## Verified code checkpoint
+## Historical code checkpoint
 
 5d9be36bbf8a8c29c19e90a9d6709dc2476f885c pushed successfully; hosted Nest CI passed. Foundation/architecture 49 + PostgreSQL/real HTTP 46 = 95 tests. Current Prisma-vs-Test-PostgreSQL diff contains no DDL. Full branch secret scan passed; all ENV values withheld. This evidence-only documentation update does not change implementation and skips a redundant hosted build; the verified code SHA is explicitly retained above.
 
@@ -72,7 +72,7 @@ GET /courses/{id} / get_courses_id ผ่าน real Nest HTTP+PostgreSQL 6 test
 - INTEGRATION-01 client component: unchanged fullstack Catalog client → actual Nest → owned PostgreSQL fixtures; 6 checks including saved edit, hidden/unknown 404, server/network errors and no mock fallback. Whole feature gate remains incomplete.
 - Blog storage gaps are explicit in [CONTRACT_STORAGE_GAPS](CONTRACT_STORAGE_GAPS.md), mapped to D05/D16; no fake reading-time/content/category values were implemented.
 
-No dependencies installed, schema/migrations changed, provider calls or STG/deployment in this follow-up. New hosted CI checkpoint is pending; previous verified SHA remains historical evidence until the new run completes. Run global no-write smoke and frontend fixture integration sequentially after DB suites finish.
+No dependencies installed, schema/migrations changed, provider calls or STG/deployment in this follow-up. Hosted Nest CI 38076634181 and Frontend CI 38076634194 passed on ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb: Backend 120 tests + 6 client checks; Frontend 172 tests and Web/Admin containers. Previous code SHAs are historical evidence. Run global no-write smoke and frontend fixture integration sequentially after DB suites finish.
 
 ## Early browser slice — course detail
 

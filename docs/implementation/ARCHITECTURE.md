@@ -67,6 +67,17 @@ Critical interface contracts เป็น PROPOSED: Auth.resolvePrincipal(sessio
 
 ## 5. Database and transaction contract
 
+Execution component interfaces reviewed 11 ต.ค. 2026:
+`EntitlementWriter` in enrollments/public is a persistence participant exported
+by EnrollmentsModule; it accepts the caller's transaction and verified command
+intent, returns created-or-existing canonical lifetime grant, and never checks
+provider credentials or commits independently. Owning Free/Redeem/Stripe commands
+must establish eligibility/source proof and documented locks before calling it;
+it is not exposed as an HTTP permission shortcut. Submitted-score arithmetic is
+feature-local to assessments, uses a local Prisma Decimal constructor, and does
+not decide D06 best-attempt selection. Public Instructor detail reads normalized
+DB-02 role grants; Auth/Management compatibility role writers remain pending.
+
 - Logical model ทั้ง V1 อยู่ DOMAIN_MODEL.md; physical Prisma/PostgreSQL migrations ทยอยตาม DB-01–06. DB-06 แยก provider identity/verification/reset หลัง D03 จึงไม่ขวาง public slice.
 - Schema Owner = Lead/DB maintainer คนเดียว. Workersส่งdelta/constraints/tests; ownerสร้างmigrationและclient generationตามbatch.
 - Shared Prisma.TransactionClientส่งต่อระหว่างowner services; participantห้ามเปิดautocommit/nested independent transaction.
