@@ -29,6 +29,19 @@ Build outputs: `dist/web`, `dist/admin`. `VITE_API_MODE=mock|remote`, `VITE_API_
 
 HTTP contract source: [OpenAPI Draft](packages/contracts/openapi/openapi.json), generated types export `@melearn/contracts/http`. การแก้ schema ให้ generate/check ตาม [R4a guide](docs/API_CONTRACT_R4A_DRAFT_TH.md); Backend ยังต้อง review/freeze ต่อ flow.
 
+## Cloud Run Frontend
+
+Target ที่ผู้ใช้ยืนยัน 10 ต.ค. 2026: project `melearn-tutor`, Bangkok `asia-southeast3`, services `melearn-web` และ `melearn-admin`. แต่ละ service ใช้ 1 vCPU / 256 MiB, first-generation runtime, request-based CPU, minimum instances 0 และ maximum instances 1 ทั้งระดับ service/revision. ไม่เปิด startup CPU boost. Cloud Run maximum instances เป็น scaling limit; อาจเกินชั่วคราวระหว่าง platform events ตาม [ข้อจำกัดของ Google](https://docs.cloud.google.com/run/docs/configuring/max-instances).
+
+```powershell
+.\scripts\deploy-cloud-run.ps1
+# หลัง Backend พร้อม: rebuild ด้วย -ApiBaseUrl https://<api-origin>/api/v1
+```
+
+Script ใช้ [Cloud Build config](containers/cloudbuild.yaml) สร้างสอง images จาก clean Git revision แล้ว deploy แยก; ไม่รัน local Docker และไม่ผูก Billing เอง. [.gcloudignore](.gcloudignore) ตัด local configuration/secrets และ generated files ออกจาก upload. ไม่มี private API key ใน bundle. Default `/api/v1` ยังไม่มี Backend proxy จึงตอบ 404; Login/Catalog และ business flows ยังใช้งานไม่ได้ใน static deployment นี้. Admin SPA เปิด public เพื่อเข้าหน้า Login; ไม่ใช่การอนุญาต Admin API.
+
+สถานะ 10 ต.ค. 2026: merge refactor เข้า `main`; Cloud deployment ยังถูก block เพราะ `melearn-tutor` ไม่มี Billing. ผู้ใช้อนุญาต Billing เดียวกับ `melearn-infra-prod` แล้ว แต่ CLI account `bill.natthawat@gmail.com` ขาด `billing.resourceAssociations.create` บนบัญชี Billing นั้น จึงต้องให้เจ้าของผูก Billing/จัดสิทธิ์ก่อน. ยังไม่มี live URLs หรือผล Cloud Run acceptance. ตรวจ local typecheck/tests/boundaries/build ก่อน push; hosted container checks อยู่ใน Frontend CI.
+
 ## อ่านต่อ
 
 - [Docs index](docs/README.md), [UI Spec](docs/UI_SPEC.md), [Code Spec](docs/CODE_SPEC.md), [AGENTS](AGENTS.md)
