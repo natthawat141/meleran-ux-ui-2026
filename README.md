@@ -1,5 +1,7 @@
 # Melearn Frontend
 
+ชื่อโฟลเดอร์ workspace: `melearn-tutor-frontend`. เอกสาร API Contract หลักย้ายไป [shared docs](../docs/api-contract/README.md); OpenAPI ใน package เป็น snapshot สำหรับ standalone clone/CI. แก้ canonical แล้วใช้ `npm run contracts:sync` ก่อน generate/check; Git remote เดิมไม่เปลี่ยน.
+
 React + TypeScript monorepo: `apps/web` สำหรับ Guest/Learner/Instructor และ `apps/admin` สำหรับ Admin; build/deployment แยกกัน. ขอบเขตธุรกิจใช้ [Final 1.6](docs/MELEARN_V1_SCOPE.md). ยังไม่มี Production Backend.
 
 Business data ใช้ HTTP client + TanStack Query กับ API mock; ถอน root `src`, `@legacy` และ `packages/store` แล้ว. Mock เก็บข้อมูลใน memory ร่วมกัน ขณะที่ cookies/query cache แยก app/account. Restart mock ล้างข้อมูล. Unsaved editor drafts อาจอยู่ใน sessionStorage; ไม่ใช่ business source of truth.

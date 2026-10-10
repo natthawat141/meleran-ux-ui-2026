@@ -1,5 +1,7 @@
 # AGENTS.md — Melearn UX/UI
 
+อัปเดต 10 ต.ค. 2026: checkout ชื่อ `melearn-tutor-frontend`; canonical API Contract อยู่ sibling `../docs/api-contract/openapi.json`. Package OpenAPI เป็น snapshot สำหรับ standalone CI; แก้ canonical แล้ว sync/generate/check. เอกสาร API_CONTRACT เดิมใน docs เป็น pointers. คำสั่งล่าสุดให้ทำคนเดียว ไม่เรียก subagents ตามกติกาประวัติด้านล่างโดยอัตโนมัติ.
+
 **กติกาธุรกิจและขอบเขตที่เจ้าของยืนยัน 6 ต.ค. 2026 อยู่ใน [docs/MELEARN_V1_SCOPE.md](docs/MELEARN_V1_SCOPE.md) Final 1.6 ต่อจากฉบับ 1.5 ที่ตรวจแล้วและคำยืนยันเพิ่มเรื่อง Stripe/AI practice ให้อ่านก่อนทำงาน ข้อความในร่างเก่าและพฤติกรรมต้นแบบที่ขัดกันไม่มีน้ำหนักเหนือฉบับนี้ การอนุมัติเอกสารไม่ใช่การยืนยันว่าโค้ดครบหรือ Production พร้อม**
 
 ## Read before editing

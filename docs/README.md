@@ -2,6 +2,8 @@
 
 เริ่มที่ไฟล์นี้ · อัปเดต 9 ตุลาคม 2026
 
+ชื่อ checkout เปลี่ยนเป็น `melearn-tutor-frontend` วันที่ 10 ต.ค. 2026. API Contract ย้ายไป [เอกสารกลาง](../../docs/api-contract/README.md); files API_CONTRACT เดิมเป็น pointers เพื่อรักษาลิงก์. [OpenAPI ใน package](../packages/contracts/openapi/openapi.json) เป็น tracked snapshot สำหรับ standalone build/CI; แก้ canonical และรัน `npm run contracts:sync` ก่อน generate/check. ชื่อ Git remote และ app package names ยังเดิม.
+
 ## เอกสารหลักที่ใช้ทำงาน
 
 | เรื่อง | อ่านไฟล์นี้ |

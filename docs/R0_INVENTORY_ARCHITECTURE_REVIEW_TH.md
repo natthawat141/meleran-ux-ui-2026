@@ -6,7 +6,7 @@
 
 ## 1. ขอบเขต หลักฐาน และ revision
 
-- Repository ที่ตรวจ: `D:\code\elearn-prod\elearning-ux-v2`; source baseline `19ec7aa3389a14dd79328a1c8e8285c24f171865`; upstream `origin/refactor/v1-api-ready`; working tree/index สะอาดก่อนสำรวจ
+- Repository ที่ตรวจ: `D:\code\elearn-prod\melearn-tutor-frontend`; source baseline `19ec7aa3389a14dd79328a1c8e8285c24f171865`; upstream `origin/refactor/v1-api-ready`; working tree/index สะอาดก่อนสำรวจ
 - Local/remote `main`, `prototype` และ peeled tag `prototype-2026-10-07` ตรงกับ `fa491b46aebe6beaa408ba30ab92b28fd478d8fd` ก่อนเขียนรายงาน; checkpoint ของเอกสารจะเดินต่อเฉพาะ refactor branch
 - อ่าน [Final 1.6](MELEARN_V1_SCOPE.md), [UI_SPEC](UI_SPEC.md), [CODE_SPEC](CODE_SPEC.md), [แผนล่าสุด](FRONTEND_REFACTOR_PLAN_TH.md), AGENTS/workspace guide, delegation/checkpoint policy และ [R0 workflow](../.codex/workflows/r0-inventory.md) สำเนา scope ชั้น workspace/repository มี SHA-256 ตรงกัน `BB349F08F6BAC5DC1F4EA15539450ECF11B53533C0CC5D83B30075C039564680`
 - ใช้ GPT-6 Luna xhigh สำรวจ Routes, State, Scope พร้อมกัน; เมื่อ State จบ ใช้ agent เดิมทำ Shared UI/Authoring ต่อ รวมสี่บทบาท สูงสุดสาม subagents พร้อมกัน ทุกบทบาท read-only และไม่เขียนรายงานเอง

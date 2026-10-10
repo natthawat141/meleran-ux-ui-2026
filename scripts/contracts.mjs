@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir, mkdtemp, readdir, rm } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
+import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { inventoryMockOperations } from './contract-inventory.mjs';
@@ -8,6 +9,12 @@ export const contractPath = resolve('packages/contracts/openapi/openapi.json');
 export async function readContract() { return JSON.parse(await readFile(contractPath, 'utf8')); }
 
 export async function validateContract() {
+  const canonical = new URL('../../docs/api-contract/openapi.json', import.meta.url);
+  if (existsSync(canonical)) {
+    const expected = (await readFile(canonical, 'utf8')).replaceAll('\r\n', '\n');
+    const current = (await readFile(contractPath, 'utf8')).replaceAll('\r\n', '\n');
+    if (expected !== current) throw new Error('Workspace canonical contract drift. Run npm run contracts:sync.');
+  }
   const doc = await readContract();
   // Local input and local refs only; no resolver fetches remote schemas.
   await SwaggerParser.validate(structuredClone(doc), { resolve: { http: false } });

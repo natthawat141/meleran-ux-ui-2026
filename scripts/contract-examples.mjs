@@ -29,6 +29,11 @@ try {
       count++;
     }
   }
-  await writeFile('packages/contracts/openapi/openapi.json',JSON.stringify(contract,null,2)+'\n');
+  const content = JSON.stringify(contract,null,2)+'\n';
+  // Example updates are contract authoring: require the shared canonical checkout.
+  const canonical = new URL('../../docs/api-contract/openapi.json', import.meta.url);
+  await readFile(canonical, 'utf8');
+  await writeFile(canonical, content);
+  await writeFile('packages/contracts/openapi/openapi.json', content);
   console.log(`Examples updated from ${count} schema-checked synthetic responses. No headers/cookies recorded.`);
 } finally { await rm(directory,{recursive:true,force:true}); }

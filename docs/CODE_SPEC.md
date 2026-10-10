@@ -168,7 +168,7 @@ Root `src`, `@legacy`, `packages/store` ถอนแล้ว. ห้ามเ�
 คำสั่งปัจจุบันบน Windows:
 
 ```powershell
-# จาก root ของ elearning-ux-v2
+# จาก root ของ melearn-tutor-frontend
 npm.cmd run dev -- --port 5174
 npm.cmd run build
 git diff --check

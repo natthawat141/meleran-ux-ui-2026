@@ -1,5 +1,5 @@
 {
-  "name": "elearning-ux-v2",
+  "name": "melearn-tutor-frontend",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -28,7 +28,8 @@
     "contracts:validate": "node scripts/contracts.mjs",
     "contracts:generate": "node scripts/contracts.mjs --generate",
     "contracts:check": "node scripts/contracts.mjs --check",
-    "contracts:examples": "node scripts/contract-examples.mjs"
+    "contracts:examples": "node scripts/contract-examples.mjs",
+    "contracts:sync": "node scripts/sync-contract.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
