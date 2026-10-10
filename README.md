@@ -2,7 +2,7 @@
 
 ASP.NET Core .NET 10 · Clean Architecture + Feature-first / use cases · Backend foundation
 
-เริ่มพัฒนา 10 ตุลาคม 2026 ตามคำสั่งผู้ใช้. ปัจจุบันเป็นโครง Backend ที่ build/test ได้ ยังไม่มี business API, authentication, database หรือ provider integration. Frontend ยังใช้ HTTP mock เดิม ห้ามเปลี่ยน base URL มาที่ host นี้แล้วคาดว่าจะใช้งานทั้งระบบได้.
+เริ่มพัฒนา 10 ตุลาคม 2026 ตามคำสั่งผู้ใช้. มี EF Core/PostgreSQL adapter + migrations และ 9 business operations สำหรับ local Username Auth/Profile, Admin-created Learner และ Catalog/Free Enrollment. ยังไม่ apply Cloud SQL หรือทำ Firebase/provider integrations. Frontend ยังใช้ HTTP mock; ไม่เปลี่ยน base URL ทั้งระบบจน endpoint ที่เกี่ยวข้องพร้อม. [สถานะ feature และวิธีตั้งค่า](docs/FEATURE_DELIVERY_STATUS_TH.md).
 
 ## เริ่มใช้งาน
 
@@ -32,19 +32,22 @@ Copy-Item -LiteralPath .env.example -Destination .env # เฉพาะเมื
 
 ASP.NET Core อ่าน process environment แต่ไม่อ่าน `.env` โดยอัตโนมัติ. Script นี้โหลดค่าแล้วเรียก `dotnet run --no-launch-profile` เพื่อให้ URL/environment จากไฟล์มีผล; หลังหยุด process จะคืนค่า environment เดิม. Blank placeholders ไม่ทับค่าที่ตั้งไว้ภายนอก. ไม่รองรับ multiline, variable interpolation หรือ inline comments; syntax check ไม่ได้ตรวจว่า key/model/sender ใช้งานกับ provider ได้จริง.
 
-ชื่อ `OpenRouter__ApiKey` map เป็น configuration `OpenRouter:ApiKey` ตาม [ASP.NET environment configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-10.0). ค่า base URL อิง [OpenRouter API](https://openrouter.ai/docs/api/api-reference/models/get-models) และ [Resend API](https://resend.com/docs/api-reference/emails/send-email). ตัวแปรเหล่านี้เตรียมไว้สำหรับ adapters ที่จะ implement ต่อ; ยังไม่มีการเรียก AI/ส่งอีเมล/ตรวจ Firebase จริง และยังไม่เพิ่ม DB/session/media credentials ที่ยังไม่เลือก protocol.
+ชื่อ `OpenRouter__ApiKey` map เป็น configuration `OpenRouter:ApiKey` ตาม [ASP.NET environment configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-10.0). ค่า base URL อิง [OpenRouter API](https://openrouter.ai/docs/api/api-reference/models/get-models) และ [Resend API](https://resend.com/docs/api-reference/emails/send-email). AI/อีเมล/Firebase/R2 adapters ยังไม่ implement. Database ใช้ ConnectionStrings__Melearn; session/CORS/bootstrap ดูเอกสารสถานะ feature.
 
 | Endpoint | ผลที่คาดหวัง | ความหมาย |
 | --- | --- | --- |
 | `GET /health/live` | 200, `status: alive`, `stage: foundation` | API process ตอบ HTTP ได้ |
-| `GET /health/ready` | 503, `backend_not_ready` | ยังไม่มี identity/persistence/business endpoints |
-| `/api/v1/*` | 404 ตาม error envelope | ยังไม่ได้ implement business operations |
+| `GET /health/ready` | 503, `backend_not_ready` | ยังไม่เปิด runtime readiness; live DB/Firebase/Frontend acceptance ยังไม่ครบ |
+| `GET /api/v1/me` | 401 เมื่อไม่มี session | local Auth/Profile implement แล้ว; ต้องตั้ง DB และ provision account |
+| `GET /api/v1/courses` | 503 เมื่อยังไม่ตั้ง DB | ไม่มี mock fallback; ต้อง apply migrations ก่อน |
+| business routes ที่ยังไม่ implement | 404 ตาม error envelope | ยังไม่เปิด use case นั้น |
 
 Health routes เป็น operational endpoints ใหม่ของ host ไม่ใช่ส่วนหนึ่งของ 86 business operations ใน Frontend Draft. ยังไม่มี route สำหรับ Swagger หรือ draft contract projection; ไม่มี fake login/seed เพื่อให้ดูเหมือน Backend พร้อม.
 
 ## เอกสารหลัก
 
 - [Backend architecture และ decision register](docs/BACKEND_ARCHITECTURE.md)
+- [Feature delivery และ setup/ข้อจำกัด](docs/FEATURE_DELIVERY_STATUS_TH.md)
 - [Cloud SQL Bangkok และ environment setup](docs/CLOUD_SQL_SETUP_TH.md) — instance RUNNABLE; application DB connection ยังไม่ทดสอบ
 - [Auth decision: Firebase Email/Google และ .NET Username](docs/AUTH_DECISION_TH.md) — ยืนยัน provider แล้ว; session/HTTP changes เป็น Draft ยังไม่ได้เชื่อมจริง
 - Business scope: `../docs/MELEARN_V1_SCOPE.md` Final 1.6; ใน Frontend Git คือ `../melearn-tutor-frontend/docs/MELEARN_V1_SCOPE.md`
@@ -55,10 +58,10 @@ Paths ข้างต้นอ้าง sibling checkout ใน workspace นี
 
 ## ผลตรวจ foundation
 
-วันที่ 10 ต.ค. 2026: Release build ผ่าน 0 warnings / 0 errors; architecture tests 5 และ integration tests 10 ผ่าน รวม 15 tests. Tests ใช้ in-memory ASP.NET test host ไม่รัน Docker/DB/provider.
+วันที่ 10 ต.ค. 2026: Release build ผ่าน 0 warnings / 0 errors; architecture tests 5 และ HTTP integration tests 30 ผ่าน รวม 35 tests. Business tests ใช้ relational SQLite ใน ASP.NET test host; ไม่รัน Docker หรือ live Cloud SQL/provider. ผลล่าสุดและ coverage อยู่ในเอกสารสถานะ feature.
 
-ตรวจ Kestrel จริงที่พอร์ต 5100 แล้ว: `/health/live` 200, `/health/ready` 503, `/api/v1/me` 404 และ `/test-only/throw` 404 ยืนยันว่า test-only controller ไม่เปิดใน dev host ปกติ. Locked restore ผ่าน. Business API และ provider acceptance ยังไม่ได้ implement.
+ตรวจ Kestrel ชุดล่าสุดด้วย temporary port 5110 แล้ว: `/health/live` 200, `/health/ready` 503, `/api/v1/me` 401, `/api/v1/courses` 503 (persistence_not_configured) และ `/test-only/throw` 404. ปิด process ที่ใช้ตรวจแล้ว. Live Cloud SQL/Firebase acceptance ยังไม่ได้ตรวจ; ไม่ใช้ผล foundation เก่าแทนชุดนี้.
 
-Domain และ Infrastructure ยังเป็น project boundaries ที่ไม่มี business/persistence classes; ไม่มี UnitTests/ContractTests project เปล่าเพื่อให้ดูว่าครบ. เพิ่มเมื่อเริ่ม use case/DTO จริง.
+Domain/Application/Infrastructure มี account/session/catalog/enrollment models, use cases และ EF adapters แล้ว. Migration SQL สร้างไว้เพื่อ review; ยังไม่ apply live DB. DTO ของ subset นี้อ้าง canonical Draft; Firebase/contract synchronization และ PostgreSQL acceptance ยังต้องทำต่อ.
 
 CI workflow เตรียมไว้ใน `.github/workflows/dotnet.yml` แต่จะไม่ถือว่าผ่าน GitHub CI จนมี remote repository และ hosted run จริง. ไม่อนุญาต deploy หรือสร้าง cloud resources โดยการมีไฟล์นี้.

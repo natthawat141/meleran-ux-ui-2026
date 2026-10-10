@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Melearn.IntegrationTests;
 
@@ -14,6 +15,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Melearn"] = "" }));
         builder.ConfigureServices(services => services.AddControllers()
             .AddApplicationPart(typeof(FoundationTestController).Assembly));
     }
@@ -61,8 +63,6 @@ public sealed class ApiFoundationTests(ApiFactory factory) : IClassFixture<ApiFa
     }
 
     [Theory]
-    [InlineData("/api/v1/me")]
-    [InlineData("/api/v1/courses")]
     [InlineData("/unknown")]
     public async Task Missing_business_routes_do_not_return_fake_success(string path)
     {
@@ -70,6 +70,24 @@ public sealed class ApiFoundationTests(ApiFactory factory) : IClassFixture<ApiFa
         using var response = await client.GetAsync(path);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         AssertError(await ReadJson(response), "not_found");
+    }
+
+    [Fact]
+    public async Task Profile_requires_authentication_before_returning_data()
+    {
+        using var client = factory.CreateClient();
+        using var response = await client.GetAsync("/api/v1/me");
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        AssertError(await ReadJson(response), "authentication_required");
+    }
+
+    [Fact]
+    public async Task Unconfigured_database_returns_503_instead_of_mock_catalog()
+    {
+        using var client = factory.CreateClient();
+        using var response = await client.GetAsync("/api/v1/courses");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        AssertError(await ReadJson(response), "persistence_not_configured");
     }
 
     [Fact]

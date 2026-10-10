@@ -48,4 +48,4 @@ ConnectionStrings__Melearn=Host=/cloudsql/melearn-infra-prod:asia-southeast3:mel
 
 Cloud Billing Catalog ที่ตรวจ 10 ต.ค. 2026: PostgreSQL Zonal Micro Bangkok SKU `6AE1-4C1F-7DF2`, USD 0.011025/hour → compute ประมาณ USD 8.04825 ต่อ 730 ชั่วโมง. ไม่รวม SSD/backup/IP/network/tax; ไม่ใช้ตัวเลขนี้อ้างเป็น total bill. [Pricing](https://cloud.google.com/sql/pricing), [Catalog API](https://docs.cloud.google.com/billing/docs/how-to/catalog-api).
 
-ตรวจผ่านเฉพาะ SQL Admin API tier availability, creation operation และ instance describe RUNNABLE. ยังไม่ได้ทดสอบ SQL login/query/migrations, Backend persistence หรือ Frontend-to-real-API. ไม่มี local Docker และไม่ได้เปิด authorized network เป็น 0.0.0.0/0. Shared-core ไม่มี SLA.
+Cloud ตรวจผ่านเฉพาะ SQL Admin API tier availability, creation operation และ instance describe RUNNABLE. Backend EF Core/Npgsql adapter และ migration SQL implement แล้ว; relational tests ใช้ SQLite ตาม [สถานะ feature](FEATURE_DELIVERY_STATUS_TH.md). ยังไม่ได้ทดสอบ live PostgreSQL login/query/apply migrations หรือ Frontend-to-real-API. ไม่มี local Docker และไม่ได้เปิด authorized network เป็น 0.0.0.0/0. Shared-core ไม่มี SLA.

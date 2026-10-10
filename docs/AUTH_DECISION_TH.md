@@ -12,7 +12,7 @@
 
 ## Ownership และ account mapping
 
-Firebase เก็บ credentials ของ Email/Google; .NET ไม่รับหรือเก็บ password ของ Firebase อีกชุด. .NET เก็บ password hash สำหรับ local Username เท่านั้น; algorithm/configuration ยังต้องกำหนดก่อน implementation.
+Firebase เก็บ credentials ของ Email/Google; .NET ไม่รับหรือเก็บ password ของ Firebase อีกชุด. .NET เก็บ password hash สำหรับ local Username เท่านั้น; implementation ใช้ ASP.NET Identity PasswordHasher iteration 210,000 ตามเอกสารสถานะ feature.
 
 บัญชีมี internal Melearn User ID; Firebase UID เป็น external identity ไม่ใช้แทน User ID ในทุก business resource. Mapping ใช้ provider/project/subject ที่ตรวจจาก token แล้วและมี uniqueness; ไม่รับ UID/email/role จาก body เพื่อให้สิทธิ์.
 
@@ -49,13 +49,13 @@ Google start/callback/link 4 operations ที่ deferred ต้อง review �
 
 ## งานถัดไปและ acceptance
 
-1. เลือก DB/ORM และ durable account/identity/session persistence; ตอนนี้ยังไม่เลือก.
+1. EF Core/PostgreSQL account/identity/session persistence + migrations implement แล้ว; ยังต้อง apply/ตรวจ Cloud SQL จริง.
 2. ปรับ canonical OpenAPI, generated DTOs, mock และ handbook พร้อมกันสำหรับ auth exchange/link/session; กำหนด signup collision, linking proof freshness, reset/email ownership และ token error semantics.
 3. ตั้ง Firebase client config แบบแยก app และ backend project/credentials ผ่าน environment/secret configuration. API key ฝั่ง clientไม่ใช่ server credential; ห้าม commit service-account private key หรือ paste credentials ในเอกสาร.
 4. Implement verifier adapter ใน Infrastructure ผ่าน Application port; local password/session use cases ไม่เรียก Firebase โดยตรงจาก Controllers.
 5. ตรวจ valid/expired/wrong-project/revoked token, duplicate identity/account, email-unverified transactions, Username ไม่มี email, link conflict, disabled user, Web/Admin isolation/logout และ Admin escalation. Provider live test ต้องมี config จริง; test doubles ไม่ใช่หลักฐาน live Firebase.
 
-สถานะปัจจุบัน: บันทึก provider decision และ integration Draft แล้วเท่านั้น. ไม่มี Firebase SDK/token verifier/session/business Auth endpoints และ Frontend ยังใช้ HTTP mock. ไม่ deploy ไม่เพิ่ม billing และไม่รัน Docker.
+สถานะปัจจุบัน: local Username Login/logout/Profile และ durable app sessions implement แล้ว; cookie/session development protocol อยู่ใน [สถานะ feature](FEATURE_DELIVERY_STATUS_TH.md). Firebase SDK/token verifier/exchange/linking ยังไม่ implement และ Frontend ยังใช้ HTTP mock. ไม่ deploy ไม่เพิ่ม billing และไม่รัน Docker.
 
 ## แหล่งอ้างอิง
 

@@ -1,6 +1,6 @@
 # Melearn Backend Architecture
 
-วันที่ 10 ตุลาคม 2026 · Architecture baseline ที่ผู้ใช้อนุญาตให้เริ่ม dev · Backend foundation เท่านั้น
+วันที่ 10 ตุลาคม 2026 · Architecture baseline + local Auth/Profile/Catalog/Free Enrollment; [สถานะ implementation](FEATURE_DELIVERY_STATUS_TH.md)
 
 ## การตัดสินใจที่ใช้แล้ว
 
@@ -106,15 +106,15 @@ Foundation tests ยังไม่เป็น contract acceptance ของ 86
 
 ## Decisions ที่ยังต้องตกลง
 
-Auth provider ยืนยันแล้ว 10 ต.ค. 2026: Firebase สำหรับ Email/Google และ .NET สำหรับ Username ไม่มี email ตาม Final 1.6. อ่าน [Auth decision และ integration Draft](AUTH_DECISION_TH.md); ยังไม่ใช่ implementation หรือ canonical HTTP contract ที่แก้แล้ว.
+Auth provider ยืนยันแล้ว 10 ต.ค. 2026: Firebase สำหรับ Email/Google และ .NET สำหรับ Username ไม่มี email ตาม Final 1.6. Local Username/session implement แล้ว; Firebase exchange/linking ยังเป็น Draft ตาม [Auth decision](AUTH_DECISION_TH.md).
 
 | เรื่อง | สถานะ / สิ่งที่ต้องเลือก |
 | --- | --- |
-| Database / ORM | PostgreSQL 16 บน Cloud SQL Bangkok instance melearn-tutor-db RUNNABLE แล้ว; EF Core/Npgsql เป็นแนวทางที่เสนอ migration/transaction/runtime DB user และ SQL connection ยังไม่ได้ implement |
-| Auth | Firebase Email/Google + .NET Username ยืนยันแล้ว; account mapping/local hash/durable session และ cookie names/domain/path/TTL/revocation/CORS/CSRF ยังต้องกำหนด |
+| Database / ORM | EF Core 10/Npgsql adapter + migrations implement แล้ว; Cloud SQL application DB/user/schema apply และ live SQL connection ยังไม่ตรวจ |
+| Auth | Local password hash/durable app sessions implement แล้ว; Strict cookies/12h/exact-origin CORS เป็น development implementation; production domains/Firebase mapping/recovery ยังต้องทำ |
 | Google | ใช้ Firebase ยืนยันแล้ว; review 4 deferred operations เป็น Firebase exchange/link flow และ account linking conflicts |
 | Stripe | 1 deferred webhook protocol; API version/signature/raw body/dedupe/idempotency |
-| Cloudflare media | ผู้ใช้เลือกทิศทาง Cloudflare แต่ยังไม่เลือก Images/R2 และ upload protocol; avatar upload ยังไม่มี contract/mock |
+| Cloudflare media | R2 เลือกแล้วและเตรียม env; upload protocol/adapter/permission ยังไม่ implement |
 | Canonical contract distribution | version/pinning/shared artifact ระหว่าง frontend/backend repos |
 | Concurrency | unified username rules, course return/publish revisions, idempotency lifetime/payload conflicts |
 | Rich document / AI / certificate | safe documents/URLs/size, async jobs/streaming, durable quota, PDF/download format |

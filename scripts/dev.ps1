@@ -1,6 +1,7 @@
 param(
     [string]$EnvFile = (Join-Path $PSScriptRoot '../.env'),
-    [switch]$CheckOnly
+    [switch]$CheckOnly,
+    [ValidateSet('Run', 'BootstrapAdmin')][string]$Operation = 'Run'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,7 +40,11 @@ try {
         # Blank placeholders do not override externally supplied credentials.
         if ($entries[$key] -ne '') { [Environment]::SetEnvironmentVariable($key, $entries[$key], 'Process') }
     }
-    & dotnet run --project (Join-Path $repoRoot 'src/Melearn.Api') --no-launch-profile
+    if ($Operation -eq 'BootstrapAdmin') {
+        & dotnet run --project (Join-Path $repoRoot 'src/Melearn.Api') --no-launch-profile -- --bootstrap-admin
+    } else {
+        & dotnet run --project (Join-Path $repoRoot 'src/Melearn.Api') --no-launch-profile
+    }
     if ($LASTEXITCODE -ne 0) { throw "dotnet run failed with exit code $LASTEXITCODE." }
 } finally {
     foreach ($key in $previousValues.Keys) {
