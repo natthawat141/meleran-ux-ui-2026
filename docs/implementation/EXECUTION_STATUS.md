@@ -5,7 +5,7 @@
 ## ผลที่ตรวจแล้ว
 
 - DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).
-- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 91/91; feature-local units 16/16; รวม 156 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
+- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 104/104; feature-local units 16/16; รวม 169 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration มี 6 Catalog + 7 Free Enroll checks แยกจาก Jest count.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
 - CI-01 DONE: hosted Nest CI [38080093084](https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084) ผ่านบน 8c07b42 รวม 156 tests, build/smoke และ 6 real frontend-client checks. Frontend source ไม่เปลี่ยนใน receiver checkpoint; Frontend CI [38076634194](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194) เป็นหลักฐานเดิมบน ea942cb (172 tests และ Web/Admin containers). D13 ปิดแล้ว.
@@ -102,3 +102,7 @@ POST /api/v1/webhooks/stripe มี original-byte signature verification แล�
 ## Admin AI / Auth session component — 11 ต.ค. 2026
 
 AUTH-BASE-01 stored-session resolution/normalized-role authority มี 8 PostgreSQL tests; AI-01 ทั้ง 3 canonical settings/transcript operations มี actual HTTP/PostgreSQL tests 13 เคส. รวม backend regression 156 tests + 6 unchanged frontend-client checks. อ่าน [ADMIN_AI_COMPONENT](ADMIN_AI_COMPONENT.md) สำหรับ owner interfaces, authorization locks, Unicode body limit และ remaining gates. ไม่มี cookie/TTL/password/provider policy ที่ประกาศปิด; legacy handlers/role writers ยังต้อง cut over. ไม่มี schema/dependency/contract/cloud/STG/deploy change. Whole tasks ยังรอ prerequisites และ full business acceptance ยังคง 0/113. Hosted Nest CI [38080093084](https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084) ผ่านบน code SHA `8c07b42ef34fcd8a754f1c089f1e83545098c9a0`: 49 foundation + 16 feature units + 91 PostgreSQL/HTTP = 156 tests, build/smoke และ 6 unchanged frontend-client checks. Metadata-only documentation checkpoint ไม่เปลี่ยน code และ skip CI ซ้ำ; receiver SHA/CI ก่อนหน้าเป็น historical evidence.
+
+## Free Enroll checkpoint — 11 ต.ค. 2026
+
+POST /courses/{id}/enroll เปลี่ยนจาก prototype check-then-create เป็น normalized Web authority + caller transaction + Course lock + existing safe EntitlementWriter. 13 actual HTTP/PostgreSQL tests ผ่าน รวม current verification, paid/hidden/owner/Admin denial, strict EmptyRequest, concurrent replay, preserved original history, SQL rollback และ concurrent price/new Admin role wait. Unchanged frontend Catalog mutation/decoder มี 7 real API/persistence checks เพิ่มจาก 6 public detail checks. Local regression 169 tests + 13 client checks; hosted checkpoint pending. อ่าน [FREE_ENROLL_COMPONENT](FREE_ENROLL_COMPONENT.md). Whole ENROLL-01 และ authenticated browser G-LEARNING ยังไม่ครบ; 0/113 full acceptance. ไม่มี contract/schema/dependency/cloud/STG/deploy change.

@@ -59,6 +59,15 @@ Infrastructure ที่ใช้ต่อ: src/prisma/prisma.module.ts แล�
 
 Progress/completion ownershipในEnrollmentsเป็น technical proposal เพื่อหลีกเลี่ยง Learning↔Assessment↔Certificate cycle.
 Assessmentส่งbackend-derived best-result proofผ่านEnrollment service; EnrollmentเรียกCertificate issuerในtransactionเดียว.
+
+Free grant execution component (11 ต.ค. 2026): Enrollments owns the atomic
+`POST /courses/{id}/enroll` command; `PrincipalService.requireLearning` checks
+fresh stored Web authority inside the caller transaction. Session/Account/roles
+locks precede Course shared lock and the existing EntitlementWriter. Exclusive
+Account lock blocks new Admin role grants as well as identity changes; existing
+role locks alone cannot protect against newly inserted roles. This route and
+Admin AI opt into normalized authority; other legacy handlers remain pending
+Auth cutover. See FREE_ENROLL_COMPONENT.md; no transport/provider policy frozen.
 Certificate issuerไม่importLearning/Assessments และไม่มีpublicissueAPI. Identityอ่าน/แก้ผ่านAuthเพื่อไม่เกิด Accounts↔Auth cycle.
 Read joinsข้ามtableอนุญาตเฉพาะprojectionที่ระบุscope/fields; ห้ามcross-module writeผ่านPrismaโดยพลการ.
 Public interfacesรับvalidated inputs/principal/transaction context ไม่รับwire claimsเป็นสิทธิ์.

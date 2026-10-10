@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 91,
+    "database_tests": 104,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -35,7 +35,9 @@
     "stripe_receiver_unit_tests": 5,
     "stripe_receiver_http_pg_tests": 10,
     "principal_resolution_postgres_tests": 8,
-    "admin_ai_http_postgres_tests": 13
+    "admin_ai_http_postgres_tests": 13,
+    "free_enroll_http_postgres_tests": 13,
+    "frontend_free_enroll_client_checks": 7
   },
   "environment": {
     "staging": false,
@@ -286,6 +288,28 @@
           "tests": 8,
           "http_operation_verified": false,
           "evidence": "Caller-owned transaction; parameterized INSERT ON CONFLICT; competing sources converge; original source/time preserved; rollback/reconnect/FK checks. Eligibility/source proof and HTTP integration remain the owning command responsibility."
+        },
+        {
+          "method": "POST",
+          "path": "/courses/{id}/enroll",
+          "operationId": "post_courses_id_enroll",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 13,
+          "frontend_client_checks": 7,
+          "protocol_document": "FREE_ENROLL_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02",
+            "AUTH-BASE-01 stored-session resolution",
+            "ENROLL-01 shared entitlement writer"
+          ],
+          "evidence": "Actual HTTP/PG normalized Web authority, verification/owner/Published/free checks, strict EmptyRequest, caller transaction and conflict-safe replay; real concurrent price/role blocking; unchanged frontend mutation/decoder and persistence.",
+          "remaining": [
+            "Own Enrollment list/query/progress projection",
+            "Complete Auth/login/provider and normalized writers",
+            "Authenticated browser G-LEARNING"
+          ],
+          "full_acceptance": false
         }
       ]
     },
@@ -817,6 +841,15 @@
           "environment": "LOCAL_PREVIEW_REMOTE_API",
           "full_feature_gate": false,
           "evidence": "EXECUTION_STATUS.md; ignored artifacts/nest-execution/browser-course-detail.png and browser-course-error.png"
+        },
+        {
+          "id": "free_enroll_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "evidence": "Unchanged fullstack Catalog enrollFree mutation/decoder -> actual built Nest HTTP -> owned Test PostgreSQL; create/replay/concurrent original grant, owner403/paid409/anonymous401.",
+          "session_fixture": true,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -893,7 +926,7 @@
             "DB-02"
           ],
           "protocol_document": "ADMIN_AI_COMPONENT.md",
-          "evidence": "Read-only fresh normalized authority/provenance, no issuance/refresh/private projection; transaction locks prevent concurrent authority revocation. Opt-in guard on Admin AI routes only.",
+          "evidence": "Read-only fresh normalized authority/provenance plus caller transaction rechecks/locks; Admin AI and Free Enroll handlers opt in. Free Enroll adds Account exclusive lock against a new Admin role grant; no issuance/refresh/provider/transport policy frozen.",
           "remaining": [
             "D01 transport/TTL/CSRF/revocation/rate policy",
             "D02 password/profile policy",
@@ -924,11 +957,11 @@
     "ci": "PASS",
     "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084",
-    "latest_component_ci": "PASS",
+    "latest_component_ci": "PENDING_NEW_FREE_ENROLL_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Frontend source unchanged in the receiver checkpoint; latest Nest CI reran 6 real frontend-client checks."
+    "frontend_ci_evidence_note": "Frontend source unchanged; new backend harness adds 7 Free Enroll client checks to 6 public Catalog checks; latest hosted confirmation pending."
   },
   "remaining_decisions": [
     "D01",

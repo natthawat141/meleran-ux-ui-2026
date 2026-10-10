@@ -8,7 +8,7 @@ const net = require('node:net');
 const { parseEnv } = require('node:util');
 const { pathToFileURL } = require('node:url');
 const { registerHooks } = require('node:module');
-const { randomUUID } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { PrismaClient, Prisma } = require('@prisma/client');
 const root = path.resolve(__dirname, '..'), frontend = path.resolve(root, '../frontend');
@@ -38,7 +38,7 @@ async function main() {
     return nextResolve(specifier, context);
   } });
   const db = new PrismaClient({ datasources: { db: { url: target.toString() } } });
-  let child, accountId;
+  let child, accountId, learnerId;
   async function stop() {
     if (child && child.exitCode === null) {
       const exited = new Promise(resolve => child.once('exit', resolve));
@@ -52,6 +52,14 @@ async function main() {
     phase = 'owned-fixtures';
     const tag = `frontend_${randomUUID()}`;
     accountId = (await db.account.create({ data: { displayName: tag, profileJson: '{"phone":"PRIVATE_PHONE"}' } })).id;
+    learnerId = (await db.account.create({ data: { displayName: tag + '_learner', origin: 'admin_created',
+      roles: 'admin', roleGrants: { create: { role: 'learner' } } } })).id;
+    await db.userRole.create({ data: { accountId, role: 'instructor' } });
+    const sessions = { learner: randomUUID(), owner: randomUUID() };
+    for (const [name, secret] of Object.entries(sessions)) await db.appSession.create({ data: {
+      tokenHash: createHash('sha256').update(secret).digest('hex').toUpperCase(),
+      accountId: name === 'learner' ? learnerId : accountId, audience: 'web', expiresAt: new Date(Date.now() + 3600000),
+    } });
     const ids = {};
     for (const status of ['published','draft','corrupt']) ids[status] = (await db.course.create({ data: {
       slug: tag + status, title: 'คอร์สจาก PostgreSQL', category: 'test', level: 'test', instructorId: accountId,
@@ -94,21 +102,53 @@ async function main() {
     assert.equal(changed.title, 'แก้แล้วและอ่านผ่าน API'); assert.deepEqual(changed.price, { amount_minor: 12300, currency: 'THB' });
     await assert.rejects(api.getCourse(ids.corrupt), error => error instanceof HttpClientError && error.kind === 'http' && error.status === 500);
     assert.deepEqual(await counts(), before);
+    // Use the unchanged frontend mutation and decoder. Session fixtures isolate
+    // this component from the pending login/provider and browser transport gate.
+    phase = 'frontend-free-enroll-checks';
+    const authenticatedApi = name => createCatalogApi(createHttpClient({
+      baseUrl: `http://127.0.0.1:${port}/api/v1`, credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'web', Cookie: `melearn_web_session=${sessions[name]}` },
+      fetcher: async (url, init) => { const response = await fetch(url, init); assert.equal(response.headers.get('x-melearn-mock'), null); return response; },
+    }));
+    const learnerApi = authenticatedApi('learner'), ownerApi = authenticatedApi('owner');
+    await db.course.update({ where: { id: ids.published }, data: { priceMinor: null } });
+    const firstGrant = await learnerApi.enrollFree(ids.published);
+    assert.equal(firstGrant.course_id, ids.published); assert.equal(firstGrant.source, 'free'); assert.equal(firstGrant.access, 'lifetime');
+    await db.$disconnect(); await db.$connect();
+    assert.deepEqual(await learnerApi.enrollFree(ids.published), firstGrant);
+    const concurrent = await Promise.all([learnerApi.enrollFree(ids.published), learnerApi.enrollFree(ids.published)]);
+    concurrent.forEach(grant => assert.deepEqual(grant, firstGrant));
+    const storedGrant = await db.enrollment.findUniqueOrThrow({ where: { accountId_courseId: { accountId: learnerId, courseId: ids.published } } });
+    assert.equal(storedGrant.id, firstGrant.id); assert.equal(storedGrant.grantedAt.toISOString(), firstGrant.granted_at);
+    await assert.rejects(ownerApi.enrollFree(ids.published), error => error instanceof HttpClientError && error.status === 403);
+    await db.course.update({ where: { id: ids.published }, data: { priceMinor: 12300 } });
+    await assert.rejects(learnerApi.enrollFree(ids.published), error => error instanceof HttpClientError && error.status === 409);
+    await assert.rejects(api.enrollFree(ids.published), error => error instanceof HttpClientError && error.status === 401);
+    // Anonymous enroll used the same public fetcher; the final network read
+    // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
     await assert.rejects(api.getCourse(ids.published), error => error instanceof HttpClientError && error.kind === 'network');
-    assert.equal(requests, 6);
+    assert.equal(requests, 7);
     const result = { component: 'INTEGRATION-01 course detail', database: 'melearn_test', checks: 6,
       unchangedFrontendClient: true, actualNestHttp: true, mockFetcher: false,
       publicDetailDecoded: true, hiddenAndUnknown404ToNull: true, savedEditAndReconnect: true,
       server500Surfaced: true, noReadOrStartupWrites: true, networkFailureSurfaced: true,
       browserAcceptance: false, fullFeatureGate: false };
+    result.freeEnroll = { component: 'ENROLL-01', checks: 7, unchangedFrontendMutation: true,
+      normalizedSessionFixture: true, canonicalDecodeAndPersistence: true, repeatAndConcurrentSameGrant: true,
+      ownCourse403: true, paidCourse409: true, anonymous401: true, loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
     await stop();
-    if (accountId) { await db.course.deleteMany({ where: { instructorId: accountId } }); await db.account.deleteMany({ where: { id: accountId } }); }
+    if (accountId) await db.enrollment.deleteMany({ where: { course: { instructorId: accountId } } });
+    if (accountId) await db.course.deleteMany({ where: { instructorId: accountId } });
+    const ownedAccounts = [accountId, learnerId].filter(Boolean);
+    await db.appSession.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.userRole.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.account.deleteMany({ where: { id: { in: ownedAccounts } } });
     await db.$disconnect(); hook.deregister();
   }
 }

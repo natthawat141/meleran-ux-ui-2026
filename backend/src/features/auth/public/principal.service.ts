@@ -45,6 +45,24 @@ export class PrincipalService {
   }
 
   /** Re-check/hold authority throughout the caller's resource transaction. */
+  async requireLearning(tx: Prisma.TransactionClient, reference: VerifiedSessionReference): Promise<AuthPrincipal> {
+    if (reference.audience !== 'web') throw new ApiException('audience_not_allowed', 403, 'ต้องเข้าสู่ระบบฝั่ง Web');
+    // UPDATE on Account also blocks an FK-backed new Admin role grant while a
+    // learning mutation is in flight; locking existing role rows alone misses it.
+    const accounts = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT a.id FROM app_sessions s JOIN accounts a ON a.id=s."accountId"
+      WHERE s."tokenHash"=${reference.tokenHash} FOR SHARE OF s FOR UPDATE OF a`);
+    if (!accounts.length) throw ApiException.unauthorized();
+    await tx.$queryRaw(Prisma.sql`SELECT role FROM user_roles WHERE "accountId"=${accounts[0].id} ORDER BY role FOR SHARE`);
+    const principal = await this.resolveHash(tx, reference);
+    if (!principal) throw ApiException.unauthorized();
+    if (principal.roles.includes('admin') || !principal.roles.some(role => role === 'learner' || role === 'instructor')) {
+      throw ApiException.forbidden('บัญชีนี้ลงเรียนไม่ได้');
+    }
+    if (!principal.learningEligible) throw new ApiException('email_not_verified', 403, 'กรุณายืนยันอีเมลก่อนลงเรียน');
+    return principal;
+  }
+
   async requireAdmin(tx: Prisma.TransactionClient, reference: VerifiedSessionReference): Promise<AuthPrincipal> {
     if (reference.audience !== 'admin') throw new ApiException('audience_not_allowed', 403, 'ต้องเข้าสู่ระบบฝั่ง Admin');
     // Auth locks precede resource locks: session/account, normalized role rows.

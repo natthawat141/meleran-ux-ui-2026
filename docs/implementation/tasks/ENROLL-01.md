@@ -20,6 +20,13 @@ command orchestration/Frontend acceptance ยังค้าง. ไม่มี
 
 ## Read set และ traceability
 
+Execution update 11 ต.ค. 2026: POST free command now has 13 canonical HTTP/PG
+tests and 7 unchanged frontend-client checks; [FREE_ENROLL_COMPONENT](../FREE_ENROLL_COMPONENT.md)
+records fresh normalized authorization, locks, EmptyRequest and atomic replay.
+The previous internal-only evidence above is historical. GET own list, complete
+Auth/provider and authenticated browser feature gates remain incomplete;
+whole ENROLL-01 stays BLOCKED and no original acceptance case is closed.
+
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.1 (line 169); §2.4 (line 264); §3.3 (line 437); §4.5 (line 956); §5.3 (line 1044); §6.3 (line 1189)
