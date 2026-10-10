@@ -1,6 +1,6 @@
 # Backend จริงและการเชื่อม Frontend
 
-วันที่ 10 ตุลาคม 2026 · Delivery plan; Cloud SQL instance สร้างแล้ว ยังไม่ deploy หรือเริ่ม business implementation
+วันที่ 10 ตุลาคม 2026 · Delivery plan; local Auth/Profile/Admin-created Learner/Catalog/Free Enrollment implement แล้ว; ยังไม่ deploy หรือเชื่อม Frontend จริง
 
 ## ยืนยันจากผู้ใช้
 
@@ -14,7 +14,7 @@
 
 | Setting | ข้อเสนอ |
 | --- | --- |
-| Engine / data access | PostgreSQL 16 ยืนยันแล้ว; EF Core/Npgsql เป็นแนวทางที่เสนอ ยังไม่ implement adapter |
+| Engine / data access | PostgreSQL 16; EF Core 10/Npgsql adapter + migrations implement แล้ว ยังไม่ apply/ตรวจ SQL connection สด |
 | Edition / tier | Enterprise / `db-f1-micro`, shared CPU, memory ประมาณ 0.6 GB |
 | Availability | Single zone; ไม่เปิด HA/read replicas ในช่วงพัฒนา |
 | Region | Bangkok `asia-southeast3` ตามคำสั่งล่าสุดของผู้ใช้ |
@@ -36,6 +36,8 @@ Cloud Run runtime service account ของ `melearn-tutor` ต้องมี�
 10 ต.ค.: เปิด Cloud SQL Admin API ฝั่ง infra และสร้าง instance แล้ว; tier availability/operation/instance describe ตรวจ RUNNABLE. ยังไม่เปลี่ยน IAM/Cloud Run หรือสร้าง application database/schema/runtime user. [คู่มือ setup](../melearn-tutor-api/docs/CLOUD_SQL_SETUP_TH.md).
 
 ## ลำดับ implementation และเกณฑ์เสร็จ
+
+สถานะล่าสุด: 9 business operations และ account/session/course/enrollment persistence models; Release build 0 warnings/errors, 35 tests ผ่าน (relational SQLite/test host). Migration SQL และ bootstrap Admin command เตรียมแล้ว. `ConnectionStrings__Melearn` และ `Firebase__ProjectId` ใน ignored .env ยังว่างตอนตรวจ; ยังไม่มี live Cloud SQL/Firebase acceptance และ Frontend ยังใช้ mock. [Endpoint coverage/ข้อจำกัด/setup](../melearn-tutor-api/docs/FEATURE_DELIVERY_STATUS_TH.md). ข้อ 1/2/4 ด้านล่างทำได้บางส่วน ไม่ถือว่าจบครบ flow.
 
 1. Persistence foundation: account/identity/local credential/app session tables และ migrations; uniqueness/transactions, DB connectivity และ readiness จริง. เลือก session cookie/Bearer/TTL/CORS/CSRF ตาม origins ที่ใช้งาน ไม่ใช้ app header เป็น role.
 2. Auth/Profile: Firebase token exchange + local Username Login + logout + GET/PATCH /me; explicit account linking, role/disabled/verification checks และ Web/Admin isolation. ปรับ canonical OpenAPI/mock/generated types พร้อมกัน.
