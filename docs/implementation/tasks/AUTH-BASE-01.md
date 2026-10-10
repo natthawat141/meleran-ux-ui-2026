@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P0 · Module: auth
 
 ต้องปิด D01, D02
 
+Execution checkpoint: policy-free PrincipalService session resolution + fresh normalized roles + transaction authority locks มี 8 PostgreSQL tests; opt-in guard ใช้กับ Admin AI handlers. ดู [ADMIN_AI_COMPONENT](../ADMIN_AI_COMPONENT.md). ไม่ปิด cookie/TTL/password/provider decisions หรือเปลี่ยน role writers/prototype handlers ทั้งระบบ.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

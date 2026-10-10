@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 70,
+    "database_tests": 91,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -33,7 +33,9 @@
     "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500",
     "frontend_hosted_tests": 172,
     "stripe_receiver_unit_tests": 5,
-    "stripe_receiver_http_pg_tests": 10
+    "stripe_receiver_http_pg_tests": 10,
+    "principal_resolution_postgres_tests": 8,
+    "admin_ai_http_postgres_tests": 13
   },
   "environment": {
     "staging": false,
@@ -492,7 +494,69 @@
         "COURSE-02",
         "DB-05"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "method": "PATCH",
+          "path": "/admin/courses/{id}/ai-support",
+          "operationId": "patch_admin_courses_id_ai-support",
+          "state": "COMPONENT_VERIFIED",
+          "feature_tests": 13,
+          "protocol_document": "ADMIN_AI_COMPONENT.md",
+          "evidence": "Actual Nest HTTP/Test PostgreSQL, normalized Admin/audience and transaction authority, strict canonical DTOs, same-course video, exact plaintext/Unicode, atomic persistence/reconnect/concurrency/rollback; learning/approval snapshots unchanged.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02",
+            "DB-05",
+            "AUTH-BASE-01 session-resolution component"
+          ],
+          "remaining": [
+            "Complete Auth/provider and Course authoring prerequisites",
+            "Frontend Admin editor/browser feature gate"
+          ],
+          "full_acceptance": false
+        },
+        {
+          "method": "GET",
+          "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+          "operationId": "get_admin_courses_id_videos_itemId_ai-transcript",
+          "state": "COMPONENT_VERIFIED",
+          "feature_tests": 13,
+          "protocol_document": "ADMIN_AI_COMPONENT.md",
+          "evidence": "Actual Nest HTTP/Test PostgreSQL, normalized Admin/audience and transaction authority, strict canonical DTOs, same-course video, exact plaintext/Unicode, atomic persistence/reconnect/concurrency/rollback; learning/approval snapshots unchanged.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02",
+            "DB-05",
+            "AUTH-BASE-01 session-resolution component"
+          ],
+          "remaining": [
+            "Complete Auth/provider and Course authoring prerequisites",
+            "Frontend Admin editor/browser feature gate"
+          ],
+          "full_acceptance": false
+        },
+        {
+          "method": "PUT",
+          "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+          "operationId": "put_admin_courses_id_videos_itemId_ai-transcript",
+          "state": "COMPONENT_VERIFIED",
+          "feature_tests": 13,
+          "protocol_document": "ADMIN_AI_COMPONENT.md",
+          "evidence": "Actual Nest HTTP/Test PostgreSQL, normalized Admin/audience and transaction authority, strict canonical DTOs, same-course video, exact plaintext/Unicode, atomic persistence/reconnect/concurrency/rollback; learning/approval snapshots unchanged.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02",
+            "DB-05",
+            "AUTH-BASE-01 session-resolution component"
+          ],
+          "remaining": [
+            "Complete Auth/provider and Course authoring prerequisites",
+            "Frontend Admin editor/browser feature gate"
+          ],
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "AI-02",
@@ -811,6 +875,25 @@
       "decision_ids": [
         "D01",
         "D02"
+      ],
+      "components": [
+        {
+          "name": "stored-session-and-normalized-principal-resolution",
+          "state": "COMPONENT_VERIFIED",
+          "postgres_tests": 8,
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01",
+            "DB-02"
+          ],
+          "protocol_document": "ADMIN_AI_COMPONENT.md",
+          "evidence": "Read-only fresh normalized authority/provenance, no issuance/refresh/private projection; transaction locks prevent concurrent authority revocation. Opt-in guard on Admin AI routes only.",
+          "remaining": [
+            "D01 transport/TTL/CSRF/revocation/rate policy",
+            "D02 password/profile policy",
+            "Normalized identity/role writers and complete Auth cutover"
+          ]
+        }
       ]
     },
     {
@@ -830,10 +913,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_NEW_ADMIN_AI_CHECKPOINT",
     "verified_sha": "26cb18665d1ba04cdb8a41f39babd50189845326",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359",
-    "latest_component_ci": "PASS",
+    "latest_component_ci": "PENDING_NEW_ADMIN_AI_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

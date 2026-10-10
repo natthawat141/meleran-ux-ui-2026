@@ -30,6 +30,8 @@ Public CourseDetail and Instructor profile have verified actual HTTP projections
 
 ## Environment and remaining work
 
+Admin AI component implements the 3 canonical settings/transcript operations using fresh normalized Admin roles and caller-owned PostgreSQL authorization/resource locks. See [component evidence and remaining gates](../docs/implementation/ADMIN_AI_COMPONENT.md). Principal resolution is a verified Auth-kernel subset; existing Auth issuance/password/provider policies and role writers remain pending. Use normalized roles for these handlers; a prototype role string does not grant authority.
+
 Stripe receiver component: `POST /api/v1/webhooks/stripe` verifies original bytes and durably deduplicates verified receipts. Set the ignored ENV `STRIPE_WEBHOOK_SECRET` to this endpoint/listener's signing secret and `STRIPE_WEBHOOK_MODE=test`. Unprocessed receipts deliberately return 503 for provider retry; this component does not process payment money or grant enrollments. See [receiver protocol/status](../docs/implementation/STRIPE_WEBHOOK_RECEIVER.md). The canonical webhook contract remains deferred and no real Stripe delivery has been verified.
 
 Prepared .env contains Firebase public Web config and server project ID plus mapped OpenRouter/Resend/R2/Stripe settings. Public Web config is not an Admin credential. Explicit process environment takes precedence over local .env; no secrets or provider payloads are logged. Missing sender, Firebase server identity, Stripe webhook configuration and D01–D16 decisions remain visible in the plan. No provider smoke calls have been made.

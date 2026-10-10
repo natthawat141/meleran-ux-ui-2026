@@ -5,7 +5,7 @@
 ## ผลที่ตรวจแล้ว
 
 - DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).
-- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 70/70; feature-local units 16/16; รวม 135 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
+- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 91/91; feature-local units 16/16; รวม 156 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
 - CI-01 DONE: hosted Nest CI [38078316359](https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359) ผ่านบน 26cb186 รวม 135 tests, build/smoke และ 6 real frontend-client checks. Frontend source ไม่เปลี่ยนใน receiver checkpoint; Frontend CI [38076634194](https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194) เป็นหลักฐานเดิมบน ea942cb (172 tests และ Web/Admin containers). D13 ปิดแล้ว.
@@ -98,3 +98,7 @@ complete from this component check.
 ## Stripe receiver checkpoint — 11 ต.ค. 2026
 
 POST /api/v1/webhooks/stripe มี original-byte signature verification และ durable deduplicated receipt บน PaymentEvent เดิม: 5 unit + 10 actual HTTP/PostgreSQL tests. รวม backend regression 135 tests. รายละเอียด local protocol และข้อจำกัดอยู่ [STRIPE_WEBHOOK_RECEIVER](STRIPE_WEBHOOK_RECEIVER.md). Canonical webhook ยัง deferred; full PROVIDER-STRIPE-01 ยัง NEEDS_DECISION/PAY-01 dependency. Signing secret ยังว่าง; ไม่มี actual Stripe delivery หรือ worker/payment processor/grant. Unprocessed receipts ตอบ 503 ให้ retry; ไม่ ACK เงินหรืออ้างผ่าน business acceptance. ไม่มี dependency/schema/migration/cloud/deploy change. Hosted Nest CI [38078316359](https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359) ผ่านบน code SHA `26cb18665d1ba04cdb8a41f39babd50189845326`: 49 foundation + 16 feature units + 70 PostgreSQL/HTTP = 135 tests, build, runtime smoke และ 6 unchanged frontend-client checks. Metadata-only checkpoint ไม่แก้ code และ skip CI ซ้ำ; SHA/CI ของ checkpoint ก่อนหน้าเป็น historical evidence.
+
+## Admin AI / Auth session component — 11 ต.ค. 2026
+
+AUTH-BASE-01 stored-session resolution/normalized-role authority มี 8 PostgreSQL tests; AI-01 ทั้ง 3 canonical settings/transcript operations มี actual HTTP/PostgreSQL tests 13 เคส. รวม backend regression 156 tests + 6 unchanged frontend-client checks. อ่าน [ADMIN_AI_COMPONENT](ADMIN_AI_COMPONENT.md) สำหรับ owner interfaces, authorization locks, Unicode body limit และ remaining gates. ไม่มี cookie/TTL/password/provider policy ที่ประกาศปิด; legacy handlers/role writers ยังต้อง cut over. ไม่มี schema/dependency/contract/cloud/STG/deploy change. Whole tasks ยังรอ prerequisites และ full business acceptance ยังคง 0/113. Hosted CI ของ checkpoint ใหม่กำลังรอ push/verify; หลักฐาน CI ข้างบนเป็น historical receiver code.
