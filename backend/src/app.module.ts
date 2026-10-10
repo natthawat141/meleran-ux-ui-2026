@@ -9,6 +9,7 @@ import { ManagementModule } from './features/management/management.module';
 import { PaymentsModule } from './features/payments/payments.module';
 import { AiModule } from './features/ai/ai.module';
 import { LearningModule } from './features/learning/learning.module';
+import { RedeemModule } from './features/redeem/redeem.module';
 import { SessionGuard } from './shared/auth/session.guard';
 
 @Module({
@@ -22,6 +23,7 @@ import { SessionGuard } from './shared/auth/session.guard';
     PaymentsModule,
     AiModule,
     LearningModule,
+    RedeemModule,
   ],
   providers: [
     {

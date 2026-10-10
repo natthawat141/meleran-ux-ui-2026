@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 125,
+    "database_tests": 146,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -40,7 +40,9 @@
     "frontend_free_enroll_client_checks": 7,
     "learning_read_http_postgres_tests": 13,
     "frontend_learning_read_client_checks": 11,
-    "resume_writer_postgres_tests": 8
+    "resume_writer_postgres_tests": 8,
+    "redeem_transaction_postgres_tests": 21,
+    "frontend_admin_revoke_client_checks": 7
   },
   "environment": {
     "staging": false,
@@ -596,7 +598,29 @@
         "DB-04",
         "AUTH-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "method": "POST",
+          "path": "/admin/redeem-codes/{id}/revoke",
+          "operationId": "post_admin_redeem-codes_id_revoke",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "REDEEM_TRANSACTION_COMPONENT.md",
+          "postgres_tests_shared": 21,
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-04",
+            "AUTH-BASE-01 stored Admin authority"
+          ],
+          "evidence": "Fresh normalized Admin locks, only Unused transition, immutable audit/replay, safe rollback, terminal Used rejection; actual Code/authority concurrency waits.",
+          "remaining": [
+            "Issue/list/generation/query review",
+            "Complete Auth/Course authoring and real browser G-REDEEM/G-AI"
+          ],
+          "full_acceptance": false,
+          "frontend_client_checks": 7
+        }
+      ]
     },
     {
       "id": "REDEEM-02",
@@ -607,7 +631,30 @@
         "REDEEM-01",
         "ENROLL-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "owned_atomic_code_entitlement",
+          "kind": "INTERNAL_PERSISTENCE_COMPONENT",
+          "state": "COMPONENT_VERIFIED",
+          "postgres_tests_shared": 21,
+          "protocol_document": "REDEEM_TRANSACTION_COMPONENT.md",
+          "component_dependencies": [
+            "DB-04",
+            "EntitlementWriter",
+            "Fresh caller authority/approved Course context"
+          ],
+          "evidence": "Caller-owned Course->Code->Entitlement transaction: consume only new grant; preserve existing source/audit/history; same-code and cross-code convergence; rollback and both directions of revoke lock wait.",
+          "http_operation_verified": false,
+          "remaining": [
+            "Public exact code-input normalization and Course-state mapping",
+            "HTTP fresh eligibility/owner orchestration and 200/201 integration",
+            "Issue/list/Auth/Course prerequisites",
+            "Full G-REDEEM delivered with G-AI"
+          ],
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "AI-01",
@@ -967,6 +1014,17 @@
           "resume_writer_integration": "Actual built internal ResumeWriter with owned locks/fixtures -> Test PG -> built Nest -> unchanged frontend decoder; public Resume mutation gate remains pending.",
           "resume_writer_integration_verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
           "resume_writer_integration_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
+        },
+        {
+          "id": "admin_revoke_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "protocol_document": "REDEEM_TRANSACTION_COMPONENT.md",
+          "evidence": "Unchanged Admin API/decoder with fixture-only client configuration -> actual built Nest/Test PG: canonical revoke/replay/reconnect, original audit, Used/unknown/audience/anonymous/network failures; actual built internal RedeemWriter fixture.",
+          "session_fixture": true,
+          "browser_acceptance": false,
+          "full_feature_gate": false,
+          "public_redeem_mutation_verified": false
         }
       ]
     },
@@ -1090,7 +1148,7 @@
     "ci": "PASS",
     "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295",
-    "latest_component_ci": "PASS_RESUME_PERSISTENCE_AND_STRIPE_RECEIVER_REGRESSION",
+    "latest_component_ci": "PENDING_REDEEM_TRANSACTION_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

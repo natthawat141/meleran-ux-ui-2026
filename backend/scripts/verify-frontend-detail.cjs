@@ -40,7 +40,9 @@ async function main() {
     if (specifier === '@melearn/contracts') return {
       url: pathToFileURL(path.join(frontend, 'packages/contracts/src/index.ts')).href, shortCircuit: true,
     };
-    if (specifier === '../../../shared/api/client' && context.parentURL?.includes('/features/learning/api/learning-api.ts')) {
+    if (specifier === '../../../shared/api/client' &&
+        (context.parentURL?.includes('/features/learning/api/learning-api.ts') ||
+         context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
       // endpoint builders/decoders and the real transport/fetch implementation.
       const name = new URL(context.parentURL).searchParams.get('learning-actor');
@@ -51,7 +53,7 @@ async function main() {
     return nextResolve(specifier, context);
   } });
   const db = new PrismaClient({ datasources: { db: { url: target.toString() } } });
-  let child, accountId, learnerId;
+  let child, accountId, learnerId, adminId;
   async function stop() {
     if (child && child.exitCode === null) {
       const exited = new Promise(resolve => child.once('exit', resolve));
@@ -67,11 +69,14 @@ async function main() {
     accountId = (await db.account.create({ data: { displayName: tag, profileJson: '{"phone":"PRIVATE_PHONE"}' } })).id;
     learnerId = (await db.account.create({ data: { displayName: tag + '_learner', origin: 'admin_created',
       roles: 'admin', roleGrants: { create: { role: 'learner' } } } })).id;
+    adminId = (await db.account.create({ data: { displayName: tag + '_admin', roles: 'learner',
+      roleGrants: { create: { role: 'admin' } } } })).id;
     await db.userRole.create({ data: { accountId, role: 'instructor' } });
-    const sessions = { learner: randomUUID(), owner: randomUUID() };
+    const sessions = { learner: randomUUID(), owner: randomUUID(), admin: randomUUID() };
     for (const [name, secret] of Object.entries(sessions)) await db.appSession.create({ data: {
       tokenHash: createHash('sha256').update(secret).digest('hex').toUpperCase(),
-      accountId: name === 'learner' ? learnerId : accountId, audience: 'web', expiresAt: new Date(Date.now() + 3600000),
+      accountId: name === 'learner' ? learnerId : name === 'admin' ? adminId : accountId,
+      audience: name === 'admin' ? 'admin' : 'web', expiresAt: new Date(Date.now() + 3600000),
     } });
     const ids = {};
     for (const status of ['published','draft','corrupt']) ids[status] = (await db.course.create({ data: {
@@ -195,11 +200,54 @@ async function main() {
     await db.progress.update({ where: { id: resume.id }, data: { resumeData: { position_seconds: -1 } } });
     await assert.rejects(learning.course(ids.published), error => error instanceof HttpClientError && error.status === 500);
     await db.progress.update({ where: { id: resume.id }, data: { resumeData: resume.resumeData, updatedAt: resume.updatedAt } });
+    phase = 'frontend-admin-revoke-checks';
+    const adminHttp = appHeader => createHttpClient({ baseUrl: `http://127.0.0.1:${port}/api/v1`,
+      fetcher: globalThis.fetch.bind(globalThis),
+      credentials: 'omit', timeoutMs: 5000, headers: { 'x-melearn-app': appHeader,
+        Cookie: `melearn_admin_session=${sessions.admin}` } });
+    const importRevoke = async (name, http) => {
+      globalThis[learningClientSlot].set(name, http);
+      const location = pathToFileURL(path.join(frontend, 'apps/admin/src/features/redeem/api/redeem-admin-api.ts'));
+      location.searchParams.set('learning-actor', name);
+      return (await import(location.href)).redeemAdminApi;
+    };
+    const adminCodes = await importRevoke('revoke-admin', adminHttp('admin'));
+    const wrongAppCodes = await importRevoke('revoke-wrong-app', adminHttp('web'));
+    const anonymousCodes = await importRevoke('revoke-anonymous', createHttpClient({
+      baseUrl: `http://127.0.0.1:${port}/api/v1`, fetcher: globalThis.fetch.bind(globalThis),
+      credentials: 'omit', timeoutMs: 5000, headers: { 'x-melearn-app': 'admin' } }));
+    const unusedCode = await db.redeemCode.create({ data: { code: tag + '_PRIVATE_UNUSED', courseId: ids.published, issuedBy: adminId } });
+    const revoked = await adminCodes.revoke(unusedCode.id);
+    assert.deepEqual(Object.keys(revoked).sort(), ['id', 'revoked_at', 'status']);
+    assert.equal(revoked.id, unusedCode.id); assert.equal(revoked.status, 'revoked');
+    const revokedRow = await db.redeemCode.findUniqueOrThrow({ where: { id: unusedCode.id } });
+    assert.equal(revokedRow.revokedBy, adminId); assert.equal(revokedRow.revokedAt.toISOString(), revoked.revoked_at);
+    await db.$disconnect(); await db.$connect();
+    assert.deepEqual(await adminCodes.revoke(unusedCode.id), revoked);
+    assert.deepEqual(await db.redeemCode.findUniqueOrThrow({ where: { id: unusedCode.id } }), revokedRow);
+    const paid = await db.course.create({ data: { slug: tag + '_paid_redeem', title: tag, instructorId: accountId,
+      category: 'test', level: 'test', priceMinor: 12000, status: 'published', publishedAt: new Date() } });
+    const usedCode = await db.redeemCode.create({ data: { code: tag + '_PRIVATE_USED', courseId: paid.id, issuedBy: adminId } });
+    const { RedeemWriter } = require(path.join(root, 'dist/features/redeem/redeem-writer.service.js'));
+    const { EntitlementWriter } = require(path.join(root, 'dist/features/enrollments/public/entitlement-writer.service.js'));
+    const grant = await db.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM courses WHERE id=${paid.id} FOR SHARE`;
+      return new RedeemWriter(new EntitlementWriter()).redeem(tx, usedCode.id, learnerId, paid.id);
+    });
+    assert.equal(grant.enrollment.source, 'redeem'); assert.equal(grant.already_enrolled, false);
+    const usedRow = await db.redeemCode.findUniqueOrThrow({ where: { id: usedCode.id } });
+    assert.equal(usedRow.usedBy, learnerId); assert.equal(usedRow.enrollmentId, grant.enrollment.id);
+    await assert.rejects(adminCodes.revoke(usedCode.id), error => error instanceof HttpClientError && error.status === 409);
+    await assert.rejects(adminCodes.revoke(randomUUID()), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects(wrongAppCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.status === 403);
+    await assert.rejects(anonymousCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.status === 401);
+    assert.deepEqual(await db.redeemCode.findUniqueOrThrow({ where: { id: usedCode.id } }), usedRow);
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
     await assert.rejects(api.getCourse(ids.published), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(learning.course(ids.published), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(adminCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.kind === 'network');
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
     const result = { component: 'INTEGRATION-01 course detail', database: 'melearn_test', checks: 6,
@@ -215,19 +263,24 @@ async function main() {
       ownerDenied: true, foreignItemDenied: true, ownResumeAndReconnect: true, safeServerAndNetworkFailure: true,
       noReadWrites: true, actualInternalResumeWriter: true, publicResumeMutationGate: false,
       loginProviderGate: false, browserAcceptance: false };
+    result.adminRevoke = { component: 'REDEEM-01 revoke', checks: 7, unchangedFrontendApiAndDecoder: true,
+      realTransportWithFixtureConfiguration: true, canonicalRevokeAndPersistence: true, originalAuditOnReplayAndReconnect: true,
+      used409: true, unknown404: true, wrongAudience403: true, anonymous401: true, networkFailure: true,
+      actualInternalRedeemWriter: true, publicRedeemMutationGate: false, loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
     await stop();
+    if (accountId) await db.redeemCode.deleteMany({ where: { course: { instructorId: accountId } } });
     if (accountId) await db.progress.deleteMany({ where: { enrollment: { course: { instructorId: accountId } } } });
     if (accountId) await db.enrollment.deleteMany({ where: { course: { instructorId: accountId } } });
     if (accountId) await db.videoTranscript.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
     if (accountId) await db.question.deleteMany({ where: { quiz: { item: { chapter: { course: { instructorId: accountId } } } } } });
     if (accountId) await db.quiz.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
     if (accountId) await db.course.deleteMany({ where: { instructorId: accountId } });
-    const ownedAccounts = [accountId, learnerId].filter(Boolean);
+    const ownedAccounts = [accountId, learnerId, adminId].filter(Boolean);
     await db.appSession.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.userRole.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.account.deleteMany({ where: { id: { in: ownedAccounts } } });

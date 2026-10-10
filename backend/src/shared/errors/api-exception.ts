@@ -4,6 +4,7 @@ export interface ValidationField { field: string; code: string }
 export interface ResourceErrorDetails {
   fields?: ValidationField[];
   current_revision?: number;
+  reason?: string;
 }
 
 export class ApiException extends HttpException {

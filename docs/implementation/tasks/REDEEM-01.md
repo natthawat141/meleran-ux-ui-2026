@@ -6,6 +6,12 @@ Status: **BLOCKED** · Priority: P1 · Module: redeem
 
 ## Read set และ traceability
 
+Execution 11 ต.ค. 2026: canonical Admin revoke operation has actual HTTP/PG
+and unchanged frontend decoder integration; original actor/time replay and
+competing Redeem lock behavior verified. See
+[REDEEM_TRANSACTION_COMPONENT](../REDEEM_TRANSACTION_COMPONENT.md).
+Issue/list and full Auth/Course/G-REDEEM/G-AI remain pending; whole task BLOCKED.
+
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.4 (line 264); §3.3 (line 437); §4.5 (line 956); §5.4 (line 1050); §6.3 (line 1189)

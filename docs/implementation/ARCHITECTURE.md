@@ -125,6 +125,14 @@ Firebase/Stripe/Resend/OpenRouter/R2/PDF adaptersหรือSDKยังไม�
 
 ## 7. Test / change gates
 
+Redeem execution component: Redeem owns Code audit through feature-local
+RedeemWriter; caller transactions use Auth → Course shared → Code exclusive →
+EntitlementWriter, with original grant preserved. Admin revoke uses fresh held
+Admin authority then Code exclusive, acquiring no later Course/Enrollment lock.
+Shared canonical EmptyRequest validation serves Free Enroll/Revoke. Public
+redeem input/lifecycle and full feature gates remain pending; see
+REDEEM_TRANSACTION_COMPONENT.md. No cross-owner write or schema delta.
+
 - ระหว่างแก้: targeted unit/authorization/contract testsตามtask.
 - จบtask: pnpm.cmd exec tsc --noEmit + relevant Jest/SuperTest suite; commandใหม่ต้องdeclaredในFoundation.
 - Current test:e2eล้างDBก่อนtest: ห้ามรันจนแยกTEST_DATABASE_URL/allowlistและisolatedfixturesแล้ว.
