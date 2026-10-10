@@ -34,3 +34,5 @@ Full ASSESS-01 start/save/submit, normalized snapshot writer, Grade/Completion o
 - Run typecheck/boundaries/blueprint; components/PG suites; build; smoke; `verify-frontend-detail.cjs` after PG tests finish. Owned fixture cleanup only; no truncate/cloud/prod mutation. Client harness uses config/session fixtures; provider/login/browser and numbered acceptance remain open.
 
 Aggregate counts/exact hosted SHA are recorded in [Execution Status](EXECUTION_STATUS.md) after verification. No contract/dependency/cloud/STG/deployment change.
+
+Verified code SHA: `5b2e7e6c857d0e2250a78b57a24b572895da8e50`; [hosted Nest CI 38093313600](https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600) passed 353 tests + 98 client checks/build/smoke/gates. Best results/attempt mutations/full feature and numbered acceptance remain open.

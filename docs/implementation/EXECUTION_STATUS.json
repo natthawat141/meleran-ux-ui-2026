@@ -669,7 +669,9 @@
             "D09 image protocol/D10 replay and committed Submitted vs canonical mapping",
             "Actual Auth/login/provider and authenticated browser G-ASSESSMENT"
           ],
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600"
         }
       ]
     },
@@ -1450,7 +1452,9 @@
           "best_result_selection_gate": false,
           "attempt_mutation_gate": false,
           "full_feature_gate": false,
-          "browser_acceptance": false
+          "browser_acceptance": false,
+          "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600"
         }
       ]
     },
@@ -1608,14 +1612,14 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_OWN_ATTEMPT_CHECKPOINT",
-    "verified_sha": "df236a23fe9a54abf194df1224bb4ae8739c0d8b",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38092340554",
-    "latest_component_ci": "PENDING_OWN_ATTEMPT_CHECKPOINT",
+    "ci": "PASS",
+    "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600",
+    "latest_component_ci": "PASS_OWN_ATTEMPT_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Unchanged Frontend feature clients tested against built Nest and isolated PostgreSQL: 89 checks including 7 current-session Logout + 8 own Payment status. Existing full frontend CI is historical unchanged-source evidence; login/provider/browser gates remain open."
+    "frontend_ci_evidence_note": "Frontend feature source unchanged; hosted Nest CI reran 98 actual feature-client checks, including 9 single own Attempt reads. Stored snapshot/session fixtures are component evidence; start/submit/grade/best-result/Auth/provider/browser gates remain open."
   },
   "remaining_decisions": [
     "D01",
