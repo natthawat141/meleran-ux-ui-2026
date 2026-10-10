@@ -126,6 +126,14 @@ Lock original User/link proof; unique provider/project/subject; conditional unus
 
 ### TX-PROFILE — Profile patch
 
+Read component: ACCOUNT-01 GET delegates Accounts caller transaction to Auth
+public SelfProfileReader; fresh bound self identity holds shared Session/Account
+and existing role locks before exact CurrentUser projection. Account edits wait
+until transaction ends. Optional profile fields use public whitelist, no repair
+or default writes; credential hash/provider subject are never selected. Linked
+method metadata is not provider verification. See SELF_PROFILE_COMPONENT.md;
+PATCH semantics and future Auth writer lock protocol remain separate decisions.
+
 Validate allowed fields and approved canonical null semantics; uniqueness enforced by DB; update allowed fields atomically through Auth-owned method. Use preconditions only where the approved contract defines them; do not add a profile revision field/header independently. Accounts facade uses exported Auth interface.
 
 ### TX-USER — Create/grant

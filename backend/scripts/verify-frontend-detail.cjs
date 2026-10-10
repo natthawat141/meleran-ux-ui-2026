@@ -44,12 +44,13 @@ async function main() {
         (context.parentURL?.includes('/features/learning/api/learning-api.ts') ||
          context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts') ||
          context.parentURL?.includes('/features/certificate/api/certificate-api.ts') ||
-         context.parentURL?.includes('/features/ai/api/ai-api.ts'))) {
+         context.parentURL?.includes('/features/ai/api/ai-api.ts') ||
+         context.parentURL?.includes('/features/auth/api/auth-session.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
       // endpoint builders/decoders and the real transport/fetch implementation.
       const name = new URL(context.parentURL).searchParams.get('learning-actor');
       if (!globalThis[learningClientSlot].has(name)) throw new Error('Unknown learning fixture client');
-      const source = `export const apiClient=globalThis[${JSON.stringify(learningClientSlot)}].get(${JSON.stringify(name)});`;
+      const source = `export const apiClient=globalThis[${JSON.stringify(learningClientSlot)}].get(${JSON.stringify(name)});export const apiConfig=globalThis[${JSON.stringify(learningClientSlot)}].apiConfig;`;
       return { url: 'data:text/javascript,' + encodeURIComponent(source), shortCircuit: true };
     }
     return nextResolve(specifier, context);
@@ -107,6 +108,7 @@ async function main() {
     await new Promise((resolve, reject) => { listener.once('error', reject); listener.listen(0, '127.0.0.1', resolve); });
     const port = listener.address().port;
     await new Promise(resolve => listener.close(resolve));
+    globalThis[learningClientSlot].apiConfig = { mock: false, baseUrl: `http://127.0.0.1:${port}/api/v1` };
     let output = '';
     child = spawn(process.execPath, ['dist/main.js'], { cwd: root, windowsHide: true,
       env: { ...process.env, NODE_ENV: 'test', PORT: String(port), DATABASE_URL: target.toString() },
@@ -376,6 +378,52 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }), originalProgress);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    phase = 'frontend-self-profile';
+    const profileChecks = [];
+    const authApiFor = async name => (await import(pathToFileURL(path.join(frontend,
+      'apps/web/src/features/auth/api/auth-session.ts')).href + '?learning-actor=' + name)).authSessionApi;
+    const ownAuth = await authApiFor('certificate-owner');
+    phase = 'frontend-self-profile-learner';
+    const ownProfile = await ownAuth.me();
+    assert.deepEqual(ownProfile, { id: learnerId, display_name: 'ชื่อปัจจุบันเปลี่ยนแล้ว', username: null, email: null,
+      email_verified: false, avatar_url: null, roles: ['learner'], origin: 'admin_created', auth_methods: [], learning_eligible: true, profile: {} });
+    profileChecks.push('canonical-nullable-owner-and-normalized-roles');
+    phase = 'frontend-self-profile-instructor';
+    const instructorProfile = await (await authApiFor('certificate-foreign')).me();
+    assert.equal(instructorProfile.id, accountId); assert.deepEqual(instructorProfile.roles, ['instructor']);
+    assert.deepEqual(instructorProfile.profile, { phone: 'PRIVATE_PHONE' });
+    profileChecks.push('instructor-self-projection');
+    phase = 'frontend-self-profile-admin';
+    const adminProfile = await (await authApiFor('certificate-admin')).me();
+    assert.equal(adminProfile.id, adminId); assert.deepEqual(adminProfile.roles, ['admin']); assert.equal(adminProfile.learning_eligible, false);
+    profileChecks.push('admin-self-projection-and-ineligible');
+    phase = 'frontend-self-profile-anonymous';
+    await assert.rejects((await authApiFor('certificate-guest')).me(), error => error instanceof HttpClientError && error.status === 401);
+    profileChecks.push('anonymous401');
+    phase = 'frontend-self-profile-reconnect';
+    await db.account.update({ where: { id: learnerId }, data: { profileJson: '{"bio":"บันทึกไว้ใน PostgreSQL","interests":[],"internalAudit":"PRIVATE_AUDIT"}' } });
+    await db.$disconnect(); await db.$connect();
+    const savedProfile = await ownAuth.me();
+    assert.deepEqual(savedProfile.profile, { bio: 'บันทึกไว้ใน PostgreSQL', interests: [] });
+    assert.equal(JSON.stringify(savedProfile).includes('PRIVATE_AUDIT'), false);
+    profileChecks.push('saved-fixture-reconnect-and-public-whitelist');
+    phase = 'frontend-self-profile-corrupt';
+    const validProfileJson = (await db.account.findUniqueOrThrow({ where: { id: learnerId } })).profileJson;
+    await db.account.update({ where: { id: learnerId }, data: { profileJson: '{"bio":false}' } });
+    await assert.rejects(ownAuth.me(), error => error instanceof HttpClientError && error.status === 500);
+    assert.equal((await db.account.findUniqueOrThrow({ where: { id: learnerId } })).profileJson, '{"bio":false}');
+    await db.account.update({ where: { id: learnerId }, data: { profileJson: validProfileJson } });
+    profileChecks.push('corrupt-storage-safe500-without-repair');
+    phase = 'frontend-self-profile-readonly';
+    const beforeProfileCounts = await counts(), beforeProfileAccount = await db.account.findUniqueOrThrow({ where: { id: learnerId } });
+    const profileSessions = () => db.appSession.findMany({ where: { accountId: learnerId }, orderBy: { tokenHash: 'asc' } });
+    const beforeProfileSessions = await profileSessions();
+    assert.deepEqual(await ownAuth.me(), savedProfile); assert.deepEqual(await ownAuth.me(), savedProfile);
+    assert.deepEqual(await counts(), beforeProfileCounts); assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), beforeProfileAccount);
+    assert.deepEqual(await profileSessions(), beforeProfileSessions);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    profileChecks.push('read-only-identity-session-and-academic-persistence');
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
@@ -387,6 +435,8 @@ async function main() {
     await assert.rejects(sendAnswer(ownAi), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(ownAi.usage(), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(ownAi.renameConversation(practiceConversation.id, 'offline'), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(ownAuth.me(), error => error instanceof HttpClientError && error.kind === 'network');
+    profileChecks.push('network-failure-without-mock-fallback');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -431,6 +481,11 @@ async function main() {
       anonymous401: true, blank422: true, reconnect: true, networkFailure: true,
       historyQuotaAcademicSnapshotsPreserved: true, deleteRetentionGate: false,
       providerGenerationGate: false, loginProviderGate: false, browserAcceptance: false };
+    result.selfProfile = { component: 'ACCOUNT-01 self read', checks: profileChecks.length, checkNames: profileChecks,
+      unchangedFrontendApiAndDecoder: true, actualNestAndPostgres: true, normalizedStoredRoles: true,
+      exactNullableOwnerProjection: true, savedFixtureReconnect: true, publicProfileWhitelist: true,
+      corruptStorageSafe500: true, noReadWrites: true, networkFailure: true,
+      profileMutationGate: false, loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');

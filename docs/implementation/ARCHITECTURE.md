@@ -92,6 +92,13 @@ Unicode canonical length, no prototype-derived normalization. See AI_RENAME_COMP
 
 Critical interface contracts เป็น PROPOSED: Auth.resolvePrincipal(session,audience) คืน internal principal/roles/eligibility; Courses.getLearningDefinition(principal,courseId) คืน authorized content/revision โดยไม่เปิด answer keys ให้ learner; Courses.getAssessmentDefinitionForAttempt(principal,enrollment,quizId) คืน immutable-definition input พร้อม private keys เฉพาะ Assessments service ไม่ serialize ออก HTTP; Enrollments.grantEntitlement(tx,userId,courseId,sourceRef) คืน created-or-existing Enrollment โดยไม่ทับ source เดิม; Enrollments.recordItemResult(tx,trustedProof) ตรวจ same-course/current content/best graded result ก่อน completion; Certificates.issueForCompletion(tx,completionSnapshot) คืน Certificate เดิมหรือสร้างหนึ่งรายการ. Proof เหล่านี้สร้างภายใน service เท่านั้น ไม่มี controller รับ proof/score/eligibility จาก client.
 
+ACCOUNT-01 GET execution: Accounts owns Controller/SelfProfileService and opens
+the read transaction; Auth exports SelfProfileReader via public/index and owns
+bounded identity/credential projection. Fresh normalized self authority holds
+Session/Account/existing roles; no passwordHash/provider subject select, CSV role
+fallback, stored metadata serialization or repair writes. Method-level guard
+cutover keeps pending PATCH separate. See SELF_PROFILE_COMPONENT.md.
+
 ## 5. Database and transaction contract
 
 Learning read component: bounded Course/Item/own Enrollment/Progress/Certificate

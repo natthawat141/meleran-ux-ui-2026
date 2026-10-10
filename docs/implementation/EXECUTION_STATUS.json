@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 217,
+    "database_tests": 231,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,11 +51,13 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 66,
+    "frontend_client_checks_total": 74,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
-    "frontend_ai_rename_client_checks": 7
+    "frontend_ai_rename_client_checks": 7,
+    "self_profile_http_postgres_tests": 14,
+    "frontend_self_profile_client_checks": 8
   },
   "environment": {
     "staging": false,
@@ -162,6 +164,32 @@
       "decision_ids": [
         "D02",
         "D09"
+      ],
+      "components": [
+        {
+          "id": "self_profile_read",
+          "method": "GET",
+          "path": "/me",
+          "operationId": "get_me",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 14,
+          "frontend_client_checks": 8,
+          "protocol_document": "SELF_PROFILE_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01 identity tables",
+            "DB-02 normalized roles",
+            "AUTH-BASE-01 fresh self authority"
+          ],
+          "evidence": "Accounts caller transaction -> Auth public bound self identity projection; exact CurrentUser, nullable identity, normalized roles, linked-method metadata without sensitive selects, profile whitelist/no defaults or read repair. Post-guard disable, actual SQL safe500, real identity-edit lock wait and reconnect/parallel no writes tested.",
+          "remaining": [
+            "PATCH/D02 username/null/array semantics",
+            "D09 image protocol",
+            "Complete Auth D01/D03 and actual Firebase/Email providers",
+            "Authenticated browser G-AUTH and A03/A09"
+          ],
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1281,6 +1309,18 @@
           "full_feature_gate": false,
           "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867"
+        },
+        {
+          "id": "self_profile_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 8,
+          "protocol_document": "SELF_PROFILE_COMPONENT.md",
+          "evidence": "Unchanged authSessionApi.me/decodeCurrentUser -> built Nest/Test PG; named canonical nullable owner, Instructor/Admin, anonymous401, saved fixture reconnect/whitelist, corrupt500/no repair, read-only values, network failures.",
+          "session_fixture": true,
+          "profile_mutation_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1405,6 +1445,17 @@
           ],
           "verified_sha": "5142d752125b7f43b801b4cf4c3f975abefab939",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38086767802"
+        },
+        {
+          "id": "bound_self_profile_projection",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "SELF_PROFILE_COMPONENT.md",
+          "tests_shared_with": "ACCOUNT-01 read HTTP/PostgreSQL 14, not an additional test count",
+          "evidence": "Auth owns bounded identity and linked-method metadata queries; read does not select passwordHash/provider subject or accept a target account ID. Fresh self authority and Account lock protect profile reads from concurrent identity edits.",
+          "remaining": [
+            "Credential/link writer locking under reviewed Auth protocol",
+            "D01/D02/D03 full Auth and provider cutover"
+          ]
         }
       ]
     },
@@ -1425,10 +1476,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_SELF_PROFILE_CHECKPOINT",
     "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867",
-    "latest_component_ci": "PASS_AI_RENAME_CHECKPOINT",
+    "latest_component_ci": "PENDING_SELF_PROFILE_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

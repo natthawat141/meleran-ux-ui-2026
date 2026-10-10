@@ -2,6 +2,14 @@
 
 Status: **NEEDS_DECISION** · Priority: P0 · Module: accounts
 
+Execution 11 ต.ค. 2026: GET /me implemented as a separate confirmed read component;
+Auth public SelfProfileReader owns bounded identity/credential projection; Accounts
+opens the caller transaction. Fresh normalized roles, exact nullable CurrentUser,
+public profile whitelist, safe corrupted-storage failure and no read writes are
+tested on real HTTP/PostgreSQL. See [SELF_PROFILE_COMPONENT](../SELF_PROFILE_COMPONENT.md)
+and EXECUTION_STATUS for current evidence. PATCH/D02/D09 and full Auth/provider/browser
+gates remain; this note does not close ACCOUNT-01/A03/A09 or approve PATCH semantics.
+
 ต้องปิด D02, D09
 
 ## Read set และ traceability
