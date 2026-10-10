@@ -20,6 +20,8 @@ HTTP dev host: `http://127.0.0.1:5100`.
 
 ### Local environment
 
+Cloudflare R2: กรอก `CloudflareR2__AccountId`, `CloudflareR2__BucketName`, `CloudflareR2__ServiceUrl` (S3 API endpoint จาก Cloudflare), `CloudflareR2__AccessKeyId` และ `CloudflareR2__SecretAccessKey` ใน `.env` ฝั่ง Backend. `CloudflareR2__PublicBaseUrl` เป็น public/custom domain ถ้ามี; private bucket เว้นว่างได้. ยังไม่มี upload adapter; ช่องเหล่านี้เป็นการเตรียม configuration เท่านั้น.
+
 คัดลอก `.env.example` เป็น `.env` และกรอก `OpenRouter__ApiKey`, `OpenRouter__Model`, `Resend__ApiKey`, `Resend__From` และ Firebase project/credential path เมื่อพร้อม. `.env` ถูก Git ignore; private credential file ให้เก็บนอก repository. Frontend ใช้เฉพาะ Firebase public client config; ห้ามนำ OpenRouter/Resend API keys ไปใส่ `VITE_*`.
 
 ```powershell
