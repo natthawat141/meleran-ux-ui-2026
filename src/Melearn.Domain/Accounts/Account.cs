@@ -17,6 +17,8 @@ public sealed class Account
     public int Revision { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public Guid? CreatedBy { get; set; }
+    public Guid? InstructorAddedBy { get; set; }
+    public DateTimeOffset? InstructorAddedAt { get; set; }
     public bool HasRole(string role) => Roles.Split(',').Contains(role, StringComparer.Ordinal);
     public bool LearningEligible => !Disabled && (Origin == "admin_created" || EmailVerified);
 }

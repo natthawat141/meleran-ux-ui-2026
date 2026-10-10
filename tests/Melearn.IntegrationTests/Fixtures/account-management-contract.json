@@ -1,0 +1,660 @@
+{
+  "source": "docs/api-contract/openapi.json (canonical shared repository)",
+  "source_normalized_sha256": "C52E240ED1467DF9C4A5AF99045292F83814F23B86D64532441D98B64DA160C3",
+  "operations": {
+    "get /admin/users": {
+      "parameters": [
+        {
+          "name": "q",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "success_schema": {
+        "$ref": "#/components/schemas/AdminUserPage"
+      }
+    },
+    "get /admin/users/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ],
+      "success_schema": {
+        "$ref": "#/components/schemas/AdminUserDetailDto"
+      }
+    },
+    "get /admin/instructors": {
+      "parameters": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 20
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "success_schema": {
+        "$ref": "#/components/schemas/InstructorPage"
+      }
+    },
+    "post /admin/users/{id}/instructor": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ],
+      "success_schema": {
+        "$ref": "#/components/schemas/AssignInstructorResponse"
+      }
+    }
+  },
+  "schemas": {
+    "AdminUserPage": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AdminUserSummary"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor"
+      ],
+      "additionalProperties": false
+    },
+    "AdminUserDetailDto": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "type": "object",
+          "properties": {
+            "bio": {
+              "type": "string"
+            },
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "firstNameEnglish": {
+              "type": "string"
+            },
+            "lastNameEnglish": {
+              "type": "string"
+            },
+            "certificateName": {
+              "type": "string"
+            },
+            "birthDate": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "school": {
+              "type": "string"
+            },
+            "educationLevel": {
+              "type": "string"
+            },
+            "interests": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "learningGoals": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "auth_methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "google",
+              "password"
+            ]
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "username": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "email_verified": {
+          "type": "boolean"
+        },
+        "avatar_url": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "instructor",
+              "learner",
+              "admin"
+            ]
+          }
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "self_email",
+            "google",
+            "admin_created"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "active"
+          ]
+        },
+        "created_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile",
+        "auth_methods",
+        "id",
+        "display_name",
+        "username",
+        "email",
+        "email_verified",
+        "avatar_url",
+        "roles",
+        "origin",
+        "status",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorPage": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/InstructorSummary"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor"
+      ],
+      "additionalProperties": false
+    },
+    "AssignInstructorResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/components/schemas/CurrentUser"
+        },
+        "added_by": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "added_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "user",
+        "added_by",
+        "added_at"
+      ],
+      "additionalProperties": false
+    },
+    "CurrentUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "username": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "email_verified": {
+          "type": "boolean"
+        },
+        "avatar_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "learner",
+              "instructor",
+              "admin"
+            ]
+          }
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "self_email",
+            "google",
+            "admin_created"
+          ]
+        },
+        "auth_methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "password",
+              "google"
+            ]
+          }
+        },
+        "learning_eligible": {
+          "type": "boolean"
+        },
+        "profile": {
+          "$ref": "#/components/schemas/AccountProfile"
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "username",
+        "email",
+        "email_verified",
+        "avatar_url",
+        "roles",
+        "origin",
+        "auth_methods",
+        "learning_eligible",
+        "profile"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorEnvelope": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "message": {
+              "type": "string"
+            },
+            "request_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "details": {
+              "$ref": "#/components/schemas/ResourceErrorDetails"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "request_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "AdminUserSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "username": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "email_verified": {
+          "type": "boolean"
+        },
+        "avatar_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "learner",
+              "instructor",
+              "admin"
+            ]
+          }
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "self_email",
+            "google",
+            "admin_created"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "pending"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "username",
+        "email",
+        "email_verified",
+        "avatar_url",
+        "roles",
+        "origin",
+        "status",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "avatar_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "avatar_url"
+      ],
+      "additionalProperties": false
+    },
+    "AccountProfile": {
+      "type": "object",
+      "properties": {
+        "bio": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "firstNameEnglish": {
+          "type": "string"
+        },
+        "lastNameEnglish": {
+          "type": "string"
+        },
+        "certificateName": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "school": {
+          "type": "string"
+        },
+        "educationLevel": {
+          "type": "string"
+        },
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 30
+        },
+        "learningGoals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 30
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "ResourceErrorDetails": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ResourceValidationField"
+          }
+        },
+        "current_revision": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ResourceValidationField": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "code"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

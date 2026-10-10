@@ -2,7 +2,7 @@
 
 ASP.NET Core .NET 10 · Clean Architecture + Feature-first / use cases · Backend foundation
 
-เริ่มพัฒนา 10 ตุลาคม 2026 ตามคำสั่งผู้ใช้. มี EF Core/PostgreSQL adapter + migrations และ 9 business operations สำหรับ local Username Auth/Profile, Admin-created Learner และ Catalog/Free Enrollment. ยังไม่ apply Cloud SQL หรือทำ Firebase/provider integrations. Frontend ยังใช้ HTTP mock; ไม่เปลี่ยน base URL ทั้งระบบจน endpoint ที่เกี่ยวข้องพร้อม. [สถานะ feature และวิธีตั้งค่า](docs/FEATURE_DELIVERY_STATUS_TH.md).
+เริ่มพัฒนา 10 ตุลาคม 2026 ตามคำสั่งผู้ใช้. มี EF Core/PostgreSQL adapter + migrations และ 13 business operations สำหรับ local Username Auth/Profile, Admin accounts/Instructor assignment และ Catalog/Free Enrollment. ยังไม่ apply Cloud SQL หรือทำ Firebase/provider integrations. Frontend ยังใช้ HTTP mock; ไม่เปลี่ยน base URL ทั้งระบบจน endpoint ที่เกี่ยวข้องพร้อม. [สถานะ feature และวิธีตั้งค่า](docs/FEATURE_DELIVERY_STATUS_TH.md).
 
 ## เริ่มใช้งาน
 
@@ -62,7 +62,7 @@ Paths ข้างต้นอ้าง sibling checkout ใน workspace นี
 
 ## ผลตรวจ foundation
 
-วันที่ 10 ต.ค. 2026: Release build ผ่าน 0 warnings / 0 errors; architecture tests 5 และ HTTP integration tests 30 ผ่าน รวม 35 tests. Business tests ใช้ relational SQLite ใน ASP.NET test host; ไม่รัน Docker หรือ live Cloud SQL/provider. ผลล่าสุดและ coverage อยู่ในเอกสารสถานะ feature.
+วันที่ 10 ต.ค. 2026: Release build/test ผ่าน; architecture tests 6 และ HTTP integration tests 46 ผ่าน รวม 52 tests. Business tests ใช้ relational SQLite ใน ASP.NET test host; ไม่รัน Docker หรือ live Cloud SQL/provider. Response ของ Admin management ตรวจชนิด/required/nullable/enum/additional fields กับ snapshot ของ canonical schema. Snapshot ตรวจซ้ำได้ด้วย `scripts/sync-account-contract.ps1 -CheckOnly`; regenerate หลัง review contract change ด้วย script เดียวกัน. ผลล่าสุดและ coverage อยู่ในเอกสารสถานะ feature.
 
 ตรวจ Kestrel ชุดล่าสุดด้วย temporary port 5110 แล้ว: `/health/live` 200, `/health/ready` 503, `/api/v1/me` 401, `/api/v1/courses` 503 (persistence_not_configured) และ `/test-only/throw` 404. ปิด process ที่ใช้ตรวจแล้ว. Live Cloud SQL/Firebase acceptance ยังไม่ได้ตรวจ; ไม่ใช้ผล foundation เก่าแทนชุดนี้.
 

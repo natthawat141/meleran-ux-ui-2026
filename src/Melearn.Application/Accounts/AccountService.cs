@@ -13,6 +13,38 @@ public sealed class AccountService(IAccountStore store, ILocalPassword passwords
     public static string Digest(string secret) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(secret)));
     public static string Normalize(string value) => value.Trim().ToUpperInvariant();
 
+    public Task<string[]> AuthMethods(Account account, CancellationToken ct) => store.AuthMethods(account.Id, ct);
+
+    public Task<IReadOnlyList<Account>> ListAccounts(Account actor, AccountListQuery query, CancellationToken ct)
+    {
+        RequireAdmin(actor);
+        return store.List(query, ct);
+    }
+
+    public async Task<Account> GetAccount(Account actor, Guid id, CancellationToken ct)
+    {
+        RequireAdmin(actor);
+        return await store.FindById(id, ct) ?? throw Error("not_found", 404, "ไม่พบบัญชีผู้ใช้");
+    }
+
+    public async Task<Account> AssignInstructor(Account actor, Guid id, CancellationToken ct)
+    {
+        var account = await GetAccount(actor, id, ct);
+        if (account.HasRole("admin")) throw Error("invalid_state", 409, "บัญชี Admin เป็น Instructor ไม่ได้");
+        if (account.HasRole("instructor")) return account;
+        account.Roles = string.Join(',', account.Roles.Split(',').Concat(["learner", "instructor"]).Distinct());
+        account.InstructorAddedBy = actor.Id;
+        account.InstructorAddedAt = clock.GetUtcNow();
+        account.Revision++;
+        await store.Save(ct);
+        return account;
+    }
+
+    private static void RequireAdmin(Account actor)
+    {
+        if (!actor.HasRole("admin") || actor.Disabled) throw Error("forbidden", 403, "เฉพาะ Admin เท่านั้น");
+    }
+
     public async Task<SessionIssue> Login(string identifier, string password, string audience, CancellationToken ct)
     {
         if (audience is not ("web" or "admin")) throw Error("validation_failed", 422, "พื้นที่เข้าสู่ระบบไม่ถูกต้อง");

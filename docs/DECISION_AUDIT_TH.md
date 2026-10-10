@@ -39,4 +39,6 @@ HTTP integration ใช้ SQLite test host และส่ง Cookie header เ
 
 Audit นี้ไม่เปลี่ยน business source, credentials, infrastructure หรือ deploy. Sonnet fallback ถูกถอนในชุดแก้ก่อน audit; ประเด็นอื่นในตารางยังเปิดอยู่.
 
+อัปเดตหลัง audit ตามคำสั่งทำ API ที่กติกาชัดเจน: แก้ auth_methods ให้มาจาก credentials/linked identities จริงแล้ว พร้อม HTTP/schema regression tests. เพิ่ม Admin users list/detail, Instructor list/assignment ตาม canonical/R4A; ยังไม่ทำ Firebase link flow จริง. Findings อื่นยังเปิดอยู่; ไม่ถือว่า test ผ่านเป็นการอนุมัติ policies ที่ค้าง.
+
 อ้างอิงพฤติกรรม cookie: [MDN Set-Cookie / SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie).

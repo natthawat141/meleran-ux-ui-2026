@@ -19,9 +19,10 @@ public sealed class AuthController(IServiceProvider services, IWebHostEnvironmen
     {
         if (SessionAuthentication.Audience(HttpContext) != request.Audience)
             throw new AccountOperationException("validation_failed", 422, "พื้นที่เข้าสู่ระบบไม่ตรงกับแอป");
-        var issue = await services.GetRequiredService<AccountService>().Login(request.Identifier, request.Password, request.Audience, ct);
+        var accounts = services.GetRequiredService<AccountService>();
+        var issue = await accounts.Login(request.Identifier, request.Password, request.Audience, ct);
         Response.Cookies.Append(SessionAuthentication.Cookie(request.Audience), issue.Secret, CookieOptions(issue.ExpiresAt));
-        return Ok(new { user = CurrentUser.From(issue.Account) });
+        return Ok(new { user = CurrentUser.From(issue.Account, await accounts.AuthMethods(issue.Account, ct)) });
     }
 
     [Authorize]

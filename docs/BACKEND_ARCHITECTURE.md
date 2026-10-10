@@ -88,7 +88,7 @@ Api รับ/validate/map HTTP DTO → Application ใช้ identity ที่
 - Request ID ใช้ server TraceIdentifier; ยังไม่รับ caller-supplied correlation header เป็นค่าที่เชื่อถือได้.
 - `/health/live` เป็น liveness; `/health/ready` ตอบ 503 จนกว่าจะมี capability checks จริง.
 
-ยังไม่มี authentication/authorization middleware, DB, validators เฉพาะ business DTO หรือ provider SDK. Business endpoints ต้องเพิ่ม identity + resource permission tests ก่อนเปิดใช้งาน ห้ามอาศัย audience/header/client role เพื่อให้สิทธิ์.
+มี local session authentication/authorization, EF Core/PostgreSQL adapter และ HTTP business tests แล้วสำหรับ operations ในเอกสารสถานะ feature; Firebase/provider SDK และ live DB acceptance ยังไม่ครบ. ทุก business endpoint ต้องตรวจ identity + resource permissions ฝั่ง server ห้ามอาศัย audience/header/client role เพื่อให้สิทธิ์.
 
 ## Contract workflow
 

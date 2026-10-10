@@ -2,11 +2,15 @@ using Melearn.Domain.Accounts;
 
 namespace Melearn.Application.Accounts;
 
+public sealed record AccountListQuery(string? Search, bool InstructorsOnly, int Limit, int Offset);
+
 public interface IAccountStore
 {
     Task<Account?> FindByUsername(string normalizedUsername, CancellationToken cancellationToken);
     Task<Account?> FindById(Guid id, CancellationToken cancellationToken);
     Task<LocalCredential?> FindCredential(Guid id, CancellationToken cancellationToken);
+    Task<string[]> AuthMethods(Guid id, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Account>> List(AccountListQuery query, CancellationToken cancellationToken);
     Task<AppSession?> FindSession(string digest, CancellationToken cancellationToken);
     Task<bool> UsernameExists(string normalizedUsername, Guid except, CancellationToken cancellationToken);
     void AddSession(AppSession session);

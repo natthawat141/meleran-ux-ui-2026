@@ -247,3 +247,28 @@ BEGIN
     END IF;
 END $EF$;
 COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261010095450_InstructorGrantAudit') THEN
+    ALTER TABLE accounts ADD "InstructorAddedAt" timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261010095450_InstructorGrantAudit') THEN
+    ALTER TABLE accounts ADD "InstructorAddedBy" uuid;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20261010095450_InstructorGrantAudit') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20261010095450_InstructorGrantAudit', '10.0.11');
+    END IF;
+END $EF$;
+COMMIT;
