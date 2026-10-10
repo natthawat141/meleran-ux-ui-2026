@@ -17,6 +17,8 @@ export class ApiException extends HttpException {
   ) {
     super({ error: { code, message } }, status);
     this.code = code;
+    // Nest cannot infer Error.message from our nested canonical envelope.
+    this.message = message;
   }
 
   static notFound(message = 'ไม่พบข้อมูลที่ต้องการ') {

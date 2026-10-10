@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { randomUUID, createHash } from 'node:crypto';
 import { assertIsolatedTestDatabase } from './test-database';
 
-export function testConnections(): { runtime: PrismaClient; migrator: PrismaClient; migrationUrl: string } {
+export function testConnections(): { runtime: PrismaClient; migrator: PrismaClient; migrationUrl: string; runtimeUrl: string } {
   const env = { ...parseEnv(readFileSync(resolve(__dirname, '../../.env'), 'utf8')), ...process.env };
   const runtimeUrl = assertIsolatedTestDatabase(env);
   const url = new URL(env.MIGRATION_DATABASE_URL || '');
@@ -14,7 +14,7 @@ export function testConnections(): { runtime: PrismaClient; migrator: PrismaClie
   if (url.hostname !== runtime.hostname || url.port !== runtime.port || url.pathname !== runtime.pathname ||
       url.username !== 'melearn_test_migrator') throw new Error('Migrator must match the isolated test target.');
   return { runtime: new PrismaClient({ datasources: { db: { url: runtimeUrl } } }),
-    migrator: new PrismaClient({ datasources: { db: { url: url.toString() } } }), migrationUrl: url.toString() };
+    migrator: new PrismaClient({ datasources: { db: { url: url.toString() } } }), migrationUrl: url.toString(), runtimeUrl };
 }
 
 export async function assertMigration(client: PrismaClient, name: string): Promise<void> {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ApiException } from '../../shared/errors/api-exception';
+import { CourseDetailDto, storedItemType, storedOutcomes } from './dto/course-detail.dto';
 
 @Injectable()
 export class CoursesService {
@@ -85,16 +86,20 @@ export class CoursesService {
     return { items, next_cursor: nextCursor };
   }
 
-  async getById(id: string) {
-    const course = await this.prisma.course.findUnique({
-      where: { id },
-      include: {
+  async getById(id: string): Promise<CourseDetailDto> {
+    const course = await this.prisma.course.findFirst({
+      where: { id, status: 'published', publishedAt: { not: null } },
+      select: {
+        id: true, slug: true, title: true, subtitle: true, coverUrl: true,
+        category: true, level: true, priceMinor: true, publishedAt: true,
+        description: true, outcomesJson: true,
         instructor: {
           select: { id: true, displayName: true, avatarUrl: true },
         },
         chapters: {
           orderBy: { position: 'asc' },
-          include: {
+          select: {
+            id: true, title: true,
             items: {
               orderBy: { position: 'asc' },
               select: { id: true, title: true, type: true },
@@ -104,7 +109,7 @@ export class CoursesService {
       },
     });
 
-    if (!course || course.status !== 'published' || !course.publishedAt) {
+    if (!course || !course.publishedAt) {
       throw ApiException.notFound('ไม่พบคอร์ส');
     }
 
@@ -124,16 +129,16 @@ export class CoursesService {
         display_name: course.instructor.displayName,
         avatar_url: course.instructor.avatarUrl,
       },
-      published_at: course.publishedAt,
+      published_at: course.publishedAt.toISOString(),
       description: course.description,
-      outcomes: JSON.parse(course.outcomesJson || '[]'),
+      outcomes: storedOutcomes(course.outcomesJson),
       outline: course.chapters.map((ch) => ({
         id: ch.id,
         title: ch.title,
         items: ch.items.map((i) => ({
           id: i.id,
           title: i.title,
-          type: i.type,
+          type: storedItemType(i.type),
         })),
       })),
     };

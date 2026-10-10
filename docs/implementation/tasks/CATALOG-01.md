@@ -83,3 +83,7 @@ Feature gate: **G-COURSE** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+## Component evidence — 2026-10-11
+
+get_courses_id implemented/tested against real Nest HTTP/Test PostgreSQL: 6 cases covering canonical success/errors, published visibility, public fields only, chapter/item order, paid/free mapping, reconnect, invalid stored shape and no writes. Typed feature-local DTO. get_courses listing remains D16-blocked; task stays NEEDS_DECISION and does not claim full feature/frontend acceptance.

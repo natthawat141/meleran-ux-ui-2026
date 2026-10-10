@@ -5,10 +5,10 @@
 ## ผลที่ตรวจแล้ว
 
 - DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).
-- Foundation/architecture tests 49/49; PostgreSQL tests 40/40; strict typecheck และ Nest build ผ่าน.
+- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP component tests 46/46; strict typecheck และ Nest build ผ่าน.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
-- CI-01 DONE: hosted CI [38073566063](https://github.com/natthawat141/meleran-tutor/actions/runs/38073566063) ผ่านบน da4a65b; follow-up hardening จะตรวจอีก run. D13 ปิดแล้ว.
+- CI-01 DONE: hosted CI [38074131304](https://github.com/natthawat141/meleran-tutor/actions/runs/38074131304) ผ่านบน 23e8e41; Catalog detail component จะตรวจ run ถัดไป. D13 ปิดแล้ว.
 - COMPLETION-01 เป็น NEEDS_DECISION: dependencies จริงคือ DB-02/DB-03 ที่ผ่านแล้ว และ D06 สำหรับ best result ข้ามคะแนนเต็มต่างกัน.
 
 ## Checkout และ Git
@@ -55,3 +55,7 @@ Root CI installs existing pinned lockfiles, provisions disposable PostgreSQL, ru
 ## Coverage recheck
 
 node scripts/check-blueprint.cjs ผ่าน: canonical 86 operations, 5 deferred, 113 case IDs พร้อม action/expected ตรง Scope เดิม, 50-task DAG และ checksums. 8 read operations ไม่มี dedicated numbered acceptance case ใน Scope; ต้องมี targeted feature tests ตามใบงานโดยไม่เพิ่ม case IDs ปลอม. ข้อเสนอที่ส่งให้ตัดสินอยู่ [NEXT_DECISIONS_TH](NEXT_DECISIONS_TH.md).
+
+## CATALOG-01 component progress
+
+GET /courses/{id} / get_courses_id ผ่าน real Nest HTTP+PostgreSQL 6 tests: explicit public select, canonical nullable/THB/date/outline, hidden/unknown 404, no private fields/body/keys, reconnect, corrupt outcomes fail closed, startup/read no session/grant/progress writes. Typed CourseDetail DTO separates storage from wire shape. Also fixed nested ApiException message propagation; Foundation regression passed. GET /courses search/sort/cursor still awaits D16; whole task and Frontend gate remain incomplete.
