@@ -514,7 +514,9 @@
             "Complete Auth/provider and Course authoring prerequisites",
             "Frontend Admin editor/browser feature gate"
           ],
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084"
         },
         {
           "method": "GET",
@@ -534,7 +536,9 @@
             "Complete Auth/provider and Course authoring prerequisites",
             "Frontend Admin editor/browser feature gate"
           ],
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084"
         },
         {
           "method": "PUT",
@@ -554,7 +558,9 @@
             "Complete Auth/provider and Course authoring prerequisites",
             "Frontend Admin editor/browser feature gate"
           ],
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084"
         }
       ]
     },
@@ -892,7 +898,9 @@
             "D01 transport/TTL/CSRF/revocation/rate policy",
             "D02 password/profile policy",
             "Normalized identity/role writers and complete Auth cutover"
-          ]
+          ],
+          "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084"
         }
       ]
     },
@@ -913,10 +921,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_NEW_ADMIN_AI_CHECKPOINT",
-    "verified_sha": "26cb18665d1ba04cdb8a41f39babd50189845326",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359",
-    "latest_component_ci": "PENDING_NEW_ADMIN_AI_CHECKPOINT",
+    "ci": "PASS",
+    "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084",
+    "latest_component_ci": "PASS",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
