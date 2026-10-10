@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Melearn.Api/Melearn.Api.csproj" />
+    <Project Path="src/Melearn.Application/Melearn.Application.csproj" />
+    <Project Path="src/Melearn.Domain/Melearn.Domain.csproj" />
+    <Project Path="src/Melearn.Infrastructure/Melearn.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Melearn.ArchitectureTests/Melearn.ArchitectureTests.csproj" />
+    <Project Path="tests/Melearn.IntegrationTests/Melearn.IntegrationTests.csproj" />
+  </Folder>
+</Solution>
