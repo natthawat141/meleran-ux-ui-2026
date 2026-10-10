@@ -4,7 +4,7 @@
 
 เอกสารนี้เตรียมข้อกำหนด API จาก [MELEARN_V1_SCOPE.md](MELEARN_V1_SCOPE.md) เพื่อให้ Frontend และ Backend ตกลงทีละ flow; ผู้ใช้อนุญาตให้ Frontend ทำ Draft types/mock/hooks ต่อได้ก่อน Backend พร้อม ปัจจุบันมี Frontend OpenAPI Draft ให้ตรวจแล้ว แต่ยังไม่มี Backend implementation/owner จึงห้ามนำ candidate path/payload ด้านล่างไปเรียกว่า frozen contract หรือใช้สร้าง production integration โดยไม่ผ่านการยืนยันร่วมกัน
 
-รายละเอียด request/response/error ของ Flow A และ B อยู่ใน [Flow A/B Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) (ยังเป็น draft เช่นกัน) และ Mock API ทุก flow สำหรับ dev/test อยู่ใน [Provisional API Mock](PROVISIONAL_API_MOCK_TH.md) (ไม่ใช่ contract)
+เริ่มอ่าน inventory และ JSON ของทุก feature ที่ [API Contract แยก 14 ฟีเจอร์](API_CONTRACT_FEATURES_TH.md): methods/path, request/response examples, fields/validation/permissions และช่องว่าง provider/media. เป็น readable projection ที่สร้างจาก OpenAPI แหล่งเดียว ไม่ใช่ schema อีกชุด. รายละเอียด request/response/error ของ Flow A และ B อยู่ใน [Flow A/B Draft](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) (ยังเป็น draft เช่นกัน) และ Mock API ทุก flow สำหรับ dev/test อยู่ใน [Provisional API Mock](PROVISIONAL_API_MOCK_TH.md) (ไม่ใช่ contract)
 
 ## Contract source และผลตรวจ 9 ต.ค. 2026
 

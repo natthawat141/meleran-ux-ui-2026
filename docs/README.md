@@ -10,7 +10,7 @@
 | หน้าตาและพฤติกรรม UI | [UI_SPEC.md](UI_SPEC.md) |
 | โครงสร้างและแนวทางเขียน code | [CODE_SPEC.md](CODE_SPEC.md) |
 | แผน refactor และสถานะ R | [FRONTEND_REFACTOR_PLAN_TH.md](FRONTEND_REFACTOR_PLAN_TH.md) |
-| API ที่ Frontend ต้องใช้ | [API Contract Draft](API_CONTRACT_R4A_DRAFT_TH.md) และ [รายละเอียด Auth/Catalog](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) — ยังเป็น Draft |
+| API ที่ Frontend ต้องใช้ | [API แยก 14 ฟีเจอร์: methods / JSON / fields](API_CONTRACT_FEATURES_TH.md) — เริ่มที่นี่; [decision register](API_CONTRACT_R4A_DRAFT_TH.md) และ [รายละเอียด Auth/Catalog](API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) — ยังเป็น Draft |
 | เกณฑ์ตรวจรับและสิ่งที่ยังขาด | [FRONTEND_API_ACCEPTANCE_MATRIX_TH.md](FRONTEND_API_ACCEPTANCE_MATRIX_TH.md) |
 
 กติกาการทำงานอยู่ที่ [AGENTS.md](../AGENTS.md) และ [Git checkpoint policy](GIT_CHECKPOINT_POLICY_TH.md). เมื่อมีการแก้ข้อกำหนด ให้อัปเดตไฟล์หลักที่เกี่ยวข้อง ไม่สร้างสเปกหรือแผนอีกชุดที่ซ้ำกัน
