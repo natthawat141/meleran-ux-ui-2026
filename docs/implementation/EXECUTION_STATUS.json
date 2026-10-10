@@ -857,7 +857,9 @@
             "DELETE/D11 retention/in-flight lifecycle/last-chat navigation"
           ],
           "delete_retention_gate": false,
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867"
         }
       ]
     },
@@ -1276,7 +1278,9 @@
           "delete_retention_gate": false,
           "login_provider_gate": false,
           "browser_acceptance": false,
-          "full_feature_gate": false
+          "full_feature_gate": false,
+          "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867"
         }
       ]
     },
@@ -1421,14 +1425,14 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_AI_RENAME_CHECKPOINT",
-    "verified_sha": "702b776f8b0399f4627ae3745931cca1f1e6f8fb",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089235653",
-    "latest_component_ci": "PENDING_AI_RENAME_CHECKPOINT",
+    "ci": "PASS",
+    "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867",
+    "latest_component_ci": "PASS_AI_RENAME_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Frontend source unchanged; current hosted Nest CI reran 6 Catalog + 7 Free Enroll + 11 Learning + 7 Admin Revoke + 6 generic Video + 7 Certificate + 8 AI Practice + 7 AI Usage checks (59). Full frontend CI remains earlier unchanged-source evidence; provider generation/reservation/login and browser gates remain open."
+    "frontend_ci_evidence_note": "Frontend source unchanged; current hosted Nest CI reran 6 Catalog + 7 Free Enroll + 11 Learning + 7 Admin Revoke + 6 generic Video + 7 Certificate + 8 AI Practice + 7 AI Usage + 7 AI Rename checks (66). Full frontend CI remains earlier unchanged-source evidence; create/history/provider/login/delete/browser gates remain open."
   },
   "remaining_decisions": [
     "D01",

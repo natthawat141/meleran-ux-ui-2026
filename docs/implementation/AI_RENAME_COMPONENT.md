@@ -24,3 +24,5 @@ Unknown/foreign/hidden404, anonymous/expired/revoked/disabled401, namespace mism
 - No schema/migration/contract/dependency/cloud/STG/deploy change. Keep all 8 applied migration bytes immutable.
 
 Verification: strict typecheck, boundaries/blueprint, foundation/components/PostgreSQL Jest configs, Nest build, runtime smoke and unchanged frontend-client harness. Isolated test target/explicit reset opt-in; cleanup only scoped fixtures.
+
+Verified code SHA: `dc2bf7830eceaf214fc0686175926d9a39de2cb4`; [hosted Nest CI 38089906867](https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867) passed 288 tests + 66 client checks, build/smoke/blueprint/boundaries. Delete retention/provider generation/login/browser and full acceptance remain unverified.
