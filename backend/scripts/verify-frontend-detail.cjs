@@ -43,7 +43,8 @@ async function main() {
     if (specifier === '../../../shared/api/client' &&
         (context.parentURL?.includes('/features/learning/api/learning-api.ts') ||
          context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts') ||
-         context.parentURL?.includes('/features/certificate/api/certificate-api.ts'))) {
+         context.parentURL?.includes('/features/certificate/api/certificate-api.ts') ||
+         context.parentURL?.includes('/features/ai/api/ai-api.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
       // endpoint builders/decoders and the real transport/fetch implementation.
       const name = new URL(context.parentURL).searchParams.get('learning-actor');
@@ -295,6 +296,38 @@ async function main() {
     assert.deepEqual(await ownCertificateApi.get(historicalCertificate.id), expectedCertificate);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     assert.deepEqual(await counts(), certificateCounts);
+    phase = 'frontend-ai-practice-answer';
+    const practiceConversation = await db.aIConversation.create({ data: { accountId: learnerId, courseId: null,
+      title: 'ชื่อที่ผู้ใช้ตั้งเอง', contextSnapshot: { private: 'PRIVATE_GENERAL_CONTEXT' } } });
+    const practiceMessage = await db.aIMessage.create({ data: { accountId: learnerId, conversationId: practiceConversation.id,
+      role: 'assistant', position: 0, content: 'ชุดฝึกเดิม', contextSnapshot: {} } });
+    const practicePayload = { version: 1, questions: [1, 2].map(index => ({ id: 'q' + index, prompt: 'โจทย์ ' + index,
+      options: [{ id: 'right' + index, text: 'ถูก' }, { id: 'wrong' + index, text: 'ผิด' }],
+      correct_option_id: 'right' + index, explanation: 'อธิบายข้อ ' + index })) };
+    const practiceSet = await db.aIPractice.create({ data: { accountId: learnerId, conversationId: practiceConversation.id,
+      messageId: practiceMessage.id, payloadSnapshot: practicePayload } });
+    const aiApiFor = async name => (await import(pathToFileURL(path.join(frontend,
+      'apps/web/src/features/ai/api/ai-api.ts')).href + '?learning-actor=' + name)).aiApi;
+    const ownAi = await aiApiFor('certificate-owner');
+    const sendAnswer = (api, question = 'q1', option = 'right1') => api.answerPractice(practiceConversation.id, practiceMessage.id, question, option);
+    const beforePracticeCounts = await counts(), originalEnrollment = await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } });
+    const originalProgress = await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } });
+    assert.deepEqual(await sendAnswer(ownAi, 'q1', 'wrong1'), { question_id: 'q1', correct: false, explanation: 'อธิบายข้อ 1', summary: null });
+    assert.deepEqual((await sendAnswer(ownAi, 'q2', 'right2')).summary, { answered: 2, total: 2, correct_count: 1 });
+    assert.deepEqual((await sendAnswer(ownAi)).summary, { answered: 2, total: 2, correct_count: 2 });
+    await assert.rejects(sendAnswer(await aiApiFor('certificate-foreign')), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects(sendAnswer(await aiApiFor('certificate-admin')), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects(sendAnswer(await aiApiFor('certificate-guest')), error => error instanceof HttpClientError && error.status === 401);
+    await assert.rejects(sendAnswer(ownAi, 'q1', 'right2'), error => error instanceof HttpClientError && error.status === 422);
+    await db.$disconnect(); await db.$connect();
+    const persistedPractice = await db.aIPractice.findUniqueOrThrow({ where: { id: practiceSet.id } });
+    assert.deepEqual(persistedPractice.payloadSnapshot, practicePayload); assert.equal(persistedPractice.answers.q1.option_id, 'right1');
+    assert.equal(persistedPractice.answers.q2.option_id, 'right2');
+    assert.equal((await db.aIConversation.findUniqueOrThrow({ where: { id: practiceConversation.id } })).title, practiceConversation.title);
+    assert.deepEqual(await counts(), beforePracticeCounts);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }), originalProgress);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
@@ -303,6 +336,7 @@ async function main() {
     await assert.rejects(adminCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(uploadRequest(ownerUploadClient), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(ownCertificateApi.get(historicalCertificate.id), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(sendAnswer(ownAi), error => error instanceof HttpClientError && error.kind === 'network');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -332,12 +366,23 @@ async function main() {
       foreignAdmin404: true, anonymous401: true, unknown404: true, renameArchiveAndReconnectPreserveSnapshot: true,
       networkFailure: true, noReadWrites: true, automaticIssueGate: false, downloadGate: false,
       loginProviderGate: false, browserAcceptance: false };
+    result.aiPracticeAnswer = { component: 'AI-04', checks: 8, unchangedFrontendApiAndDecoder: true,
+      actualNestAndPostgres: true, trustedSnapshotFixture: true, partialAndCompleteSummary: true,
+      latestAnswerAndReconnect: true, foreignInstructorAndAdmin404: true, anonymous401: true, foreignOption422: true,
+      networkFailure: true, originalDefinitionsTitleAcademicHistoryPreserved: true, noNewQuotaRows: true,
+      providerGenerationGate: false, loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
     await stop();
+    const ownedAccounts = [accountId, learnerId, adminId].filter(Boolean);
+    await db.aIPractice.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.aIRequest.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.aIMessage.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.aIConversation.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.aIUsageDaily.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     if (accountId) await db.redeemCode.deleteMany({ where: { course: { instructorId: accountId } } });
     if (accountId) await db.certificate.deleteMany({ where: { enrollment: { course: { instructorId: accountId } } } });
     if (accountId) await db.progress.deleteMany({ where: { enrollment: { course: { instructorId: accountId } } } });
@@ -346,7 +391,6 @@ async function main() {
     if (accountId) await db.question.deleteMany({ where: { quiz: { item: { chapter: { course: { instructorId: accountId } } } } } });
     if (accountId) await db.quiz.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
     if (accountId) await db.course.deleteMany({ where: { instructorId: accountId } });
-    const ownedAccounts = [accountId, learnerId, adminId].filter(Boolean);
     await db.appSession.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.userRole.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.account.deleteMany({ where: { id: { in: ownedAccounts } } });

@@ -72,6 +72,13 @@ Certificate issuerไม่importLearning/Assessments และไม่มีpu
 Read joinsข้ามtableอนุญาตเฉพาะprojectionที่ระบุscope/fields; ห้ามcross-module writeผ่านPrismaโดยพลการ.
 Public interfacesรับvalidated inputs/principal/transaction context ไม่รับwire claimsเป็นสิทธิ์.
 
+AI-04 execution component: AI owns feature-local answer Controller/Service/DTO
+and private snapshot decoder; reuse Auth public `requireSelfRead` for fresh bound
+identity and normalized Admin namespace, then lock Conversation→Message→Practice.
+Only latest answer/time and conversation activity change in the caller transaction;
+no provider/quota/academic cross-module writes. Schema owner appends DB-05 linkage
+and message-role locking migrations; see AI_PRACTICE_ANSWER_COMPONENT.md.
+
 Critical interface contracts เป็น PROPOSED: Auth.resolvePrincipal(session,audience) คืน internal principal/roles/eligibility; Courses.getLearningDefinition(principal,courseId) คืน authorized content/revision โดยไม่เปิด answer keys ให้ learner; Courses.getAssessmentDefinitionForAttempt(principal,enrollment,quizId) คืน immutable-definition input พร้อม private keys เฉพาะ Assessments service ไม่ serialize ออก HTTP; Enrollments.grantEntitlement(tx,userId,courseId,sourceRef) คืน created-or-existing Enrollment โดยไม่ทับ source เดิม; Enrollments.recordItemResult(tx,trustedProof) ตรวจ same-course/current content/best graded result ก่อน completion; Certificates.issueForCompletion(tx,completionSnapshot) คืน Certificate เดิมหรือสร้างหนึ่งรายการ. Proof เหล่านี้สร้างภายใน service เท่านั้น ไม่มี controller รับ proof/score/eligibility จาก client.
 
 ## 5. Database and transaction contract

@@ -257,14 +257,14 @@ model VideoTranscript {
 model AIConversation {
   id String @id @default(uuid())
   accountId String
-  courseId String
+  courseId String?
   title String?
   contextSnapshot Json @db.JsonB
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   deletedAt DateTime? @db.Timestamptz(3)
   account Account @relation(fields: [accountId], references: [id], onDelete: Restrict)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: Restrict)
   messages AIMessage[]
   requests AIRequest[]
   practices AIPractice[]
@@ -283,6 +283,8 @@ model AIMessage {
   contextSnapshot Json @db.JsonB
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   conversation AIConversation @relation(fields: [conversationId, accountId], references: [id, accountId], onDelete: Restrict)
+  practice AIPractice?
+  @@unique([id, conversationId, accountId])
   @@unique([conversationId, position])
   @@map("ai_messages")
 }
@@ -322,10 +324,14 @@ model AIPractice {
   id String @id @default(uuid())
   conversationId String
   accountId String
+  // Existing unlinked rows stay quarantined; no message association is guessed.
+  messageId String? @unique
   payloadSnapshot Json @db.JsonB
   answers Json @default("{}") @db.JsonB
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   conversation AIConversation @relation(fields: [conversationId, accountId], references: [id, accountId], onDelete: Restrict)
+  message AIMessage? @relation(fields: [messageId, conversationId, accountId], references: [id, conversationId, accountId], onDelete: Restrict)
+  @@unique([messageId, conversationId, accountId])
   @@map("ai_practice")
 }
 

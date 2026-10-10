@@ -188,6 +188,15 @@ T1 authorize owner/context and check user/request_id payload, lock (user,Bangkok
 
 Own persisted practice and question/option IDs; derive correctness from server key, upsert latest answer/result in one practice transaction. No provider call, no quota or academic writes.
 
+Execution 11 ต.ค. 2026: reviewed DB-05 follow-ups implement nullable General
+Conversation course and unique Practice→same-owner assistant Message composite FK.
+Legacy null linkage stays quarantined without guessed backfill. Message validation
+holds FOR SHARE against concurrent role mutation; snapshot/identity remain immutable.
+Answer uses Auth→Conversation exclusive→Message shared→Practice exclusive locks,
+DB-clock latest answer and activity, and private version-1 serialization described
+in [AI_PRACTICE_ANSWER_COMPONENT](AI_PRACTICE_ANSWER_COMPONENT.md). No quota/academic
+writes; generation/history/Auth/browser and D11/D12 gates remain open.
+
 ### TX-BLOG — Revision protected blog
 
 Admin and current expected_revision; validate safe document under D05, save content/editor/time/revision atomic. Publish saved state; unpublish hides public. DELETE retains canonical JSON precondition until approved change; physical retention D11. Blog never updates learning entities.

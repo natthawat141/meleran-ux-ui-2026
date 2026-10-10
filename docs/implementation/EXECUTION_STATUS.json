@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 173,
+    "database_tests": 193,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -22,7 +22,7 @@
     "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 16,
+    "feature_component_unit_tests": 22,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
@@ -46,7 +46,12 @@
     "video_unavailable_http_postgres_tests": 14,
     "frontend_video_unavailable_transport_checks": 6,
     "certificate_detail_http_postgres_tests": 13,
-    "frontend_certificate_detail_client_checks": 7
+    "frontend_certificate_detail_client_checks": 7,
+    "ai_practice_snapshot_unit_tests": 6,
+    "ai_practice_answer_http_postgres_tests": 14,
+    "ai_practice_link_postgres_tests": 6,
+    "frontend_ai_practice_answer_client_checks": 8,
+    "frontend_client_checks_total": 52
   },
   "environment": {
     "staging": false,
@@ -83,6 +88,14 @@
       {
         "name": "20261011041000_db04_history_guard",
         "sha256": "e58bdf0cf2b13cb6dce3647597e3b205ffee4a75299fc8dcc4ed04f5c814f9e4"
+      },
+      {
+        "name": "20261011043000_db05_practice_message",
+        "sha256": "612266c0df0d4c516cbd1546cc5ded6f875d8b243d318b55d8cf66dd7ab974be"
+      },
+      {
+        "name": "20261011044000_db05_practice_message_lock",
+        "sha256": "3a23c0e8a4eccc4b7e16494e08f3990b4f05430241aea580f384f4524d632605"
       }
     ],
     "stripe_webhook": {
@@ -842,7 +855,34 @@
       "dependencies": [
         "AI-03"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "ai_practice_answer",
+          "method": "PUT",
+          "path": "/me/ai/conversations/{id}/messages/{messageId}/practice/answers",
+          "operationId": "put_me_ai_conversations_id_messages_messageId_practice_answers",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 14,
+          "snapshot_unit_tests": 6,
+          "frontend_client_checks": 8,
+          "protocol_document": "AI_PRACTICE_ANSWER_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-05 owned immutable message linkage",
+            "AUTH-BASE-01 fresh stored-session self authority"
+          ],
+          "evidence": "Fresh bound identity -> own Conversation X -> assistant Message S -> Practice X; private stable keys derive latest results/summary, DB clock activity, concurrent answers, safe corrupt state and actual DB failure rollback; original quota/request/academic values preserved.",
+          "remaining": [
+            "AI-03 actual generation/provider",
+            "AI history read and full Auth",
+            "Authenticated browser G-AI",
+            "D11/D12 lifecycle/retention"
+          ],
+          "provider_generation_gate": false,
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "BLOG-01",
@@ -948,7 +988,28 @@
       "dependencies": [
         "DB-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "practice_message_schema",
+          "state": "COMPONENT_VERIFIED",
+          "postgres_tests": 6,
+          "migrations": [
+            {
+              "name": "20261011043000_db05_practice_message",
+              "sha256": "612266c0df0d4c516cbd1546cc5ded6f875d8b243d318b55d8cf66dd7ab974be"
+            },
+            {
+              "name": "20261011044000_db05_practice_message_lock",
+              "sha256": "3a23c0e8a4eccc4b7e16494e08f3990b4f05430241aea580f384f4524d632605"
+            }
+          ],
+          "protocol_document": "AI_PRACTICE_ANSWER_COMPONENT.md",
+          "evidence": "8-migration DDL rollback, exact applied checksums, nullable general Course, one same-owner assistant Message per Practice, immutable payload/identity and actual concurrent role/update waiting both directions. Existing null-linked records retained/quarantined without guessed backfill.",
+          "physical_schema_parity": "PASS_NO_DDL_DIFF",
+          "closed_provider_or_retention_decisions": false
+        }
+      ]
     },
     {
       "id": "COMPLETION-01",
@@ -1112,6 +1173,19 @@
           "full_feature_gate": false,
           "verified_sha": "5142d752125b7f43b801b4cf4c3f975abefab939",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38086767802"
+        },
+        {
+          "id": "ai_practice_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 8,
+          "protocol_document": "AI_PRACTICE_ANSWER_COMPONENT.md",
+          "evidence": "Unchanged aiApi.answerPractice/decoder -> actual built Nest/Test PG; partial/complete/latest results/reconnect, foreign Instructor/Admin404, anonymous401, foreign option422, network failure and original title/definitions/academic history preserved.",
+          "session_fixture": true,
+          "trusted_snapshot_fixture": true,
+          "provider_generation_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1256,10 +1330,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_AI_PRACTICE_CHECKPOINT",
     "verified_sha": "5142d752125b7f43b801b4cf4c3f975abefab939",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38086767802",
-    "latest_component_ci": "PASS_CERTIFICATE_DETAIL_CHECKPOINT",
+    "latest_component_ci": "PENDING_AI_PRACTICE_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
