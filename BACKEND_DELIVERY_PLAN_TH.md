@@ -1,31 +1,31 @@
 # Backend จริงและการเชื่อม Frontend
 
-วันที่ 10 ตุลาคม 2026 · Delivery plan; ยังไม่ provision/deploy หรือเริ่ม business implementation
+วันที่ 10 ตุลาคม 2026 · Delivery plan; Cloud SQL instance สร้างแล้ว ยังไม่ deploy หรือเริ่ม business implementation
 
 ## ยืนยันจากผู้ใช้
 
 - API ใช้ ASP.NET Core .NET 10; Frontend เป็น React Web/Admin ใน monorepo.
 - Cloud Run อยู่ project `melearn-tutor`.
-- Database อยู่ project `melearn-infra-prod`, ใช้ Cloud SQL แต่ยังไม่ได้สร้าง instance. ต้องเริ่มตัวเล็กเพื่อคุมค่าใช้จ่าย.
+- Database อยู่ project `melearn-infra-prod`, PostgreSQL 16 Cloud SQL instance `melearn-tutor-db` สร้างแล้วใน Bangkok ตามคำสั่งผู้ใช้ และยืนยันให้ใช้ต่อ. ต้องเริ่มตัวเล็กเพื่อคุมค่าใช้จ่าย.
 - Firebase Email/Google และ .NET Username ไม่มี email; บัญชีชุดเดียว Web/Admin แยก Login/session.
 - เตรียม OpenRouter/model และ Resend environment แล้ว; provider adapter ยังไม่ implement. API keys เพียงอย่างเดียวไม่ทำให้ persistence/IAM/session พร้อม.
 
-## Proposed initial database configuration — รอยืนยัน engine/region/cost
+## Database configuration — instance ตรวจแล้ว; runtime/deployment ยังต้อง implement
 
 | Setting | ข้อเสนอ |
 | --- | --- |
-| Engine / data access | PostgreSQL 16 + EF Core/Npgsql; ยังไม่เพิ่ม SDK จนตกลง engine |
+| Engine / data access | PostgreSQL 16 ยืนยันแล้ว; EF Core/Npgsql เป็นแนวทางที่เสนอ ยังไม่ implement adapter |
 | Edition / tier | Enterprise / `db-f1-micro`, shared CPU, memory ประมาณ 0.6 GB |
 | Availability | Single zone; ไม่เปิด HA/read replicas ในช่วงพัฒนา |
-| Region | Singapore `asia-southeast1` ทั้ง Cloud SQL และ Cloud Run; region ยังเป็นข้อเสนอ |
-| Storage | SSD 10 GB; กำหนดเพดานการเติบโตเมื่อสร้างเพื่อไม่ให้ขยายโดยไร้ขอบเขต |
-| Recovery | Daily backups retention สั้นตามช่วง dev; คิดค่า backup แยก ไม่ปิดเพื่อแสดงราคาเทียม |
+| Region | Bangkok `asia-southeast3` ตามคำสั่งล่าสุดของผู้ใช้ |
+| Storage | SSD 10 GB, storage auto-increase cap 20 GB ตรวจแล้ว |
+| Recovery | Daily backups เปิด retention 3 ชุด; backup คิดค่าใช้จ่ายแยก |
 | Access | Cloud SQL connection ผ่าน service identity/proxy; ไม่เปิด authorized networks เป็น `0.0.0.0/0` |
 | Cloud Run scaling | เสนอ min instances 0 / max 2 และจำกัด DB pool ต่อ process; ปรับตาม DB connection budget/ผล load test |
 
-Shared-core ไม่มี Cloud SQL SLA; ใช้เริ่ม dev/integration เท่านั้น ไม่ประกาศพร้อม traffic จริงจากขนาดนี้. รายการข้างบนไม่สร้าง resource/เพิ่ม billing และไม่ใช่ production capacity guarantee.
+Shared-core ไม่มี Cloud SQL SLA; ใช้เริ่ม dev/integration เท่านั้น ไม่ประกาศพร้อม traffic จริงจากขนาดนี้. instance สร้างตามคำสั่งก่อนข้อความให้หยุด และเสร็จแล้ว; ผู้ใช้ยืนยันให้ใช้ต่อ. ไม่ใช่ production capacity guarantee และยังไม่มี Cloud Run deployment.
 
-ราคา: ต้องเลือก region ใน [Cloud SQL pricing](https://cloud.google.com/sql/pricing) หรือ calculator ก่อนสร้าง. ค่า compute = regional hourly rate × ชั่วโมงที่เปิด (ประมาณ 730 ชั่วโมง/เดือน); บวก SSD 10 GB, backup, network/IP และภาษีตามบัญชี. Published table มีตัวอย่าง db-f1-micro $0.0105/hour แต่ไม่ใช้ตัวเลขนั้นอ้างเป็นราคาของ Singapore ที่ยืนยันแล้ว. Cloud SQL มีค่า instance ขณะเปิดแม้ไม่มี traffic; Cloud Run min 0 ไม่ทำให้ DB หยุดตาม.
+ราคา: ต้องเลือก region ใน [Cloud SQL pricing](https://cloud.google.com/sql/pricing) หรือ calculator ก่อนสร้าง. ค่า compute = regional hourly rate × ชั่วโมงที่เปิด (ประมาณ 730 ชั่วโมง/เดือน); บวก SSD 10 GB, backup, network/IP และภาษีตามบัญชี. Cloud Billing Catalog Bangkok Zonal Micro SKU 6AE1-4C1F-7DF2 ที่ตรวจวันที่ 10 ต.ค. 2026 ราคา USD 0.011025/hour (ประมาณ USD 8.05/730 ชั่วโมง เฉพาะ compute) ไม่ใช่ total bill. Cloud SQL มีค่า instance ขณะเปิดแม้ไม่มี traffic; Cloud Run min 0 ไม่ทำให้ DB หยุดตาม.
 
 ## Cross-project access
 
@@ -33,7 +33,7 @@ Cloud Run runtime service account ของ `melearn-tutor` ต้องมี�
 
 เลือก public IP ผ่าน authenticated proxy/Cloud Run integration หรือ private network ตาม topology ที่ตกลง; ชุดนี้ยังไม่สร้าง VPC/service accounts/เปลี่ยน IAM. ตรวจ project ID ของ Firebase จาก config จริงแยกต่างหาก ห้ามถือว่า Firebase ต้องเป็น project เดียวกับ Cloud Run.
 
-Read-only check 10 ต.ค.: gcloud services list ฝั่ง `melearn-infra-prod` ไม่คืน sqladmin.googleapis.com ในรายการ enabled; ยังไม่ได้ enable API. ไม่ได้ list/create databases หรือเปลี่ยน billing.
+10 ต.ค.: เปิด Cloud SQL Admin API ฝั่ง infra และสร้าง instance แล้ว; tier availability/operation/instance describe ตรวจ RUNNABLE. ยังไม่เปลี่ยน IAM/Cloud Run หรือสร้าง application database/schema/runtime user. [คู่มือ setup](../melearn-tutor-api/docs/CLOUD_SQL_SETUP_TH.md).
 
 ## ลำดับ implementation และเกณฑ์เสร็จ
 
