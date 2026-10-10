@@ -76,6 +76,14 @@ Critical interface contracts เป็น PROPOSED: Auth.resolvePrincipal(sessio
 
 ## 5. Database and transaction contract
 
+Learning read component: bounded Course/Item/own Enrollment/Progress/Certificate
+read joins are declared in LEARNING_READ_COMPONENT.md. No private Quiz key or
+Transcript select; no cross-owner write. Fresh Auth locks precede Course and
+Enrollment shared locks. Authoring takes Course exclusive; academic/resume
+writers take Enrollment exclusive before Progress, preserving coherent current
+reads at ReadCommitted. Current progress comes from rows, historical completion
+remains intact. Management preview and full Auth/authoring gates remain pending.
+
 Execution component interfaces reviewed 11 ต.ค. 2026:
 `EntitlementWriter` in enrollments/public is a persistence participant exported
 by EnrollmentsModule; it accepts the caller's transaction and verified command

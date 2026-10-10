@@ -6,6 +6,14 @@ Status: **BLOCKED** · Priority: P1 · Module: learning
 
 ## Read set และ traceability
 
+Execution update 11 ต.ค. 2026: enrolled learner course/item reads have 13
+actual HTTP/PostgreSQL tests and 11 unchanged frontend-client checks. See
+[LEARNING_READ_COMPONENT](../LEARNING_READ_COMPONENT.md) for bounded read joins,
+owner lock contract, source/privacy and the remaining Scope §6.4 vs enrolled-only
+HTTP mapping. GET /me/progress, management preview reconciliation, complete
+Auth/authoring and authenticated browser feature gate are incomplete. Whole task
+remains BLOCKED; no original acceptance case is closed.
+
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.5 (line 302); §3.2 (line 415); §3.5 (line 475); §6.4 (line 1216)
