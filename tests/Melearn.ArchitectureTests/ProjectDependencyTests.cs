@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using System.Text.Json;
 
 namespace Melearn.ArchitectureTests;
 
@@ -42,6 +43,19 @@ public sealed class ProjectDependencyTests
     {
         foreach (var path in Directory.GetFiles(Path.Combine(FindRoot(), "src", "Melearn.Api", "Features"), "*.cs", SearchOption.AllDirectories))
             Assert.DoesNotContain("Melearn.Infrastructure", File.ReadAllText(path));
+    }
+
+    [Fact]
+    public void OpenRouter_model_and_key_must_not_be_defined_in_appsettings()
+    {
+        var apiRoot = Path.Combine(FindRoot(), "src", "Melearn.Api");
+        foreach (var path in Directory.GetFiles(apiRoot, "appsettings*.json", SearchOption.TopDirectoryOnly))
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(path));
+            if (!document.RootElement.TryGetProperty("OpenRouter", out var router)) continue;
+            Assert.False(router.TryGetProperty("Model", out _), "Select OpenRouter model through environment configuration; no JSON fallback is allowed.");
+            Assert.False(router.TryGetProperty("ApiKey", out _), "OpenRouter API key belongs in secret/environment configuration.");
+        }
     }
 
     private static string FindRoot()

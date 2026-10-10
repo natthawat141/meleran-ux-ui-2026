@@ -7,6 +7,7 @@ Business rules ใช้ workspace ../docs/MELEARN_V1_SCOPE.md Final 1.6 หร�
 - รักษา dependency rules และ scope ใน architecture document; Controllers ไม่มี business/SQL/provider code.
 - Auth provider ยืนยัน 10 ต.ค. 2026: Firebase Email/Google และ .NET Username ไม่มี email; อ่าน docs/AUTH_DECISION_TH.md. PostgreSQL 16 Cloud SQL Bangkok ยืนยันและ instance melearn-tutor-db สร้างแล้ว; อ่าน docs/CLOUD_SQL_SETUP_TH.md. EF Core/Npgsql และ local Username/session/Catalog/Free Enrollment implement แล้วตาม docs/FEATURE_DELIVERY_STATUS_TH.md; ยังไม่ apply/ตรวจ live DB หรือเชื่อม Firebase/R2. ไม่เพิ่ม provider/infra ใหม่โดยเดาแทนผู้ใช้.
 - Request/response DTO แยกจาก entities; nullable/required/errors ต้องตรง Contract.
+- OpenRouter model และ API key มาจาก environment/secret configuration เท่านั้น; ห้ามกำหนด default model หรือใส่ Model/ApiKey ใน appsettings*.json. ถ้า model ไม่ได้ตั้ง ห้ามเดาหรือ fallback เป็น paid model.
 - ไม่ deploy, รัน local Docker, สร้าง cloud resources หรือแก้ reference systems โดยอัตโนมัติ.
 - ตรวจ restore/build/test และ scoped diff ก่อน commit. ห้าม blanket git add/reset/force push. Repo ใหม่ยังไม่มี remote; ไม่เดา remote หรือส่ง Backend เข้า Frontend Git.
 - สรุปเป็นภาษาไทย แยก foundation/build/test, business implementation และ production readiness.
