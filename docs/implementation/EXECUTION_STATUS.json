@@ -1213,7 +1213,9 @@
             "Auth/Management/directories/authoring browser gate"
           ],
           "new_http_operations": 0,
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "621a27ed079ba1c3290645d84c598e0f9984492b",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38096201158"
         }
       ]
     },
@@ -1729,13 +1731,13 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "d56acfe409502305427191c3dbf29c447f33e0c7",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38095412874",
-    "latest_component_ci": "PENDING_COURSE_CREATOR_SCHEMA_CHECKPOINT",
+    "verified_sha": "621a27ed079ba1c3290645d84c598e0f9984492b",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38096201158",
+    "latest_component_ci": "PASS_COURSE_CREATOR_SCHEMA_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Frontend feature source unchanged; hosted Nest CI ran 114 actual client/transport checks including 8 current Web/Admin resource/decoder locator checks and pure authoring form ID mapping. Auth/provider/authoring/directory/browser/full feature gates remain open."
+    "frontend_ci_evidence_note": "Frontend feature source unchanged; hosted Nest CI migrated all nine batches, passed 391 tests and 114 actual client/transport checks. Creation/replay/Auth/provider/query/browser/full feature gates remain open."
   },
   "remaining_decisions": [
     "D01",

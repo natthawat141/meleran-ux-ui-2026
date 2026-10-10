@@ -24,4 +24,4 @@ Prisma validate/generate and read-only actual Test PostgreSQL→Prisma diff: no 
 
 Whole COURSE-01 still requires canonical Instructor/Admin creation and directories, reviewed D10 create/replay/precondition handling, complete Auth/Management prerequisites and real authoring browser gate. This schema verification does not accept creation behavior, permission enforcement or any original113 case. Scope §2.2/COURSE-01 is the read set; no duplicate business specification.
 
-Local regression checkpoint: 49 foundation + 28 feature units + 314 PostgreSQL = 391 tests; unchanged114 real client/transport checks. Hosted checkpoint pending; previous CI is historical evidence.
+Local regression checkpoint: 49 foundation + 28 feature units + 314 PostgreSQL = 391 tests; unchanged114 real client/transport checks. [Hosted Nest CI 38096201158](https://github.com/natthawat141/meleran-tutor/actions/runs/38096201158) passed exact code SHA `621a27ed079ba1c3290645d84c598e0f9984492b` after all nine migrations; full creation/feature/acceptance remain open.
