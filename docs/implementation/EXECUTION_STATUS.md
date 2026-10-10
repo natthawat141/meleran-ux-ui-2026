@@ -8,7 +8,7 @@
 - Foundation/architecture tests 49/49; PostgreSQL + actual HTTP component tests 46/46; strict typecheck และ Nest build ผ่าน.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
-- CI-01 DONE: hosted CI [38074131304](https://github.com/natthawat141/meleran-tutor/actions/runs/38074131304) ผ่านบน 23e8e41; Catalog detail component จะตรวจ run ถัดไป. D13 ปิดแล้ว.
+- CI-01 DONE: hosted CI [38074542071](https://github.com/natthawat141/meleran-tutor/actions/runs/38074542071) ผ่านบน 5d9be36 รวม Catalog detail component. D13 ปิดแล้ว.
 - COMPLETION-01 เป็น NEEDS_DECISION: dependencies จริงคือ DB-02/DB-03 ที่ผ่านแล้ว และ D06 สำหรับ best result ข้ามคะแนนเต็มต่างกัน.
 
 ## Checkout และ Git
@@ -59,3 +59,7 @@ node scripts/check-blueprint.cjs ผ่าน: canonical 86 operations, 5 deferr
 ## CATALOG-01 component progress
 
 GET /courses/{id} / get_courses_id ผ่าน real Nest HTTP+PostgreSQL 6 tests: explicit public select, canonical nullable/THB/date/outline, hidden/unknown 404, no private fields/body/keys, reconnect, corrupt outcomes fail closed, startup/read no session/grant/progress writes. Typed CourseDetail DTO separates storage from wire shape. Also fixed nested ApiException message propagation; Foundation regression passed. GET /courses search/sort/cursor still awaits D16; whole task and Frontend gate remain incomplete.
+
+## Verified code checkpoint
+
+5d9be36bbf8a8c29c19e90a9d6709dc2476f885c pushed successfully; hosted Nest CI passed. Foundation/architecture 49 + PostgreSQL/real HTTP 46 = 95 tests. Current Prisma-vs-Test-PostgreSQL diff contains no DDL. Full branch secret scan passed; all ENV values withheld. This evidence-only documentation update does not change implementation and skips a redundant hosted build; the verified code SHA is explicitly retained above.

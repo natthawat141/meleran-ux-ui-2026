@@ -20,7 +20,8 @@
     "runtime_smoke": "PASS",
     "business_acceptance_cases": 0,
     "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
-    "catalog_detail_component_tests": 6
+    "catalog_detail_component_tests": 6,
+    "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF"
   },
   "environment": {
     "staging": false,
@@ -710,9 +711,9 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "23e8e41845d77fd499b648e52367105f6ace07e4",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38074131304",
-    "latest_component_ci": "PENDING_HOSTED_RUN"
+    "verified_sha": "5d9be36bbf8a8c29c19e90a9d6709dc2476f885c",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38074542071",
+    "latest_component_ci": "PASS"
   },
   "remaining_decisions": [
     "D01",
