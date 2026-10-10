@@ -711,7 +711,9 @@
             "D10 fulfillment/reconciliation",
             "PAY-01 server Checkout binding",
             "Actual endpoint signing secret and real provider delivery"
-          ]
+          ],
+          "verified_sha": "26cb18665d1ba04cdb8a41f39babd50189845326",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359"
         }
       ]
     },
@@ -828,12 +830,14 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_NEW_RECEIVER_CHECKPOINT",
-    "verified_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634181",
-    "latest_component_ci": "PENDING_NEW_RECEIVER_CHECKPOINT",
+    "ci": "PASS",
+    "verified_sha": "26cb18665d1ba04cdb8a41f39babd50189845326",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359",
+    "latest_component_ci": "PASS",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
-    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194"
+    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
+    "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
+    "frontend_ci_evidence_note": "Frontend source unchanged in the receiver checkpoint; latest Nest CI reran 6 real frontend-client checks."
   },
   "remaining_decisions": [
     "D01",

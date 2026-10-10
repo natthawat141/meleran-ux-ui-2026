@@ -51,3 +51,5 @@ Local provider response contract ของ receiver (ไม่ใช่ canonica
 ถัดไป: ปิดเฉพาะ D08 provider event selection/API version และ D10 processing/reconciliation ที่เกี่ยวข้อง แล้วทำ money transaction → fulfillment transaction ผ่าน EntitlementWriter, ให้ paid state คงอยู่เมื่อ grant ล้มเหลว และ retry โดยไม่ charge ใหม่. PAY-01 ยังต้องสร้าง/ผูก server-owned Checkout Session + price snapshot อย่างถูกต้องก่อน full payment acceptance.
 
 การตรวจ provider จริงต้องใช้ signing secret จาก Stripe Dashboard หรือ local Stripe CLI listener ของ endpoint นี้ แล้ว forward ไป local route. เครื่องนี้ยังไม่มี Stripe CLI และไม่มี signing secret. ยังไม่เคยรับ delivery จาก Stripe จริง, ไม่ deploy/STG และไม่แก้ cloud resources ใน checkpoint นี้. ไม่ส่ง signing secret ใน chat/Git/log.
+
+Verified code SHA: `26cb18665d1ba04cdb8a41f39babd50189845326`; [hosted Nest CI 38078316359](https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359) ผ่าน 135 tests + 6 real-client checks, build และ smoke. Provider delivery verification ยังไม่มี; whole business acceptance ยังคง 0/113.
