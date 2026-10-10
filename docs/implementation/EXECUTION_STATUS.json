@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 205,
+    "database_tests": 217,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,9 +51,11 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 59,
+    "frontend_client_checks_total": 66,
     "ai_usage_read_http_postgres_tests": 12,
-    "frontend_ai_usage_client_checks": 7
+    "frontend_ai_usage_client_checks": 7,
+    "ai_rename_http_postgres_tests": 12,
+    "frontend_ai_rename_client_checks": 7
   },
   "environment": {
     "staging": false,
@@ -831,6 +833,32 @@
       ],
       "decision_ids": [
         "D11"
+      ],
+      "components": [
+        {
+          "id": "ai_rename",
+          "method": "PATCH",
+          "path": "/me/ai/conversations/{id}",
+          "operationId": "patch_me_ai_conversations_id",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 12,
+          "frontend_client_checks": 7,
+          "protocol_document": "AI_RENAME_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-05 persisted owned conversations",
+            "AUTH-BASE-01 fresh self authority"
+          ],
+          "evidence": "Fresh identity -> own non-hidden Conversation exclusive lock -> DB clock -> exact title/activity only. Canonical Unicode80/nonblank and claims validation, foreign Instructor/Admin404, existing history/quota preservation, real DB failure rollback, competing history mutation wait and subsequent practice answer retains manual name.",
+          "remaining": [
+            "AI-02 create/list/history and full Auth",
+            "Actual provider generation preserves manual title",
+            "Authenticated browser G-AI",
+            "DELETE/D11 retention/in-flight lifecycle/last-chat navigation"
+          ],
+          "delete_retention_gate": false,
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1236,6 +1264,19 @@
           "full_feature_gate": false,
           "verified_sha": "702b776f8b0399f4627ae3745931cca1f1e6f8fb",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089235653"
+        },
+        {
+          "id": "ai_rename_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "protocol_document": "AI_RENAME_COMPONENT.md",
+          "evidence": "Unchanged aiApi.renameConversation/decoder -> built Nest/Test PG; own projection/persistence, foreign Instructor/Admin404, anonymous401, blank422, reconnect/network failure and original history/quota/academic values preserved.",
+          "session_fixture": true,
+          "conversation_fixture": true,
+          "delete_retention_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1380,10 +1421,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_AI_RENAME_CHECKPOINT",
     "verified_sha": "702b776f8b0399f4627ae3745931cca1f1e6f8fb",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089235653",
-    "latest_component_ci": "PASS_AI_USAGE_READ_CHECKPOINT",
+    "latest_component_ci": "PENDING_AI_RENAME_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

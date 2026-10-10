@@ -178,6 +178,13 @@ Authorize Admin and video/course link; upsert Plain Text or set ai flag through 
 
 ### TX-CHAT — Owned history mutations
 
+Execution rename component: fresh Auth→own non-hidden Conversation exclusive
+lock→DB clock→title/activity only; context/Message/Practice/Request/Quota and
+academic history unchanged. Canonical Unicode length and nonblank validation;
+retain valid text, no new normalization policy. Same Conversation lock as
+practice answer. DELETE retention/in-flight lifecycle still D11; see
+[AI_RENAME_COMPONENT](AI_RENAME_COMPONENT.md).
+
 Authorize owner before read/write. Keep ordered durable messages and context snapshot; title<=80 and preserve manual naming. Delete behavior/in-flight race D11, quota/dedupe accounting remains durable and unchanged.
 
 ### TX-AI — Reserve/provider/finalize

@@ -85,6 +85,11 @@ AI config owns AI_DAILY_PROMPT_LIMIT=20 and timezone; future limit changes also
 require review of DB quota constraint. GET reads success only, never inserts or
 reserves; no provider/academic dependencies. See AI_USAGE_READ_COMPONENT.md.
 
+AI-05 rename: feature-local Controller/Service/Pipe/DTO; fresh Auth identity
+then exclusive owned Conversation lock. Title/activity only; no cross-module
+writes or provider call. Same Conversation lock order as practice answers;
+Unicode canonical length, no prototype-derived normalization. See AI_RENAME_COMPONENT.md.
+
 Critical interface contracts เป็น PROPOSED: Auth.resolvePrincipal(session,audience) คืน internal principal/roles/eligibility; Courses.getLearningDefinition(principal,courseId) คืน authorized content/revision โดยไม่เปิด answer keys ให้ learner; Courses.getAssessmentDefinitionForAttempt(principal,enrollment,quizId) คืน immutable-definition input พร้อม private keys เฉพาะ Assessments service ไม่ serialize ออก HTTP; Enrollments.grantEntitlement(tx,userId,courseId,sourceRef) คืน created-or-existing Enrollment โดยไม่ทับ source เดิม; Enrollments.recordItemResult(tx,trustedProof) ตรวจ same-course/current content/best graded result ก่อน completion; Certificates.issueForCompletion(tx,completionSnapshot) คืน Certificate เดิมหรือสร้างหนึ่งรายการ. Proof เหล่านี้สร้างภายใน service เท่านั้น ไม่มี controller รับ proof/score/eligibility จาก client.
 
 ## 5. Database and transaction contract

@@ -353,6 +353,29 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }), originalProgress);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    phase = 'frontend-ai-rename';
+    const beforeRenameCounts = await counts(), beforeRenameConversation = await db.aIConversation.findUniqueOrThrow({ where: { id: practiceConversation.id } });
+    const unchangedAiHistory = () => Promise.all([
+      db.aIMessage.findMany({ where: { conversationId: practiceConversation.id }, orderBy: { id: 'asc' } }),
+      db.aIPractice.findMany({ where: { conversationId: practiceConversation.id }, orderBy: { id: 'asc' } }),
+      db.aIRequest.findMany({ where: { conversationId: practiceConversation.id }, orderBy: { id: 'asc' } }), usageRows(),
+    ]);
+    const beforeRenameHistory = await unchangedAiHistory();
+    const renamed = await ownAi.renameConversation(practiceConversation.id, 'ชื่อใหม่ของผู้ใช้');
+    assert.equal(renamed.id, practiceConversation.id); assert.equal(renamed.title, 'ชื่อใหม่ของผู้ใช้');
+    assert.equal(renamed.course_id, null); assert.equal(renamed.created_at, practiceConversation.createdAt.toISOString());
+    assert.equal(renamed.updated_at, (await db.aIConversation.findUniqueOrThrow({ where: { id: practiceConversation.id } })).updatedAt.toISOString());
+    for (const [name, status] of [['certificate-foreign', 404], ['certificate-admin', 404], ['certificate-guest', 401]])
+      await assert.rejects((await aiApiFor(name)).renameConversation(practiceConversation.id, 'forged'), error => error instanceof HttpClientError && error.status === status);
+    await assert.rejects(ownAi.renameConversation(practiceConversation.id, ' '), error => error instanceof HttpClientError && error.status === 422);
+    await db.$disconnect(); await db.$connect();
+    assert.equal((await db.aIConversation.findUniqueOrThrow({ where: { id: practiceConversation.id } })).title, 'ชื่อใหม่ของผู้ใช้');
+    assert.equal((await ownAi.renameConversation(practiceConversation.id, 'ชื่อหลัง reconnect')).title, 'ชื่อหลัง reconnect');
+    assert.deepEqual((await db.aIConversation.findUniqueOrThrow({ where: { id: practiceConversation.id } })).contextSnapshot, beforeRenameConversation.contextSnapshot);
+    assert.deepEqual(await counts(), beforeRenameCounts); assert.deepEqual(await unchangedAiHistory(), beforeRenameHistory);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }), originalProgress);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
@@ -363,6 +386,7 @@ async function main() {
     await assert.rejects(ownCertificateApi.get(historicalCertificate.id), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(sendAnswer(ownAi), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(ownAi.usage(), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(ownAi.renameConversation(practiceConversation.id, 'offline'), error => error instanceof HttpClientError && error.kind === 'network');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -402,6 +426,11 @@ async function main() {
       anonymous401: true, exhaustedQuotaStillReadable: true, reconnectPreservesCounters: true,
       networkFailure: true, noReadOrAcademicWrites: true, providerReservationGate: false,
       loginProviderGate: false, browserAcceptance: false };
+    result.aiRename = { component: 'AI-05 owned rename', checks: 7, unchangedFrontendApiAndDecoder: true,
+      actualNestAndPostgres: true, ownerProjectionAndPersistence: true, foreignInstructorAndAdmin404: true,
+      anonymous401: true, blank422: true, reconnect: true, networkFailure: true,
+      historyQuotaAcademicSnapshotsPreserved: true, deleteRetentionGate: false,
+      providerGenerationGate: false, loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
