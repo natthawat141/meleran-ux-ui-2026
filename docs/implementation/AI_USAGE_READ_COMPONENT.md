@@ -26,3 +26,5 @@ Account/date/count query claims are ignored by this parameter-free route; cannot
 - No schema/migration, canonical HTTP, dependency, cloud/STG/deploy change. Existing 8 migration SQL bytes immutable.
 
 Verification: `typecheck`, `check:boundaries`, foundation/component/database Jest configs, Nest build, runtime smoke, unchanged-client integration and Blueprint gate. Tests use isolated melearn_test/reset opt-in, cleanup only own fixtures.
+
+Verified code SHA: `702b776f8b0399f4627ae3745931cca1f1e6f8fb`; [hosted Nest CI 38089235653](https://github.com/natthawat141/meleran-tutor/actions/runs/38089235653) passed 276 tests + 59 client checks, build/smoke/blueprint/boundaries. Provider reservation/generation/login/browser and full acceptance remain unverified.
