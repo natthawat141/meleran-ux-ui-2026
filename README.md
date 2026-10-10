@@ -50,6 +50,7 @@ Health routes เป็น operational endpoints ใหม่ของ host ไ�
 
 ## เอกสารหลัก
 
+- [แผน Backend B0–B10 / สถานะ 14 ฟีเจอร์ / เกณฑ์ตรวจรับ](../docs/BACKEND_DELIVERY_PLAN_TH.md)
 - [Backend architecture และ decision register](docs/BACKEND_ARCHITECTURE.md)
 - [Feature delivery และ setup/ข้อจำกัด](docs/FEATURE_DELIVERY_STATUS_TH.md)
 - [Cloud SQL Bangkok และ environment setup](docs/CLOUD_SQL_SETUP_TH.md) — instance RUNNABLE; application DB connection ยังไม่ทดสอบ
