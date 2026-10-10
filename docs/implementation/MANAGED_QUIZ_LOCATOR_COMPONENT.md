@@ -27,4 +27,4 @@ Course shared lock ทำให้ ownership change รอจน read จบ; au
 
 Whole MGMT-04 remains NEEDS_DECISION: D16 roster/query/PII, GET Instructor/Admin learner directories, managed Attempt/GRADE prerequisites and actual Management browser gate. Full Auth/login/provider and course-authoring feature gates also remain open. No numbered case added or closed in the original113 acceptance set. See [execution status](EXECUTION_STATUS.md).
 
-Local checkpoint: 49 foundation + 28 feature units + 307 PostgreSQL = 384 tests; 114 client/transport checks including8 locator checks. Hosted checkpoint pending; previous CI is historical evidence.
+Local checkpoint: 49 foundation + 28 feature units + 307 PostgreSQL = 384 tests; 114 client/transport checks including8 locator checks. [Hosted Nest CI 38095412874](https://github.com/natthawat141/meleran-tutor/actions/runs/38095412874) passed exact code SHA `d56acfe409502305427191c3dbf29c447f33e0c7`; full feature/acceptance remain open.
