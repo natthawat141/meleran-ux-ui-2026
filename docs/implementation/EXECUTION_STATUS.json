@@ -188,7 +188,9 @@
             "Complete Auth D01/D03 and actual Firebase/Email providers",
             "Authenticated browser G-AUTH and A03/A09"
           ],
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871"
         }
       ]
     },
@@ -1320,7 +1322,9 @@
           "profile_mutation_gate": false,
           "login_provider_gate": false,
           "browser_acceptance": false,
-          "full_feature_gate": false
+          "full_feature_gate": false,
+          "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871"
         }
       ]
     },
@@ -1455,7 +1459,9 @@
           "remaining": [
             "Credential/link writer locking under reviewed Auth protocol",
             "D01/D02/D03 full Auth and provider cutover"
-          ]
+          ],
+          "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871"
         }
       ]
     },
@@ -1476,14 +1482,14 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_SELF_PROFILE_CHECKPOINT",
-    "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867",
-    "latest_component_ci": "PENDING_SELF_PROFILE_CHECKPOINT",
+    "ci": "PASS",
+    "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871",
+    "latest_component_ci": "PASS_SELF_PROFILE_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Frontend source unchanged; current hosted Nest CI reran 6 Catalog + 7 Free Enroll + 11 Learning + 7 Admin Revoke + 6 generic Video + 7 Certificate + 8 AI Practice + 7 AI Usage + 7 AI Rename checks (66). Full frontend CI remains earlier unchanged-source evidence; create/history/provider/login/delete/browser gates remain open."
+    "frontend_ci_evidence_note": "Frontend source unchanged; hosted Nest CI reran 6 Catalog + 7 Free Enroll + 11 Learning + 7 Admin Revoke + 6 generic Video + 7 Certificate + 8 AI Practice + 7 AI Usage + 7 AI Rename + 8 Self Profile checks (74). Full frontend CI remains earlier unchanged-source evidence; Auth/provider/profile mutation/browser gates remain open."
   },
   "remaining_decisions": [
     "D01",

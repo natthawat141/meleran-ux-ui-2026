@@ -29,3 +29,5 @@ profile projection whitelist declared fields; ไม่เติม defaults ใ
 ## Remaining gates
 
 PATCH/D02 username/null/array semantics และ image protocol/D09 ยังไม่ปิด; AUTH-01/AUTH-BASE-01/PROVIDER-AUTH-01 session/provider protocols D01/D03, Firebase credential/actual provider login และ authenticated browser G-AUTH ยังไม่ผ่าน. A03/A09/full113 acceptance ไม่ผ่านจาก read tests นี้. ไม่มี STG/deploy หรือ migrationข้อมูลจริง.
+
+Verified code SHA: `d3230b4e4013a6df135ec2a802065e91fa9bd64c`; [hosted Nest CI 38090915871](https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871) passed 302 tests + 74 client checks, build/smoke/blueprint/boundaries. Profile PATCH/provider login/browser and full acceptance remain unverified.
