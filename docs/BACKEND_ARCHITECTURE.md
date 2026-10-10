@@ -110,7 +110,7 @@ Auth provider ยืนยันแล้ว 10 ต.ค. 2026: Firebase สำ�
 
 | เรื่อง | สถานะ / สิ่งที่ต้องเลือก |
 | --- | --- |
-| Database / ORM | Cloud SQL ใน melearn-infra-prod ยืนยันแล้ว ยังไม่มี instance; PostgreSQL shared-core + EF Core เป็นข้อเสนอ ยังไม่เลือก engine/migration/transaction strategy |
+| Database / ORM | PostgreSQL 16 บน Cloud SQL Bangkok instance melearn-tutor-db RUNNABLE แล้ว; EF Core/Npgsql เป็นแนวทางที่เสนอ migration/transaction/runtime DB user และ SQL connection ยังไม่ได้ implement |
 | Auth | Firebase Email/Google + .NET Username ยืนยันแล้ว; account mapping/local hash/durable session และ cookie names/domain/path/TTL/revocation/CORS/CSRF ยังต้องกำหนด |
 | Google | ใช้ Firebase ยืนยันแล้ว; review 4 deferred operations เป็น Firebase exchange/link flow และ account linking conflicts |
 | Stripe | 1 deferred webhook protocol; API version/signature/raw body/dedupe/idempotency |
@@ -118,7 +118,7 @@ Auth provider ยืนยันแล้ว 10 ต.ค. 2026: Firebase สำ�
 | Canonical contract distribution | version/pinning/shared artifact ระหว่าง frontend/backend repos |
 | Concurrency | unified username rules, course return/publish revisions, idempotency lifetime/payload conflicts |
 | Rich document / AI / certificate | safe documents/URLs/size, async jobs/streaming, durable quota, PDF/download format |
-| Hosting / delivery | Cloud Run project melearn-tutor ยืนยันแล้ว; region/origin/config/secrets/health/rollbacks และ cross-project SQL access ยังต้องกำหนด ไม่ได้ deploy |
+| Hosting / delivery | Cloud Run project melearn-tutor และ Bangkok ยืนยันแล้ว; origin/config/secrets/health/rollbacks และ cross-project SQL access ยังต้องกำหนด ไม่ได้ deploy |
 
 ## ลำดับงานต่อ
 

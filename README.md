@@ -43,6 +43,7 @@ Health routes เป็น operational endpoints ใหม่ของ host ไ�
 ## เอกสารหลัก
 
 - [Backend architecture และ decision register](docs/BACKEND_ARCHITECTURE.md)
+- [Cloud SQL Bangkok และ environment setup](docs/CLOUD_SQL_SETUP_TH.md) — instance RUNNABLE; application DB connection ยังไม่ทดสอบ
 - [Auth decision: Firebase Email/Google และ .NET Username](docs/AUTH_DECISION_TH.md) — ยืนยัน provider แล้ว; session/HTTP changes เป็น Draft ยังไม่ได้เชื่อมจริง
 - Business scope: `../docs/MELEARN_V1_SCOPE.md` Final 1.6; ใน Frontend Git คือ `../melearn-tutor-frontend/docs/MELEARN_V1_SCOPE.md`
 - API handbook: `../docs/api-contract/API_CONTRACT_FEATURES_TH.md`
