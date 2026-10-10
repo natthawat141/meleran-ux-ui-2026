@@ -36,3 +36,5 @@ Client harness ใช้ source Frontend ที่ไม่แก้, real fetch
 - 113 original cases ยังติดตามครบ; full business acceptance remains 0. Full task/wave counts ไม่เพิ่มจาก subset นี้.
 
 Local/hosted aggregate counts และ exact code SHA อยู่ [Execution Status](EXECUTION_STATUS.md); hosted result จะบันทึกหลังตรวจ run ของ SHA นี้จริง.
+
+Verified code SHA: `df236a23fe9a54abf194df1224bb4ae8739c0d8b`; [hosted Nest CI 38092340554](https://github.com/natthawat141/meleran-tutor/actions/runs/38092340554) passed 332 tests + 89 client checks/build/smoke/gates. Provider/browser/full feature acceptance remain open.
