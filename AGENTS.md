@@ -5,7 +5,7 @@
 Business rules ใช้ workspace ../MELEARN_V1_SCOPE.md Final 1.6 หรือสำเนา Frontend ../elearning-ux-v2/docs/MELEARN_V1_SCOPE.md. API Draft canonical อยู่ ../elearning-ux-v2/packages/contracts/openapi/openapi.json. อย่าถือว่า frontend mock, DTOs หรือ memory ของสแตกเก่าเป็น database/security/provider implementation.
 
 - รักษา dependency rules และ scope ใน architecture document; Controllers ไม่มี business/SQL/provider code.
-- Database/ORM/Auth/media protocol ยังไม่เลือก. ไม่เดาแทนผู้ใช้หรือเพิ่ม infrastructure SDK ก่อนตัดสิน.
+- Auth provider ยืนยัน 10 ต.ค. 2026: Firebase Email/Google และ .NET Username ไม่มี email; อ่าน docs/AUTH_DECISION_TH.md. Database/ORM/session/media protocol ยังไม่เลือก. ไม่เดาแทนผู้ใช้หรือเพิ่ม infrastructure SDK ก่อนตัดสิน protocol ที่เกี่ยวข้อง.
 - Request/response DTO แยกจาก entities; nullable/required/errors ต้องตรง Contract.
 - ไม่ deploy, รัน local Docker, สร้าง cloud resources หรือแก้ reference systems โดยอัตโนมัติ.
 - ตรวจ restore/build/test และ scoped diff ก่อน commit. ห้าม blanket git add/reset/force push. Repo ใหม่ยังไม่มี remote; ไม่เดา remote หรือส่ง Backend เข้า Frontend Git.

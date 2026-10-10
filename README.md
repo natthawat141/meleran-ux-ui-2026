@@ -29,6 +29,7 @@ Health routes เป็น operational endpoints ใหม่ของ host ไ�
 ## เอกสารหลัก
 
 - [Backend architecture และ decision register](docs/BACKEND_ARCHITECTURE.md)
+- [Auth decision: Firebase Email/Google และ .NET Username](docs/AUTH_DECISION_TH.md) — ยืนยัน provider แล้ว; session/HTTP changes เป็น Draft ยังไม่ได้เชื่อมจริง
 - Business scope: `../MELEARN_V1_SCOPE.md` Final 1.6; ใน Frontend Git คือ `../elearning-ux-v2/docs/MELEARN_V1_SCOPE.md`
 - API handbook: `../elearning-ux-v2/docs/API_CONTRACT_FEATURES_TH.md`
 - Canonical OpenAPI Draft: `../elearning-ux-v2/packages/contracts/openapi/openapi.json`

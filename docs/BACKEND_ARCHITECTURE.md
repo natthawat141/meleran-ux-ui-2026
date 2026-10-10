@@ -106,11 +106,13 @@ Foundation tests ยังไม่เป็น contract acceptance ของ 86
 
 ## Decisions ที่ยังต้องตกลง
 
+Auth provider ยืนยันแล้ว 10 ต.ค. 2026: Firebase สำหรับ Email/Google และ .NET สำหรับ Username ไม่มี email ตาม Final 1.6. อ่าน [Auth decision และ integration Draft](AUTH_DECISION_TH.md); ยังไม่ใช่ implementation หรือ canonical HTTP contract ที่แก้แล้ว.
+
 | เรื่อง | สถานะ / สิ่งที่ต้องเลือก |
 | --- | --- |
 | Database / ORM | ยังไม่เลือก engine, EF Core/provider, migration และ transaction strategy |
-| Auth | account implementation/password hashing/session persistence; cookie names/domain/path/TTL/revocation/CORS/CSRF; Web/Admin แยก session ยืนยันแล้ว |
-| Google | 4 deferred start/callback/link operations; provider verification/PKCE/state/account linking conflicts |
+| Auth | Firebase Email/Google + .NET Username ยืนยันแล้ว; account mapping/local hash/durable session และ cookie names/domain/path/TTL/revocation/CORS/CSRF ยังต้องกำหนด |
+| Google | ใช้ Firebase ยืนยันแล้ว; review 4 deferred operations เป็น Firebase exchange/link flow และ account linking conflicts |
 | Stripe | 1 deferred webhook protocol; API version/signature/raw body/dedupe/idempotency |
 | Cloudflare media | ผู้ใช้เลือกทิศทาง Cloudflare แต่ยังไม่เลือก Images/R2 และ upload protocol; avatar upload ยังไม่มี contract/mock |
 | Canonical contract distribution | version/pinning/shared artifact ระหว่าง frontend/backend repos |
