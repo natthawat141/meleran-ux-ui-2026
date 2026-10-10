@@ -22,3 +22,5 @@ Management Controller/Service เรียก Auth public InstructorGrantWriter 
 8 checks: unchanged `frontend/apps/admin/src/shared/api/resources.ts` resource transport + actual `decodeManagementResponse` ที่ UI ใช้ → built Nest → Test PostgreSQL. Success/canonical/persistence, parallel replay/reconnect, namespace403, Admin409, unknown404, anonymous401, body422, network failure. Injectเฉพาะconfigured client; actual fetch/decoder ไม่ mock. เป็น transport/decoder component evidence ไม่ใช่การเปิด Admin page หรือ React hook/browser acceptance.
 
 Full task ยังขาด GET /admin/instructors directory/query protocol, complete Auth/Login/provider/normalized creation writers และ actual Management browser gate/A04. ไม่ปิด 113 numbered acceptance จาก component tests. ดู [execution status](EXECUTION_STATUS.md).
+
+Verified code SHA: `fc622a25b1f4a2f52f16b97e0e8f78ac463ddd29`; [hosted Nest CI 38094636720](https://github.com/natthawat141/meleran-tutor/actions/runs/38094636720) passed 49 foundation + 28 feature units + 294 PG = 371 tests, build/smoke และ 106 actual client checks. Full task/feature/acceptance remain open.
