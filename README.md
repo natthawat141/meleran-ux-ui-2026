@@ -4,6 +4,7 @@
 
 - [Business scope Final 1.6](MELEARN_V1_SCOPE.md)
 - [API Contract index](api-contract/README.md)
+- [Backend delivery / Cloud Run และ Cloud SQL](BACKEND_DELIVERY_PLAN_TH.md) — project owners ยืนยันแล้ว; DB sizing/engine เป็นข้อเสนอ
 - [Frontend UI/code/plan](../melearn-tutor-frontend/docs/README.md)
 - [Backend architecture](../melearn-tutor-api/docs/BACKEND_ARCHITECTURE.md)
 - [Auth decision](../melearn-tutor-api/docs/AUTH_DECISION_TH.md)
