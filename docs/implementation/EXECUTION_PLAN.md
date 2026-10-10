@@ -2,7 +2,7 @@
 
 Planning blueprint · 10 ตุลาคม 2026 · ไม่มีAPIimplementationในชุดงานนี้
 
-เริ่ม execution แล้ว 11 ตุลาคม 2026 ตามคำสั่งทำ Wave 1–17; ตารางด้านล่างคง planning baseline สำหรับ traceability. ดู [สถานะและหลักฐานปัจจุบัน](EXECUTION_STATUS.md) / [machine-readable board](EXECUTION_STATUS.json) ก่อนเลือกใบงาน. Foundation และ DB-01 ผ่านแล้ว; ไม่ถือว่า business acceptance ผ่านจากการปิดสองงานนี้.
+เริ่ม execution แล้ว 11 ตุลาคม 2026 ตามคำสั่งทำ Wave 1–17; ตารางด้านล่างคง planning baseline สำหรับ traceability. ดู [สถานะและหลักฐานปัจจุบัน](EXECUTION_STATUS.md) / [machine-readable board](EXECUTION_STATUS.json) ก่อนเลือกใบงาน. Foundation, DB-01/02/05/03/04 และ CI-01 ผ่านแล้ว; ไม่ถือว่า business acceptance ผ่านจากการปิดสองงานนี้.
 
 ## 1. Inventory and readiness
 
@@ -169,3 +169,7 @@ Component DoD แยกจาก Feature Accepted: ปิด backend task ด้
 ## 7. Completion of planning vs completion of product
 
 Planningผ่านเมื่อstructuralchecksและ113mappingครบพร้อมblockersชัด ไม่หมายความว่า113casesผ่านruntimeแล้ว. READYมีเพียงFoundationตอนbaselineนี้; tasksอื่นเปลี่ยนstatusหลังdependencies/decisionsมีevidence. ดู VALIDATION_REPORT.md และ ACCEPTANCE_MAP.md.
+
+## Execution correction — 2026-10-11
+
+D13 is confirmed: Nest backend is tracked in the fullstack branch; root CI passed. COMPLETION-01 depends on DB-03 as well as DB-02, and D06 best-result selection remains unresolved. This supplements the historical wave table; use EXECUTION_STATUS.json for current readiness. [Next decision packet](NEXT_DECISIONS_TH.md) keeps concrete proposals separate from approved requirements.

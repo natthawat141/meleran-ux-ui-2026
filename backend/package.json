@@ -14,7 +14,8 @@
     "start:dev": "nest start --watch",
     "test": "jest",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "check:boundaries": "node scripts/check-boundaries.cjs"
+    "check:boundaries": "node scripts/check-boundaries.cjs",
+    "check:blueprint": "node scripts/check-blueprint.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",

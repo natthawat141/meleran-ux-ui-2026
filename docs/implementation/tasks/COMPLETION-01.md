@@ -1,8 +1,8 @@
 # COMPLETION-01 — Shared completion transaction service (no new HTTP operation)
 
-Status: **READY** · Priority: P1 · Module: enrollments
+Status: **NEEDS_DECISION** · Priority: P1 · Module: enrollments
 
-รอ dependencies: DB-02
+Dependencies passed: DB-02, DB-03; pending D06 for best-result selection.
 
 ## Read set และ traceability
 
@@ -29,7 +29,7 @@ Status: **READY** · Priority: P1 · Module: enrollments
 - Entities: Enrollment, Progress, QuizAttempt, Certificate
 - [Domain model](../DOMAIN_MODEL.md) §TX-COMPLETE — Progress/course completion
 - PROPOSED_TECHNICAL execution: Enrollment owns Progress and completion coordinator. Lock Enrollment; record legitimate manual article/video or backend-derived fully graded Quiz proof; unique Progress. Compare completed current items exactly (no rounded100). First completion writes immutable snapshot/time and Certificate record via issuer in same transaction. Already completed retains old snapshot despite later content. PDF/network work outside transaction.
-- Dependencies: [DB-02](DB-02.md)
+- Dependencies: [DB-02](DB-02.md), [DB-03](DB-03.md)
 - Schema Owner: Lead/DB maintainer ผู้เดียว; feature agent ส่ง schema delta ไป DB task ไม่สร้าง migration เอง
 
 ## Expected files / modules
@@ -76,7 +76,7 @@ Feature gate: **G-LEARNING** ใน [Execution Plan](../EXECUTION_PLAN.md); ต�
 
 ## Decisions / สิ่งที่ห้ามแก้
 
-ไม่มี business/protocol decision เฉพาะ task; ตรวจ dependency/environment ก่อนเริ่ม
+Execution review 2026-10-11: D06 applies to the best-attempt snapshot selection required by Q06/Q07; DB-03 is a concrete schema dependency. No completion implementation until this policy is resolved.
 
 - ห้ามเปลี่ยน business policy, canonical path/schema/security semantics หรือเติม endpoint ให้ CRUD ครบ
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test

@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 39,
+    "database_tests": 40,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -52,6 +52,10 @@
       {
         "name": "20261011040000_db04",
         "sha256": "684d41199be93bac7f368c8723cd89ec04cd9f46a360afe5b315152c8cb4d180"
+      },
+      {
+        "name": "20261011041000_db04_history_guard",
+        "sha256": "e58bdf0cf2b13cb6dce3647597e3b205ffee4a75299fc8dcc4ed04f5c814f9e4"
       }
     ]
   },
@@ -558,11 +562,15 @@
       "id": "COMPLETION-01",
       "module": "enrollments",
       "priority": "P1",
-      "state": "READY",
+      "state": "NEEDS_DECISION",
       "dependencies": [
-        "DB-02"
+        "DB-02",
+        "DB-03"
       ],
-      "decision_ids": []
+      "decision_ids": [
+        "D06"
+      ],
+      "note": "Task consumes QuizAttempt and best completed proof; across changed max-score selection remains D06, not a new policy."
     },
     {
       "id": "PROVIDER-AUTH-01",
@@ -642,12 +650,13 @@
       "id": "CI-01",
       "module": "foundation",
       "priority": "P1",
-      "state": "IN_PROGRESS",
+      "state": "DONE",
       "dependencies": [
         "FOUNDATION-01",
         "DB-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "evidence": "GitHub Actions 38073566063 success on da4a65b51d9889b8cfa1c4605fd02fbe41525540; follow-up hardening rerun pending."
     },
     {
       "id": "AUTH-BASE-01",
@@ -680,7 +689,9 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_HOSTED_RUN"
+    "ci": "PASS",
+    "verified_sha": "da4a65b51d9889b8cfa1c4605fd02fbe41525540",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38073566063"
   },
   "remaining_decisions": [
     "D01",

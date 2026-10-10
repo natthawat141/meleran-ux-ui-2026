@@ -99,3 +99,7 @@ Whitespace: ตรวจ tracked diff และ new artifact directory ด้ว
 Contract version: `1.0.0-draft.1`
 
 SHA-256: `c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3`
+
+## Execution audit — 2026-10-11
+
+Planning rows above are historical baseline. Current board lives in EXECUTION_STATUS.json. check-blueprint.cjs verifies all 86 method/path/operation IDs/request-response schemas, 5 deferred records, 113 original case action/expected texts, 50-task execution DAG, canonical SHA and applied migration SHA. Eight read operations have no dedicated original numbered case; their targeted tests remain mandatory. COMPLETION-01 gained concrete DB-03 dependency/D06 blocker after schema review; no missing policy inferred. CI placement D13 is confirmed and hosted checkpoint passed.

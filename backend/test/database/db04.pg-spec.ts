@@ -29,7 +29,8 @@ describe('DB-04 atomic redemption and durable payment storage', () => {
   });
   it('checks immutable checksum and rolls back the complete 27-table chain', async () => {
     await assertMigration(migrator, '20261011040000_db04');
-    await assertMigrationRollback(migrationUrl, migrator, ['20261011002000_db01', '20261011010000_db02', '20261011020000_db05', '20261011030000_db03', '20261011040000_db04'], 27);
+    await assertMigration(migrator, '20261011041000_db04_history_guard');
+    await assertMigrationRollback(migrationUrl, migrator, ['20261011002000_db01', '20261011010000_db02', '20261011020000_db05', '20261011030000_db03', '20261011040000_db04', '20261011041000_db04_history_guard'], 27);
   });
   it('rolls back redemption without leaving Used or an enrollment', async () => {
     await expect(db.$transaction(async tx => {
@@ -59,9 +60,9 @@ describe('DB-04 atomic redemption and durable payment storage', () => {
   it('rejects inconsistent redeem state and wrong grant owner', async () => {
     const code = await db.redeemCode.create({ data: { code: tag + '_invalid', courseId, issuedBy: accounts[0] } });
     await expect(db.redeemCode.update({ where: { id: code.id }, data: { status: 'used' } })).rejects.toThrow();
-    const used = await db.redeemCode.findUniqueOrThrow({ where: { id: codeId } });
-    await expect(db.redeemCode.update({ where: { id: code.id }, data: { status: 'used', enrollmentId: used.enrollmentId,
-      usedBy: accounts[3], usedAt: new Date() } })).rejects.toThrow();
+    const other = await db.enrollment.create({ data: { accountId: accounts[0], courseId } });
+    await expect(db.redeemCode.update({ where: { id: code.id }, data: { status: 'used', enrollmentId: other.id,
+      usedBy: accounts[3], usedAt: new Date() } })).rejects.toMatchObject({ code: 'P2003' });
     expect((await db.redeemCode.findUniqueOrThrow({ where: { id: code.id } })).status).toBe('unused');
   });
   it('keeps checkout identity/price fixed and deduplicates provider events', async () => {
@@ -89,6 +90,7 @@ describe('DB-04 atomic redemption and durable payment storage', () => {
       await tx.payment.update({ where: { id: paymentId }, data: { enrollmentId: enrollment.id, fulfillmentStatus: 'granted' } });
     });
     await expect(db.payment.update({ where: { id: paymentId }, data: { status: 'pending', paidAt: null } })).rejects.toThrow();
+    await expect(db.payment.update({ where: { id: paymentId }, data: { fulfillmentStatus: 'failed', enrollmentId: null } })).rejects.toThrow();
     await db.$disconnect(); await db.$connect();
     expect(await db.payment.findUniqueOrThrow({ where: { id: paymentId } })).toMatchObject({ status: 'succeeded', fulfillmentStatus: 'granted' });
     expect(await db.enrollment.count({ where: { accountId: accounts[3], courseId } })).toBe(1);
@@ -97,5 +99,11 @@ describe('DB-04 atomic redemption and durable payment storage', () => {
     for (const data of [{ amountMinor: 0 }, { amountMinor: -1 }, { currency: 'USD' }, { fulfillmentStatus: 'granted' }]) {
       await expect(db.payment.create({ data: { accountId: accounts[1], courseId, requestId: randomUUID(), payloadHash: 'test', amountMinor: 1000, ...data } })).rejects.toThrow();
     }
+  });
+  it('preserves verified event identity while permitting processing bookkeeping', async () => {
+    await db.paymentEvent.update({ where: { eventId: tag }, data: { status: 'processed', processedAt: new Date() } });
+    await expect(db.paymentEvent.update({ where: { eventId: tag }, data: { eventSnapshot: {} } })).rejects.toThrow();
+    await expect(db.paymentEvent.update({ where: { eventId: tag }, data: { eventId: tag + '_new' } })).rejects.toThrow();
+    expect((await db.paymentEvent.findUniqueOrThrow({ where: { eventId: tag } })).status).toBe('processed');
   });
 });

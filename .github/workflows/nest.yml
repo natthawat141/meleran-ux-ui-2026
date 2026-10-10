@@ -68,7 +68,7 @@ jobs:
       - run: pnpm run db:test:migrate
         env:
           ALLOW_TEST_DATABASE_MIGRATION: 'yes'
-      - run: pnpm run typecheck && pnpm run check:boundaries && pnpm run test:foundation
+      - run: pnpm run typecheck && pnpm run check:blueprint && pnpm run check:boundaries && pnpm run test:foundation
       - run: pnpm run test:database
         env:
           ALLOW_TEST_DATABASE_RESET: 'yes'

@@ -42,7 +42,8 @@ describe('DB-03 immutable assessment storage', () => {
     const chapter = await db.courseChapter.findFirstOrThrow({ where: { courseId } });
     const article = await db.courseItem.create({ data: { chapterId: chapter.id, courseId, title: tag, position: 1 } });
     await expect(db.quiz.create({ data: { itemId: article.id, courseId, title: tag } })).rejects.toMatchObject({ code: 'P2003' });
-    await expect(db.quiz.create({ data: { itemId: article.id, courseId: randomUUID(), title: tag } })).rejects.toMatchObject({ code: 'P2003' });
+    const quizItem = await db.courseItem.create({ data: { chapterId: chapter.id, courseId, type: 'quiz', title: tag, position: 2 } });
+    await expect(db.quiz.create({ data: { itemId: quizItem.id, courseId: randomUUID(), title: tag } })).rejects.toMatchObject({ code: 'P2003' });
   });
   it('keeps question/answer-key/max snapshots after live authoring edit/deletion', async () => {
     await db.question.update({ where: { id: questionId }, data: { prompt: { text: 'changed' }, maxScore: 100 } });

@@ -9,7 +9,7 @@ Status register สำหรับ planning; ไม่มี canonical change �
 - NestJS/TypeScript/Prisma/PostgreSQL target; currentSQLiteเป็นimplementationgap ไม่ใช่สิทธิ์เลือกDBใหม่.
 - Fresh test data; no prototype accounts/password/hash migration; no liveDBchanges.
 - FirebaseEmail/GoogleกับlocalUsername; Web/Adminsharedaccountแต่แยกlogin/logoutsession; Resend/Stripe/R2/OpenRouterตามconfirmeddecisions.
-- ทำคนเดียว; identifyparallel-safepackagesได้แต่ไม่spawnagentsหรือเปลี่ยนCI/Gitplacementเอง.
+- ทำคนเดียว; Git/CI placement ปิด D13 ตามคำสั่ง 11 ต.ค. 2026; ไม่ spawn agents.
 
 ## D01 — Session/security transport [UNRESOLVED]
 
@@ -125,7 +125,7 @@ Status register สำหรับ planning; ไม่มี canonical change �
 ## D15 — Reuse existing backend/latest instruction [CONFIRMED]
 
 - Evidence/conflict: Latest instruction overrides earlier new-project choice: use existing Nest structure and Prisma; PostgreSQL target already confirmed; no new backend scaffold or dependency installation.
-- Proposed resolution / next action: Existing D:\code\elearn-prod\melearn-nest-api is target. Fresh test data only; no prototype account/hash migration.
+- Proposed resolution / next action: Existing Nest is reused in D:\code\elearn-prod\worktrees\melearn-fullstack\backend per D13. Fresh test data only; no prototype account/hash migration.
 - Blocking tasks: ไม่มี business policy blocker; technical review ตาม task
 - Owner: Lead Architect / Schema Owner
 - Approval evidence: Latest user request: reuse existing NestJS/ORM; earlier explicit PostgreSQL+Prisma and fresh test data instructions
@@ -194,3 +194,7 @@ Leadเตรียมdecisionเฉพาะfeature → user/backend/frontendow
 | docs/api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md | 248fc99516cd2457a756aabc2b0b96812963499bde2538bbd1b6f216621bea90 |
 | docs/BACKEND_DELIVERY_PLAN_TH.md | d9eb61643367665feec92abdd5e3579a4ae8bad2d00bda381620e4497a633880 |
 | melearn-tutor-api/docs/AUTH_DECISION_TH.md | 1dcf980b5be02f496765830cb176f91d9d65b9ca3cc2e5dbdd3218d67d317eb8 |
+
+## Execution review 2026-10-11
+
+[Next decision packet](NEXT_DECISIONS_TH.md) holds concrete Proposed A/B/C choices; none is silently approved. COMPLETION-01 depends on DB-03 and D06 because its own acceptance requires best result selection. Physical batches are reviewed/applied only to melearn_test; D14 review is per batch and does not resolve business policy.

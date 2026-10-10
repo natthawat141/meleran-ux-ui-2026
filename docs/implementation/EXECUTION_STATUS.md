@@ -4,12 +4,12 @@
 
 ## ผลที่ตรวจแล้ว
 
-- DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (6/50 tasks).
-- Foundation/architecture tests 49/49; PostgreSQL tests 39/39; strict typecheck และ Nest build ผ่าน.
+- DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).
+- Foundation/architecture tests 49/49; PostgreSQL tests 40/40; strict typecheck และ Nest build ผ่าน.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
-- CI-01 กำลังตรวจ hosted CI; D13 ปิดด้วยคำอนุญาตผู้ใช้ให้ push branch เมื่อ 11 ต.ค.
-- COMPLETION-01 พร้อมเริ่มตาม baseline แต่ใช้ QuizAttempt จึงต้องเพิ่ม DB-03 เป็น dependency จริง; การเลือก best attempt ข้าม max-score รอ D06.
+- CI-01 DONE: hosted CI [38073566063](https://github.com/natthawat141/meleran-tutor/actions/runs/38073566063) ผ่านบน da4a65b; follow-up hardening จะตรวจอีก run. D13 ปิดแล้ว.
+- COMPLETION-01 เป็น NEEDS_DECISION: dependencies จริงคือ DB-02/DB-03 ที่ผ่านแล้ว และ D06 สำหรับ best result ข้ามคะแนนเต็มต่างกัน.
 
 ## Checkout และ Git
 
@@ -38,6 +38,8 @@ Instance เดิม melearn-infra-prod:asia-southeast3:melearn-tutor-db; Postg
 | 20261011030000_db03 | 726de5121ced61057fe4f43e9a2427743c043a10f6d30ae582b13b078aa85648 |
 | 20261011040000_db04 | 684d41199be93bac7f368c8723cd89ec04cd9f46a360afe5b315152c8cb4d180 |
 
+DB-04 follow-up history guard: 20261011041000_db04_history_guard, SHA256 e58bdf0cf2b13cb6dce3647597e3b205ffee4a75299fc8dcc4ed04f5c814f9e4. Granted fulfillment และ verified event identity เปลี่ยนย้อนหลังไม่ได้; ไม่ rewrite migration เดิม.
+
 ## สิ่งที่ยังรอ
 
 D16 Catalog proposal อยู่ [CATALOG_QUERY_REVIEW](CATALOG_QUERY_REVIEW.md) และยังรอคำตอบ. Auth/security/Firebase recovery ownership D01–D03, revision/rich text D04–D05, best score D06, file/media/provider/idempotency/lifecycle D07–D12 ยังไม่ frozen. Permission/business factsที่ยืนยันแล้วไม่ถามซ้ำ.
@@ -49,3 +51,7 @@ Use [execution board](EXECUTION_STATUS.json) for exact dependencies/readiness; [
 From backend/: typecheck; check:boundaries; test:foundation; test:database with process-only ALLOW_TEST_DATABASE_RESET=yes; build; node scripts/smoke-test-api.cjs; node scripts/prisma-test.cjs status. Reviewed migrations require process-only ALLOW_TEST_DATABASE_MIGRATION=yes. Runtime never seeds/migrates.
 
 Root CI installs existing pinned lockfiles, provisions disposable PostgreSQL, runs these checks and never connects Cloud SQL/providers. Static boundary exceptions for unchanged prototype Account writers are hash tracked for future Auth-owned cutover; no production/security approval implied.
+
+## Coverage recheck
+
+node scripts/check-blueprint.cjs ผ่าน: canonical 86 operations, 5 deferred, 113 case IDs พร้อม action/expected ตรง Scope เดิม, 50-task DAG และ checksums. 8 read operations ไม่มี dedicated numbered acceptance case ใน Scope; ต้องมี targeted feature tests ตามใบงานโดยไม่เพิ่ม case IDs ปลอม. ข้อเสนอที่ส่งให้ตัดสินอยู่ [NEXT_DECISIONS_TH](NEXT_DECISIONS_TH.md).
