@@ -9,5 +9,5 @@ Business rules ใช้ workspace ../docs/MELEARN_V1_SCOPE.md Final 1.6 หร�
 - Request/response DTO แยกจาก entities; nullable/required/errors ต้องตรง Contract.
 - OpenRouter model และ API key มาจาก environment/secret configuration เท่านั้น; ห้ามกำหนด default model หรือใส่ Model/ApiKey ใน appsettings*.json. ถ้า model ไม่ได้ตั้ง ห้ามเดาหรือ fallback เป็น paid model.
 - ไม่ deploy, รัน local Docker, สร้าง cloud resources หรือแก้ reference systems โดยอัตโนมัติ.
-- ตรวจ restore/build/test และ scoped diff ก่อน commit. ห้าม blanket git add/reset/force push. Repo ใหม่ยังไม่มี remote; ไม่เดา remote หรือส่ง Backend เข้า Frontend Git.
+- ตรวจ restore/build/test และ scoped diff ก่อน commit. ห้าม blanket git add/reset/force push. ผู้ใช้อนุญาตให้นำ Backend ขึ้น Git แล้ว 10 ต.ค. 2026: private repo `natthawat141/melearn-tutor-api`, branch `backend/v1-foundation`. ใช้ remote นี้; ไม่ส่ง Backend เข้า Frontend Git. การ push ไม่ใช่การ deploy Backend.
 - สรุปเป็นภาษาไทย แยก foundation/build/test, business implementation และ production readiness.
