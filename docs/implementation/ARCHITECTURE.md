@@ -79,6 +79,12 @@ Only latest answer/time and conversation activity change in the caller transacti
 no provider/quota/academic cross-module writes. Schema owner appends DB-05 linkage
 and message-role locking migrations; see AI_PRACTICE_ANSWER_COMPONENT.md.
 
+AI-03 usage read: feature-local AiUsageController/Service/DTO reuse Auth fresh
+self authority; one DB instant drives explicit Bangkok day/reset SQL. Central
+AI config owns AI_DAILY_PROMPT_LIMIT=20 and timezone; future limit changes also
+require review of DB quota constraint. GET reads success only, never inserts or
+reserves; no provider/academic dependencies. See AI_USAGE_READ_COMPONENT.md.
+
 Critical interface contracts เป็น PROPOSED: Auth.resolvePrincipal(session,audience) คืน internal principal/roles/eligibility; Courses.getLearningDefinition(principal,courseId) คืน authorized content/revision โดยไม่เปิด answer keys ให้ learner; Courses.getAssessmentDefinitionForAttempt(principal,enrollment,quizId) คืน immutable-definition input พร้อม private keys เฉพาะ Assessments service ไม่ serialize ออก HTTP; Enrollments.grantEntitlement(tx,userId,courseId,sourceRef) คืน created-or-existing Enrollment โดยไม่ทับ source เดิม; Enrollments.recordItemResult(tx,trustedProof) ตรวจ same-course/current content/best graded result ก่อน completion; Certificates.issueForCompletion(tx,completionSnapshot) คืน Certificate เดิมหรือสร้างหนึ่งรายการ. Proof เหล่านี้สร้างภายใน service เท่านั้น ไม่มี controller รับ proof/score/eligibility จาก client.
 
 ## 5. Database and transaction contract

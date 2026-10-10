@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 193,
+    "database_tests": 205,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,7 +51,9 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 52
+    "frontend_client_checks_total": 59,
+    "ai_usage_read_http_postgres_tests": 12,
+    "frontend_ai_usage_client_checks": 7
   },
   "environment": {
     "staging": false,
@@ -845,6 +847,31 @@
       ],
       "decision_ids": [
         "D12"
+      ],
+      "components": [
+        {
+          "id": "ai_usage_read",
+          "method": "GET",
+          "path": "/me/ai/usage",
+          "operationId": "get_me_ai_usage",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 12,
+          "frontend_client_checks": 7,
+          "protocol_document": "AI_USAGE_READ_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-05 persisted daily success count",
+            "AUTH-BASE-01 fresh stored-session self authority"
+          ],
+          "evidence": "Fresh bound own identity, one DB clock instant, explicit Bangkok day/next-midnight projection; select success only, same20 all roles, missing row no insertion/reset. Query claims cannot select foreign account, exhausted history readable, reconnect/parallel no-write, actual PG failure and timezone/month/year/leap boundaries.",
+          "remaining": [
+            "POST messages and actual provider generation",
+            "D12 reservation/finalization/recovery/admission",
+            "Full Auth, AI history and browser G-AI"
+          ],
+          "provider_reservation_gate": false,
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1192,6 +1219,19 @@
           "full_feature_gate": false,
           "verified_sha": "926c1eb5f51accc353415146a86b0b3f787cc6f2",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736"
+        },
+        {
+          "id": "ai_usage_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "protocol_document": "AI_USAGE_READ_COMPONENT.md",
+          "evidence": "Unchanged aiApi.usage/decoder -> built Nest/Test PG; own Learner/Instructor/Admin successes, no pending charge, anonymous401, exhausted quota/reconnect/network failure and original quota/academic values preserved.",
+          "session_fixture": true,
+          "daily_usage_fixture": true,
+          "provider_reservation_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1336,10 +1376,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_AI_USAGE_CHECKPOINT",
     "verified_sha": "926c1eb5f51accc353415146a86b0b3f787cc6f2",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736",
-    "latest_component_ci": "PASS_AI_PRACTICE_ANSWER_CHECKPOINT",
+    "latest_component_ci": "PENDING_AI_USAGE_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

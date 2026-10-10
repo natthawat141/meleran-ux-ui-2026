@@ -328,6 +328,31 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }), originalProgress);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    phase = 'frontend-ai-usage';
+    const { quotaWindow: builtQuotaWindow } = require(path.join(root, 'dist/features/ai/quota-window.js'));
+    const quotaInstant = (await db.$queryRaw`SELECT clock_timestamp() AS now`)[0].now;
+    const quotaDay = await builtQuotaWindow(db, quotaInstant);
+    for (const [id, used, pending] of [[learnerId, 7, 2], [accountId, 9, 0], [adminId, 20, 0]])
+      await db.aIUsageDaily.create({ data: { accountId: id, usageDate: quotaDay.usageDate, successCount: used, pendingCount: pending } });
+    const beforeUsageCounts = await counts();
+    const usageRows = () => db.aIUsageDaily.findMany({ where: { accountId: { in: [learnerId, accountId, adminId] } }, orderBy: { accountId: 'asc' } });
+    const originalUsage = await usageRows();
+    const expectedUsage = used => ({ limit: 20, used, remaining: 20 - used, reset_at: quotaDay.resetAt.toISOString() });
+    assert.deepEqual(await ownAi.usage(), expectedUsage(7));
+    assert.deepEqual(await (await aiApiFor('certificate-foreign')).usage(), expectedUsage(9));
+    assert.deepEqual(await (await aiApiFor('certificate-admin')).usage(), expectedUsage(20));
+    await assert.rejects((await aiApiFor('certificate-guest')).usage(), error => error instanceof HttpClientError && error.status === 401);
+    assert.deepEqual(await counts(), beforeUsageCounts); assert.deepEqual(await usageRows(), originalUsage);
+    await db.aIUsageDaily.update({ where: { accountId_usageDate: { accountId: learnerId, usageDate: quotaDay.usageDate } },
+      data: { successCount: 20, pendingCount: 0 } });
+    const exhaustedUsage = await usageRows();
+    assert.deepEqual(await ownAi.usage(), expectedUsage(20));
+    await db.$disconnect(); await db.$connect();
+    assert.deepEqual(await ownAi.usage(), expectedUsage(20));
+    assert.deepEqual(await counts(), beforeUsageCounts); assert.deepEqual(await usageRows(), exhaustedUsage);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.progress.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }), originalProgress);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
@@ -337,6 +362,7 @@ async function main() {
     await assert.rejects(uploadRequest(ownerUploadClient), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(ownCertificateApi.get(historicalCertificate.id), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(sendAnswer(ownAi), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(ownAi.usage(), error => error instanceof HttpClientError && error.kind === 'network');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -371,6 +397,11 @@ async function main() {
       latestAnswerAndReconnect: true, foreignInstructorAndAdmin404: true, anonymous401: true, foreignOption422: true,
       networkFailure: true, originalDefinitionsTitleAcademicHistoryPreserved: true, noNewQuotaRows: true,
       providerGenerationGate: false, loginProviderGate: false, browserAcceptance: false };
+    result.aiUsage = { component: 'AI-03 daily usage read', checks: 7, unchangedFrontendApiAndDecoder: true,
+      actualNestAndPostgres: true, ownedAllRolesSameLimit: true, successfulOnlyNoPendingCharge: true,
+      anonymous401: true, exhaustedQuotaStillReadable: true, reconnectPreservesCounters: true,
+      networkFailure: true, noReadOrAcademicWrites: true, providerReservationGate: false,
+      loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');

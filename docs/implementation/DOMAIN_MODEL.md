@@ -182,6 +182,11 @@ Authorize owner before read/write. Keep ordered durable messages and context sna
 
 ### TX-AI — Reserve/provider/finalize
 
+Execution read component: GET own usage selects persisted successful count using
+one DB clock instant/Bangkok day, returns remaining=20-success and next midnight.
+No row creation/reset/reservation or old-day pending cleanup. This read is not T1
+request admission; D12 lifecycle remains open. See [AI_USAGE_READ_COMPONENT](AI_USAGE_READ_COMPONENT.md).
+
 T1 authorize owner/context and check user/request_id payload, lock (user,Bangkok date), reserve if success+reserved <20, persist Pending/context/date. Call configured provider outside tx. T2 atomically persist validated response/practice snapshot, success_count+1, release reservation. Failed/no usable answer releases without success. Replay returns durable prior state; pending crosses midnight on original date. Cleanup/recovery/timeout protocol D12; do not hold DB transaction during model call.
 
 ### TX-PRACTICE — Answer latest snapshot
