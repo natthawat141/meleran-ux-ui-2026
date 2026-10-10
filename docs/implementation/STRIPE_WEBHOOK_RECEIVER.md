@@ -23,7 +23,7 @@ Receiver รองรับ envelope ของ **account-scoped v1 snapshot even
 
 1. ถ้า config/signature/envelope ไม่ผ่าน: ไม่เขียน DB.
 2. หลัง verify: allowlist receipt snapshot และ `INSERT ... ON CONFLICT(eventId) DO NOTHING`; unique constraint ของ PostgreSQL ทำให้ delivery พร้อมกัน converge.
-3. อ่าน snapshot/status เดิม; event id ที่มี payload ต่างกันคืน conflict ไม่เขียนทับ proof/time/status. Fingerprint เป็น SHA-256 ของ **canonicalized decoded JSON** เพื่อให้ whitespace/key-order บน fresh signed retry ไม่เกิด false conflict; signature ยังคำนวณจาก original raw bytes เท่านั้น.
+3. อ่าน snapshot/status เดิม; event id ที่มี immutable event data ต่างกันคืน conflict ไม่เขียนทับ proof/time/status. Fingerprint เป็น SHA-256 ของ **canonicalized id/object/type/api_version/created/livemode/data** เพื่อให้ whitespace/key-order และ delivery counter `pending_webhooks` บน fresh signed retry ไม่เกิด false conflict; signature ยังคำนวณจาก original raw bytes ทั้ง payload เท่านั้น. ไม่ใช้ request/transport fields เป็น payment authority; [Stripe Event object](https://docs.stripe.com/api/events/object) ระบุว่า data คงเดิมและ pending_webhooks นับ delivery ที่ยังไม่สำเร็จ.
 4. Snapshot เก็บ receipt version, fingerprint, event envelope, object id/type และ Checkout fields ที่จำเป็น: mode/status/payment_status/currency/amount_total/payment_intent. ไม่เก็บ raw body, signature, metadata, email/address/customer details, card fields หรือ client secret. ไม่มี user/course claim จาก metadata กลายเป็น authority. จะต้องใช้ provider reconciliation เมื่อ processor ต้องการข้อมูลนอก snapshot; ไม่ถือ snapshot นี้เป็น raw event archive.
 5. Receiver ไม่เปลี่ยน Payment, Enrollment, session หรือผลการเรียน; ไม่ผูก Payment จาก claim ที่ผู้ส่งระบุเอง. Proof/time/processing metadata เดิมยังถูกคุ้มครองด้วย immutable DB triggers.
 
@@ -44,7 +44,7 @@ Local provider response contract ของ receiver (ไม่ใช่ canonica
 ## Verification และ next step
 
 - 5 signature unit tests รวม UTF-8 golden HMAC vector ที่สร้างด้วย .NET HMACSHA256 แยกจาก verifier.
-- 10 actual Nest HTTP + isolated Test PostgreSQL tests: raw whitespace/UTF-8, spoof/tamper/missing/old/future signature, missing config, invalid envelope/mode/Connect, 5 concurrent deliveries, reconnect, reordered JSON, id collision, failed/processed retry behavior, parser limits/encoding, DB failure/no diagnostics leak และไม่มี financial/grant writes.
+- 10 actual Nest HTTP + isolated Test PostgreSQL tests: raw whitespace/UTF-8, spoof/tamper/missing/old/future signature, missing config, invalid envelope/mode/Connect, 5 concurrent deliveries, reconnect, reordered JSON/changed delivery counter, id collision, failed/processed retry behavior, parser limits/encoding, DB failure/no diagnostics leak และไม่มี financial/grant writes.
 - Shared error schema ตรวจ invalid-signature response ด้วย canonical validator. Provider success/pending response เป็น local receiver contract ตามตารางข้างบน; ไม่อ้าง canonical operation completion.
 - Existing foundation/module/HTTP components ต้อง regression ผ่าน; no schema delta จึงไม่ generate/apply migration ซ้ำ.
 

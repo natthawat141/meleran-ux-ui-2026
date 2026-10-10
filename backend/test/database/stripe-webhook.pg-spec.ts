@@ -18,7 +18,7 @@ describe('PROVIDER-STRIPE-01 receiver real HTTP / Test PostgreSQL', () => {
   let initialCounts: number[];
   function event(suffix: string) {
     return { id: tag + suffix, object: 'event', type: 'checkout.session.completed', created: 1,
-      api_version: '2026-09-30.clover', livemode: false, data: { object: {
+      api_version: '2026-09-30.clover', livemode: false, pending_webhooks: 5, data: { object: {
         id: 'cs_test_' + tag + suffix, object: 'checkout.session', mode: 'payment', status: 'complete',
         payment_status: 'paid', amount_total: 12000, currency: 'thb', payment_intent: 'pi_test_fixture',
         metadata: { user_id: 'FORGED_USER', course_id: 'FORGED_COURSE' },
@@ -99,7 +99,7 @@ describe('PROVIDER-STRIPE-01 receiver real HTTP / Test PostgreSQL', () => {
     expect(responses.map(response => response.status)).toEqual([503, 503, 503, 503, 503]);
     const before = await db.paymentEvent.findUniqueOrThrow({ where: { eventId: payload.id } });
     // Fresh signature over equivalent JSON with reordered keys/new whitespace.
-    const reordered = Object.fromEntries(Object.entries(payload).reverse());
+    const reordered = Object.fromEntries(Object.entries({ ...payload, pending_webhooks: 0 }).reverse());
     await send(JSON.stringify(reordered, null, 2)).expect(503);
     await db.$disconnect(); await db.$connect();
     expect(await db.paymentEvent.findUniqueOrThrow({ where: { eventId: payload.id } })).toEqual(before);

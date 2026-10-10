@@ -6,7 +6,7 @@ type JsonObject = Record<string, unknown>;
 const record = (value: unknown): value is JsonObject => !!value && typeof value === 'object' && !Array.isArray(value);
 const shortString = (value: unknown): value is string => typeof value === 'string' && value.length > 0 && value.length <= 255;
 
-/** Stable fingerprint: key ordering/whitespace on a fresh signed retry is immaterial. */
+/** Stable JSON: key ordering/whitespace on a fresh signed retry is immaterial. */
 function stableJson(value: unknown, depth = 0): string {
   if (depth > 64) throw new Error('Invalid event');
   if (typeof value === 'number' && !Number.isFinite(value)) throw new Error('Invalid event');
@@ -56,7 +56,11 @@ export function decodeStripeReceipt(body: Buffer, mode: 'test' | 'live'): Verifi
       projection.payment_intent = record(object.payment_intent) ? object.payment_intent.id as string : object.payment_intent as string | null;
     }
   }
-  const fingerprint = createHash('sha256').update(stableJson(event)).digest('hex');
+  // Stripe guarantees event.data is immutable. pending_webhooks is delivery state,
+  // not event identity; request/other transport fields are not payment authority.
+  const fingerprint = createHash('sha256').update(stableJson({ id: event.id, object: event.object,
+    type: event.type, api_version: event.api_version, created: event.created,
+    livemode: event.livemode, data: event.data })).digest('hex');
   return { eventId: event.id, type: event.type, checkoutSessionId: session ? object.id as string : null,
     fingerprint, snapshot: { receipt_version: 1, payload_sha256: fingerprint,
       event: { id: event.id, type: event.type, api_version: event.api_version as string | null,
