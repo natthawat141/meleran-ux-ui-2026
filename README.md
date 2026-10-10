@@ -18,6 +18,20 @@ dotnet run --project src/Melearn.Api --launch-profile http
 
 HTTP dev host: `http://127.0.0.1:5100`.
 
+### Local environment
+
+คัดลอก `.env.example` เป็น `.env` และกรอก `OpenRouter__ApiKey`, `OpenRouter__Model`, `Resend__ApiKey`, `Resend__From` และ Firebase project/credential path เมื่อพร้อม. `.env` ถูก Git ignore; private credential file ให้เก็บนอก repository. Frontend ใช้เฉพาะ Firebase public client config; ห้ามนำ OpenRouter/Resend API keys ไปใส่ `VITE_*`.
+
+```powershell
+Copy-Item -LiteralPath .env.example -Destination .env # เฉพาะเมื่อยังไม่มี .env
+.\scripts\dev.ps1 -CheckOnly
+.\scripts\dev.ps1
+```
+
+ASP.NET Core อ่าน process environment แต่ไม่อ่าน `.env` โดยอัตโนมัติ. Script นี้โหลดค่าแล้วเรียก `dotnet run --no-launch-profile` เพื่อให้ URL/environment จากไฟล์มีผล; หลังหยุด process จะคืนค่า environment เดิม. Blank placeholders ไม่ทับค่าที่ตั้งไว้ภายนอก. ไม่รองรับ multiline, variable interpolation หรือ inline comments; syntax check ไม่ได้ตรวจว่า key/model/sender ใช้งานกับ provider ได้จริง.
+
+ชื่อ `OpenRouter__ApiKey` map เป็น configuration `OpenRouter:ApiKey` ตาม [ASP.NET environment configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-10.0). ค่า base URL อิง [OpenRouter API](https://openrouter.ai/docs/api/api-reference/models/get-models) และ [Resend API](https://resend.com/docs/api-reference/emails/send-email). ตัวแปรเหล่านี้เตรียมไว้สำหรับ adapters ที่จะ implement ต่อ; ยังไม่มีการเรียก AI/ส่งอีเมล/ตรวจ Firebase จริง และยังไม่เพิ่ม DB/session/media credentials ที่ยังไม่เลือก protocol.
+
 | Endpoint | ผลที่คาดหวัง | ความหมาย |
 | --- | --- | --- |
 | `GET /health/live` | 200, `status: alive`, `stage: foundation` | API process ตอบ HTTP ได้ |
