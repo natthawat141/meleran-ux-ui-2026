@@ -1,0 +1,2116 @@
+{
+  "date": "2026-10-11",
+  "audited_sha": "b7e60a33ca45987c578592061509da463cc31521",
+  "verified_code_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
+  "contract": {
+    "version": "1.0.0-draft.1",
+    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "status": "DRAFT"
+  },
+  "interpretation": "Wave 1–13; alternative first 13 task-board rows listed in Markdown",
+  "counts": {
+    "tasks": 44,
+    "done_tasks": 7,
+    "needs_decision_tasks": 25,
+    "blocked_tasks": 12,
+    "defined_operations": 73,
+    "component_verified_operations": 16,
+    "route_present_unverified": 9,
+    "no_current_controller": 48,
+    "fully_complete_waves": 2,
+    "full_feature_acceptance": 0
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "tasks": [
+        "FOUNDATION-01"
+      ],
+      "done": 1,
+      "total": 1,
+      "verified_operations": 0,
+      "total_operations": 0
+    },
+    {
+      "wave": 2,
+      "tasks": [
+        "DB-01"
+      ],
+      "done": 1,
+      "total": 1,
+      "verified_operations": 0,
+      "total_operations": 0
+    },
+    {
+      "wave": 3,
+      "tasks": [
+        "AUTH-BASE-01",
+        "CATALOG-01",
+        "CI-01",
+        "DB-02",
+        "DB-05",
+        "DB-06"
+      ],
+      "done": 3,
+      "total": 6,
+      "verified_operations": 1,
+      "total_operations": 2
+    },
+    {
+      "wave": 4,
+      "tasks": [
+        "BLOG-01",
+        "CATALOG-02",
+        "COMPLETION-01",
+        "DB-03",
+        "DB-04",
+        "INTEGRATION-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "done": 2,
+      "total": 7,
+      "verified_operations": 1,
+      "total_operations": 4
+    },
+    {
+      "wave": 5,
+      "tasks": [
+        "AUTH-01"
+      ],
+      "done": 0,
+      "total": 1,
+      "verified_operations": 1,
+      "total_operations": 2
+    },
+    {
+      "wave": 6,
+      "tasks": [
+        "ACCOUNT-01",
+        "AI-02",
+        "AUTH-02",
+        "AUTH-03",
+        "BLOG-02",
+        "CERT-01",
+        "ENROLL-01",
+        "VIDEO-01"
+      ],
+      "done": 0,
+      "total": 8,
+      "verified_operations": 4,
+      "total_operations": 20
+    },
+    {
+      "wave": 7,
+      "tasks": [
+        "AI-05",
+        "BLOG-03",
+        "INTEGRATION-02",
+        "MGMT-01",
+        "PAY-01"
+      ],
+      "done": 0,
+      "total": 5,
+      "verified_operations": 2,
+      "total_operations": 10
+    },
+    {
+      "wave": 8,
+      "tasks": [
+        "MGMT-02",
+        "PAY-02",
+        "PROVIDER-STRIPE-01"
+      ],
+      "done": 0,
+      "total": 3,
+      "verified_operations": 0,
+      "total_operations": 3
+    },
+    {
+      "wave": 9,
+      "tasks": [
+        "COURSE-01"
+      ],
+      "done": 0,
+      "total": 1,
+      "verified_operations": 0,
+      "total_operations": 4
+    },
+    {
+      "wave": 10,
+      "tasks": [
+        "COURSE-02",
+        "REDEEM-01"
+      ],
+      "done": 0,
+      "total": 2,
+      "verified_operations": 1,
+      "total_operations": 7
+    },
+    {
+      "wave": 11,
+      "tasks": [
+        "AI-01",
+        "LEARN-01",
+        "REDEEM-02",
+        "REVIEW-01"
+      ],
+      "done": 0,
+      "total": 4,
+      "verified_operations": 5,
+      "total_operations": 9
+    },
+    {
+      "wave": 12,
+      "tasks": [
+        "ASSESS-01",
+        "LEARN-02",
+        "REVIEW-02"
+      ],
+      "done": 0,
+      "total": 3,
+      "verified_operations": 0,
+      "total_operations": 8
+    },
+    {
+      "wave": 13,
+      "tasks": [
+        "ASSESS-02",
+        "GRADE-01"
+      ],
+      "done": 0,
+      "total": 2,
+      "verified_operations": 1,
+      "total_operations": 4
+    }
+  ],
+  "tasks": [
+    {
+      "id": "FOUNDATION-01",
+      "state": "DONE",
+      "dependencies": [],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "DB-01",
+      "state": "DONE",
+      "dependencies": [
+        "FOUNDATION-01"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "AUTH-BASE-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "FOUNDATION-01",
+        "DB-01"
+      ],
+      "decision_ids": [
+        "D01",
+        "D02"
+      ],
+      "components": [
+        {
+          "id": "stored-session-and-normalized-principal-resolution",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "D01 transport/TTL/CSRF/revocation/rate policy",
+            "D02 password/profile policy",
+            "Normalized identity/role writers and complete Auth cutover"
+          ]
+        },
+        {
+          "id": "learning-command-fresh-authority",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "D01/D02/D03 complete Auth/login/provider and writer cutover"
+          ]
+        },
+        {
+          "id": "fresh-authoring-authority",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "D01/D02/D03 complete Auth/login/provider and normalized writer cutover"
+          ]
+        },
+        {
+          "id": "fresh-historical-self-read",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "D01/D02/D03 complete Auth and normalized writer cutover"
+          ]
+        },
+        {
+          "id": "bound_self_profile_projection",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Credential/link writer locking under reviewed Auth protocol",
+            "D01/D02/D03 full Auth and provider cutover"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CATALOG-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": [
+        "D16"
+      ],
+      "components": [
+        {
+          "method": "GET",
+          "path": "/courses/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "method": "GET",
+          "path": "/courses",
+          "state": "NEEDS_DECISION",
+          "remaining": []
+        }
+      ]
+    },
+    {
+      "id": "CI-01",
+      "state": "DONE",
+      "dependencies": [
+        "FOUNDATION-01",
+        "DB-01"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "DB-02",
+      "state": "DONE",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "DB-05",
+      "state": "DONE",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "practice_message_schema",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        }
+      ]
+    },
+    {
+      "id": "DB-06",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": [
+        "D03"
+      ],
+      "components": []
+    },
+    {
+      "id": "BLOG-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-05"
+      ],
+      "decision_ids": [
+        "D05",
+        "D16"
+      ],
+      "components": []
+    },
+    {
+      "id": "CATALOG-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "CATALOG-01"
+      ],
+      "decision_ids": [
+        "D16"
+      ],
+      "components": [
+        {
+          "method": "GET",
+          "path": "/instructors/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "method": "GET",
+          "path": "/instructors/{id}/courses",
+          "state": "NEEDS_DECISION",
+          "remaining": []
+        }
+      ]
+    },
+    {
+      "id": "COMPLETION-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-02",
+        "DB-03"
+      ],
+      "decision_ids": [
+        "D06"
+      ],
+      "components": []
+    },
+    {
+      "id": "DB-03",
+      "state": "DONE",
+      "dependencies": [
+        "DB-02"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "DB-04",
+      "state": "DONE",
+      "dependencies": [
+        "DB-02"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "INTEGRATION-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "CATALOG-01"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "course_detail_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "course_detail_browser",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "free_enroll_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "learning_read_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "admin_revoke_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "video_unavailable_generic_transport",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "certificate_detail_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "ai_practice_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "ai_usage_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "ai_rename_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "self_profile_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "logout_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "own_payment_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "id": "own_attempt_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        }
+      ]
+    },
+    {
+      "id": "PROVIDER-AUTH-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-BASE-01",
+        "DB-06"
+      ],
+      "decision_ids": [
+        "D01",
+        "D03"
+      ],
+      "components": []
+    },
+    {
+      "id": "AUTH-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-BASE-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "decision_ids": [
+        "D01",
+        "D02",
+        "D03"
+      ],
+      "components": [
+        {
+          "id": "current_session_logout",
+          "method": "POST",
+          "path": "/auth/logout",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Login/D01/D02/D03",
+            "Provider credentials/recovery",
+            "Browser cookie/Origin gate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ACCOUNT-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01"
+      ],
+      "decision_ids": [
+        "D02",
+        "D09"
+      ],
+      "components": [
+        {
+          "id": "self_profile_read",
+          "method": "GET",
+          "path": "/me",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "PATCH/D02 username/null/array semantics",
+            "D09 image protocol",
+            "Complete Auth D01/D03 and actual Firebase/Email providers",
+            "Authenticated browser G-AUTH and A03/A09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AI-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "DB-05"
+      ],
+      "decision_ids": [
+        "D16"
+      ],
+      "components": []
+    },
+    {
+      "id": "AUTH-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "decision_ids": [
+        "D03"
+      ],
+      "components": []
+    },
+    {
+      "id": "AUTH-03",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "decision_ids": [
+        "D03"
+      ],
+      "components": []
+    },
+    {
+      "id": "BLOG-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "BLOG-01"
+      ],
+      "decision_ids": [
+        "D05",
+        "D09"
+      ],
+      "components": []
+    },
+    {
+      "id": "CERT-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "COMPLETION-01",
+        "AUTH-01"
+      ],
+      "decision_ids": [
+        "D07"
+      ],
+      "components": [
+        {
+          "method": "GET",
+          "path": "/me/certificates/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Full Auth/normalized writers",
+            "Automatic Completion/Certificate issuance",
+            "List query protocol",
+            "D07 download/file rendering and authenticated browser G-CERTIFICATE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENROLL-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AUTH-01",
+        "CATALOG-01",
+        "DB-02"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "shared_entitlement_writer",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        },
+        {
+          "method": "POST",
+          "path": "/courses/{id}/enroll",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Own Enrollment list/query/progress projection",
+            "Complete Auth/login/provider and normalized writers",
+            "Authenticated browser G-LEARNING"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VIDEO-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "FOUNDATION-01",
+        "AUTH-01"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "method": "POST",
+          "path": "/courses/{id}/videos/uploads",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Complete Auth/login/provider and normalized writers",
+            "Real editor/frontend authoring handler and authenticated browser V02/G-COURSE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AI-05",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AI-02"
+      ],
+      "decision_ids": [
+        "D11"
+      ],
+      "components": [
+        {
+          "id": "ai_rename",
+          "method": "PATCH",
+          "path": "/me/ai/conversations/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "AI-02 create/list/history and full Auth",
+            "Actual provider generation preserves manual title",
+            "Authenticated browser G-AI",
+            "DELETE/D11 retention/in-flight lifecycle/last-chat navigation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BLOG-03",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "BLOG-02"
+      ],
+      "decision_ids": [
+        "D11"
+      ],
+      "components": []
+    },
+    {
+      "id": "INTEGRATION-02",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01",
+        "ENROLL-01",
+        "INTEGRATION-01"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "MGMT-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01"
+      ],
+      "decision_ids": [
+        "D02",
+        "D03",
+        "D16"
+      ],
+      "components": []
+    },
+    {
+      "id": "PAY-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "ENROLL-01",
+        "DB-04"
+      ],
+      "decision_ids": [
+        "D08",
+        "D10"
+      ],
+      "components": [
+        {
+          "id": "own_payment_status",
+          "method": "GET",
+          "path": "/me/payments/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Checkout/D08/D10",
+            "Financial event processing/fulfillment and actual Stripe tests",
+            "Login/provider/browser feature gate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MGMT-02",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-01"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "PAY-02",
+      "state": "BLOCKED",
+      "dependencies": [
+        "PAY-01"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "PROVIDER-STRIPE-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "PAY-01"
+      ],
+      "decision_ids": [
+        "D08",
+        "D10"
+      ],
+      "components": [
+        {
+          "method": "POST",
+          "path": "/webhooks/stripe",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "D08 provider version/event selection/money processor",
+            "D10 fulfillment/reconciliation",
+            "PAY-01 server Checkout binding",
+            "Actual endpoint signing secret and real provider delivery"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "COURSE-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-02",
+        "DB-02"
+      ],
+      "decision_ids": [
+        "D10"
+      ],
+      "components": []
+    },
+    {
+      "id": "COURSE-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "COURSE-01",
+        "DB-03"
+      ],
+      "decision_ids": [
+        "D04",
+        "D05",
+        "D09"
+      ],
+      "components": []
+    },
+    {
+      "id": "REDEEM-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "COURSE-01",
+        "DB-04",
+        "AUTH-01"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "method": "POST",
+          "path": "/admin/redeem-codes/{id}/revoke",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Issue/list/generation/query review",
+            "Complete Auth/Course authoring and real browser G-REDEEM/G-AI"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AI-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "COURSE-02",
+        "DB-05"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "method": "PATCH",
+          "path": "/admin/courses/{id}/ai-support",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Complete Auth/provider and Course authoring prerequisites",
+            "Frontend Admin editor/browser feature gate"
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Complete Auth/provider and Course authoring prerequisites",
+            "Frontend Admin editor/browser feature gate"
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Complete Auth/provider and Course authoring prerequisites",
+            "Frontend Admin editor/browser feature gate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "LEARN-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "ENROLL-01",
+        "COURSE-02"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "method": "GET",
+          "path": "/learn/courses/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "GET /me/progress",
+            "Scope owner/Admin view vs enrolled-only canonical mapping/COURSE-02 D04",
+            "Full Auth/authoring/normalized writers",
+            "Authenticated browser G-LEARNING"
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/learn/courses/{id}/items/{item_id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "GET /me/progress",
+            "Scope owner/Admin view vs enrolled-only canonical mapping/COURSE-02 D04",
+            "Full Auth/authoring/normalized writers",
+            "Authenticated browser G-LEARNING"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REDEEM-02",
+      "state": "BLOCKED",
+      "dependencies": [
+        "REDEEM-01",
+        "ENROLL-01"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "owned_atomic_code_entitlement",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "Public exact code-input normalization and Course-state mapping",
+            "HTTP fresh eligibility/owner orchestration and 200/201 integration",
+            "Issue/list/Auth/Course prerequisites",
+            "Full G-REDEEM delivered with G-AI"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REVIEW-01",
+      "state": "BLOCKED",
+      "dependencies": [
+        "COURSE-02"
+      ],
+      "decision_ids": [],
+      "components": []
+    },
+    {
+      "id": "ASSESS-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "LEARN-01",
+        "DB-03",
+        "COMPLETION-01"
+      ],
+      "decision_ids": [
+        "D06",
+        "D09",
+        "D10"
+      ],
+      "components": [
+        {
+          "id": "submitted_snapshot_score",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": []
+        }
+      ]
+    },
+    {
+      "id": "LEARN-02",
+      "state": "BLOCKED",
+      "dependencies": [
+        "LEARN-01",
+        "COMPLETION-01"
+      ],
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "owned_resume_persistence",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "ResumeRequest optional/type mapping vs mock requires explicit answer",
+            "Public PUT DTO/authority/owned-course orchestration",
+            "Complete command / COMPLETION-01 D06",
+            "Full Auth/authoring and browser G-LEARNING"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "REVIEW-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "REVIEW-01"
+      ],
+      "decision_ids": [
+        "D04"
+      ],
+      "components": []
+    },
+    {
+      "id": "ASSESS-02",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "ASSESS-01"
+      ],
+      "decision_ids": [
+        "D06"
+      ],
+      "components": [
+        {
+          "id": "own_attempt_read",
+          "method": "GET",
+          "path": "/learn/attempts/{id}",
+          "state": "COMPONENT_VERIFIED",
+          "remaining": [
+            "GET item results and D06 best comparison",
+            "ASSESS-01 snapshot start/save/submit and Grade/Completion orchestration",
+            "D09 image protocol/D10 replay and committed Submitted vs canonical mapping",
+            "Actual Auth/login/provider and authenticated browser G-ASSESSMENT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "GRADE-01",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "ASSESS-01",
+        "COMPLETION-01"
+      ],
+      "decision_ids": [
+        "D06",
+        "D10"
+      ],
+      "components": []
+    }
+  ],
+  "operations": [
+    {
+      "method": "POST",
+      "path": "/auth/register",
+      "operationId": "post_auth_register",
+      "task_id": "AUTH-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/verify-email",
+      "operationId": "post_auth_verify-email",
+      "task_id": "AUTH-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/resend-verification-email",
+      "operationId": "post_auth_resend-verification-email",
+      "task_id": "AUTH-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "operationId": "post_auth_login",
+      "task_id": "AUTH-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/auth/login",
+        "file": "backend/src/features/auth/auth.controller.ts",
+        "line": 23,
+        "authority": "PUBLIC_OR_PROVIDER"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D01",
+        "D02",
+        "D03"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/password-reset/request",
+      "operationId": "post_auth_password-reset_request",
+      "task_id": "AUTH-03",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/password-reset/confirm",
+      "operationId": "post_auth_password-reset_confirm",
+      "task_id": "AUTH-03",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "operationId": "post_auth_logout",
+      "task_id": "AUTH-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/auth/logout",
+        "file": "backend/src/features/auth/auth.controller.ts",
+        "line": 48,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Login/D01/D02/D03",
+        "Provider credentials/recovery",
+        "Browser cookie/Origin gate"
+      ],
+      "decision_ids": [
+        "D01",
+        "D02",
+        "D03"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "operationId": "get_me",
+      "task_id": "ACCOUNT-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/me",
+        "file": "backend/src/features/accounts/accounts.controller.ts",
+        "line": 12,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "PATCH/D02 username/null/array semantics",
+        "D09 image protocol",
+        "Complete Auth D01/D03 and actual Firebase/Email providers",
+        "Authenticated browser G-AUTH and A03/A09"
+      ],
+      "decision_ids": [
+        "D02",
+        "D09"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/me",
+      "operationId": "patch_me",
+      "task_id": "ACCOUNT-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "PATCH",
+        "path": "/me",
+        "file": "backend/src/features/accounts/accounts.controller.ts",
+        "line": 18,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D02",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users",
+      "operationId": "post_admin_users",
+      "task_id": "MGMT-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/admin/users",
+        "file": "backend/src/features/management/management.controller.ts",
+        "line": 39,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D02",
+        "D03",
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users",
+      "operationId": "get_admin_users",
+      "task_id": "MGMT-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/admin/users",
+        "file": "backend/src/features/management/management.controller.ts",
+        "line": 28,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D02",
+        "D03",
+        "D16"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/{id}/instructor",
+      "operationId": "post_admin_users_id_instructor",
+      "task_id": "MGMT-02",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/admin/users/{id}/instructor",
+        "file": "backend/src/features/management/management.controller.ts",
+        "line": 59,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/admin/instructors",
+      "operationId": "get_admin_instructors",
+      "task_id": "MGMT-02",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/admin/instructors",
+        "file": "backend/src/features/management/management.controller.ts",
+        "line": 70,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/courses",
+      "operationId": "get_courses",
+      "task_id": "CATALOG-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/courses",
+        "file": "backend/src/features/courses/courses.controller.ts",
+        "line": 9,
+        "authority": "PUBLIC_OR_PROVIDER"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}",
+      "operationId": "get_courses_id",
+      "task_id": "CATALOG-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/courses/{id}",
+        "file": "backend/src/features/courses/courses.controller.ts",
+        "line": 22,
+        "authority": "PUBLIC_OR_PROVIDER"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/courses/{id}",
+      "operationId": "patch_courses_id",
+      "task_id": "COURSE-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04",
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/enroll",
+      "operationId": "post_courses_id_enroll",
+      "task_id": "ENROLL-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/courses/{id}/enroll",
+        "file": "backend/src/features/enrollments/enrollments.controller.ts",
+        "line": 13,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Own Enrollment list/query/progress projection",
+        "Complete Auth/login/provider and normalized writers",
+        "Authenticated browser G-LEARNING"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/me/enrollments",
+      "operationId": "get_me_enrollments",
+      "task_id": "ENROLL-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/me/enrollments",
+        "file": "backend/src/features/enrollments/enrollments.controller.ts",
+        "line": 22,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/learn/courses/{id}",
+      "operationId": "get_learn_courses_id",
+      "task_id": "LEARN-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/learn/courses/{id}",
+        "file": "backend/src/features/learning/learning.controller.ts",
+        "line": 12,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "GET /me/progress",
+        "Scope owner/Admin view vs enrolled-only canonical mapping/COURSE-02 D04",
+        "Full Auth/authoring/normalized writers",
+        "Authenticated browser G-LEARNING"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/learn/courses/{id}/items/{item_id}",
+      "operationId": "get_learn_courses_id_items_item_id",
+      "task_id": "LEARN-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/learn/courses/{id}/items/{item_id}",
+        "file": "backend/src/features/learning/learning.controller.ts",
+        "line": 16,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "GET /me/progress",
+        "Scope owner/Admin view vs enrolled-only canonical mapping/COURSE-02 D04",
+        "Full Auth/authoring/normalized writers",
+        "Authenticated browser G-LEARNING"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/me/progress",
+      "operationId": "get_me_progress",
+      "task_id": "LEARN-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/learn/items/{id}/complete",
+      "operationId": "post_learn_items_id_complete",
+      "task_id": "LEARN-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "PUT",
+      "path": "/learn/items/{id}/resume",
+      "operationId": "put_learn_items_id_resume",
+      "task_id": "LEARN-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/learn/items/{id}/attempts",
+      "operationId": "post_learn_items_id_attempts",
+      "task_id": "ASSESS-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D06",
+        "D09",
+        "D10"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/learn/attempts/{id}/answers",
+      "operationId": "put_learn_attempts_id_answers",
+      "task_id": "ASSESS-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D06",
+        "D09",
+        "D10"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/learn/attempts/{id}/submit",
+      "operationId": "post_learn_attempts_id_submit",
+      "task_id": "ASSESS-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D06",
+        "D09",
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/learn/attempts/{id}",
+      "operationId": "get_learn_attempts_id",
+      "task_id": "ASSESS-02",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/learn/attempts/{id}",
+        "file": "backend/src/features/assessments/attempt-read.controller.ts",
+        "line": 11,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "GET item results and D06 best comparison",
+        "ASSESS-01 snapshot start/save/submit and Grade/Completion orchestration",
+        "D09 image protocol/D10 replay and committed Submitted vs canonical mapping",
+        "Actual Auth/login/provider and authenticated browser G-ASSESSMENT"
+      ],
+      "decision_ids": [
+        "D06"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/learn/items/{id}/results",
+      "operationId": "get_learn_items_id_results",
+      "task_id": "ASSESS-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D06"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/grading-queue",
+      "operationId": "get_instructor_grading-queue",
+      "task_id": "GRADE-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D06",
+        "D10"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/instructor/attempts/{id}/questions/{question_id}/grade",
+      "operationId": "put_instructor_attempts_id_questions_question_id_grade",
+      "task_id": "GRADE-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D06",
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/certificates",
+      "operationId": "get_me_certificates",
+      "task_id": "CERT-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D07"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/certificates/{id}",
+      "operationId": "get_me_certificates_id",
+      "task_id": "CERT-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/me/certificates/{id}",
+        "file": "backend/src/features/certificates/certificates.controller.ts",
+        "line": 12,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Full Auth/normalized writers",
+        "Automatic Completion/Certificate issuance",
+        "List query protocol",
+        "D07 download/file rendering and authenticated browser G-CERTIFICATE"
+      ],
+      "decision_ids": [
+        "D07"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/certificates/{id}/download",
+      "operationId": "get_me_certificates_id_download",
+      "task_id": "CERT-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D07"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/instructor/courses",
+      "operationId": "post_instructor_courses",
+      "task_id": "COURSE-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/courses",
+      "operationId": "get_instructor_courses",
+      "task_id": "COURSE-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D10"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/courses",
+      "operationId": "post_admin_courses",
+      "task_id": "COURSE-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/courses",
+      "operationId": "get_admin_courses",
+      "task_id": "COURSE-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}/authoring",
+      "operationId": "get_courses_id_authoring",
+      "task_id": "COURSE-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04",
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/videos/uploads",
+      "operationId": "post_courses_id_videos_uploads",
+      "task_id": "VIDEO-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/courses/{id}/videos/uploads",
+        "file": "backend/src/features/courses/video-upload.controller.ts",
+        "line": 13,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Complete Auth/login/provider and normalized writers",
+        "Real editor/frontend authoring handler and authenticated browser V02/G-COURSE"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}/authoring-preview",
+      "operationId": "get_courses_id_authoring-preview",
+      "task_id": "COURSE-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04",
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/submit-review",
+      "operationId": "post_courses_id_submit-review",
+      "task_id": "COURSE-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04",
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/course-reviews",
+      "operationId": "get_admin_course-reviews",
+      "task_id": "REVIEW-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/admin/course-reviews/{id}",
+      "operationId": "get_admin_course-reviews_id",
+      "task_id": "REVIEW-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/admin/course-reviews/{id}/approve",
+      "operationId": "post_admin_course-reviews_id_approve",
+      "task_id": "REVIEW-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/course-reviews/{id}/return",
+      "operationId": "post_admin_course-reviews_id_return",
+      "task_id": "REVIEW-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/publish",
+      "operationId": "post_courses_id_publish",
+      "task_id": "REVIEW-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D04"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/me/payments/checkout",
+      "operationId": "post_me_payments_checkout",
+      "task_id": "PAY-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D08",
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/payments/{id}",
+      "operationId": "get_me_payments_id",
+      "task_id": "PAY-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/me/payments/{id}",
+        "file": "backend/src/features/payments/own-payment.controller.ts",
+        "line": 11,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Checkout/D08/D10",
+        "Financial event processing/fulfillment and actual Stripe tests",
+        "Login/provider/browser feature gate"
+      ],
+      "decision_ids": [
+        "D08",
+        "D10"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/payments/{id}",
+      "operationId": "get_admin_payments_id",
+      "task_id": "PAY-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/me/redeem",
+      "operationId": "post_me_redeem",
+      "task_id": "REDEEM-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/admin/redeem-codes",
+      "operationId": "post_admin_redeem-codes",
+      "task_id": "REDEEM-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/admin/redeem-codes",
+      "operationId": "get_admin_redeem-codes",
+      "task_id": "REDEEM-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/admin/redeem-codes/{id}/revoke",
+      "operationId": "post_admin_redeem-codes_id_revoke",
+      "task_id": "REDEEM-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "POST",
+        "path": "/admin/redeem-codes/{id}/revoke",
+        "file": "backend/src/features/redeem/revoke-code.controller.ts",
+        "line": 14,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Issue/list/generation/query review",
+        "Complete Auth/Course authoring and real browser G-REDEEM/G-AI"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/courses/{id}/ai-support",
+      "operationId": "patch_admin_courses_id_ai-support",
+      "task_id": "AI-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "PATCH",
+        "path": "/admin/courses/{id}/ai-support",
+        "file": "backend/src/features/ai/admin-ai.controller.ts",
+        "line": 13,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Complete Auth/provider and Course authoring prerequisites",
+        "Frontend Admin editor/browser feature gate"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "GET",
+      "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+      "operationId": "get_admin_courses_id_videos_itemId_ai-transcript",
+      "task_id": "AI-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+        "file": "backend/src/features/ai/admin-ai.controller.ts",
+        "line": 17,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Complete Auth/provider and Course authoring prerequisites",
+        "Frontend Admin editor/browser feature gate"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+      "operationId": "put_admin_courses_id_videos_itemId_ai-transcript",
+      "task_id": "AI-01",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "PUT",
+        "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+        "file": "backend/src/features/ai/admin-ai.controller.ts",
+        "line": 21,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "Complete Auth/provider and Course authoring prerequisites",
+        "Frontend Admin editor/browser feature gate"
+      ],
+      "decision_ids": []
+    },
+    {
+      "method": "POST",
+      "path": "/me/ai/conversations",
+      "operationId": "post_me_ai_conversations",
+      "task_id": "AI-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/ai/conversations",
+      "operationId": "get_me_ai_conversations",
+      "task_id": "AI-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/ai/conversations/{id}/messages",
+      "operationId": "get_me_ai_conversations_id_messages",
+      "task_id": "AI-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/me/ai/conversations/{id}",
+      "operationId": "patch_me_ai_conversations_id",
+      "task_id": "AI-05",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "PATCH",
+        "path": "/me/ai/conversations/{id}",
+        "file": "backend/src/features/ai/rename-conversation.controller.ts",
+        "line": 12,
+        "authority": "NORMALIZED_AUTHORITY"
+      },
+      "remaining": [
+        "AI-02 create/list/history and full Auth",
+        "Actual provider generation preserves manual title",
+        "Authenticated browser G-AI",
+        "DELETE/D11 retention/in-flight lifecycle/last-chat navigation"
+      ],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/me/ai/conversations/{id}",
+      "operationId": "delete_me_ai_conversations_id",
+      "task_id": "AI-05",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/blog/{id}",
+      "operationId": "delete_admin_blog_id",
+      "task_id": "BLOG-03",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/blog/{id}",
+      "operationId": "patch_admin_blog_id",
+      "task_id": "BLOG-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/blog/{id}/unpublish",
+      "operationId": "post_admin_blog_id_unpublish",
+      "task_id": "BLOG-03",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/blog",
+      "operationId": "get_blog",
+      "task_id": "BLOG-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D05",
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/blog/{slug}",
+      "operationId": "get_blog_slug",
+      "task_id": "BLOG-01",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D05",
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/blog",
+      "operationId": "get_admin_blog",
+      "task_id": "BLOG-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/blog",
+      "operationId": "post_admin_blog",
+      "task_id": "BLOG-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/blog/{id}/preview",
+      "operationId": "get_admin_blog_id_preview",
+      "task_id": "BLOG-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/blog/{id}/publish",
+      "operationId": "post_admin_blog_id_publish",
+      "task_id": "BLOG-03",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/{id}",
+      "operationId": "get_admin_users_id",
+      "task_id": "MGMT-01",
+      "classification": "ROUTE_PRESENT_UNVERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/admin/users/{id}",
+        "file": "backend/src/features/management/management.controller.ts",
+        "line": 50,
+        "authority": "PROTOTYPE_GUARD"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D02",
+        "D03",
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructors/{id}/courses",
+      "operationId": "get_instructors_id_courses",
+      "task_id": "CATALOG-02",
+      "classification": "NO_CURRENT_CONTROLLER",
+      "route": null,
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructors/{id}",
+      "operationId": "get_instructors_id",
+      "task_id": "CATALOG-02",
+      "classification": "COMPONENT_VERIFIED",
+      "route": {
+        "method": "GET",
+        "path": "/instructors/{id}",
+        "file": "backend/src/features/courses/public-instructor.controller.ts",
+        "line": 9,
+        "authority": "PUBLIC_OR_PROVIDER"
+      },
+      "remaining": [],
+      "decision_ids": [
+        "D16"
+      ]
+    }
+  ],
+  "verification": {
+    "current_blueprint": "PASS_86_5_113_50",
+    "current_boundary": "PASS_WITH_2_TRACKED_PROTOTYPE_WRITER_EXCEPTIONS",
+    "hosted_ci_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600",
+    "hosted_ci_head": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
+    "hosted_ci_conclusion": "success",
+    "prior_backend_tests": 353,
+    "prior_frontend_client_checks": 98,
+    "tests_rerun_this_audit": false,
+    "route_inventory": "TypeScript AST/controller + feature module registration; static evidence only",
+    "no_backend_or_contract_change": true
+  }
+}
