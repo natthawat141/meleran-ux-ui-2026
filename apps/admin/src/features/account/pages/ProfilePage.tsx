@@ -16,11 +16,11 @@ export function ProfilePage() {
   const save = async (values: ProfileValues) => {
     const { name, avatar, username, googleLinkedEmail: _google, ...profile } = values;
     const body: UpdateProfileRequest = { display_name: name, username, profile };
-    // Local uploaded blobs are UI drafts until an upload API exists.
+    // A selected image remains a UI draft until the media upload API returns a hosted URL.
+    if (avatar?.startsWith('data:')) return { ok: false, message: 'ภาพนี้ยังเป็นตัวอย่าง ยังไม่มีระบบอัปโหลดภาพ กรุณานำภาพออกก่อนบันทึกข้อมูลอื่น' };
     if (avatar && !/^(https?:\/\/|\/(?!\/))/.test(avatar)) return { ok: false, message: 'กรุณาใช้ URL รูปภาพแบบ HTTP/HTTPS; การอัปโหลดไฟล์รอ Media API' };
     if (avatar) body.avatar_url = avatar;
     if (!avatar) body.avatar_url = null;
-    if (avatar?.startsWith('data:')) return { ok: false, message: 'ยังไม่มี API อัปโหลดรูป กรุณาใช้ URL รูปภาพ' };
     setSaving(true);
     try { await authSessionApi.updateProfile(body); await session.refresh(); return { ok: true }; }
     catch (error) { return { ok: false, message: provisionalLoginError(error) }; }

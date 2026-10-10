@@ -50,6 +50,8 @@ export function ImageUploadField({ value, onChange, fallback, avatar = false, wi
     } finally {
       setLoading(false);
     }
+    // Selection only: upload must be handled by a feature media API.
+    return false;
   };
   return (
     <div className={`image-upload-field${avatar ? ' image-upload-avatar' : ''}${wide ? ' image-upload-wide' : ''}`}>

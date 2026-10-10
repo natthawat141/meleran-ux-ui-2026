@@ -1,5 +1,6 @@
 import React from 'react';
-import { Avatar, Button, Form, Input, Select, Typography, message } from 'antd';
+import { ImageUploadField } from '@melearn/ui';
+import { Button, Form, Input, Select, Typography, message } from 'antd';
 import { defaultUsername, validateProfile, type ProfileUserLike, type ProfileValues } from '@melearn/contracts';
 import './profile-settings.css';
 
@@ -42,7 +43,7 @@ export function ProfileSettings({ user, users, updateProfile, saving }: Props) {
       <Form.Item name="googleLinkedEmail" hidden><Input /></Form.Item>
       <header className="profile-v2-header">
         <div className="profile-v2-heading"><Text className="profile-v2-eyebrow">บัญชีของฉัน</Text><h1>โปรไฟล์ของฉัน</h1><Text type="secondary">ตั้งค่าข้อมูลที่ใช้ระหว่างเรียนและบนใบรับรอง</Text></div>
-        <div className="profile-v2-upload"><Avatar size={72} src={values.avatar || user.avatar}>{user.name.slice(0, 1)}</Avatar></div>
+        <div className="profile-v2-upload"><Form.Item name="avatar" style={{ marginBottom: 0 }}><ImageUploadField avatar /></Form.Item><Text type="secondary" className="profile-v2-demo-tag">JPG, PNG หรือ WebP · ไม่เกิน 5 MB</Text></div>
       </header>
 
       <div className="profile-v2-sections">
@@ -50,7 +51,7 @@ export function ProfileSettings({ user, users, updateProfile, saving }: Props) {
           <div className="profile-v2-section-title"><div><h2>บัญชีและตัวตน</h2><Text type="secondary">ชื่อผู้ใช้ใช้ระบุตัวตนในต้นแบบนี้</Text></div></div>
           <div className="profile-v2-fields">
             <Form.Item name="username" label="ชื่อผู้ใช้" required extra="3–30 ตัวอักษร: a-z, 0-9, จุด หรือขีดล่าง"><Input placeholder="เช่น somchai.learn" autoComplete="username" /></Form.Item>
-            <Form.Item name="avatar" label="URL รูปโปรไฟล์" extra="ใช้ URL รูปภาพได้; การอัปโหลดไฟล์รอ Media API"><Input placeholder="https://…" aria-label="URL รูปโปรไฟล์" /></Form.Item>
+            {values.avatar?.startsWith('data:') && <div className="profile-v2-demo-tag" role="status">ภาพตัวอย่างยังไม่ได้อัปโหลด การบันทึกภาพจะพร้อมเมื่อเชื่อมระบบจัดเก็บภาพ <Button type="link" onClick={() => form.setFieldValue('avatar', user.avatar ?? '')}>ยกเลิกภาพที่เลือก</Button></div>}
             <Form.Item name="name" label="ชื่อที่แสดง" rules={[{ required: true, whitespace: true, message: 'กรอกชื่อที่แสดง' }]}><Input autoComplete="nickname" /></Form.Item>
             <Form.Item label="อีเมลบัญชี" extra="อีเมลนี้ใช้เข้าสู่ระบบและแก้ไขในหน้านี้ไม่ได้"><Input value={user.email} readOnly /></Form.Item>
           </div>
