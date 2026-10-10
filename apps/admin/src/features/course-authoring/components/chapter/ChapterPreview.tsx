@@ -1,4 +1,5 @@
 import React from 'react';
+import { youtubeEmbedUrl } from '@melearn/course-authoring';
 import { Alert, Empty, Modal, Radio, Space, Tag } from 'antd';
 import { RichDocument } from '@melearn/ui';
 import type { Chapter, EssayQuestion, Quiz } from '@melearn/contracts';
@@ -32,8 +33,8 @@ export function ChapterPreview({ chapter, quizzes, open, onClose, dirty = false 
           <h2>{item.title}</h2>
           {item.type === 'video' && (
             <>
-              {/^(https?:\/\/|data:video\/(mp4|webm);base64,)/i.test(item.videoUrl || '') ? (
-                <video controls src={item.videoUrl} className="chapter-video-preview" />
+              {youtubeEmbedUrl(item.videoUrl) ? (
+                <iframe title={item.title} src={youtubeEmbedUrl(item.videoUrl)} className="chapter-video-preview" style={{ width: '100%', aspectRatio: '16 / 9', border: 0 }} allowFullScreen />
               ) : (
                 <Empty description="ยังไม่ได้เลือกวิดีโอ" />
               )}

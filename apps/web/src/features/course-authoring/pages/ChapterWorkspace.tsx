@@ -1,3 +1,4 @@
+import { youtubeEmbedUrl } from '@melearn/course-authoring';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Breadcrumb, Button, Dropdown, Empty, Input, Modal, Space, Tag, message } from 'antd';
 import {
@@ -203,11 +204,11 @@ function Workspace({ course, initial, initialItem, initialAdd, initialView }: Wo
       }
       if (
         entry.type === 'video' &&
-        !/^(https?:\/\/|data:video\/(mp4|webm);base64,)/i.test(entry.videoUrl || '')
+        !youtubeEmbedUrl(entry.videoUrl)
       ) {
         if (!confirmTranscriptChange()) return 'AI Transcript ยังไม่ได้บันทึก กรุณาบันทึกหรือเลือกทิ้งก่อน';
         setSelected(entry.id);
-        return `เพิ่มวิดีโอให้ “${entry.title}” ก่อนบันทึก`;
+        return `เพิ่มลิงก์ YouTube ให้ “${entry.title}” ก่อนบันทึก`;
       }
       if (
         entry.type === 'article' &&
