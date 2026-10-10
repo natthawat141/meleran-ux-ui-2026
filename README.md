@@ -40,7 +40,16 @@ Target ที่ผู้ใช้ยืนยัน 10 ต.ค. 2026: project `
 
 Script ใช้ [Cloud Build config](containers/cloudbuild.yaml) สร้างสอง images จาก clean Git revision แล้ว deploy แยก; ไม่รัน local Docker และไม่ผูก Billing เอง. [.gcloudignore](.gcloudignore) ตัด local configuration/secrets และ generated files ออกจาก upload. ไม่มี private API key ใน bundle. Default `/api/v1` ยังไม่มี Backend proxy จึงตอบ 404; Login/Catalog และ business flows ยังใช้งานไม่ได้ใน static deployment นี้. Admin SPA เปิด public เพื่อเข้าหน้า Login; ไม่ใช่การอนุญาต Admin API.
 
-สถานะ 10 ต.ค. 2026: merge refactor เข้า `main`; Cloud deployment ยังถูก block เพราะ `melearn-tutor` ไม่มี Billing. ผู้ใช้อนุญาต Billing เดียวกับ `melearn-infra-prod` แล้ว แต่ CLI account `bill.natthawat@gmail.com` ขาด `billing.resourceAssociations.create` บนบัญชี Billing นั้น จึงต้องให้เจ้าของผูก Billing/จัดสิทธิ์ก่อน. ยังไม่มี live URLs หรือผล Cloud Run acceptance. ตรวจ local typecheck/tests/boundaries/build ก่อน push; hosted container checks อยู่ใน Frontend CI.
+สถานะ 10 ต.ค. 2026: Billing พร้อมแล้ว; deploy สำเร็จจาก source `ce8ccf58c7c4` บน `main` ผ่าน [Cloud Build](https://console.cloud.google.com/cloud-build/builds;region=asia-southeast3/299f8ab7-4f9a-4147-9b76-6c0859c899e2?project=melearn-tutor) และ [Frontend CI](https://github.com/natthawat141/meleran-tutor/actions/runs/38058440112). ไม่ใช้ local Docker.
+
+| App | Live URL | Ready revision |
+| --- | --- | --- |
+| Web | https://melearn-web-963924709921.asia-southeast3.run.app | `melearn-web-00003-xgl` |
+| Admin | https://melearn-admin-963924709921.asia-southeast3.run.app | `melearn-admin-00003-qqs` |
+
+ตรวจค่าบริการจริงแล้ว: Bangkok, CPU 1 / RAM 256 MiB, min 0 / max 1 ทั้ง service/revision และ traffic 100% ต่อบริการ. Runtime ใช้ `melearn-frontend-runtime` ที่ไม่มี project roles; แยกจาก default Cloud Build identity ซึ่งได้รับ `roles/cloudbuild.builds.builder`. HTTP `/health` ตอบ 200 และ `ok` ทั้งสองบริการ; หน้าแรก/deep links และ JS/CSS ตอบ 200, assets มี immutable cache. `/.env`, missing assets และ `/api/v1/me` ตอบ 404 ตาม config. Public health ใช้ `/health`; คง `/healthz` สำหรับ container-local checks เพราะ public Google frontend ไม่ส่ง path นี้ถึง container ในการตรวจครั้งนี้.
+
+ผลนี้ยืนยัน static frontend deployment; ยังไม่ได้เชื่อม Backend จริง จึงยังไม่ใช่ acceptance ของ Login, Catalog หรือ business flows.
 
 ## อ่านต่อ
 
