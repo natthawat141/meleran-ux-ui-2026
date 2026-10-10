@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text } from '@mantine/core';
+import defaultLoginArtworkUrl from '../assets/melearn-ui/melearn-hero.jpg';
 
 export interface AuthFrameProps {
   children: React.ReactNode;
@@ -8,7 +9,7 @@ export interface AuthFrameProps {
   loginArtworkUrl?: string;
 }
 
-export function AuthFrame({ children, variant, brand, loginArtworkUrl }: AuthFrameProps) {
+export function AuthFrame({ children, variant, brand, loginArtworkUrl = defaultLoginArtworkUrl }: AuthFrameProps) {
   if (variant === 'entry') {
     return (
       <div className="auth-frame auth-frame-entry">
