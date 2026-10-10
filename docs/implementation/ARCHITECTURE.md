@@ -125,6 +125,13 @@ Firebase/Stripe/Resend/OpenRouter/R2/PDF adaptersหรือSDKยังไม�
 
 ## 7. Test / change gates
 
+Certificate detail execution: Certificates owns the owner-filtered historical
+metadata read; Auth public requireSelfRead holds fresh bound authority without
+granting learning eligibility. Certificate/Enrollment shared locks protect the
+issued record; the projection uses original snapshot names/date/code and no
+current Course or Account profile. No read-triggered issuer/file renderer or
+completion repair. See CERTIFICATE_DETAIL_COMPONENT.md; full task gates remain.
+
 VIDEO-01 execution: Courses owns the unavailable route; Auth requireAuthoring
 holds fresh normalized authority separately from learning eligibility. Explicit
 either-audience metadata selects a bound session namespace, never role claims.

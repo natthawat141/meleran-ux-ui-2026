@@ -4,6 +4,13 @@ Status: **NEEDS_DECISION** · Priority: P2 · Module: certificates
 
 ต้องปิด D07
 
+Execution update 11 ต.ค. 2026: canonical GET /me/certificates/{id} now has
+13 actual HTTP/PostgreSQL tests and unchanged certificateApi.get/decoder
+integration in [CERTIFICATE_DETAIL_COMPONENT](../CERTIFICATE_DETAIL_COMPONENT.md).
+This metadata read is independent of D07 file rendering. List/query protocol,
+automatic completion/issuance, download, full Auth and browser G-CERTIFICATE
+remain incomplete; whole task stays NEEDS_DECISION and no case is closed.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

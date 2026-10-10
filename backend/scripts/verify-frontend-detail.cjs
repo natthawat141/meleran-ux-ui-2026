@@ -42,7 +42,8 @@ async function main() {
     };
     if (specifier === '../../../shared/api/client' &&
         (context.parentURL?.includes('/features/learning/api/learning-api.ts') ||
-         context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts'))) {
+         context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts') ||
+         context.parentURL?.includes('/features/certificate/api/certificate-api.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
       // endpoint builders/decoders and the real transport/fetch implementation.
       const name = new URL(context.parentURL).searchParams.get('learning-actor');
@@ -265,6 +266,35 @@ async function main() {
     assert.deepEqual(await counts(), beforeUploads);
     assert.deepEqual(await db.course.findUniqueOrThrow({ where: { id: ids.published } }), originalCourse);
     assert.deepEqual(await db.courseItem.findMany({ where: { courseId: ids.published }, orderBy: { id: 'asc' } }), originalItems);
+    phase = 'frontend-certificate-detail';
+    // A trusted historical completed fixture is independent of a future
+    // automatic Completion/Certificate issuer. This does not test issuance.
+    const issueTime = new Date('2026-10-10T17:01:02.123Z');
+    await db.enrollment.update({ where: { id: firstGrant.id }, data: { completedAt: issueTime,
+      completionSnapshot: { total_items: 1, completed_items: 1, private: 'PRIVATE_HISTORICAL_FIXTURE' } } });
+    const historicalCertificate = await db.certificate.create({ data: { enrollmentId: firstGrant.id, code: tag + '_CERT',
+      courseName: 'ชื่อคอร์สตอนออกใบ', recipientName: 'ชื่อผู้เรียนตอนออกใบ', issuedAt: issueTime } });
+    for (const [name, client] of [['certificate-owner', learnerUploadClient], ['certificate-foreign', ownerUploadClient],
+      ['certificate-admin', adminHttp('admin')], ['certificate-guest', anonymousUploadClient]]) globalThis[learningClientSlot].set(name, client);
+    const certificateApiFor = async name => (await import(pathToFileURL(path.join(frontend,
+      'apps/web/src/features/certificate/api/certificate-api.ts')).href + '?learning-actor=' + name)).certificateApi;
+    const ownCertificateApi = await certificateApiFor('certificate-owner');
+    const expectedCertificate = { id: historicalCertificate.id, code: historicalCertificate.code, course_id: ids.published,
+      course_title: historicalCertificate.courseName, learner_name: historicalCertificate.recipientName,
+      issued_at: issueTime.toISOString(), enrollment_id: firstGrant.id };
+    const certificateCounts = await counts();
+    assert.deepEqual(await ownCertificateApi.get(historicalCertificate.id), expectedCertificate);
+    assert.ok(!JSON.stringify(expectedCertificate).includes('PRIVATE_'));
+    await assert.rejects((await certificateApiFor('certificate-foreign')).get(historicalCertificate.id), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects((await certificateApiFor('certificate-admin')).get(historicalCertificate.id), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects((await certificateApiFor('certificate-guest')).get(historicalCertificate.id), error => error instanceof HttpClientError && error.status === 401);
+    await assert.rejects(ownCertificateApi.get(randomUUID()), error => error instanceof HttpClientError && error.status === 404);
+    await db.account.update({ where: { id: learnerId }, data: { displayName: 'ชื่อปัจจุบันเปลี่ยนแล้ว' } });
+    await db.course.update({ where: { id: ids.published }, data: { title: 'ชื่อคอร์สปัจจุบันเปลี่ยนแล้ว', status: 'archived' } });
+    await db.$disconnect(); await db.$connect();
+    assert.deepEqual(await ownCertificateApi.get(historicalCertificate.id), expectedCertificate);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    assert.deepEqual(await counts(), certificateCounts);
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
@@ -272,6 +302,7 @@ async function main() {
     await assert.rejects(learning.course(ids.published), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(adminCodes.revoke(unusedCode.id), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(uploadRequest(ownerUploadClient), error => error instanceof HttpClientError && error.kind === 'network');
+    await assert.rejects(ownCertificateApi.get(historicalCertificate.id), error => error instanceof HttpClientError && error.kind === 'network');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -296,6 +327,11 @@ async function main() {
       actualNestAndPostgres: true, owner503: true, admin503: true, learner403: true, anonymous401: true,
       unknown404: true, networkFailure: true, successDecoderNeverCalled: true, noUploadOrCourseMutation: true,
       frontendAuthoringHandlerGate: false, loginProviderGate: false, browserAcceptance: false };
+    result.certificateDetail = { component: 'CERT-01 detail', checks: 7, unchangedFrontendApiAndDecoder: true,
+      actualNestAndPostgres: true, historicalFixture: true, ownerProjection: true, foreignInstructor404: true,
+      foreignAdmin404: true, anonymous401: true, unknown404: true, renameArchiveAndReconnectPreserveSnapshot: true,
+      networkFailure: true, noReadWrites: true, automaticIssueGate: false, downloadGate: false,
+      loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
@@ -303,6 +339,7 @@ async function main() {
   } finally {
     await stop();
     if (accountId) await db.redeemCode.deleteMany({ where: { course: { instructorId: accountId } } });
+    if (accountId) await db.certificate.deleteMany({ where: { enrollment: { course: { instructorId: accountId } } } });
     if (accountId) await db.progress.deleteMany({ where: { enrollment: { course: { instructorId: accountId } } } });
     if (accountId) await db.enrollment.deleteMany({ where: { course: { instructorId: accountId } } });
     if (accountId) await db.videoTranscript.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });

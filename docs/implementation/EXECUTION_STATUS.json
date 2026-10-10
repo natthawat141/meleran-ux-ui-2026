@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 160,
+    "database_tests": 173,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -44,7 +44,9 @@
     "redeem_transaction_postgres_tests": 21,
     "frontend_admin_revoke_client_checks": 7,
     "video_unavailable_http_postgres_tests": 14,
-    "frontend_video_unavailable_transport_checks": 6
+    "frontend_video_unavailable_transport_checks": 6,
+    "certificate_detail_http_postgres_tests": 13,
+    "frontend_certificate_detail_client_checks": 7
   },
   "environment": {
     "staging": false,
@@ -588,6 +590,30 @@
       ],
       "decision_ids": [
         "D07"
+      ],
+      "components": [
+        {
+          "method": "GET",
+          "path": "/me/certificates/{id}",
+          "operationId": "get_me_certificates_id",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 13,
+          "frontend_client_checks": 7,
+          "protocol_document": "CERTIFICATE_DETAIL_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02 persisted certificate/completion linkage",
+            "AUTH-BASE-01 stored-session authority"
+          ],
+          "evidence": "Owner-filtered immutable historical projection, fresh bound self authority; foreign Instructor/Admin/learner hidden 404; all 27 model counts/history unchanged, rename/archive/new content/reconnect and real authority lock wait. Unchanged actual certificateApi.get/decoder.",
+          "remaining": [
+            "Full Auth/normalized writers",
+            "Automatic Completion/Certificate issuance",
+            "List query protocol",
+            "D07 download/file rendering and authenticated browser G-CERTIFICATE"
+          ],
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1070,6 +1096,18 @@
           "full_feature_gate": false,
           "verified_sha": "78aee05c5d85828041c83e48b0ca428913e35c34",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38085878574"
+        },
+        {
+          "id": "certificate_detail_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "protocol_document": "CERTIFICATE_DETAIL_COMPONENT.md",
+          "evidence": "Unchanged certificateApi.get/decoder and actual HttpClient -> built Nest/Test PostgreSQL; historical owned projection, Instructor/Admin foreign404, anonymous401, unknown404, rename/archive/reconnect and network failure. Trusted completion fixture only.",
+          "session_fixture": true,
+          "automatic_issue_gate": false,
+          "download_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1182,6 +1220,16 @@
           ],
           "verified_sha": "78aee05c5d85828041c83e48b0ca428913e35c34",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38085878574"
+        },
+        {
+          "name": "fresh-historical-self-read",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "CERTIFICATE_DETAIL_COMPONENT.md",
+          "tests_shared_with": "CERT-01 detail HTTP/PostgreSQL 13, not an additional test count",
+          "evidence": "Fresh bound identity/normalized Admin namespace proof held before owner-only historical read; no learning enrollment/readiness authority is granted. Post-guard disable/role changes and real Account lock wait.",
+          "remaining": [
+            "D01/D02/D03 complete Auth and normalized writer cutover"
+          ]
         }
       ]
     },
@@ -1205,7 +1253,7 @@
     "ci": "PASS",
     "verified_sha": "78aee05c5d85828041c83e48b0ca428913e35c34",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38085878574",
-    "latest_component_ci": "PASS_VIDEO_UNAVAILABLE_CHECKPOINT",
+    "latest_component_ci": "PENDING_CERTIFICATE_DETAIL_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
