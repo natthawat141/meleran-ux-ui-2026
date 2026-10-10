@@ -2,10 +2,12 @@ param(
     [string]$Project = 'melearn-tutor',
     [string]$Region = 'asia-southeast3',
     [string]$ApiBaseUrl = '/api/v1',
-    [switch]$MockPreview
+    [ValidateSet('mock', 'remote')]
+    [string]$DeploymentMode = 'mock'
 )
 
 $ErrorActionPreference = 'Stop'
+$MockPreview = $DeploymentMode -eq 'mock'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {

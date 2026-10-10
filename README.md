@@ -35,21 +35,24 @@ Target ที่ผู้ใช้ยืนยัน 10 ต.ค. 2026: project `
 
 ```powershell
 .\scripts\deploy-cloud-run.ps1
-# หลัง Backend พร้อม: rebuild ด้วย -ApiBaseUrl https://<api-origin>/api/v1
+# Default = mock preview ที่ทดลองใช้งานได้เหมือน local
+# หลัง Backend พร้อม: -DeploymentMode remote -ApiBaseUrl https://<api-origin>/api/v1
 ```
 
-Script ใช้ [Cloud Build config](containers/cloudbuild.yaml) สร้างสอง images จาก clean Git revision แล้ว deploy แยก; ไม่รัน local Docker และไม่ผูก Billing เอง. [.gcloudignore](.gcloudignore) ตัด local configuration/secrets และ generated files ออกจาก upload. ไม่มี private API key ใน bundle. Default `/api/v1` ยังไม่มี Backend proxy จึงตอบ 404; Login/Catalog และ business flows ยังใช้งานไม่ได้ใน static deployment นี้. Admin SPA เปิด public เพื่อเข้าหน้า Login; ไม่ใช่การอนุญาต Admin API.
+Default deployment เป็น **mock preview**: [Mock Cloud Build](containers/cloudbuild.mock.yaml) build `VITE_API_MODE=mock`, `VITE_APP_ENV=preview`, `/mock-api/v1`. Web container ให้บริการ SPA และ mock ใน memory; Admin container ให้บริการ SPA และ forward mock requests ไป Web โดย cookie อยู่ origin ของแต่ละ app และ audience แยก Web/Admin. มีสอง Cloud Run services เท่านั้น. ไม่ใช้ API/provider keys จริง ไม่ส่งอีเมลหรือตัดเงินจริง และไม่ใช่ Production Backend. ข้อมูล mock เริ่มใหม่เมื่อ Web instance หยุด/restart รวมถึง scale to zero; refresh หรือ login ใหม่หลัง session หาย. บัญชี Learner `learner@example.test`, Instructor `instructor-a@example.test`, Admin `admin` ใช้รหัส `mock-password-1` (ข้อมูลสมมติสำหรับ demo).
 
-สถานะ 10 ต.ค. 2026: Billing พร้อมแล้ว; deploy สำเร็จจาก source `ce8ccf58c7c4` บน `main` ผ่าน [Cloud Build](https://console.cloud.google.com/cloud-build/builds;region=asia-southeast3/299f8ab7-4f9a-4147-9b76-6c0859c899e2?project=melearn-tutor) และ [Frontend CI](https://github.com/natthawat141/meleran-tutor/actions/runs/38058440112). ไม่ใช้ local Docker.
+`-DeploymentMode remote` ใช้ [Static Cloud Build](containers/cloudbuild.yaml) และต้องกำหนด Backend URL ที่ใช้งานได้เอง. ทั้งสอง mode build บน Cloud Build ไม่รัน local Docker; ignore files ตัด local configuration/secrets ออกจาก upload. Mock อยู่ฝั่ง server ใน `tools/mock-preview` และไม่เข้า frontend/shared package runtime.
+
+สถานะ 10 ต.ค. 2026: mock preview deploy สำเร็จจาก source `1819db7410cc` บน `main` ผ่าน [Cloud Build](https://console.cloud.google.com/cloud-build/builds;region=asia-southeast3/b941b630-eac7-47cc-a957-792c3ab5d76c?project=melearn-tutor) และ [Frontend CI](https://github.com/natthawat141/meleran-tutor/actions/runs/38059476415). ชุด local tests ผ่าน 173 tests รวม adapter/session boundary. ไม่ใช้ local Docker.
 
 | App | Live URL | Ready revision |
 | --- | --- | --- |
-| Web | https://melearn-web-963924709921.asia-southeast3.run.app | `melearn-web-00003-xgl` |
-| Admin | https://melearn-admin-963924709921.asia-southeast3.run.app | `melearn-admin-00003-qqs` |
+| Web | https://melearn-web-963924709921.asia-southeast3.run.app | `melearn-web-00004-znc` |
+| Admin | https://melearn-admin-963924709921.asia-southeast3.run.app | `melearn-admin-00004-lsn` |
 
-ตรวจค่าบริการจริงแล้ว: Bangkok, CPU 1 / RAM 256 MiB, min 0 / max 1 ทั้ง service/revision และ traffic 100% ต่อบริการ. Runtime ใช้ `melearn-frontend-runtime` ที่ไม่มี project roles; แยกจาก default Cloud Build identity ซึ่งได้รับ `roles/cloudbuild.builds.builder`. HTTP `/health` ตอบ 200 และ `ok` ทั้งสองบริการ; หน้าแรก/deep links และ JS/CSS ตอบ 200, assets มี immutable cache. `/.env`, missing assets และ `/api/v1/me` ตอบ 404 ตาม config. Public health ใช้ `/health`; คง `/healthz` สำหรับ container-local checks เพราะ public Google frontend ไม่ส่ง path นี้ถึง container ในการตรวจครั้งนี้.
+ตรวจค่าบริการจริงแล้ว: Bangkok, CPU 1 / RAM 256 MiB, min 0 / max 1 ทั้ง service/revision และ traffic 100% ต่อบริการ. Runtime ใช้ `melearn-frontend-runtime` ที่ไม่มี project roles; แยกจาก default Cloud Build identity ซึ่งได้รับ `roles/cloudbuild.builds.builder`. HTTP `/health` ตอบ 200 และ `ok` ทั้งสองบริการ; หน้าแรก/deep links และ JS/CSS ตอบ 200, assets มี immutable cache. Public health ใช้ `/health`. Static remote image ยังคงใช้ `/healthz` ภายใน container ได้ แต่ public Google frontend ไม่ส่ง path นี้ถึง container ในการตรวจครั้งก่อน.
 
-ผลนี้ยืนยัน static frontend deployment; ยังไม่ได้เชื่อม Backend จริง จึงยังไม่ใช่ acceptance ของ Login, Catalog หรือ business flows.
+ตรวจ HTTP flow บน Cloud จริงผ่าน: Login และ `/me` ของ Learner/Instructor/Admin, Catalog → enroll ฟรี → เปิดบทเรียน → complete, Admin users/Blog, Instructor/Admin เห็นข้อมูลคอร์สชุดเดียวกัน และ logout Web ไม่กระทบ Admin session. หน้า SPA/deep link กับ JS/CSS โหลดผ่านและมี `X-Melearn-Deployment: mock-preview`. เครื่องมือ browser เปิดไม่ได้ (`failed to write kernel assets`) จึงยังไม่ได้ตรวจการคลิก UI ใน browser รอบนี้. ผลตรวจนี้เป็น mock acceptance ไม่ยืนยัน Backend/provider จริง.
 
 ## อ่านต่อ
 
