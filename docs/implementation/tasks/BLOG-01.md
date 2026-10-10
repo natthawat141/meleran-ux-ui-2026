@@ -2,7 +2,16 @@
 
 Status: **NEEDS_DECISION** · Priority: P2 · Module: blog
 
-ต้องปิด D16
+ต้องปิด D05, D16 และ storage projection gaps
+
+## Storage review — 11 ต.ค. 2026
+
+ยังไม่เปิด Blog detail: PublicBlogDetail บังคับ `content`, `category`,
+`reading_minutes` แต่ BlogPost ที่ผ่าน DB-05 ยังไม่มีฟิลด์เหล่านี้. Create/Patch
+ไม่มี reading_minutes และ category optional-on-create; ห้ามเดาค่า/default
+หรือสูตรอ่าน. JSON null/omitted mapping ของ content_doc ต้อง review ด้วย.
+ดู [Contract/storage gaps](../CONTRACT_STORAGE_GAPS.md); DB-05 DONE เป็น
+physical batch evidence ไม่ใช่การอนุมัติ Blog authoring/response policy ทั้งหมด.
 
 ## Read set และ traceability
 
@@ -76,6 +85,8 @@ Feature gate: **G-BLOG** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร�
 - ปิด task ได้เมื่อแก้ครบทุก defined operation ใน task; partial subset ต้องรายงาน ไม่ลด scopeเงียบ
 
 ## Decisions / สิ่งที่ห้ามแก้
+
+- D05 projection/authoring subreview: plain content vs rich document, category default when omitted, JSON null handling and reading_minutes derivation are still unresolved; see CONTRACT_STORAGE_GAPS.md. No defaults/reading algorithm are inferred.
 
 - D16 — List query, cursor and public/PII projection review: OpenAPI x-pending-decisions and Flow AB D7 still leave cursor expiry/search/sort/filter semantics and visibility/PII review open. Current schema fixes wire fields/limits, but a deterministic backend query/cursor design has not been reviewed. Resolution: Review per flow: keep canonical query/response fields, choose deterministic sort tuple and cursor binding to filters/principal, decide expiry and permitted search fields. Use public canonical projections only; do not broaden PII. Close the Catalog subset first so the public vertical slice need not wait for Auth/provider decisions.
 

@@ -5,7 +5,7 @@
 ## ผลที่ตรวจแล้ว
 
 - DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).
-- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP component tests 46/46; strict typecheck และ Nest build ผ่าน.
+- Foundation/architecture tests 49/49; PostgreSQL + actual HTTP/persistence components 60/60; feature-local units 11/11; รวม 120 tests. Strict typecheck และ Nest build ผ่าน. Frontend client integration เพิ่ม 6 checks แยกจาก Jest count.
 - Real Nest → melearn_test smoke ผ่าน: Catalog 200, /me 401, unknown route 404, invalid login 422; correlation ตรงกัน และจำนวนแถวทั้ง 27 models ไม่เปลี่ยนจาก startup/read.
 - ยัง 0/113 cases ที่ผ่าน full feature acceptance; technical tests ไม่แทน UI/API/provider checks.
 - CI-01 DONE: hosted CI [38074542071](https://github.com/natthawat141/meleran-tutor/actions/runs/38074542071) ผ่านบน 5d9be36 รวม Catalog detail component. D13 ปิดแล้ว.
@@ -63,3 +63,34 @@ GET /courses/{id} / get_courses_id ผ่าน real Nest HTTP+PostgreSQL 6 test
 ## Verified code checkpoint
 
 5d9be36bbf8a8c29c19e90a9d6709dc2476f885c pushed successfully; hosted Nest CI passed. Foundation/architecture 49 + PostgreSQL/real HTTP 46 = 95 tests. Current Prisma-vs-Test-PostgreSQL diff contains no DDL. Full branch secret scan passed; all ENV values withheld. This evidence-only documentation update does not change implementation and skips a redundant hosted build; the verified code SHA is explicitly retained above.
+
+## Follow-up components — 11 ต.ค. 2026
+
+- CATALOG-02 profile detail: canonical 4 public fields, normalized Instructor grant, no invented published-course prerequisite, hidden/non-Instructor/missing 404, malformed profile fails closed, edits/reconnect/no writes. Actual HTTP/PG 6 + bio unit 3.
+- ENROLL-01 internal EntitlementWriter: caller-owned transaction, safe parameterized ON CONFLICT, parallel sources converge, original source/time preserved, rollback/reconnect/FK checks. PG 8 รวม UTC timestamp ภายใต้ Bangkok transaction timezone. No eligibility/provider/HTTP operation declared complete.
+- ASSESS-01 internal submitted-score helper: exact snapshot Decimal aggregate and strict >70, pending never pass, bounds and no global precision mutation. Unit 8. D06 best-attempt comparison and orchestrated grading/Progress remain pending.
+- INTEGRATION-01 client component: unchanged fullstack Catalog client → actual Nest → owned PostgreSQL fixtures; 6 checks including saved edit, hidden/unknown 404, server/network errors and no mock fallback. Whole feature gate remains incomplete.
+- Blog storage gaps are explicit in [CONTRACT_STORAGE_GAPS](CONTRACT_STORAGE_GAPS.md), mapped to D05/D16; no fake reading-time/content/category values were implemented.
+
+No dependencies installed, schema/migrations changed, provider calls or STG/deployment in this follow-up. New hosted CI checkpoint is pending; previous verified SHA remains historical evidence until the new run completes. Run global no-write smoke and frontend fixture integration sequentially after DB suites finish.
+
+## Early browser slice — course detail
+
+Local preview Web (`VITE_APP_ENV=preview`, API_MODE=remote, credentials=omit) →
+loopback Nest → melearn_test verified: anonymous published detail displays the
+stored title/instructor/outline; changing the fixture title and price in
+PostgreSQL then reloading displays the new title and ฿123. A malformed stored
+outcome produces real 500 and the existing load-error UI, with no mock fallback.
+Screenshots are ignored local artifacts at artifacts/nest-execution/
+browser-course-detail.png and browser-course-error.png. Fixtures and temporary
+API/preview services are cleaned up after verification; Cloud SQL proxy remains.
+
+The two public Catalog pages now show their existing mock notice only when
+apiConfig.mock is true; remote mode previously claimed the API was a mock.
+Full Frontend Web/Admin/packages typecheck, Web/Admin preview build and 31
+targeted transport/Catalog tests passed. No route, styling, release flag or
+permission changes. The default production feature gate still hides prototypes.
+This proves the detail component's real Frontend → Nest → PostgreSQL path;
+list/search/cursor, authenticated learning and full G-COURSE acceptance remain
+pending. The original 113 acceptance cases remain mapped and none is marked
+complete from this component check.

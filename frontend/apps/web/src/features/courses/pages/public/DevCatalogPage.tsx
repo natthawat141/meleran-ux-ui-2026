@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Col, Input, Row, Space, Typography } from 'antd';
+import { apiConfig } from '../../../../shared/api/client';
 import { SearchOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Text, Title } from '@mantine/core';
 import { Link } from 'react-router-dom';
@@ -25,9 +26,9 @@ export function DevPublicCatalogPage() {
         title="เลือกเรื่องที่อยากเรียนรู้"
         subtitle="ดูภาพรวม เนื้อหา ผู้สอน และเวลาเรียน ก่อนตัดสินใจเริ่มคอร์ส"
       />
-      <Typography.Paragraph type="secondary">
+      {apiConfig.mock && <Typography.Paragraph type="secondary">
         โหมดพัฒนา: รายการนี้มาจาก API จำลอง ไม่ใช่ข้อมูลตัวอย่างในเครื่อง และไม่ใช่ Backend จริง
-      </Typography.Paragraph>
+      </Typography.Paragraph>}
       <div className="catalog-controls">
         <Input
           aria-label="ค้นหาคอร์ส"

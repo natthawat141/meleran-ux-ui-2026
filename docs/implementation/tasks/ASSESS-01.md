@@ -4,6 +4,17 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: assessments
 
 ต้องปิด D06, D09, D10
 
+## Internal component evidence — 11 ต.ค. 2026
+
+`summarizeSubmittedScores` COMPONENT_VERIFIED: feature-local units 8 tests ผ่าน.
+คำนวณหนึ่ง Attempt ที่ส่งคำตอบครบแล้วจาก trusted snapshot grades เท่านั้น:
+รวมคะแนน/คะแนนเต็มด้วย Decimal, strict >70 ไม่ปัดเศษ (ทดสอบเกิน/ต่ำกว่า
+ขอบเขตที่ทศนิยม 30 ตำแหน่ง), รอคะแนนครบก่อนมี pass result, ตรวจ bounds,
+ไม่เปลี่ยน global Decimal precision. ไม่ตัดสิน best attempt ข้าม version D06,
+ไม่รับ score จาก client, ไม่เปลี่ยน Progress และไม่เปิด HTTP operation.
+Owning service ยังต้องตรวจ auth/completeness/provenance/transaction แล้วเชื่อม
+helper กับ submit/manual grade flow; whole task และ Q acceptance ยังค้าง.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

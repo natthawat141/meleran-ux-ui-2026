@@ -197,4 +197,11 @@ Leadเตรียมdecisionเฉพาะfeature → user/backend/frontendow
 
 ## Execution review 2026-10-11
 
+Blog projection/authoring subreview D05/D16: [CONTRACT_STORAGE_GAPS](CONTRACT_STORAGE_GAPS.md)
+records missing plain content/category/reading_minutes and JSON null/omitted mapping.
+No server reading-time formula or category default is inferred. CATALOG-02 detail
+uses canonical public fields and normalized grants; its list policy remains D16.
+Internal entitlement writer and one-attempt score math implement confirmed facts
+only; they do not close Auth/source proofs, D06 or whole feature gates.
+
 [Next decision packet](NEXT_DECISIONS_TH.md) holds concrete Proposed A/B/C choices; none is silently approved. COMPLETION-01 depends on DB-03 and D06 because its own acceptance requires best result selection. Physical batches are reviewed/applied only to melearn_test; D14 review is per batch and does not resolve business policy.

@@ -6,6 +6,14 @@ Status: **BLOCKED** · Priority: P0 · Module: integration
 
 ## Read set และ traceability
 
+Component progress 11 ต.ค. 2026: unchanged fullstack Frontend Catalog client →
+actual local Nest HTTP → isolated PostgreSQL ผ่าน 6 checks ด้วย
+`node backend/scripts/verify-frontend-detail.cjs` (build ก่อนและ process-only
+ALLOW_TEST_DATABASE_RESET=yes). Published decode/outline, hidden+unknown 404,
+saved edit+reconnect, 500/network error surfaced, no startup/read writes และ
+ไม่ใช้ mock fetcher. Browser UI evidence แยกใน EXECUTION_STATUS.md; รายการ/search/
+cursor D16 และ whole G-COURSE/INTEGRATION-01 ยังไม่ DONE.
+
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.3 (line 243); §3.2 (line 415); §6.3 (line 1189)

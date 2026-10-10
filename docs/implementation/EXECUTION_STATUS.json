@@ -14,14 +14,23 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 46,
+    "database_tests": 60,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
     "business_acceptance_cases": 0,
     "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
-    "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF"
+    "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
+    "feature_component_unit_tests": 11,
+    "instructor_detail_component_tests": 6,
+    "entitlement_writer_component_tests": 8,
+    "submitted_score_component_tests": 8,
+    "frontend_detail_client_checks": 6,
+    "frontend_targeted_tests": 31,
+    "frontend_typecheck": "PASS_WEB_ADMIN_PACKAGES",
+    "frontend_build": "PASS_WEB_ADMIN_LOCAL_PREVIEW",
+    "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500"
   },
   "environment": {
     "staging": false,
@@ -221,6 +230,30 @@
       ],
       "decision_ids": [
         "D16"
+      ],
+      "components": [
+        {
+          "method": "GET",
+          "path": "/instructors/{id}",
+          "operationId": "get_instructors_id",
+          "state": "COMPONENT_VERIFIED",
+          "tests": 6,
+          "unit_tests": 3,
+          "dependencies": [
+            "DB-01",
+            "DB-02"
+          ],
+          "evidence": "Actual Nest HTTP/PostgreSQL: canonical public projection, normalized Instructor grant, non-Instructor/missing 404, reconnect, corrupt bio fails closed, no academic writes. No published-course prerequisite invented."
+        },
+        {
+          "method": "GET",
+          "path": "/instructors/{id}/courses",
+          "operationId": "get_instructors_id_courses",
+          "state": "NEEDS_DECISION",
+          "decisions": [
+            "D16"
+          ]
+        }
       ]
     },
     {
@@ -233,7 +266,17 @@
         "CATALOG-01",
         "DB-02"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "shared_entitlement_writer",
+          "kind": "INTERNAL_PERSISTENCE_COMPONENT",
+          "state": "COMPONENT_VERIFIED",
+          "tests": 8,
+          "http_operation_verified": false,
+          "evidence": "Caller-owned transaction; parameterized INSERT ON CONFLICT; competing sources converge; original source/time preserved; rollback/reconnect/FK checks. Eligibility/source proof and HTTP integration remain the owning command responsibility."
+        }
+      ]
     },
     {
       "id": "COURSE-01",
@@ -333,6 +376,16 @@
         "D06",
         "D09",
         "D10"
+      ],
+      "components": [
+        {
+          "id": "submitted_snapshot_score",
+          "kind": "INTERNAL_CALCULATION_COMPONENT",
+          "state": "COMPONENT_VERIFIED",
+          "tests": 8,
+          "http_operation_verified": false,
+          "evidence": "Submitted trusted snapshot grades; exact Decimal strict >70; pending -> no pass; per-question bounds; zero maximum not pass. No best-attempt policy D06 chosen, no Progress writes."
+        }
       ]
     },
     {
@@ -492,8 +545,18 @@
         "DB-05"
       ],
       "decision_ids": [
+        "D05",
         "D16"
-      ]
+      ],
+      "storage_gaps": {
+        "fields": [
+          "content",
+          "category",
+          "reading_minutes",
+          "content_doc null/omitted mapping"
+        ],
+        "reference": "CONTRACT_STORAGE_GAPS.md"
+      }
     },
     {
       "id": "BLOG-02",
@@ -628,7 +691,30 @@
       "dependencies": [
         "CATALOG-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "course_detail_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 6,
+          "evidence": "Unchanged fullstack Catalog client -> actual local Nest HTTP -> isolated PostgreSQL; live saved edit/reconnect, 404, 500, network failure, no mock fallback or startup/read writes.",
+          "browser_acceptance": false,
+          "full_feature_gate": false
+        },
+        {
+          "id": "course_detail_browser",
+          "state": "COMPONENT_VERIFIED",
+          "checks": [
+            "Published detail from test PostgreSQL",
+            "saved title/THB price edit visible after reload",
+            "real 500 rendered as error without mock fallback",
+            "mock warning hidden in remote mode"
+          ],
+          "environment": "LOCAL_PREVIEW_REMOTE_API",
+          "full_feature_gate": false,
+          "evidence": "EXECUTION_STATUS.md; ignored artifacts/nest-execution/browser-course-detail.png and browser-course-error.png"
+        }
+      ]
     },
     {
       "id": "INTEGRATION-02",
@@ -677,7 +763,7 @@
         "DB-01"
       ],
       "decision_ids": [],
-      "evidence": "GitHub Actions 38073566063 success on da4a65b51d9889b8cfa1c4605fd02fbe41525540; follow-up hardening rerun pending."
+      "evidence": "Previous hosted CI 38074542071 passed; new component verification checkpoint pending hosted run."
     },
     {
       "id": "AUTH-BASE-01",
@@ -713,7 +799,7 @@
     "ci": "PASS",
     "verified_sha": "5d9be36bbf8a8c29c19e90a9d6709dc2476f885c",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38074542071",
-    "latest_component_ci": "PASS"
+    "latest_component_ci": "PENDING_NEW_CHECKPOINT"
   },
   "remaining_decisions": [
     "D01",

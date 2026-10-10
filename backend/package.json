@@ -5,6 +5,8 @@
   "scripts": {
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit --incremental false",
     "test:foundation": "node node_modules/jest/bin/jest.js --config test/jest-foundation.json --runInBand",
+    "test:components": "node node_modules/jest/bin/jest.js --config test/jest-components.json --runInBand",
+    "test:frontend-detail": "node scripts/verify-frontend-detail.cjs",
     "test:database": "node node_modules/jest/bin/jest.js --config test/jest-database.json --runInBand",
     "db:test:validate": "node scripts/prisma-test.cjs validate",
     "db:test:generate": "node scripts/prisma-test.cjs generate",

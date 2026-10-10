@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Space, Tag, Typography } from 'antd';
+import { apiConfig } from '../../../../shared/api/client';
 import { ArrowRightOutlined, CheckCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { PageTitle } from '@melearn/ui';
@@ -89,9 +90,9 @@ export function DevCourseDetailPage() {
             </Button>
             <Typography.Text className="detail-price">{formatCatalogPrice(course.price)}</Typography.Text>
           </div>
-          <Typography.Paragraph type="secondary">
+          {apiConfig.mock && <Typography.Paragraph type="secondary">
             โหมดพัฒนา: ข้อมูลและการสมัครเรียนมาจาก API จำลอง ไม่ใช่ Backend จริง
-          </Typography.Paragraph>
+          </Typography.Paragraph>}
           {enrollments.isError && <Typography.Paragraph role="alert">โหลดสถานะการลงเรียนไม่สำเร็จ</Typography.Paragraph>}
           {enrollError && <Typography.Paragraph role="alert">{enrollError}</Typography.Paragraph>}
         </div>

@@ -4,6 +4,17 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
 
 ต้องปิด D16
 
+## Component evidence — 11 ต.ค. 2026
+
+`GET /instructors/{id}` / `get_instructors_id` COMPONENT_VERIFIED: real Nest HTTP
+และ isolated PostgreSQL 6 tests + feature-local bio projection 3 units ผ่าน.
+ใช้ normalized Instructor grant จาก DB-02; public scalar fields เท่านั้น,
+ไม่มีเงื่อนไขว่าต้องมีคอร์สที่ Scope ไม่ได้ระบุ. Non-Instructor/unknown 404,
+nullable/reconnect/profile edit, malformed stored bio 500 ไม่เปิด private JSON,
+ไม่มี session/grant/academic writes. Component ใช้ DB-01/DB-02 โดยไม่ต้องรอ
+Catalog list; Auth/Management normalized writers ยังต้องทำต่อ.
+รายชื่อคอร์สของผู้สอนยังรอ D16; whole task/Frontend gate ยังไม่ DONE.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

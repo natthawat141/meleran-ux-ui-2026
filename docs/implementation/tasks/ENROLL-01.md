@@ -4,6 +4,20 @@ Status: **BLOCKED** · Priority: P0 · Module: enrollments
 
 รอ dependencies: AUTH-01, CATALOG-01, DB-02
 
+## Internal component evidence — 11 ต.ค. 2026
+
+`EntitlementWriter` COMPONENT_VERIFIED: PostgreSQL 8 tests ผ่าน สำหรับ internal
+create-or-return ใน transaction ของ caller; free/redeem/stripe คืน lifetime
+wire fields เดิม, race สร้างหนึ่งสิทธิ์, ไม่ทับ source/time/completion state,
+rollback/reconnect/FK checks. ไม่เปิด HTTP API และไม่รับ source proof จาก client.
+Caller ต้องตรวจ eligibility/Published/type/owner และ source proof ก่อนเรียก,
+รักษา lock order; serialization retry เป็นความรับผิดชอบของ owning command.
+ไฟล์ `backend/src/features/enrollments/public/entitlement-writer.service.ts`
+export ผ่าน EnrollmentsModule เพื่อให้ Redeem/Payments ใช้ public interface.
+ยังไม่เปลี่ยน prototype Free Enroll/GET list ให้ถือว่าพร้อม; AUTH-01 และ
+command orchestration/Frontend acceptance ยังค้าง. ไม่มี acceptance ID ปิดจาก
+การทดสอบ persistence component นี้เพียงอย่างเดียว.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
