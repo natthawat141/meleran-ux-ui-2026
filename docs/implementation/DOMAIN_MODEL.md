@@ -229,6 +229,8 @@ Exercise real feature HTTP writes/reads and their reviewed transactions on isola
 
 ASSESS-02 single Attempt read convention (11 ต.ค.): immutable definitionSnapshot.item_id preserves item identity; AttemptQuestion payload public prompt/options/optional prompt_doc projects canonical question, with normalized type/position/maxScore. Reader never selects private key/full payload. Existing DB-03 remains unchanged; future owner writer must populate this format and lock Enrollment→Attempt before Answer/summary updates. Missing/invalid metadata is500 without repair or current-definition fallback. See ATTEMPT_READ_COMPONENT.md; this does not close snapshot start/submit, D06 or D09/D10.
 
+MGMT-04 current authoring locator convention (11 ต.ค.): canonical CourseItem.id identifies the quiz item on HTTP; Quiz.id remains internal storage identity. Require current Quiz.itemId/courseId link to same-course quiz CourseItem, then project course_id/item_id only. Owner change serializes with Course shared read; future authoring writes lock Course exclusive before child rows. This convention changes no existing schema/history and does not expose private Quiz/Question definitions; see MANAGED_QUIZ_LOCATOR_COMPONENT.md.
+
 - DB taskมีproposed Prisma diff/DDL/constraints/testfixtures/migrationstrategy; feature taskมีentitiesและowner interfaces. ห้ามหลายagentแก้schemaพร้อมกัน.
 - Reviewsource/hashก่อนphysicalmigration; approvalofdesignไม่ใช่approvalofliveDBmigration.
 - PGtestproofต้องมีenvironment/commands/FKunique/race/rollback/read-back; ไม่ใช้SQLiteผลผ่านแทน.

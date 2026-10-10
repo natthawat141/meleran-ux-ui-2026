@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P2 · Module: management
 
 ต้องปิด D16
 
+Component update 11 ต.ค.: GET /managed-quizzes/{id} implemented and verified separately; see [MANAGED_QUIZ_LOCATOR_COMPONENT](../MANAGED_QUIZ_LOCATOR_COMPONENT.md) for exact authority, public CourseItem ID mapping, locks and tests. Locator dependencies are FOUNDATION-01, DB-02 normalized identity, DB-03 current Quiz linkage and AUTH-BASE-01 fresh authoring authority. It does not depend on unresolved roster query/PII or grading policy. Whole task remains NEEDS_DECISION until all four operations and feature gate pass; no silent relaxation of planning dependencies for directories/managed Attempt.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
@@ -41,7 +43,7 @@ Errors: ใช้ statuses/schema/examples ใน subset ราย operation; �
 
 - Entities: User, Course, Enrollment, Quiz, QuizAttempt, Answer
 - [Domain model](../DOMAIN_MODEL.md) §READ — Read scoped projections
-- PROPOSED_TECHNICAL execution: No write; apply principal/resource/Published scope before selecting fields; deterministic sort and page limits from canonical. No public GET grants/charges/completes.
+- PROPOSED_TECHNICAL execution: No write; apply principal/resource scope before selecting fields; deterministic sort and page limits from canonical. Locator is private authoring and accepts owned course states per Scope; Published visibility applies only where the relevant operation requires it. No public GET grants/charges/completes.
 - Dependencies: [MGMT-03](MGMT-03.md), [GRADE-01](GRADE-01.md)
 - Schema Owner: Lead/DB maintainer ผู้เดียว; feature agent ส่ง schema delta ไป DB task ไม่สร้าง migration เอง
 

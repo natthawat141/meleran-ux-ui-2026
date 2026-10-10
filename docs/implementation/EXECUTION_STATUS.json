@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 294,
+    "database_tests": 307,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,7 +51,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 106,
+    "frontend_client_checks_total": 114,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -66,7 +66,9 @@
     "attempt_projection_unit_tests": 6,
     "frontend_own_attempt_client_checks": 9,
     "instructor_grant_http_postgres_tests": 18,
-    "frontend_instructor_grant_transport_checks": 8
+    "frontend_instructor_grant_transport_checks": 8,
+    "managed_quiz_locator_http_postgres_tests": 13,
+    "frontend_managed_quiz_locator_transport_checks": 8
   },
   "environment": {
     "staging": false,
@@ -307,6 +309,32 @@
       ],
       "decision_ids": [
         "D16"
+      ],
+      "components": [
+        {
+          "id": "managed_quiz_locator",
+          "method": "GET",
+          "path": "/managed-quizzes/{id}",
+          "operationId": "get_managed-quizzes_id",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 13,
+          "frontend_transport_checks": 8,
+          "protocol_document": "MANAGED_QUIZ_LOCATOR_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02 normalized roles",
+            "DB-03 current Quiz linkage",
+            "AUTH-BASE-01 fresh authoring authority"
+          ],
+          "evidence": "Fresh bound normalized Instructor owner/Admin. Canonical CourseItem wire ID; no internal UUID fallback. Auth -> Course -> Item/Quiz shared locks, scoped SQL selects only two IDs. Real ownership writer wait, post-guard revocation/transfer, private-definition/history/all-model preservation.",
+          "remaining": [
+            "D16 roster/query/PII design and both learner directories",
+            "Managed Attempt/GRADE prerequisites",
+            "Complete Auth/provider and aggregate authoring",
+            "Actual Management browser feature gate"
+          ],
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1497,6 +1525,19 @@
           "full_feature_gate": false,
           "verified_sha": "fc622a25b1f4a2f52f16b97e0e8f78ac463ddd29",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38094636720"
+        },
+        {
+          "id": "managed_quiz_locator_transport",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 8,
+          "protocol_document": "MANAGED_QUIZ_LOCATOR_COMPONENT.md",
+          "evidence": "Unchanged actual Web/Admin resources.ts + management decoder -> built Nest/Test PG. Exact IDs, Admin authority, current pure authoringForm wire-ID roundtrip, foreign enrolled Instructor404, anonymous401, invalid item/storage UUID404, reconnect/no writes, network failure.",
+          "session_fixture": true,
+          "authoring_http_gate": false,
+          "management_directory_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1657,7 +1698,7 @@
     "ci": "PASS",
     "verified_sha": "fc622a25b1f4a2f52f16b97e0e8f78ac463ddd29",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38094636720",
-    "latest_component_ci": "PASS_INSTRUCTOR_GRANT_CHECKPOINT",
+    "latest_component_ci": "PENDING_MANAGED_QUIZ_LOCATOR_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

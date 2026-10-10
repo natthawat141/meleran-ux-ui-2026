@@ -40,9 +40,9 @@ async function main() {
     if (specifier === '@melearn/contracts') return {
       url: pathToFileURL(path.join(frontend, 'packages/contracts/src/index.ts')).href, shortCircuit: true,
     };
-    if (specifier === './client' && context.parentURL?.includes('/apps/admin/src/shared/api/resources.ts')) {
+    if (specifier === './client' && /\/apps\/(admin|web)\/src\/shared\/api\/resources\.ts/.test(context.parentURL || '')) {
       const name = new URL(context.parentURL).searchParams.get('learning-actor');
-      if (!globalThis[learningClientSlot].has(name)) throw new Error('Unknown Admin resource fixture client');
+      if (!globalThis[learningClientSlot].has(name)) throw new Error('Unknown resource fixture client');
       const source = `export const apiClient=globalThis[${JSON.stringify(learningClientSlot)}].get(${JSON.stringify(name)});`;
       return { url: 'data:text/javascript,' + encodeURIComponent(source), shortCircuit: true };
     }
@@ -526,9 +526,9 @@ async function main() {
     attemptChecks.push('reconnect-no-grade-completion-or-history-writes');
     phase = 'frontend-instructor-grant';
     const instructorGrantChecks = [];
-    const adminResourceFor = async (name, http) => {
+    const adminResourceFor = async (name, http, app = 'admin') => {
       globalThis[learningClientSlot].set(name, http);
-      const location = pathToFileURL(path.join(frontend, 'apps/admin/src/shared/api/resources.ts'));
+      const location = pathToFileURL(path.join(frontend, 'apps', app, 'src/shared/api/resources.ts'));
       location.searchParams.set('learning-actor', name); return (await import(location.href)).resource;
     };
     const adminResource = await adminResourceFor('grant-admin', adminHttp('admin'));
@@ -562,6 +562,50 @@ async function main() {
     instructorGrantChecks.push('anonymous401');
     await assert.rejects(adminResource(grantPath, 'POST', { role: 'admin' }), error => error instanceof HttpClientError && error.status === 422);
     instructorGrantChecks.push('strict-body422-no-admin-elevation');
+    phase = 'frontend-managed-quiz-locator';
+    const locatorChecks = [];
+    const webResourceFor = (name, secret) => adminResourceFor(name, createHttpClient({
+      baseUrl: `http://127.0.0.1:${port}/api/v1`, credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'web', Cookie: `melearn_web_session=${secret}` },
+      fetcher: globalThis.fetch.bind(globalThis),
+    }), 'web');
+    const ownerResource = await webResourceFor('locator-owner', sessions.owner);
+    const foreignResource = await webResourceFor('locator-enrolled-foreign', sessions.learner);
+    const locatorPath = 'managed-quizzes/' + encodeURIComponent(quizItem.id);
+    const expectedLocator = { course_id: ids.published, item_id: quizItem.id };
+    const beforeLocatorCounts = await counts();
+    const locatorDefinitions = () => Promise.all([
+      db.quiz.findUniqueOrThrow({ where: { id: quiz.id } }),
+      db.question.findMany({ where: { quizId: quiz.id }, orderBy: { id: 'asc' } }),
+      attemptRows(),
+    ]);
+    const beforeLocatorDefinitions = await locatorDefinitions();
+    assert.deepEqual(await ownerResource(locatorPath), expectedLocator);
+    assert.notEqual(quizItem.id, quiz.id);
+    locatorChecks.push('actual-web-resource-and-canonical-two-ID-decoder');
+    assert.deepEqual(await adminResource(locatorPath), expectedLocator);
+    locatorChecks.push('actual-admin-resource-authority');
+    // Pure current frontend form mapping is a wire-ID interoperability check,
+    // not evidence that the full authoring HTTP/editor feature is implemented.
+    const { authoringForm } = await import(pathToFileURL(path.join(frontend, 'packages/course-authoring/src/http-view.ts')).href);
+    const form = authoringForm({ id: ids.published, instructor: { id: accountId },
+      chapters: [{ id: learningChapter.id, title: 'บทจริง', items: [{ id: quizItem.id, type: 'quiz', title: quizItem.title, has_history: true }] }] });
+    assert.equal(form.quizzes[0].id, quizItem.id);
+    assert.equal(form.course.chapters[0].items[0].quizId, quizItem.id);
+    assert.deepEqual(await ownerResource('managed-quizzes/' + encodeURIComponent(form.quizzes[0].id)), expectedLocator);
+    locatorChecks.push('current-pure-authoring-form-item-ID-roundtrip');
+    await assert.rejects(foreignResource(locatorPath), error => error instanceof HttpClientError && error.status === 404);
+    locatorChecks.push('enrolled-foreign-instructor404');
+    await assert.rejects(anonymousResource(locatorPath), error => error instanceof HttpClientError && error.status === 401);
+    locatorChecks.push('anonymous401');
+    for (const id of [randomUUID(), articleItem.id, quiz.id])
+      await assert.rejects(ownerResource('managed-quizzes/' + encodeURIComponent(id)), error => error instanceof HttpClientError && error.status === 404);
+    locatorChecks.push('unknown-nonquiz-private-UUID404-without-fallback');
+    await db.$disconnect(); await db.$connect();
+    for (const value of await Promise.all([ownerResource(locatorPath), adminResource(locatorPath)])) assert.deepEqual(value, expectedLocator);
+    assert.deepEqual(await counts(), beforeLocatorCounts);
+    assert.deepEqual(await locatorDefinitions(), beforeLocatorDefinitions);
+    locatorChecks.push('reconnect-read-preserves-all-models-definition-and-academic-history');
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -611,6 +655,8 @@ async function main() {
     attemptChecks.push('network-failure-without-mock-fallback');
     await assert.rejects(adminResource(grantPath, 'POST', {}), error => error instanceof HttpClientError && error.kind === 'network');
     instructorGrantChecks.push('network-failure-without-mock-fallback');
+    await assert.rejects(ownerResource(locatorPath), error => error instanceof HttpClientError && error.kind === 'network');
+    locatorChecks.push('network-failure-without-mock-fallback');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -677,6 +723,11 @@ async function main() {
     result.instructorGrant = { component: 'MGMT-02 grant', checks: instructorGrantChecks.length, checkNames: instructorGrantChecks,
       unchangedAdminResourceAndDecoder: true, normalizedRolesAndAudit: true, originalAcademicHistory: true,
       sessionFixture: true, instructorDirectoryGate: false, loginProviderGate: false, browserAcceptance: false, fullFeatureGate: false };
+    result.managedQuizLocator = { component: 'MGMT-04 locator', checks: locatorChecks.length, checkNames: locatorChecks,
+      unchangedWebAdminResourcesAndDecoder: true, actualNestAndPostgres: true, publicCourseItemID: true,
+      actualPureAuthoringForm: true, noReadWrites: true, sessionFixture: true,
+      authoringHttpGate: false, managementDirectoryGate: false, loginProviderGate: false,
+      browserAcceptance: false, fullFeatureGate: false };
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
