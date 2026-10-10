@@ -105,6 +105,13 @@ DB-02 role grants; Auth/Management compatibility role writers remain pending.
 
 ## 6. Dependencies: reuse baseline / proposals
 
+Resume persistence execution: EnrollmentsModule exports ResumeWriter and the
+feature-local storedResume format. Caller owns fresh access/Course shared and
+Enrollment exclusive locks. Separate saved UTC time/private bigint order in
+Progress.resumeData prevents completion timestamps/millisecond ties from changing
+latest resume. Canonical projections strip internal metadata. No public mutation
+or input-omission policy frozen here; see RESUME_PERSISTENCE_COMPONENT.md.
+
 สแตก NestJS, TypeScript, Prisma, PostgreSQL ได้รับการเลือกแล้ว. Packagesที่พบและให้ใช้ baselineเดิมตามคำสั่ง reuse:
 Nest common/core/platform-express, Prisma client/CLI, class-validator/transformer, cookie-parser, reflect-metadata, rxjs;
 dev: Jest/ts-jest, SuperTest/Nest testing, TypeScript/compiler tools ตาม lockfile.

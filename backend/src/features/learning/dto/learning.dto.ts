@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { storedResume } from '../../enrollments/public/index';
 
 export type LearningItemType = 'article' | 'video' | 'quiz';
 export interface LearningItemDto {
@@ -27,11 +28,5 @@ export function learningItemType(value: string): LearningItemType {
 
 /** Project only the canonical resume fields; never return the JSON entity. */
 export function learningResume(value: Prisma.JsonValue | null, updatedAt: Date): LearningItemDto['resume'] {
-  if (value === null) return null;
-  if (typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid stored learning resume');
-  const position = value.position_seconds;
-  if (position !== null && (typeof position !== 'number' || !Number.isFinite(position) || position < 0)) {
-    throw new Error('Invalid stored learning position');
-  }
-  return { position_seconds: position, updated_at: updatedAt.toISOString() };
+  return storedResume(value, updatedAt)?.wire ?? null;
 }

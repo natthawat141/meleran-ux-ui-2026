@@ -174,11 +174,21 @@ async function main() {
     await assert.rejects(ownerLearning.course(ids.published), error => error instanceof HttpClientError && error.status === 403);
     await assert.rejects(anonymousLearning.course(ids.published), error => error instanceof HttpClientError && error.status === 401);
     assert.deepEqual(await counts(), readCounts);
-    const resume = await db.progress.create({ data: { enrollmentId: firstGrant.id, courseId: ids.published, itemId: videoItem.id,
-      resumeData: { position_seconds: 42.125, private: 'PRIVATE_RESUME_EXTRA' }, updatedAt: new Date('2026-10-11T03:00:00Z') } });
+    const { ResumeWriter } = require(path.join(root, 'dist/features/enrollments/public/resume-writer.service.js'));
+    const savedResume = await db.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM courses WHERE id=${ids.published} FOR SHARE`;
+      await tx.$queryRaw`SELECT id FROM enrollments WHERE id=${firstGrant.id} FOR UPDATE`;
+      return new ResumeWriter().save(tx, firstGrant.id, videoItem.id, ids.published, 42.125);
+    });
+    let resume = await db.progress.findUniqueOrThrow({ where: { enrollmentId_itemId: { enrollmentId: firstGrant.id, itemId: videoItem.id } } });
+    resume = await db.progress.update({ where: { id: resume.id }, data: {
+      resumeData: { ...resume.resumeData, private: 'PRIVATE_RESUME_EXTRA' },
+    } });
     const resumed = await learning.course(ids.published);
     assert.equal(resumed.resume_item_id, videoItem.id);
     assert.equal(resumed.outline[0].items[0].resume.position_seconds, 42.125);
+    assert.deepEqual(resumed.outline[0].items[0].resume, savedResume.resume);
+    assert.ok(!JSON.stringify(resumed).includes('_resume_order'));
     assert.ok(!JSON.stringify(resumed).includes('PRIVATE_'));
     await db.$disconnect(); await db.$connect();
     assert.deepEqual(await learning.course(ids.published), resumed);
@@ -203,7 +213,8 @@ async function main() {
     result.learningRead = { component: 'LEARN-01 enrolled reads', checks: 11, unchangedFrontendApiAndDecoders: true,
       realTransportWithFixtureConfiguration: true, freeGrantToCourseAndItem: true, noPrivateQuizTranscriptOrProfile: true,
       ownerDenied: true, foreignItemDenied: true, ownResumeAndReconnect: true, safeServerAndNetworkFailure: true,
-      noReadWrites: true, loginProviderGate: false, browserAcceptance: false };
+      noReadWrites: true, actualInternalResumeWriter: true, publicResumeMutationGate: false,
+      loginProviderGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');

@@ -42,6 +42,13 @@ Type-specific content: Video returns video_url; Article returns body:null + stor
 
 ## Unresolved / remaining work
 
+Resume projection update: [RESUME_PERSISTENCE_COMPONENT](RESUME_PERSISTENCE_COMPONENT.md)
+supersedes the Progress.updatedAt-only latest selection above. New owner writes
+store separate UTC resume time/private server order; legacy rows retain the
+old fallback. A later completion update does not move an older item ahead of the
+actual latest resume, including millisecond ties. Public Resume input mapping
+and mutation/browser gates remain pending; historical c134b16 CI below is retained.
+
 - Whole LEARN-01 still needs GET /me/progress query/projection, full Auth/normalized writers and Course-authoring prerequisites, real authenticated browser G-LEARNING. No complete/submit/grade/resume-write/Certificate delivery implementation is claimed.
 - **Scope/HTTP mapping conflict:** Scope §6.4 describes learner/owner/Admin contexts on learning reads; canonical WireLearningCourse accepts only `access.mode='enrolled'`, and these paths advertise WebSession/effective Enrollment. The existing task proposes the canonical `/courses/{id}/authoring-preview` for management view. This component implements only the confirmed enrolled learner subset; owner/Admin preview and final reconciliation remain part of COURSE-02/D04. Do not add enum variants, silently grant ownership-based Enrollment, or claim F03 accepted.
 - D04 curriculum/revision/reconciliation and D05 rich-document/URL writer validation remain open. D06 best-attempt selection is not decided by this reader; accepted Progress records are read, no score is recalculated. Resume writer timestamp vs completion updates must be reviewed when LEARN-02 is implemented. D01–D03 Auth transport/provider policies remain open.

@@ -53,3 +53,22 @@ Local provider response contract ของ receiver (ไม่ใช่ canonica
 การตรวจ provider จริงต้องใช้ signing secret จาก Stripe Dashboard หรือ local Stripe CLI listener ของ endpoint นี้ แล้ว forward ไป local route. เครื่องนี้ยังไม่มี Stripe CLI และไม่มี signing secret. ยังไม่เคยรับ delivery จาก Stripe จริง, ไม่ deploy/STG และไม่แก้ cloud resources ใน checkpoint นี้. ไม่ส่ง signing secret ใน chat/Git/log.
 
 Verified code SHA: `26cb18665d1ba04cdb8a41f39babd50189845326`; [hosted Nest CI 38078316359](https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359) ผ่าน 135 tests + 6 real-client checks, build และ smoke. Provider delivery verification ยังไม่มี; whole business acceptance ยังคง 0/113.
+
+## Local handoff / receiver verification
+
+Authoritative backend: `D:\code\elearn-prod\worktrees\melearn-fullstack\backend`. ตรวจซ้ำ 11 ต.ค. 2026: signature unit 5 เคส และ receiver HTTP/PostgreSQL 10 เคสผ่าน; signing secret ใน ignored `.env` ยังว่าง. Tests ใช้ fixture secret ชั่วคราวและล้างเฉพาะ event ของตัวเอง ไม่สร้าง Checkout หรือ charge จาก Stripe จริง.
+
+รัน targeted verification จาก `backend/` โดยใช้ Test PostgreSQL ที่มีอยู่และ proxy ที่เปิดไว้:
+
+```powershell
+node node_modules/jest/bin/jest.js --config test/jest-components.json --runInBand --runTestsByPath src/features/payments/providers/stripe-signature.spec.ts
+$env:ALLOW_TEST_DATABASE_RESET='yes'
+try {
+  node node_modules/jest/bin/jest.js --config test/jest-database.json --runInBand --runTestsByPath test/database/stripe-webhook.pg-spec.ts
+  if ($LASTEXITCODE -ne 0) { throw 'Stripe receiver tests failed' }
+} finally { Remove-Item Env:ALLOW_TEST_DATABASE_RESET -ErrorAction SilentlyContinue }
+```
+
+ขั้น provider delivery ที่ยังไม่รัน: เมื่อ local API เปิดด้วย runtime Test database บน port 4000 แล้ว ใช้ `stripe listen --forward-to http://127.0.0.1:4000/api/v1/webhooks/stripe` ในเครื่องที่มี CLI/auth พร้อม. นำ signing secret ของ listener นั้นใส่ `STRIPE_WEBHOOK_SECRET` ใน ignored local ENV และ restart API; ห้ามใช้ secret ของ Dashboard endpoint คนละตัวหรือ API key แทน. ตาม [Stripe local listener](https://docs.stripe.com/webhooks#test-locally-without-a-registered-url). คำสั่งนี้เป็น handoff ยังไม่ใช่หลักฐานว่าตรวจ provider ผ่าน และยังไม่เปิด public destination.
+
+เกณฑ์ตรวจ delivery แยกจากเงิน: valid fresh signature → one durable received row / 503 pending; fresh retry ของ event เดิม → same row / 503; invalid signature → 400 / no row; missing secret → 503 / no row. จะได้ 200 เฉพาะ matching receipt ที่ processor บันทึก processed จริงแล้ว. ต้องทำ processor/reconciliation และ PAY-01 ก่อน paid → Enrollment acceptance.

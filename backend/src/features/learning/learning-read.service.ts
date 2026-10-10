@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ApiException } from '../../shared/errors/api-exception';
 import { PrincipalService, VerifiedSessionReference } from '../auth/public/index';
+import { storedResume } from '../enrollments/public/index';
 import { LearningCourseDto, LearningItemContentDto, learningItemType, learningResume } from './dto/learning.dto';
 
 const ExactDecimal = Prisma.Decimal.clone({ precision: 100 });
@@ -51,8 +52,16 @@ export class LearningReadService {
           completed_at: stored?.completedAt?.toISOString() ?? null,
           resume: stored ? learningResume(stored.resumeData, stored.updatedAt) : null };
       }) }));
-      const items = outline.flatMap(chapter => chapter.items), currentIds = new Set(items.map(item => item.id));
-      const latestResume = enrollment.progress.find(row => row.resumeData !== null && currentIds.has(row.itemId));
+      const items = outline.flatMap(chapter => chapter.items);
+      const resumeOrders = new Map(enrollment.progress.map(row => [row.itemId, storedResume(row.resumeData, row.updatedAt)?.order ?? null]));
+      const latestResume = items.filter(item => item.resume !== null).sort((left, right) => {
+        const leftOrder = resumeOrders.get(left.id) ?? null, rightOrder = resumeOrders.get(right.id) ?? null;
+        if (leftOrder !== rightOrder) {
+          if (leftOrder === null) return 1; if (rightOrder === null) return -1;
+          return leftOrder < rightOrder ? 1 : -1;
+        }
+        return Date.parse(right.resume!.updated_at) - Date.parse(left.resume!.updated_at) || (left.id < right.id ? -1 : left.id > right.id ? 1 : 0);
+      })[0];
       return { id: course.id, slug: course.slug, title: course.title, subtitle: course.subtitle, cover_url: course.coverUrl,
         category: course.category, level: course.level,
         price: course.priceMinor !== null && course.priceMinor > 0 ? { amount_minor: course.priceMinor, currency: 'THB' } : null,
@@ -62,7 +71,7 @@ export class LearningReadService {
           source: enrollment.source as 'free' | 'stripe' | 'redeem', access: 'lifetime', granted_at: enrollment.grantedAt.toISOString() } },
         outline, progress: { completed_items: items.filter(item => item.completed_at !== null).length,
           total_items: items.length, completed_at: enrollment.completedAt?.toISOString() ?? null },
-        resume_item_id: latestResume?.itemId ?? null, certificate_id: enrollment.certificate?.id ?? null };
+        resume_item_id: latestResume?.id ?? null, certificate_id: enrollment.certificate?.id ?? null };
     }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted });
   }
 

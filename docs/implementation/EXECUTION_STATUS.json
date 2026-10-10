@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 117,
+    "database_tests": 125,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -39,7 +39,8 @@
     "free_enroll_http_postgres_tests": 13,
     "frontend_free_enroll_client_checks": 7,
     "learning_read_http_postgres_tests": 13,
-    "frontend_learning_read_client_checks": 11
+    "frontend_learning_read_client_checks": 11,
+    "resume_writer_postgres_tests": 8
   },
   "environment": {
     "staging": false,
@@ -415,7 +416,12 @@
           ],
           "full_acceptance": false,
           "verified_sha": "c134b168f952b1231712dbe3d8300e88fe0370be",
-          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295"
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295",
+          "resume_projection_update": {
+            "protocol_document": "RESUME_PERSISTENCE_COMPONENT.md",
+            "evidence": "Owner UTC saved time/private order supersedes Progress.updatedAt-only selection for new rows; legacy fallback retained; internal order never serialized.",
+            "postgres_tests_shared": 8
+          }
         },
         {
           "method": "GET",
@@ -442,7 +448,12 @@
           ],
           "full_acceptance": false,
           "verified_sha": "c134b168f952b1231712dbe3d8300e88fe0370be",
-          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295"
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295",
+          "resume_projection_update": {
+            "protocol_document": "RESUME_PERSISTENCE_COMPONENT.md",
+            "evidence": "Owner UTC saved time/private order supersedes Progress.updatedAt-only selection for new rows; legacy fallback retained; internal order never serialized.",
+            "postgres_tests_shared": 8
+          }
         }
       ]
     },
@@ -455,7 +466,30 @@
         "LEARN-01",
         "COMPLETION-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "owned_resume_persistence",
+          "kind": "INTERNAL_PERSISTENCE_COMPONENT",
+          "state": "COMPONENT_VERIFIED",
+          "postgres_tests": 8,
+          "protocol_document": "RESUME_PERSISTENCE_COMPONENT.md",
+          "component_dependencies": [
+            "DB-02",
+            "LEARN-01 read component",
+            "AUTH-BASE-01 stored authority for future caller"
+          ],
+          "evidence": "Caller-owned Course/Enrollment locks, explicit trusted position/null, actual parameterized upsert and rollback/FK/reconnect; preserved academic history, separate UTC timestamp/private monotonic order, same-millisecond/later completion read behavior.",
+          "http_operation_verified": false,
+          "remaining": [
+            "ResumeRequest optional/type mapping vs mock requires explicit answer",
+            "Public PUT DTO/authority/owned-course orchestration",
+            "Complete command / COMPLETION-01 D06",
+            "Full Auth/authoring and browser G-LEARNING"
+          ],
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "ASSESS-01",
@@ -923,7 +957,8 @@
           "browser_acceptance": false,
           "full_feature_gate": false,
           "verified_sha": "c134b168f952b1231712dbe3d8300e88fe0370be",
-          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295"
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295",
+          "resume_writer_integration": "Actual built internal ResumeWriter with owned locks/fixtures -> Test PG -> built Nest -> unchanged frontend decoder; public Resume mutation gate remains pending."
         }
       ]
     },
@@ -1047,7 +1082,7 @@
     "ci": "PASS",
     "verified_sha": "c134b168f952b1231712dbe3d8300e88fe0370be",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295",
-    "latest_component_ci": "PASS",
+    "latest_component_ci": "PENDING_RESUME_PERSISTENCE_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

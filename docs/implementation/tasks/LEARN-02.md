@@ -6,6 +6,13 @@ Status: **BLOCKED** · Priority: P1 · Module: learning
 
 ## Read set และ traceability
 
+Execution update 11 ต.ค. 2026: owner ResumeWriter/storedResume participant has
+8 PostgreSQL tests and built-writer→Nest→unchanged frontend read integration.
+[RESUME_PERSISTENCE_COMPONENT](../RESUME_PERSISTENCE_COMPONENT.md) records UTC
+resume time/private order, immutable academic history, locks and pending
+ResumeRequest vs mock reconciliation. No public PUT/complete operation is closed;
+whole task remains BLOCKED and no original acceptance case is marked accepted.
+
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.5 (line 302); §2.7 (line 327); §4.5 (line 956); §5.5 (line 1064); §6.4 (line 1216)
