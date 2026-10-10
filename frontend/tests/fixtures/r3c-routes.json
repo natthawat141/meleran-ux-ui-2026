@@ -1,0 +1,432 @@
+{
+  "baselineRevision": "afa2d6f25e6aa5555499ea9f506bc1701abe2e50",
+  "web": [
+    {
+      "path": "/",
+      "featurePath": "/",
+      "element": "featureElement('/', <LandingPage />)"
+    },
+    {
+      "path": "/about",
+      "featurePath": "/about",
+      "element": "featureElement('/about', <AboutPage />)"
+    },
+    {
+      "path": "/courses",
+      "featurePath": "/courses",
+      "element": "featureElement('/courses', <PublicCourseEntry />)"
+    },
+    {
+      "path": "/courses/:slug",
+      "featurePath": "/courses/:slug",
+      "element": "featureElement('/courses/:slug', <PublicCourseEntry detail />)"
+    },
+    {
+      "path": "/explore/courses",
+      "featurePath": "/explore/courses",
+      "element": "featureElement('/explore/courses', <RolePage roles={['learner', 'instructor']}><MemberCatalogPage /></RolePage>)"
+    },
+    {
+      "path": "/explore/courses/:slug",
+      "featurePath": "/explore/courses/:slug",
+      "element": "featureElement('/explore/courses/:slug', <RolePage roles={['learner', 'instructor']}><MemberCourseDetailPage /></RolePage>)"
+    },
+    {
+      "path": "/articles",
+      "featurePath": "/articles",
+      "element": "featureElement('/articles', <BlogIndexPage />)"
+    },
+    {
+      "path": "/articles/:id",
+      "featurePath": "/articles/:id",
+      "element": "featureElement('/articles/:id', <BlogArticlePage />)"
+    },
+    {
+      "path": "/instructors/:id",
+      "featurePath": "/instructors/:id",
+      "element": "featureElement('/instructors/:id', <Public><InstructorProfilePage /></Public>)"
+    },
+    {
+      "path": "/login",
+      "featurePath": "/login",
+      "element": "featureElement('/login', <LoginPage />)"
+    },
+    {
+      "path": "/register",
+      "featurePath": "/register",
+      "element": "featureElement('/register', <RegisterPage />)"
+    },
+    {
+      "path": "/verify-email",
+      "featurePath": "/verify-email",
+      "element": "featureElement('/verify-email', <VerifyEmailPage />)"
+    },
+    {
+      "path": "/forgot-password",
+      "featurePath": "/forgot-password",
+      "element": "featureElement('/forgot-password', <DemoAccountPage type=\"forgot\" />)"
+    },
+    {
+      "path": "/reset-password",
+      "featurePath": "/reset-password",
+      "element": "featureElement('/reset-password', <DemoAccountPage type=\"reset\" />)"
+    },
+    {
+      "path": "/learn",
+      "featurePath": "/learn",
+      "element": "featureElement('/learn', learner(<LearnerDashboardPage />))"
+    },
+    {
+      "path": "/learn/courses",
+      "featurePath": "/learn/courses",
+      "element": "featureElement('/learn/courses', learner(<MyCoursesPage />))"
+    },
+    {
+      "path": "/learn/redeem",
+      "featurePath": "/learn/redeem",
+      "element": "featureElement('/learn/redeem', learner(<RedeemCourseCodePage />))"
+    },
+    {
+      "path": "/learn/ai",
+      "featurePath": "/learn/ai",
+      "element": "featureElement('/learn/ai', <RolePage roles={['learner', 'instructor']} standalone><React.Suspense fallback={<div style={{ minHeight: '100dvh', display: 'grid', placeItems: 'center' }}>กำลังเปิด Melearn AI…</div>}><LearnerAiPage /></React.Suspense></RolePage>)"
+    },
+    {
+      "path": "/learn/courses/:courseId",
+      "featurePath": "/learn/courses/:courseId",
+      "element": "featureElement('/learn/courses/:courseId', learner(<LearnerCoursePage />))"
+    },
+    {
+      "path": "/learn/courses/:courseId/videos/:itemId",
+      "featurePath": "/learn/courses/:courseId/videos/:itemId",
+      "element": "featureElement('/learn/courses/:courseId/videos/:itemId', learner(<VideoLessonPage />))"
+    },
+    {
+      "path": "/learn/courses/:courseId/articles/:itemId",
+      "featurePath": "/learn/courses/:courseId/articles/:itemId",
+      "element": "featureElement('/learn/courses/:courseId/articles/:itemId', learner(<ArticleLessonPage />))"
+    },
+    {
+      "path": "/learn/courses/:courseId/quizzes/:itemId",
+      "featurePath": "/learn/courses/:courseId/quizzes/:itemId",
+      "element": "featureElement('/learn/courses/:courseId/quizzes/:itemId', learner(<RedirectCourseQuiz />))"
+    },
+    {
+      "path": "/learn/quizzes/:quizId",
+      "featurePath": "/learn/quizzes/:quizId",
+      "element": "featureElement('/learn/quizzes/:quizId', learner(<QuizIntroPage />))"
+    },
+    {
+      "path": "/learn/attempts/:attemptId",
+      "featurePath": "/learn/attempts/:attemptId",
+      "element": "featureElement('/learn/attempts/:attemptId', learner(<QuizAttemptPage />))"
+    },
+    {
+      "path": "/learn/attempts/:attemptId/result",
+      "featurePath": "/learn/attempts/:attemptId/result",
+      "element": "featureElement('/learn/attempts/:attemptId/result', learner(<QuizResultPage />))"
+    },
+    {
+      "path": "/checkout/:courseId",
+      "featurePath": "/checkout/:courseId",
+      "element": "featureElement('/checkout/:courseId', paymentUser(<CheckoutPage />))"
+    },
+    {
+      "path": "/checkout/:orderId/result",
+      "featurePath": "/checkout/:orderId/result",
+      "element": "featureElement('/checkout/:orderId/result', paymentUser(<CheckoutResultPage />))"
+    },
+    {
+      "path": "/account/certificates",
+      "featurePath": "/account/certificates",
+      "element": "featureElement('/account/certificates', accountUser(<CertificatesPage />))"
+    },
+    {
+      "path": "/account/certificates/:certificateId",
+      "featurePath": "/account/certificates/:certificateId",
+      "element": "featureElement('/account/certificates/:certificateId', accountUser(<CertificateDetailPage />))"
+    },
+    {
+      "path": "/account/profile",
+      "featurePath": "/account/profile",
+      "element": "featureElement('/account/profile', accountUser(<ProfilePage />))"
+    },
+    {
+      "path": "/teach",
+      "featurePath": "/teach",
+      "element": "featureElement('/teach', instructor(<InstructorDashboardPage />))"
+    },
+    {
+      "path": "/teach/reviews",
+      "featurePath": "/teach/reviews",
+      "element": "featureElement('/teach/reviews', grader(<LearnerReviewQueuePage />))"
+    },
+    {
+      "path": "/teach/courses",
+      "featurePath": "/teach/courses",
+      "element": "featureElement('/teach/courses', instructor(<InstructorCoursesPage />))"
+    },
+    {
+      "path": "/teach/courses/new",
+      "featurePath": "/teach/courses/new",
+      "element": "featureElement('/teach/courses/new', instructor(<CourseEditorPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId",
+      "featurePath": "/teach/courses/:courseId",
+      "element": "featureElement('/teach/courses/:courseId', instructor(<InstructorCourseOverviewPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/settings",
+      "featurePath": "/teach/courses/:courseId/settings",
+      "element": "featureElement('/teach/courses/:courseId/settings', instructor(<CourseEditorPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/curriculum",
+      "featurePath": "/teach/courses/:courseId/curriculum",
+      "element": "featureElement('/teach/courses/:courseId/curriculum', instructor(<CurriculumPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/chapters/:chapterId",
+      "featurePath": "/teach/courses/:courseId/chapters/:chapterId",
+      "element": "featureElement('/teach/courses/:courseId/chapters/:chapterId', instructor(<ChapterEditorPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/videos/:itemId",
+      "featurePath": "/teach/courses/:courseId/videos/:itemId",
+      "element": "featureElement('/teach/courses/:courseId/videos/:itemId', instructor(<ContentEditorPage type=\"video\" />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/articles/:itemId",
+      "featurePath": "/teach/courses/:courseId/articles/:itemId",
+      "element": "featureElement('/teach/courses/:courseId/articles/:itemId', instructor(<ContentEditorPage type=\"article\" />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/quizzes",
+      "featurePath": "/teach/courses/:courseId/quizzes",
+      "element": "featureElement('/teach/courses/:courseId/quizzes', instructor(<QuizManagerPage />))"
+    },
+    {
+      "path": "/teach/quizzes",
+      "featurePath": "/teach/quizzes",
+      "element": "featureElement('/teach/quizzes', instructor(<QuizManagerPage />))"
+    },
+    {
+      "path": "/teach/quizzes/:quizId",
+      "featurePath": "/teach/quizzes/:quizId",
+      "element": "featureElement('/teach/quizzes/:quizId', instructor(<QuizEditorPage />))"
+    },
+    {
+      "path": "/teach/quizzes/:quizId/attempts",
+      "featurePath": "/teach/quizzes/:quizId/attempts",
+      "element": "featureElement('/teach/quizzes/:quizId/attempts', instructor(<QuizAttemptsPage />))"
+    },
+    {
+      "path": "/teach/attempts/:attemptId/grade",
+      "featurePath": "/teach/attempts/:attemptId/grade",
+      "element": "featureElement('/teach/attempts/:attemptId/grade', grader(<GradeEssayPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/preview",
+      "featurePath": "/teach/courses/:courseId/preview",
+      "element": "featureElement('/teach/courses/:courseId/preview', instructor(<CoursePreviewPage />))"
+    },
+    {
+      "path": "/teach/courses/:courseId/learners",
+      "featurePath": "/teach/courses/:courseId/learners",
+      "element": "featureElement('/teach/courses/:courseId/learners', instructor(<InstructorLearnersPage />))"
+    },
+    {
+      "path": "/teach/learners",
+      "featurePath": "/teach/learners",
+      "element": "featureElement('/teach/learners', instructor(<InstructorLearnersPage />))"
+    },
+    {
+      "path": "/403",
+      "featurePath": null,
+      "element": "<Public><NoAccessPage /></Public>"
+    },
+    {
+      "path": "*",
+      "featurePath": null,
+      "element": "<Public><NotFoundPage /></Public>"
+    }
+  ],
+  "admin": [
+    {
+      "path": "/",
+      "featurePath": null,
+      "element": "<Navigate to=\"/admin\" replace />"
+    },
+    {
+      "path": "/login",
+      "featurePath": null,
+      "element": "<LoginPage audience=\"admin\" />"
+    },
+    {
+      "path": "/verify-email",
+      "featurePath": null,
+      "element": "<VerifyEmailPage />"
+    },
+    {
+      "path": "/forgot-password",
+      "featurePath": null,
+      "element": "<DemoAccountPage type=\"forgot\" />"
+    },
+    {
+      "path": "/reset-password",
+      "featurePath": null,
+      "element": "<DemoAccountPage type=\"reset\" />"
+    },
+    {
+      "path": "/articles/:id",
+      "featurePath": null,
+      "element": "<BlogArticlePage />"
+    },
+    {
+      "path": "/admin",
+      "featurePath": "/admin",
+      "element": "featureElement('/admin', admin(<AdminDashboardPage />))"
+    },
+    {
+      "path": "/admin/articles",
+      "featurePath": "/admin/articles",
+      "element": "featureElement('/admin/articles', admin(<AdminBlogPage />))"
+    },
+    {
+      "path": "/admin/articles/new",
+      "featurePath": "/admin/articles/new",
+      "element": "featureElement('/admin/articles/new', admin(<AdminBlogEditorPage />))"
+    },
+    {
+      "path": "/admin/articles/:id/edit",
+      "featurePath": "/admin/articles/:id/edit",
+      "element": "featureElement('/admin/articles/:id/edit', admin(<AdminBlogEditorPage />))"
+    },
+    {
+      "path": "/admin/users",
+      "featurePath": "/admin/users",
+      "element": "featureElement('/admin/users', admin(<AdminUsersPage />))"
+    },
+    {
+      "path": "/admin/users/:id",
+      "featurePath": "/admin/users/:id",
+      "element": "featureElement('/admin/users/:id', admin(<AdminUserDetailPage />))"
+    },
+    {
+      "path": "/admin/instructors",
+      "featurePath": "/admin/instructors",
+      "element": "featureElement('/admin/instructors', admin(<AdminInstructorsPage />))"
+    },
+    {
+      "path": "/admin/courses",
+      "featurePath": "/admin/courses",
+      "element": "featureElement('/admin/courses', admin(<AdminCoursesPage />))"
+    },
+    {
+      "path": "/admin/courses/reviews",
+      "featurePath": "/admin/courses/reviews",
+      "element": "featureElement('/admin/courses/reviews', admin(<CourseReviewPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId",
+      "featurePath": "/admin/courses/:courseId",
+      "element": "featureElement('/admin/courses/:courseId', admin(<AdminCourseDetailPage />))"
+    },
+    {
+      "path": "/admin/access-codes",
+      "featurePath": "/admin/access-codes",
+      "element": "featureElement('/admin/access-codes', admin(<AccessCodesPage />))"
+    },
+    {
+      "path": "/account/profile",
+      "featurePath": "/account/profile",
+      "element": "featureElement('/account/profile', admin(<ProfilePage />))"
+    },
+    {
+      "path": "/admin/courses/new",
+      "featurePath": "/teach/courses/new",
+      "element": "featureElement('/teach/courses/new', admin(<CourseEditorPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/settings",
+      "featurePath": "/teach/courses/:courseId/settings",
+      "element": "featureElement('/teach/courses/:courseId/settings', admin(<CourseEditorPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/overview",
+      "featurePath": "/teach/courses/:courseId",
+      "element": "featureElement('/teach/courses/:courseId', admin(<InstructorCourseOverviewPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/curriculum",
+      "featurePath": "/teach/courses/:courseId/curriculum",
+      "element": "featureElement('/teach/courses/:courseId/curriculum', admin(<CurriculumPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/chapters/:chapterId",
+      "featurePath": "/teach/courses/:courseId/chapters/:chapterId",
+      "element": "featureElement('/teach/courses/:courseId/chapters/:chapterId', admin(<ChapterEditorPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/videos/:itemId",
+      "featurePath": "/teach/courses/:courseId/videos/:itemId",
+      "element": "featureElement('/teach/courses/:courseId/videos/:itemId', admin(<ContentEditorPage type=\"video\" />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/articles/:itemId",
+      "featurePath": "/teach/courses/:courseId/articles/:itemId",
+      "element": "featureElement('/teach/courses/:courseId/articles/:itemId', admin(<ContentEditorPage type=\"article\" />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/quizzes",
+      "featurePath": "/teach/courses/:courseId/quizzes",
+      "element": "featureElement('/teach/courses/:courseId/quizzes', admin(<QuizManagerPage />))"
+    },
+    {
+      "path": "/admin/quizzes",
+      "featurePath": "/teach/quizzes",
+      "element": "featureElement('/teach/quizzes', admin(<QuizManagerPage />))"
+    },
+    {
+      "path": "/admin/quizzes/:quizId",
+      "featurePath": "/teach/quizzes/:quizId",
+      "element": "featureElement('/teach/quizzes/:quizId', admin(<QuizEditorPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/preview",
+      "featurePath": "/teach/courses/:courseId/preview",
+      "element": "featureElement('/teach/courses/:courseId/preview', admin(<CoursePreviewPage />))"
+    },
+    {
+      "path": "/admin/courses/:courseId/learners",
+      "featurePath": "/teach/courses/:courseId/learners",
+      "element": "featureElement('/teach/courses/:courseId/learners', admin(<InstructorLearnersPage />))"
+    },
+    {
+      "path": "/admin/learners",
+      "featurePath": "/teach/learners",
+      "element": "featureElement('/teach/learners', admin(<InstructorLearnersPage />))"
+    },
+    {
+      "path": "/teach",
+      "featurePath": null,
+      "element": "<LegacyAdminRedirect />"
+    },
+    {
+      "path": "/teach/*",
+      "featurePath": null,
+      "element": "<LegacyAdminRedirect />"
+    },
+    {
+      "path": "/403",
+      "featurePath": null,
+      "element": "<WorkspaceShell availableRoles={['admin']}><NoAccessPage /></WorkspaceShell>"
+    },
+    {
+      "path": "*",
+      "featurePath": null,
+      "element": "<WorkspaceShell availableRoles={['admin']}><NotFoundPage /></WorkspaceShell>"
+    }
+  ]
+}

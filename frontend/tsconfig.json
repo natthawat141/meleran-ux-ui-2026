@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+
+    /* Strictness */
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": false,
+    "types": ["node"],
+
+    /* Path aliases */
+    "paths": {
+      "@melearn/course-authoring": ["./packages/course-authoring/src/index.ts"],
+      "@melearn/contracts": ["./packages/contracts/src/index.ts"],
+      "@melearn/ui": ["./packages/ui/src/index.ts"],
+      "@melearn/api-client": ["./packages/api-client/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*.ts", "packages/**/*.tsx", "tests/**/*.ts", "tools/provisional-api/**/*.ts"]
+}

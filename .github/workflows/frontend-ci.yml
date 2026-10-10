@@ -1,0 +1,67 @@
+name: Fullstack Frontend
+
+on:
+  push:
+    branches: [backend/v1-foundation]
+    paths: [frontend/**, docs/api-contract/**, .github/workflows/frontend-ci.yml]
+  pull_request:
+    paths: [frontend/**, docs/api-contract/**, .github/workflows/frontend-ci.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fullstack-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run contracts:setup
+      - run: npm run contracts:sync -- --check
+      - run: npm run contracts:check
+      - run: npm run tokens:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run check:boundaries
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fullstack-frontend-${{ github.sha }}
+          path: frontend/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  containers:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        app: [web, admin]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: docker build --file apps/${{ matrix.app }}/Dockerfile --tag melearn-${{ matrix.app }}:ci .
+      - run: |
+          node containers/verify-container.mjs --app ${{ matrix.app }} --image melearn-${{ matrix.app }}:ci --port 8080
+          node containers/verify-container.mjs --app ${{ matrix.app }} --image melearn-${{ matrix.app }}:ci --port 8181

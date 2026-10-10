@@ -1,0 +1,13 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { aiApi } from '../api/ai-api';
+import type { ApiSessionUser } from '../../auth/api/auth-session';
+
+export function useAiConversations(search: string) { return useQuery({ queryKey: ['ai', 'conversations', search], queryFn: ({ signal }) => aiApi.conversations(search, signal) }); }
+export function useAiMessages(id: string) { return useQuery({ queryKey: ['ai', 'messages', id], queryFn: ({ signal }) => aiApi.messages(id, signal), enabled: Boolean(id) }); }
+export function useAiUsage() { return useQuery({ queryKey: ['ai', 'usage'], queryFn: ({ signal }) => aiApi.usage(signal) }); }
+export function useAiContextCourses(roles: ApiSessionUser['roles']) { return useQuery({ queryKey: ['ai', 'context-courses', roles], queryFn: ({ signal }) => aiApi.contextCourses(roles, signal) }); }
+export function useCreateAiConversation() { const client = useQueryClient(); return useMutation({ mutationFn: aiApi.createConversation, onSuccess: async () => client.invalidateQueries({ queryKey: ['ai', 'conversations'] }) }); }
+export function useRenameAiConversation() { const client = useQueryClient(); return useMutation({ mutationFn: ({ id, title }: { id: string; title: string }) => aiApi.renameConversation(id, title), onSuccess: async () => client.invalidateQueries({ queryKey: ['ai', 'conversations'] }) }); }
+export function useDeleteAiConversation() { const client = useQueryClient(); return useMutation({ mutationFn: aiApi.deleteConversation, onSuccess: async () => Promise.all([client.invalidateQueries({ queryKey: ['ai', 'conversations'] }), client.invalidateQueries({ queryKey: ['ai', 'messages'] })]) }); }
+export function useSendAiMessage() { const client = useQueryClient(); return useMutation({ mutationFn: ({ id, content, requestId, courseId }: { id: string; content: string; requestId: string; courseId: string | null }) => aiApi.sendMessage(id, content, requestId, courseId), onSuccess: async (_, input) => Promise.all([client.invalidateQueries({ queryKey: ['ai', 'messages', input.id] }), client.invalidateQueries({ queryKey: ['ai', 'conversations'] }), client.invalidateQueries({ queryKey: ['ai', 'usage'] })]) }); }
+export function useAnswerAiPractice() { const client = useQueryClient(); return useMutation({ mutationFn: ({ conversationId, messageId, questionId, optionId }: { conversationId: string; messageId: string; questionId: string; optionId: string }) => aiApi.answerPractice(conversationId, messageId, questionId, optionId), onSuccess: async (_, input) => client.invalidateQueries({ queryKey: ['ai', 'messages', input.conversationId] }) }); }

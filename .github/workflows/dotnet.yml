@@ -1,20 +1,33 @@
-name: Backend foundation
+name: Fullstack Backend
 
 on:
   push:
+    branches: [backend/v1-foundation]
+    paths: [backend/**, docs/api-contract/**, .github/workflows/dotnet.yml]
   pull_request:
+    paths: [backend/**, docs/api-contract/**, .github/workflows/dotnet.yml]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: fullstack-backend-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          global-json-file: global.json
+          global-json-file: backend/global.json
+      - run: ./scripts/sync-account-contract.ps1 -CheckOnly
+        shell: pwsh
       - run: dotnet restore Melearn.slnx --locked-mode
       - run: dotnet build Melearn.slnx --configuration Release --no-restore
       - run: dotnet test Melearn.slnx --configuration Release --no-build --no-restore

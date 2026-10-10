@@ -1,13 +1,11 @@
-# Melearn API working instructions
+# Melearn Tutor fullstack branch
 
-ผู้ใช้ยืนยัน ASP.NET Core .NET 10 และอนุญาต foundation ตาม Clean Architecture + Feature-first วันที่ 10 ต.ค. 2026. อ่าน README และ docs/BACKEND_ARCHITECTURE.md ก่อนแก้. ทำคนเดียวตามคำสั่งล่าสุดที่ยกเลิก subagents.
+คำยืนยันผู้ใช้ล่าสุด: branch `backend/v1-foundation` ใน repo `natthawat141/meleran-tutor` ต้องมี `frontend/` และ `backend/` วางคู่กัน. `main` ยังคงเป็น Frontend รุ่นเดิม. ไม่สร้าง repo แยกและไม่ push Backend ทับ `main`.
 
-Business rules ใช้ workspace ../docs/MELEARN_V1_SCOPE.md Final 1.6 หรือสำเนา Frontend ../melearn-tutor-frontend/docs/MELEARN_V1_SCOPE.md. API Draft canonical อยู่ ../docs/api-contract/openapi.json. อย่าถือว่า frontend mock, DTOs หรือ memory ของสแตกเก่าเป็น database/security/provider implementation.
-
-- รักษา dependency rules และ scope ใน architecture document; Controllers ไม่มี business/SQL/provider code.
-- Auth provider ยืนยัน 10 ต.ค. 2026: Firebase Email/Google และ .NET Username ไม่มี email; อ่าน docs/AUTH_DECISION_TH.md. PostgreSQL 16 Cloud SQL Bangkok ยืนยันและ instance melearn-tutor-db สร้างแล้ว; อ่าน docs/CLOUD_SQL_SETUP_TH.md. EF Core/Npgsql และ local Username/session/Catalog/Free Enrollment implement แล้วตาม docs/FEATURE_DELIVERY_STATUS_TH.md; ยังไม่ apply/ตรวจ live DB หรือเชื่อม Firebase/R2. ไม่เพิ่ม provider/infra ใหม่โดยเดาแทนผู้ใช้.
-- Request/response DTO แยกจาก entities; nullable/required/errors ต้องตรง Contract.
-- OpenRouter model และ API key มาจาก environment/secret configuration เท่านั้น; ห้ามกำหนด default model หรือใส่ Model/ApiKey ใน appsettings*.json. ถ้า model ไม่ได้ตั้ง ห้ามเดาหรือ fallback เป็น paid model.
-- ไม่ deploy, รัน local Docker, สร้าง cloud resources หรือแก้ reference systems โดยอัตโนมัติ.
-- ตรวจ restore/build/test และ scoped diff ก่อน commit. ห้าม blanket git add/reset/force push. ผู้ใช้แก้ความเข้าใจวันที่ 10 ต.ค. 2026: Backend ต้องเป็น branch `backend/v1-foundation` ใน repo เดียวกับ Frontend คือ `natthawat141/meleran-tutor`; ไม่ใช่ repo แยก. Checkout นี้เก็บ ASP.NET code ที่ root ของ branch นั้น และห้าม push Backend ทับ `main` ซึ่งเป็น Frontend. Repo `natthawat141/melearn-tutor-api` ถูกสร้างจากความเข้าใจผิด ไม่ใช่ remote ที่ใช้ต่อ. การ push ไม่ใช่การ deploy Backend.
-- สรุปเป็นภาษาไทย แยก foundation/build/test, business implementation และ production readiness.
+- Business rules: `docs/MELEARN_V1_SCOPE.md` Final 1.6; canonical API: `docs/api-contract/openapi.json`.
+- Frontend: อ่าน `frontend/AGENTS.md`, `frontend/docs/UI_SPEC.md`, `frontend/docs/CODE_SPEC.md` และ checkpoint policy ก่อนแก้.
+- Backend: อ่าน `backend/AGENTS.md` และ architecture document ก่อนแก้.
+- ทำงานคนเดียวตามคำสั่งล่าสุด; พักการเขียน API จนกว่าผู้ใช้สั่งต่อ.
+- ใช้ working directory `frontend/` สำหรับ npm/containers และ `backend/` สำหรับ dotnet.
+- `.github/workflows/` ที่ root คือ CI ของ branch นี้; workflows ภายใน frontend/backend เป็น source snapshot เดิมและ GitHub ไม่เรียกจาก nested directories.
+- รักษา dirty work/secrets ใน checkouts เดิม; stage เฉพาะงานที่ได้รับอนุญาต. ไม่ deploy, รัน local Docker หรือสร้าง cloud resources โดยอัตโนมัติ.

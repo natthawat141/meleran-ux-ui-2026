@@ -1,0 +1,401 @@
+/* Landing palette from the user's blue/cyan/red reference. The hero identifies this page, keeping About and
+   other consumers of landing.css unchanged, including shared team portraits. */
+.home-v3:has(.home-hero) {
+  --home-blue: var(--brand-blue);
+  --home-blue-hover: var(--brand-blue-hover);
+  --home-cyan: var(--brand-cyan);
+  --home-red: var(--brand-red);
+  --home-ink: var(--brand-ink);
+  --home-muted: var(--brand-muted);
+  --home-sky: var(--brand-sky);
+  --home-line: var(--brand-line);
+  --home-soft-sky: var(--brand-soft-sky);
+  --home-bright-sky: var(--brand-bright-sky);
+  --home-shape-blue: var(--home-cyan);
+  --primary-hover: var(--home-blue-hover);
+  background: var(--home-sky);
+  overflow: clip;
+}
+
+.home-v3:has(.home-hero) .ant-btn-primary:not(:disabled):hover {
+  background: var(--home-blue-hover);
+  border-color: var(--home-blue-hover);
+}
+
+.home-v3:has(.home-hero) :is(.home-hero h1 span, .brand-introduction h2 span) {
+  color: var(--home-blue);
+}
+
+.home-v3:has(.home-hero) .ant-btn {
+  border-radius: 999px;
+}
+
+.home-v3:has(.home-hero) .home-hero {
+  background: var(--home-sky);
+}
+
+.home-v3:has(.home-hero) .home-hero-layout {
+  position: relative;
+}
+
+.home-v3:has(.home-hero) .home-hero-layout::before {
+  content: '';
+  position: absolute;
+  top: 9%;
+  right: 18%;
+  width: 72px;
+  height: 48px;
+  background-image: radial-gradient(circle, var(--home-cyan) 2px, transparent 2.5px);
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+
+.home-v3:has(.home-hero) .home-hero::before,
+.home-v3:has(.home-hero) .home-hero::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.home-v3:has(.home-hero) .home-hero::before {
+  width: 49%;
+  height: 83%;
+  right: 3%;
+  top: 8%;
+  border-radius: 48% 52% 44% 56% / 54% 44% 56% 46%;
+  background: var(--home-bright-sky);
+  transform: rotate(-9deg);
+}
+
+.home-v3:has(.home-hero) .home-hero::after {
+  width: 82px;
+  height: 82px;
+  right: 46%;
+  bottom: 12%;
+  border: 15px solid var(--home-cyan);
+  border-radius: 50%;
+}
+
+.home-v3:has(.home-hero) .home-hero-background {
+  inset: 11% 5% 10% auto;
+  width: 43%;
+  overflow: hidden;
+  border-radius: 49% 49% 44% 44% / 46% 46% 54% 54%;
+  z-index: -1;
+  background: var(--home-soft-sky);
+}
+
+.home-v3:has(.home-hero) .home-hero-background img {
+  object-position: 89% center;
+}
+
+.home-v3:has(.home-hero) .home-hero-scrim {
+  inset: 11% 8% auto auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--home-red);
+  z-index: 0;
+}
+
+.home-v3:has(.home-hero) .home-hero-layout {
+  min-height: 640px;
+  padding-block: 70px;
+}
+
+.home-v3:has(.home-hero) .home-hero-copy {
+  width: 46%;
+}
+
+.home-v3:has(.home-hero) .home-hero h1 {
+  font-size: clamp(38px, 4vw, 57px);
+  line-height: 1.4;
+}
+
+.home-v3:has(.home-hero) .home-hero-actions {
+  gap: 18px;
+}
+
+.home-v3:has(.home-hero) .brand-introduction {
+  border-bottom: 0;
+}
+
+.home-v3:has(.home-hero) .brand-team-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: min(1320px, calc(100% - 40px));
+  margin-inline: auto;
+  padding-block: 68px;
+  background-color: #fff;
+  background-image:
+    radial-gradient(circle, var(--home-decoration-blue-24) 2px, transparent 2.5px),
+    radial-gradient(circle, transparent 0 22px, var(--home-red) 23px 26px, transparent 27px);
+  background-repeat: no-repeat;
+  background-position: 25px 22px, right 28px top 22px;
+  background-size: 40px 40px, 66px 66px;
+  border-radius: 48px;
+}
+
+.home-v3:has(.home-hero) .brand-introduction {
+  position: relative;
+}
+
+.home-v3:has(.home-hero) .brand-introduction::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  width: 76px;
+  height: 48px;
+  background-image:
+    radial-gradient(circle, var(--home-decoration-blue-28) 2px, transparent 2.5px),
+    radial-gradient(circle, transparent 0 12px, var(--home-red) 13px 15px, transparent 16px);
+  background-size: 12px 12px, 34px 34px;
+  background-position: 0 0, right top;
+  background-repeat: repeat, no-repeat;
+  pointer-events: none;
+}
+
+.home-v3:has(.home-hero) .brand-introduction > .brand-kicker,
+.home-v3:has(.home-hero) .brand-introduction-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.home-v3:has(.home-hero) .home-teachers {
+  position: relative;
+}
+
+.home-v3:has(.home-hero) .home-teachers::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: 76px;
+  height: 48px;
+  background-image:
+    radial-gradient(circle, var(--home-decoration-blue-28) 2px, transparent 2.5px),
+    radial-gradient(circle, transparent 0 12px, var(--home-red) 13px 15px, transparent 16px);
+  background-size: 12px 12px, 34px 34px;
+  background-position: 0 0, right top;
+  background-repeat: repeat, no-repeat;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .home-v3:has(.home-hero) .home-teachers::before {
+    top: 5px;
+    width: 72px;
+    height: 32px;
+    background-size: 12px 12px, 28px 28px;
+  }
+}
+
+.home-v3:has(.home-hero) .brand-team-layout {
+  display: block;
+  width: calc(100% - 96px);
+  max-width: 1180px;
+}
+
+.home-v3:has(.home-hero) .brand-team-copy {
+  margin: 0 0 34px;
+  text-align: left;
+}
+
+.home-v3:has(.home-hero) .brand-team-copy > p:not(.brand-kicker) {
+  max-width: none;
+  margin: 14px 0 20px;
+}
+
+.home-v3:has(.home-hero) .brand-team-copy .home-text-link {
+  justify-content: flex-start;
+}
+
+.home-v3:has(.home-hero) .brand-team-portraits {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 20px;
+}
+
+.home-v3:has(.home-hero) .brand-team-person {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.home-v3:has(.home-hero) .brand-team-person > a {
+  display: block;
+}
+
+.home-v3:has(.home-hero) .brand-team-person .founder-portrait {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px 14px 0 0;
+}
+
+.home-v3:has(.home-hero) .brand-team-identity {
+  flex: 1;
+  padding: 13px 15px 15px;
+  border-radius: 0 0 14px 14px;
+  background: var(--home-soft-sky);
+}
+
+.home-v3:has(.home-hero) .brand-team-identity h3 { min-height: 3.2em; }
+.home-v3:has(.home-hero) .brand-team-identity p { color: var(--home-muted); }
+
+.home-v3:has(.home-hero) .home-invitation {
+  border-bottom: 0;
+  align-items: center;
+  gap: 60px;
+}
+
+.home-v3:has(.home-hero) .home-invitation-prompts {
+  padding: 30px;
+  background: var(--home-soft-sky);
+  border-radius: 32px;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-nav::before,
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-ink-bar {
+  display: none;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab {
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab + .ant-tabs-tab {
+  margin-left: 8px;
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab-active {
+  background: var(--home-blue);
+}
+
+.home-v3:has(.home-hero) .home-invitation .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #fff;
+}
+
+.home-v3:has(.home-hero) .home-invitation-note {
+  border-left: 0;
+  border-radius: 18px;
+  background: var(--home-soft-sky);
+}
+
+.home-v3:has(.home-hero) .home-guide {
+  background: var(--home-soft-sky);
+  border-radius: 64px 64px 0 0;
+}
+
+.home-v3:has(.home-hero) .home-guide-photo img {
+  border-radius: 45% 45% 26px 26px;
+}
+
+.home-v3:has(.home-hero) .home-step-icon {
+  border: 0;
+  border-radius: 50%;
+  background: var(--home-soft-sky);
+}
+
+.home-v3:has(.home-hero) .home-guide-photo img,
+.home-v3:has(.home-hero) .home-guide-photo .home-photo-fallback {
+  border-bottom: 10px solid var(--home-cyan);
+}
+
+.home-v3:has(.home-hero) .home-course {
+  border-radius: 26px;
+}
+
+.home-v3:has(.home-hero) .home-course-meta > span:first-child {
+  padding: 3px 10px;
+  background: var(--home-soft-sky);
+  color: var(--home-ink);
+  border-radius: 999px;
+}
+
+.home-v3:has(.home-hero) .home-course-meta {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.home-v3:has(.home-hero) .home-newsletter {
+  width: min(1320px, calc(100% - 40px));
+  margin: 0 auto 48px;
+  border: 0;
+  border-radius: 48px;
+}
+
+.home-v3:has(.home-hero) .home-newsletter::after {
+  content: '';
+  position: absolute;
+  top: 24px;
+  right: clamp(14px, 4vw, 52px);
+  width: clamp(42px, 6vw, 68px);
+  aspect-ratio: 1;
+  border: 9px solid var(--home-red);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.home-v3:has(.home-hero) .home-newsletter-form .ant-input {
+  border-radius: 999px;
+}
+
+@media (max-width: 1100px) {
+  .home-v3:has(.home-hero) .home-hero-layout { min-height: 580px; }
+  .home-v3:has(.home-hero) .home-hero h1 { font-size: 40px; }
+  .home-v3:has(.home-hero) .brand-team-layout { width: calc(100% - 64px); }
+  .home-v3:has(.home-hero) .home-invitation { gap: 32px; }
+}
+
+@media (max-width: 700px) {
+  .home-v3:has(.home-hero) .home-hero-layout {
+    min-height: auto;
+    padding-block: 36px 380px;
+    align-items: flex-start;
+  }
+  .home-v3:has(.home-hero) .home-hero-copy { width: 100%; padding: 0; }
+  .home-v3:has(.home-hero) .home-hero h1 { font-size: clamp(33px, 8.5vw, 45px); }
+  .home-v3:has(.home-hero) .home-hero-background {
+    inset: auto 8% 36px auto;
+    width: 80%;
+    height: 310px;
+  }
+  .home-v3:has(.home-hero) .home-hero::before {
+    inset: auto 5% 22px auto;
+    width: 86%;
+    height: 326px;
+  }
+  .home-v3:has(.home-hero) .home-hero::after {
+    right: auto;
+    left: 5%;
+    bottom: 48px;
+    width: 54px;
+    height: 54px;
+    border-width: 10px;
+  }
+  .home-v3:has(.home-hero) .home-hero-scrim { inset: auto 9% 326px auto; width: 19px; height: 19px; }
+  .home-v3:has(.home-hero) .home-intro { max-width: 48ch; font-size: 16px; margin-top: 17px; }
+  .home-v3:has(.home-hero) .home-hero-actions { margin-top: 22px; }
+  .home-v3:has(.home-hero) .brand-team-section { width: calc(100% - 24px); padding-block: 40px; border-radius: 32px; }
+  .home-v3:has(.home-hero) .brand-team-layout { width: calc(100% - 40px); }
+  .home-v3:has(.home-hero) .brand-team-copy { margin-bottom: 26px; }
+  .home-v3:has(.home-hero) .brand-team-portraits { grid-template-columns: 1fr; gap: 18px; }
+  .home-v3:has(.home-hero) .brand-team-person { display: flex; }
+  .home-v3:has(.home-hero) .brand-team-person .founder-portrait { border-radius: 12px 12px 0 0; }
+  .home-v3:has(.home-hero) .brand-team-identity { padding: 12px 14px; border-radius: 0 0 12px 12px; }
+  .home-v3:has(.home-hero) .brand-team-identity h3 { min-height: 0; }
+  .home-v3:has(.home-hero) .home-invitation { gap: 26px; }
+  .home-v3:has(.home-hero) .home-invitation-prompts { padding: 22px 18px; border-radius: 26px; }
+  .home-v3:has(.home-hero) .home-invitation .ant-tabs-tab { padding: 9px 12px; font-size: 14px; }
+  .home-v3:has(.home-hero) .home-guide { border-radius: 36px 36px 0 0; }
+  .home-v3:has(.home-hero) .home-newsletter { width: calc(100% - 24px); margin-bottom: 28px; border-radius: 32px; }
+}

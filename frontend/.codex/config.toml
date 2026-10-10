@@ -1,0 +1,24 @@
+# Melearn project agents. Do not change the parent model or global settings.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+
+[agents.melearn_routes]
+description = "R0 read-only inventory of routes, pages, layouts, imports and Web/Admin dependencies."
+config_file = "agents/melearn_routes.toml"
+
+[agents.melearn_state]
+description = "R0 read-only inventory of store, persistence, types, mocks and data consumers."
+config_file = "agents/melearn_state.toml"
+
+[agents.melearn_scope]
+description = "R0 evidence-based feature inventory against Final 1.6, including non-route actions."
+config_file = "agents/melearn_scope.toml"
+
+[agents.melearn_ui_authoring]
+description = "R0 read-only inventory of shared UI, CSS/theme and actual authoring reuse."
+config_file = "agents/melearn_ui_authoring.toml"
+
+[agents.melearn_complex]
+description = "Independent high-difficulty review or bounded implementation for authorized Melearn work."
+config_file = "agents/melearn_complex.toml"

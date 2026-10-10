@@ -1,0 +1,13 @@
+{
+  "name": "@melearn/course-authoring",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "antd": "^6.6.5",
+    "react": "^19.1.0"
+  }
+}
