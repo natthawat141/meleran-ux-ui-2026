@@ -2,7 +2,7 @@
 
 ASP.NET Core .NET 10 · Clean Architecture + Feature-first / use cases · Backend foundation
 
-Git: private repository [natthawat141/melearn-tutor-api](https://github.com/natthawat141/melearn-tutor-api), branch `backend/v1-foundation`. ผู้ใช้สั่งพักการเขียน API และเก็บ code ขึ้น Git วันที่ 10 ต.ค. 2026; ยังไม่ deploy Backend. `.env`/generated output ไม่ได้ขึ้น Git; shared scope/contract ฉบับหลักยังอยู่ใน workspace sibling `../docs`.
+Git: private repository [natthawat141/melearn-tutor-api](https://github.com/natthawat141/melearn-tutor-api), branch `main` (รวม `backend/v1-foundation` แล้วตามคำสั่งจัด branches). ผู้ใช้สั่งพักการเขียน API และเก็บ code ขึ้น Git วันที่ 10 ต.ค. 2026; ยังไม่ deploy Backend. `.env`/generated output ไม่ได้ขึ้น Git; shared scope/contract ฉบับหลักยังอยู่ใน workspace sibling `../docs`.
 
 เริ่มพัฒนา 10 ตุลาคม 2026 ตามคำสั่งผู้ใช้. มี EF Core/PostgreSQL adapter + migrations และ 13 business operations สำหรับ local Username Auth/Profile, Admin accounts/Instructor assignment และ Catalog/Free Enrollment. ยังไม่ apply Cloud SQL หรือทำ Firebase/provider integrations. Frontend ยังใช้ HTTP mock; ไม่เปลี่ยน base URL ทั้งระบบจน endpoint ที่เกี่ยวข้องพร้อม. [สถานะ feature และวิธีตั้งค่า](docs/FEATURE_DELIVERY_STATUS_TH.md).
 
