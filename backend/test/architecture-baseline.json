@@ -5,8 +5,8 @@
     "reason": "Unchanged prototype writes Account directly; replace through Auth owner when dependent task is unblocked."
   },
   "src/features/management/management.service.ts": {
-    "sha256": "64eef7e3ac3830ba35bebda29e2c37462de4e539027937d7eac1f2b421f8ed6d",
+    "sha256": "8b116da8c093ed0ecc6dfa428af0da615fd6d2bae0b0afa498927c597bafafde",
     "remove_by": "MGMT-01/MGMT-02",
-    "reason": "Unchanged prototype writes Account directly; replace through Auth owner when dependent task is unblocked."
+    "reason": "Remaining prototype Account-create writer only; Instructor assignment removed and owned by Auth public grant facade. Replace creation through Auth under MGMT-01."
   }
 }

@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 276,
+    "database_tests": 294,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,7 +51,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 98,
+    "frontend_client_checks_total": 106,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -64,7 +64,9 @@
     "frontend_own_payment_client_checks": 8,
     "own_attempt_http_postgres_tests": 15,
     "attempt_projection_unit_tests": 6,
-    "frontend_own_attempt_client_checks": 9
+    "frontend_own_attempt_client_checks": 9,
+    "instructor_grant_http_postgres_tests": 18,
+    "frontend_instructor_grant_transport_checks": 8
   },
   "environment": {
     "staging": false,
@@ -252,7 +254,31 @@
         "AUTH-01",
         "MGMT-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "normalized_instructor_grant",
+          "method": "POST",
+          "path": "/admin/users/{id}/instructor",
+          "operationId": "post_admin_users_id_instructor",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 18,
+          "frontend_transport_checks": 8,
+          "protocol_document": "INSTRUCTOR_GRANT_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02 normalized roles",
+            "AUTH-BASE-01 fresh Admin authority"
+          ],
+          "evidence": "Management caller transaction -> Auth public writer; Session -> sorted actor/target Account UPDATE -> fresh normalized Admin -> UserRole. One original PostgreSQL audit and compatibility mirror; exact bounded CurrentUser. Parallel/replay/UTC/role-insert lock wait, opposite Admin conflicts, actual rollback, original identity/learning history verified.",
+          "remaining": [
+            "GET /admin/instructors/query protocol",
+            "Complete Auth/login/provider and normalized account creation",
+            "Actual Admin Management browser gate/A04"
+          ],
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "MGMT-03",
@@ -1455,6 +1481,18 @@
           "browser_acceptance": false,
           "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600"
+        },
+        {
+          "id": "instructor_grant_admin_transport",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 8,
+          "protocol_document": "INSTRUCTOR_GRANT_COMPONENT.md",
+          "evidence": "Unchanged actual Admin resource transport and canonical management decoder -> built Nest/Test PG. Grant/persistence, concurrent replay/reconnect, namespace403/Admin409/unknown404/anonymous401/body422/network failure.",
+          "session_fixture": true,
+          "instructor_directory_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1615,7 +1653,7 @@
     "ci": "PASS",
     "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600",
-    "latest_component_ci": "PASS_OWN_ATTEMPT_CHECKPOINT",
+    "latest_component_ci": "PENDING_INSTRUCTOR_GRANT_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

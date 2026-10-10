@@ -134,49 +134,6 @@ export class ManagementService {
     };
   }
 
-  async assignInstructor(actorId: string, id: string) {
-    const account = await this.prisma.account.findUnique({
-      where: { id },
-    });
-    if (!account) throw ApiException.notFound('ไม่พบบัญชีผู้ใช้');
-
-    const roles = account.roles.split(',');
-    if (roles.includes('admin')) {
-      throw new ApiException('invalid_state', 409, 'บัญชี Admin เป็น Instructor ไม่ได้');
-    }
-
-    let updated = account;
-    if (!roles.includes('instructor')) {
-      const newRoles = Array.from(new Set([...roles, 'instructor'])).join(',');
-      updated = await this.prisma.account.update({
-        where: { id },
-        data: {
-          roles: newRoles,
-          instructorAddedBy: actorId,
-          instructorAddedAt: new Date(),
-          revision: { increment: 1 },
-        },
-      });
-    }
-
-    const authMethods = await this.authService.getAuthMethods(id);
-
-    return {
-      user: {
-        id: updated.id,
-        display_name: updated.displayName,
-        username: updated.username,
-        email: updated.email,
-        email_verified: updated.emailVerified,
-        avatar_url: updated.avatarUrl,
-        roles: updated.roles.split(','),
-        auth_methods: authMethods,
-      },
-      added_by: updated.instructorAddedBy,
-      added_at: updated.instructorAddedAt,
-    };
-  }
-
   async listInstructors(limit = 20, cursor?: string) {
     if (limit < 1 || limit > 50) {
       throw ApiException.validationFailed('Limit ต้องอยู่ระหว่าง 1 ถึง 50');

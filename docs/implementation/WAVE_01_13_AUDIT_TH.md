@@ -1,5 +1,7 @@
 # ตรวจความครบถ้วน Wave 1–13 — 11 ต.ค. 2026
 
+Follow-up: รายงานด้านล่างเป็น snapshot บน b7e60a3 ตาม SHA ที่ระบุ. หลัง audit เพิ่ม [normalized Instructor assignment](INSTRUCTOR_GRANT_COMPONENT.md) ใน Wave 8 แล้ว; ดู EXECUTION_STATUS.md สำหรับ current counts. Source finding ข้อ 3 เรื่อง assignment writer ได้รับการแก้บน path นั้น; Login/creation/list/legacy guard cutover ยังเปิด. ไม่แก้ตัวเลขย้อนหลังของ audit snapshot.
+
 **ยังไม่ครบ:** 44 tasks ใน Wave 1–13 ปิดครบ 7 tasks; 25 NEEDS_DECISION และ 12 BLOCKED. จบทั้ง Wave เฉพาะ 1 และ 2.
 73 defined HTTP operations ในช่วงนี้: 16 ผ่านระดับ component, 9 มี controller เดิมแต่ยังไม่ผ่านการตรวจรับใหม่ และ 48 ยังไม่มี controller. Stripe receiver เป็น deferred operation แยกจาก 73 นี้ และยังไม่ใช่ payment processor.
 

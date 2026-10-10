@@ -1,5 +1,7 @@
 # MGMT-02 — Instructor grant and directory
 
+Execution component 11 ต.ค. 2026: POST /admin/users/{id}/instructor ใช้ fresh normalized Admin + Auth-owned atomic UserRole/audit/compatibility mirror; 18 actual HTTP/PG + 8 actual unchanged Admin resource/decoder checks. ดู [INSTRUCTOR_GRANT_COMPONENT](../INSTRUCTOR_GRANT_COMPONENT.md). Directory/query, full Auth/Management browser และ A04 ยังไม่ครบ; whole task ยังคง BLOCKED.
+
 Status: **BLOCKED** · Priority: P2 · Module: management
 
 รอ dependencies: AUTH-01, MGMT-01

@@ -11,13 +11,17 @@ import {
 } from '@nestjs/common';
 import { ManagementService } from './management.service';
 import { CurrentUser } from '../../shared/auth/current-user.decorator';
-import { Roles } from '../../shared/auth/session.guard';
+import { CurrentPrincipal } from '../../shared/auth/current-user.decorator';
+import { AuthoritativeAudience, Roles } from '../../shared/auth/session.guard';
 import { ApiException } from '../../shared/errors/api-exception';
+import { AuthPrincipal } from '../auth/public/index';
+import { EmptyRequestPipe } from '../../shared/validation/empty-request.pipe';
+import { AssignInstructorService } from './assign-instructor.service';
 
 @Roles('admin')
 @Controller('admin')
 export class ManagementController {
-  constructor(private readonly managementService: ManagementService) {}
+  constructor(private readonly managementService: ManagementService, private readonly instructorGrants: AssignInstructorService) {}
 
   private checkAdminAudience(appHeader?: string) {
     if (appHeader !== 'admin') {
@@ -57,14 +61,14 @@ export class ManagementController {
   }
 
   @Post('users/:id/instructor')
+  @AuthoritativeAudience('admin')
   @HttpCode(HttpStatus.OK)
   async assignInstructor(
-    @CurrentUser() actor: any,
+    @CurrentPrincipal() actor: AuthPrincipal,
     @Param('id') id: string,
-    @Headers('x-melearn-app') appHeader?: string,
+    @Body(new EmptyRequestPipe()) _body: void,
   ) {
-    this.checkAdminAudience(appHeader);
-    return this.managementService.assignInstructor(actor.id, id);
+    return this.instructorGrants.assign(actor.session, id);
   }
 
   @Get('instructors')

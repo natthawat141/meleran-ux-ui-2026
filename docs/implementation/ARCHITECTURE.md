@@ -70,6 +70,7 @@ Admin AI opt into normalized authority; other legacy handlers remain pending
 Auth cutover. See FREE_ENROLL_COMPONENT.md; no transport/provider policy frozen.
 Certificate issuerไม่importLearning/Assessments และไม่มีpublicissueAPI. Identityอ่าน/แก้ผ่านAuthเพื่อไม่เกิด Accounts↔Auth cycle.
 Read joinsข้ามtableอนุญาตเฉพาะprojectionที่ระบุscope/fields; ห้ามcross-module writeผ่านPrismaโดยพลการ.
+MGMT-02 Instructor assignment execution: Management caller transaction invokes Auth public InstructorGrantWriter; Session shared → sorted actor/target Account exclusive locks → fresh normalized Admin authority. Atomic UserRole/original audit/compatibility role mirror replaces legacy assignment; Auth-local bounded CurrentUser projector is shared with self reads. Account-create writer remains a tracked exception; directory/browser/provider prerequisites remain open. See INSTRUCTOR_GRANT_COMPONENT.md.
 Public interfacesรับvalidated inputs/principal/transaction context ไม่รับwire claimsเป็นสิทธิ์.
 
 AI-04 execution component: AI owns feature-local answer Controller/Service/DTO

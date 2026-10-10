@@ -40,6 +40,12 @@ async function main() {
     if (specifier === '@melearn/contracts') return {
       url: pathToFileURL(path.join(frontend, 'packages/contracts/src/index.ts')).href, shortCircuit: true,
     };
+    if (specifier === './client' && context.parentURL?.includes('/apps/admin/src/shared/api/resources.ts')) {
+      const name = new URL(context.parentURL).searchParams.get('learning-actor');
+      if (!globalThis[learningClientSlot].has(name)) throw new Error('Unknown Admin resource fixture client');
+      const source = `export const apiClient=globalThis[${JSON.stringify(learningClientSlot)}].get(${JSON.stringify(name)});`;
+      return { url: 'data:text/javascript,' + encodeURIComponent(source), shortCircuit: true };
+    }
     if (specifier === '../../../shared/api/client' &&
         (context.parentURL?.includes('/features/learning/api/learning-api.ts') ||
          context.parentURL?.includes('/features/learning/api/assessment-api.ts') ||
@@ -518,11 +524,50 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     attemptChecks.push('reconnect-no-grade-completion-or-history-writes');
+    phase = 'frontend-instructor-grant';
+    const instructorGrantChecks = [];
+    const adminResourceFor = async (name, http) => {
+      globalThis[learningClientSlot].set(name, http);
+      const location = pathToFileURL(path.join(frontend, 'apps/admin/src/shared/api/resources.ts'));
+      location.searchParams.set('learning-actor', name); return (await import(location.href)).resource;
+    };
+    const adminResource = await adminResourceFor('grant-admin', adminHttp('admin'));
+    const wrongResource = await adminResourceFor('grant-wrong-app', adminHttp('web'));
+    const anonymousResource = await adminResourceFor('grant-anonymous', createHttpClient({
+      baseUrl: `http://127.0.0.1:${port}/api/v1`, credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'admin' }, fetcher: globalThis.fetch.bind(globalThis),
+    }));
+    const grantPath = 'admin/users/' + encodeURIComponent(learnerId) + '/instructor';
+    const beforeAcademicGrant = await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } });
+    const beforeGrantSessionCount = await db.appSession.count();
+    const grantResult = await adminResource(grantPath, 'POST', {});
+    assert.deepEqual(grantResult.user.roles, ['instructor', 'learner']); assert.equal(grantResult.added_by, adminId);
+    assert.equal(grantResult.user.id, learnerId); assert.equal(grantResult.user.learning_eligible, true);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), beforeAcademicGrant);
+    assert.equal(await db.appSession.count(), beforeGrantSessionCount);
+    instructorGrantChecks.push('actual-admin-resource-and-canonical-decoder-durable-normalized-grant');
+    const beforeRepeat = await db.account.findUniqueOrThrow({ where: { id: learnerId } });
+    await db.$disconnect(); await db.$connect();
+    for (const value of await Promise.all([adminResource(grantPath, 'POST', {}), adminResource(grantPath, 'POST', {})])) assert.deepEqual(value, grantResult);
+    assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), beforeRepeat);
+    assert.equal(await db.userRole.count({ where: { accountId: learnerId, role: 'instructor' } }), 1);
+    instructorGrantChecks.push('concurrent-replay-reconnect-preserves-original-audit');
+    await assert.rejects(wrongResource(grantPath, 'POST', {}), error => error instanceof HttpClientError && error.status === 403);
+    instructorGrantChecks.push('wrong-admin-namespace403');
+    await assert.rejects(adminResource('admin/users/' + encodeURIComponent(adminId) + '/instructor', 'POST', {}), error => error instanceof HttpClientError && error.status === 409);
+    instructorGrantChecks.push('admin-target409');
+    await assert.rejects(adminResource('admin/users/unknown/instructor', 'POST', {}), error => error instanceof HttpClientError && error.status === 404);
+    instructorGrantChecks.push('unknown404');
+    await assert.rejects(anonymousResource(grantPath, 'POST', {}), error => error instanceof HttpClientError && error.status === 401);
+    instructorGrantChecks.push('anonymous401');
+    await assert.rejects(adminResource(grantPath, 'POST', { role: 'admin' }), error => error instanceof HttpClientError && error.status === 422);
+    instructorGrantChecks.push('strict-body422-no-admin-elevation');
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
     logoutChecks.push('anonymous401');
     const beforeLogoutCounts = await counts();
+    const beforeLogoutAccount = await db.account.findUniqueOrThrow({ where: { id: learnerId } });
     const learnerHash = createHash('sha256').update(sessions.learner).digest('hex').toUpperCase();
     const otherSessions = () => db.appSession.findMany({ where: { accountId: { in: [accountId, learnerId, adminId] }, tokenHash: { not: learnerHash } }, orderBy: { tokenHash: 'asc' } });
     const beforeOtherSessions = await otherSessions();
@@ -541,7 +586,7 @@ async function main() {
     assert.deepEqual(await otherSessions(), beforeOtherSessions);
     logoutChecks.push('other-account-and-admin-sessions-unchanged');
     assert.deepEqual(await counts(), beforeLogoutCounts);
-    assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), beforeProfileAccount);
+    assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), beforeLogoutAccount);
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     logoutChecks.push('identity-and-academic-history-preserved');
@@ -564,6 +609,8 @@ async function main() {
     paymentChecks.push('network-failure-without-mock-fallback');
     await assert.rejects(ownAssessments.attempt(attemptFixtures.graded.id), error => error instanceof HttpClientError && error.kind === 'network');
     attemptChecks.push('network-failure-without-mock-fallback');
+    await assert.rejects(adminResource(grantPath, 'POST', {}), error => error instanceof HttpClientError && error.kind === 'network');
+    instructorGrantChecks.push('network-failure-without-mock-fallback');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -627,6 +674,9 @@ async function main() {
       attemptMutationGate: false, loginProviderGate: false, fullFeatureGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
+    result.instructorGrant = { component: 'MGMT-02 grant', checks: instructorGrantChecks.length, checkNames: instructorGrantChecks,
+      unchangedAdminResourceAndDecoder: true, normalizedRolesAndAudit: true, originalAcademicHistory: true,
+      sessionFixture: true, instructorDirectoryGate: false, loginProviderGate: false, browserAcceptance: false, fullFeatureGate: false };
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
