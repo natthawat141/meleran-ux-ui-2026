@@ -420,7 +420,9 @@
           "resume_projection_update": {
             "protocol_document": "RESUME_PERSISTENCE_COMPONENT.md",
             "evidence": "Owner UTC saved time/private order supersedes Progress.updatedAt-only selection for new rows; legacy fallback retained; internal order never serialized.",
-            "postgres_tests_shared": 8
+            "postgres_tests_shared": 8,
+            "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
+            "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
           }
         },
         {
@@ -452,7 +454,9 @@
           "resume_projection_update": {
             "protocol_document": "RESUME_PERSISTENCE_COMPONENT.md",
             "evidence": "Owner UTC saved time/private order supersedes Progress.updatedAt-only selection for new rows; legacy fallback retained; internal order never serialized.",
-            "postgres_tests_shared": 8
+            "postgres_tests_shared": 8,
+            "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
+            "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
           }
         }
       ]
@@ -487,7 +491,9 @@
             "Complete command / COMPLETION-01 D06",
             "Full Auth/authoring and browser G-LEARNING"
           ],
-          "full_acceptance": false
+          "full_acceptance": false,
+          "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
         }
       ]
     },
@@ -958,7 +964,9 @@
           "full_feature_gate": false,
           "verified_sha": "c134b168f952b1231712dbe3d8300e88fe0370be",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295",
-          "resume_writer_integration": "Actual built internal ResumeWriter with owned locks/fixtures -> Test PG -> built Nest -> unchanged frontend decoder; public Resume mutation gate remains pending."
+          "resume_writer_integration": "Actual built internal ResumeWriter with owned locks/fixtures -> Test PG -> built Nest -> unchanged frontend decoder; public Resume mutation gate remains pending.",
+          "resume_writer_integration_verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
+          "resume_writer_integration_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
         }
       ]
     },
@@ -1080,9 +1088,9 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "c134b168f952b1231712dbe3d8300e88fe0370be",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38082286295",
-    "latest_component_ci": "PENDING_RESUME_PERSISTENCE_CHECKPOINT",
+    "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295",
+    "latest_component_ci": "PASS_RESUME_PERSISTENCE_AND_STRIPE_RECEIVER_REGRESSION",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
