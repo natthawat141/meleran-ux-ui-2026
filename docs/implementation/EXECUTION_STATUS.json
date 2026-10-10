@@ -818,5 +818,11 @@
     "D11",
     "D12",
     "D16"
-  ]
+  ],
+  "scope_fingerprint": {
+    "canonical_root_sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680",
+    "fullstack_lf_sha256": "179c104ac0780d127e48a0dc2536d5cf659d7a9161da76217ae30a70264b60d8",
+    "newline_normalization": "LF",
+    "normalized_content_match": true
+  }
 }

@@ -186,6 +186,14 @@ Leadเตรียมdecisionเฉพาะfeature → user/backend/frontendow
 
 ## Source fingerprint
 
+ตารางนี้เก็บ byte fingerprints ของ canonical workspace ตอนสร้าง planning
+baseline. Fullstack Git snapshot ใช้ LF จึงมี Scope byte SHA256
+179c104ac0780d127e48a0dc2536d5cf659d7a9161da76217ae30a70264b60d8;
+canonical root Scope ใช้ CRLF และยังตรง bb349f08... ในตาราง. ตรวจแล้วว่า
+เนื้อหาเท่ากันเมื่อ normalize newline เป็น LF; ไม่มี business rule เปลี่ยน.
+OpenAPI byte hash ตรงกันทั้งสอง checkout โดยไม่ normalize. Current execution
+fingerprints อยู่ EXECUTION_STATUS.json; ไม่ rewrite historical matrix baseline.
+
 | Source | SHA-256 |
 | --- | --- |
 | docs/MELEARN_V1_SCOPE.md | bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680 |
