@@ -45,6 +45,7 @@ async function main() {
          context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts') ||
          context.parentURL?.includes('/features/certificate/api/certificate-api.ts') ||
          context.parentURL?.includes('/features/ai/api/ai-api.ts') ||
+         context.parentURL?.includes('/features/payment/api/payment-api.ts') ||
          context.parentURL?.includes('/features/auth/api/auth-session.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
       // endpoint builders/decoders and the real transport/fetch implementation.
@@ -424,6 +425,68 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     profileChecks.push('read-only-identity-session-and-academic-persistence');
+    phase = 'frontend-owned-payment-status';
+    const paymentChecks = [];
+    const paymentApiFor = async name => (await import(pathToFileURL(path.join(frontend,
+      'apps/web/src/features/payment/api/payment-api.ts')).href + '?learning-actor=' + name)).paymentApi;
+    const ownPayments = await paymentApiFor('certificate-owner');
+    const paymentFixtures = {};
+    for (const kind of ['pending', 'failed', 'granted']) paymentFixtures[kind] = await db.payment.create({ data: {
+      accountId: learnerId, courseId: ids.published, requestId: tag + kind, amountMinor: 12300, payloadHash: 'PRIVATE_PAYMENT_PROOF',
+      status: kind === 'pending' ? 'pending' : 'succeeded', paidAt: kind === 'pending' ? null : new Date(),
+      fulfillmentStatus: kind === 'pending' ? 'pending' : kind, enrollmentId: kind === 'granted' ? firstGrant.id : null,
+    } });
+    const paymentRows = () => db.payment.findMany({ where: { accountId: learnerId }, orderBy: { id: 'asc' } });
+    const beforePaymentCounts = await counts(), beforePaymentRows = await paymentRows();
+    const pendingPayment = await ownPayments.status(paymentFixtures.pending.id);
+    assert.deepEqual(pendingPayment, { payment_id: paymentFixtures.pending.id, course_id: ids.published,
+      status: 'pending', fulfillment_status: 'pending', enrollment: null });
+    paymentChecks.push('canonical-pending-without-inferred-existing-enrollment');
+    const failedGrant = await ownPayments.status(paymentFixtures.failed.id);
+    assert.equal(failedGrant.status, 'succeeded'); assert.equal(failedGrant.fulfillment_status, 'failed'); assert.equal(failedGrant.enrollment, null);
+    paymentChecks.push('succeeded-money-failed-fulfillment-without-retry');
+    assert.deepEqual((await ownPayments.status(paymentFixtures.granted.id)).enrollment, firstGrant);
+    paymentChecks.push('linked-lifetime-enrollment-original-source');
+    await assert.rejects((await paymentApiFor('certificate-foreign')).status(paymentFixtures.pending.id), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects((await paymentApiFor('certificate-admin')).status(paymentFixtures.pending.id), error => error instanceof HttpClientError && error.status === 404);
+    paymentChecks.push('foreign-instructor-and-admin404');
+    await assert.rejects((await paymentApiFor('certificate-guest')).status(paymentFixtures.pending.id), error => error instanceof HttpClientError && error.status === 401);
+    paymentChecks.push('anonymous401');
+    await assert.rejects(ownPayments.status(randomUUID()), error => error instanceof HttpClientError && error.status === 404);
+    paymentChecks.push('unknown404');
+    await db.$disconnect(); await db.$connect();
+    assert.deepEqual(await ownPayments.status(paymentFixtures.pending.id), pendingPayment);
+    assert.deepEqual(await counts(), beforePaymentCounts); assert.deepEqual(await paymentRows(), beforePaymentRows);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    paymentChecks.push('reconnect-and-polls-preserve-money-and-academic-history');
+    phase = 'frontend-current-session-logout';
+    const logoutChecks = [];
+    await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
+    logoutChecks.push('anonymous401');
+    const beforeLogoutCounts = await counts();
+    const learnerHash = createHash('sha256').update(sessions.learner).digest('hex').toUpperCase();
+    const otherSessions = () => db.appSession.findMany({ where: { accountId: { in: [accountId, learnerId, adminId] }, tokenHash: { not: learnerHash } }, orderBy: { tokenHash: 'asc' } });
+    const beforeOtherSessions = await otherSessions();
+    assert.equal(await ownAuth.logout(), undefined);
+    logoutChecks.push('unchanged-logout-client-bodyless204');
+    assert.ok((await db.appSession.findUniqueOrThrow({ where: { tokenHash: learnerHash } })).revokedAt);
+    await db.$disconnect(); await db.$connect();
+    await assert.rejects(ownAuth.me(), error => error instanceof HttpClientError && error.status === 401);
+    logoutChecks.push('durable-revocation-reconnect-me401');
+    const revokedSession = await db.appSession.findUniqueOrThrow({ where: { tokenHash: learnerHash } });
+    await assert.rejects(ownAuth.logout(), error => error instanceof HttpClientError && error.status === 401);
+    assert.deepEqual(await db.appSession.findUniqueOrThrow({ where: { tokenHash: learnerHash } }), revokedSession);
+    logoutChecks.push('replay401-without-timestamp-change');
+    assert.equal((await (await authApiFor('certificate-admin')).me()).id, adminId);
+    assert.equal((await (await authApiFor('certificate-foreign')).me()).id, accountId);
+    assert.deepEqual(await otherSessions(), beforeOtherSessions);
+    logoutChecks.push('other-account-and-admin-sessions-unchanged');
+    assert.deepEqual(await counts(), beforeLogoutCounts);
+    assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), beforeProfileAccount);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    logoutChecks.push('identity-and-academic-history-preserved');
     // Anonymous enroll used the same public fetcher; the final network read
     // brings that fetcher's request count to seven (six Catalog checks + one).
     await stop();
@@ -437,6 +500,10 @@ async function main() {
     await assert.rejects(ownAi.renameConversation(practiceConversation.id, 'offline'), error => error instanceof HttpClientError && error.kind === 'network');
     await assert.rejects(ownAuth.me(), error => error instanceof HttpClientError && error.kind === 'network');
     profileChecks.push('network-failure-without-mock-fallback');
+    await assert.rejects(ownAuth.logout(), error => error instanceof HttpClientError && error.kind === 'network');
+    logoutChecks.push('network-failure-without-mock-fallback');
+    await assert.rejects(ownPayments.status(paymentFixtures.pending.id), error => error instanceof HttpClientError && error.kind === 'network');
+    paymentChecks.push('network-failure-without-mock-fallback');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -486,6 +553,14 @@ async function main() {
       exactNullableOwnerProjection: true, savedFixtureReconnect: true, publicProfileWhitelist: true,
       corruptStorageSafe500: true, noReadWrites: true, networkFailure: true,
       profileMutationGate: false, loginProviderGate: false, browserAcceptance: false };
+    result.logout = { component: 'AUTH-01 current session logout', checks: logoutChecks.length, checkNames: logoutChecks,
+      unchangedFrontendApi: true, actualNestAndPostgres: true, sessionFixture: true,
+      durableSingleSessionRevocation: true, academicHistoryPreserved: true,
+      cookieBrowserGate: false, loginProviderGate: false, fullFeatureGate: false, browserAcceptance: false };
+    result.ownPaymentStatus = { component: 'PAY-01 own status read', checks: paymentChecks.length, checkNames: paymentChecks,
+      unchangedFrontendApiAndDecoder: true, actualNestAndPostgres: true, storedFinancialFixtures: true,
+      noChargeOrGrant: true, noReadWrites: true, checkoutProviderGate: false,
+      loginProviderGate: false, fullFeatureGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
@@ -493,6 +568,9 @@ async function main() {
   } finally {
     await stop();
     const ownedAccounts = [accountId, learnerId, adminId].filter(Boolean);
+    const ownedPayments = await db.payment.findMany({ where: { accountId: { in: ownedAccounts } }, select: { id: true } });
+    await db.paymentEvent.deleteMany({ where: { paymentId: { in: ownedPayments.map(row => row.id) } } });
+    await db.payment.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.aIPractice.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.aIRequest.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.aIMessage.deleteMany({ where: { accountId: { in: ownedAccounts } } });

@@ -10,12 +10,15 @@ import {
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dto/login-request.dto';
-import { Public } from '../../shared/auth/session.guard';
-import { CurrentSession } from '../../shared/auth/current-user.decorator';
+import { Public, AuthoritativeAudience } from '../../shared/auth/session.guard';
+import { CurrentPrincipal } from '../../shared/auth/current-user.decorator';
+import { AuthPrincipal } from './public/principal.service';
+import { EmptyRequestPipe } from '../../shared/validation/empty-request.pipe';
+import { LogoutService } from './logout.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly logoutService: LogoutService) {}
 
   @Public()
   @Post('login')
@@ -43,16 +46,15 @@ export class AuthController {
   }
 
   @Post('logout')
+  @AuthoritativeAudience('web', 'admin')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(
-    @CurrentSession() session: any,
+    @CurrentPrincipal() actor: AuthPrincipal,
+    @Body(new EmptyRequestPipe()) _body: void,
     @Res({ passthrough: true }) response: Response,
   ) {
-    if (session) {
-      await this.authService.logout(session.tokenHash);
-      response.clearCookie(`melearn_${session.audience}_session`, {
-        path: '/api/v1',
-      });
-    }
+    await this.logoutService.logout(actor.session);
+    // Retain the existing cookie name/path; broader transport policy is D01.
+    response.clearCookie(`melearn_${actor.session.audience}_session`, { path: '/api/v1' });
   }
 }

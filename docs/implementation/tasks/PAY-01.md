@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: payments
 
 ต้องปิด D08, D10
 
+Implemented subset: owned historical `GET /me/payments/{id}` คืน canonical WirePaymentView แบบ read-only, linked Enrollment/source เดิม; 16 HTTP/PG tests + 8 unchanged client checks. อ่าน [component checkpoint](../LOGOUT_PAYMENT_COMPONENTS.md). Checkout/event processing/provider gate ยังค้าง; 113 business acceptance ไม่ได้ผ่านจาก stored fixtures.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

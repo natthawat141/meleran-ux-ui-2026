@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P0 · Module: auth
 
 ต้องปิด D01, D02, D03
 
+Implemented subset: current-session `POST /auth/logout` ใช้ authoritative normalized identity, transaction/rollback และ isolated audience; 14 HTTP/PG tests + 7 unchanged client checks. อ่าน [component checkpoint](../LOGOUT_PAYMENT_COMPONENTS.md). Login/provider/browser transport ยังค้าง; ห้ามปิด whole task จาก Logout เพียง operation เดียว.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 231,
+    "database_tests": 261,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,13 +51,17 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 74,
+    "frontend_client_checks_total": 89,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
     "frontend_ai_rename_client_checks": 7,
     "self_profile_http_postgres_tests": 14,
-    "frontend_self_profile_client_checks": 8
+    "frontend_self_profile_client_checks": 8,
+    "logout_http_postgres_tests": 14,
+    "own_payment_read_http_postgres_tests": 16,
+    "frontend_logout_client_checks": 7,
+    "frontend_own_payment_client_checks": 8
   },
   "environment": {
     "staging": false,
@@ -125,6 +129,31 @@
         "D01",
         "D02",
         "D03"
+      ],
+      "components": [
+        {
+          "id": "current_session_logout",
+          "method": "POST",
+          "path": "/auth/logout",
+          "operationId": "post_auth_logout",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 14,
+          "frontend_client_checks": 7,
+          "protocol_document": "LOGOUT_PAYMENT_COMPONENTS.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01",
+            "DB-02",
+            "AUTH-BASE-01 fresh self authority"
+          ],
+          "evidence": "Exclusive current Session -> fresh account/normalized roles; DB-time revocation, commit before expiring selected cookie. Real parallel204/401, other audience/device isolation, post-guard revoke, SQL rollback and pg_blocking_pids lock wait.",
+          "remaining": [
+            "Login/D01/D02/D03",
+            "Provider credentials/recovery",
+            "Browser cookie/Origin gate"
+          ],
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -677,6 +706,30 @@
       "decision_ids": [
         "D08",
         "D10"
+      ],
+      "components": [
+        {
+          "id": "own_payment_status",
+          "method": "GET",
+          "path": "/me/payments/{id}",
+          "operationId": "get_me_payments_id",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 16,
+          "frontend_client_checks": 8,
+          "protocol_document": "LOGOUT_PAYMENT_COMPONENTS.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-04",
+            "AUTH-BASE-01 fresh self authority"
+          ],
+          "evidence": "Owned historical bounded WirePaymentView; independent money/fulfillment, actual linked original enrollment source, foreign404, no charge/grant/provider calls. Six stored statuses, SQL500, reconnect/parallel no writes and real Payment writer lock wait.",
+          "remaining": [
+            "Checkout/D08/D10",
+            "Financial event processing/fulfillment and actual Stripe tests",
+            "Login/provider/browser feature gate"
+          ],
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1325,6 +1378,28 @@
           "full_feature_gate": false,
           "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871"
+        },
+        {
+          "id": "logout_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "protocol_document": "LOGOUT_PAYMENT_COMPONENTS.md",
+          "evidence": "Unchanged authSessionApi.logout -> built Nest/Test PG; named bodyless204, durable revoke/me401, replay401, other sessions, history/no leaks, network failure checks.",
+          "session_fixture": true,
+          "full_feature_gate": false,
+          "browser_acceptance": false
+        },
+        {
+          "id": "own_payment_frontend_client",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 8,
+          "protocol_document": "LOGOUT_PAYMENT_COMPONENTS.md",
+          "evidence": "Unchanged paymentApi.status/decoder -> built Nest/Test PG; actual stored pending, failed grant, linked original enrollment, foreign/unknown404, anonymous401, reconnect/read-only history, network failure.",
+          "session_fixture": true,
+          "stored_financial_fixtures": true,
+          "provider_checkout_gate": false,
+          "full_feature_gate": false,
+          "browser_acceptance": false
         }
       ]
     },
@@ -1482,10 +1557,10 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_LOGOUT_PAYMENT_CHECKPOINT",
     "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871",
-    "latest_component_ci": "PASS_SELF_PROFILE_CHECKPOINT",
+    "latest_component_ci": "PENDING_LOGOUT_PAYMENT_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

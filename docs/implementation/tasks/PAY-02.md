@@ -4,6 +4,8 @@ Status: **BLOCKED** · Priority: P1 · Module: payments
 
 รอ dependencies: PAY-01
 
+Contract conflict found 11 ต.ค. 2026: `WireAdminPayment.checkout_session_id` required string ขัดกับ valid DB Checkout intent ที่ยังมี null; events `outcome` ยังไม่มี mapping ที่ยืนยันจาก receipt processing state. Proposed required-nullable + explicit event outcome protocol ต้อง approved canonical delta ก่อน implement; ห้าม invent empty ID/fulfilled outcome. อ่าน [component checkpoint](../LOGOUT_PAYMENT_COMPONENTS.md).
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

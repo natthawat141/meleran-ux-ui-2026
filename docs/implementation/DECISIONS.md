@@ -213,3 +213,5 @@ Internal entitlement writer and one-attempt score math implement confirmed facts
 only; they do not close Auth/source proofs, D06 or whole feature gates.
 
 [Next decision packet](NEXT_DECISIONS_TH.md) holds concrete Proposed A/B/C choices; none is silently approved. COMPLETION-01 depends on DB-03 and D06 because its own acceptance requires best result selection. Physical batches are reviewed/applied only to melearn_test; D14 review is per batch and does not resolve business policy.
+
+Execution conflict PAY-02 (11 ต.ค.): required string `WireAdminPayment.checkout_session_id` excludes valid pre-provider intent with null; event `outcome` has no approved interpretation of stored receipt processing state. Proposed required-nullable + explicit D08 outcome mapping awaits contract approval. Own Payment read is independent and implemented; never invent empty Checkout ID or infer fulfilled from processed. Evidence: [LOGOUT_PAYMENT_COMPONENTS](LOGOUT_PAYMENT_COMPONENTS.md).
