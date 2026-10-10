@@ -42,6 +42,7 @@ async function main() {
     };
     if (specifier === '../../../shared/api/client' &&
         (context.parentURL?.includes('/features/learning/api/learning-api.ts') ||
+         context.parentURL?.includes('/features/learning/api/assessment-api.ts') ||
          context.parentURL?.includes('/features/redeem/api/redeem-admin-api.ts') ||
          context.parentURL?.includes('/features/certificate/api/certificate-api.ts') ||
          context.parentURL?.includes('/features/ai/api/ai-api.ts') ||
@@ -460,6 +461,63 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     paymentChecks.push('reconnect-and-polls-preserve-money-and-academic-history');
+    phase = 'frontend-own-attempt-detail';
+    const attemptChecks = [];
+    const adminWebSecret = randomUUID();
+    await db.appSession.create({ data: { accountId: adminId, audience: 'web', expiresAt: new Date(Date.now() + 3600000),
+      tokenHash: createHash('sha256').update(adminWebSecret).digest('hex').toUpperCase() } });
+    globalThis[learningClientSlot].set('attempt-admin-web', createHttpClient({ baseUrl: `http://127.0.0.1:${port}/api/v1`,
+      fetcher: globalThis.fetch.bind(globalThis), credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'web', Cookie: `melearn_web_session=${adminWebSecret}` } }));
+    const assessmentApiFor = async name => (await import(pathToFileURL(path.join(frontend,
+      'apps/web/src/features/learning/api/assessment-api.ts')).href + '?learning-actor=' + name)).assessmentApi;
+    const ownAssessments = await assessmentApiFor('certificate-owner'), attemptFixtures = {};
+    for (const [index, status] of ['in_progress', 'pending_review', 'graded', 'bad'].entries()) {
+      const graded = status === 'graded';
+      const attempt = await db.quizAttempt.create({ data: { enrollmentId: firstGrant.id, quizId: quiz.id, courseId: ids.published,
+        number: index + 1, status: status === 'bad' ? 'in_progress' : status, maxScore: 10,
+        definitionSnapshot: { item_id: quizItem.id, correct_key: 'PRIVATE_ATTEMPT_KEY' },
+        submittedAt: status === 'pending_review' || graded ? new Date() : null, gradedAt: graded ? new Date() : null,
+        earnedScore: graded ? 8 : null, passed: graded ? true : null,
+        snapshotQuestions: { create: { questionId: 'historical_question', position: 0, type: 'essay', maxScore: 10,
+          payloadSnapshot: { prompt: status === 'bad' ? false : 'คำถามจากชุดเดิม', options: [], correct_key: 'PRIVATE_ATTEMPT_KEY' } } } } });
+      attemptFixtures[status] = attempt;
+      await db.answer.create({ data: { attemptId: attempt.id, questionId: 'historical_question', response: { text: 'คำตอบเดิม', private: 'PRIVATE_ANSWER' },
+        score: graded ? 8 : null, comment: graded ? 'ความคิดเห็นจากผู้สอน' : null, gradedAt: graded ? new Date() : null, gradedBy: graded ? accountId : null } });
+    }
+    const attemptRows = () => Promise.all([
+      db.quizAttempt.findMany({ where: { enrollmentId: firstGrant.id }, orderBy: { id: 'asc' } }),
+      db.answer.findMany({ where: { attemptId: { in: Object.values(attemptFixtures).map(row => row.id) } }, orderBy: { id: 'asc' } }),
+    ]);
+    const beforeAttemptRows = await attemptRows(), beforeAttemptCounts = await counts();
+    const openAttempt = await ownAssessments.attempt(attemptFixtures.in_progress.id);
+    assert.equal(openAttempt.item_id, quizItem.id); assert.equal(openAttempt.status, 'in_progress');
+    assert.equal(openAttempt.earned, null); assert.equal(openAttempt.percent, null); assert.equal(openAttempt.passed, null); assert.equal(openAttempt.question_results, null);
+    attemptChecks.push('open-snapshot-canonical-nullable-result');
+    const pendingAttempt = await ownAssessments.attempt(attemptFixtures.pending_review.id);
+    assert.equal(pendingAttempt.status, 'pending_review'); assert.equal(pendingAttempt.passed, null); assert.equal(pendingAttempt.question_results, null);
+    attemptChecks.push('pending-does-not-publish-a-final-score');
+    const gradedAttempt = await ownAssessments.attempt(attemptFixtures.graded.id);
+    assert.equal(gradedAttempt.max, 10); assert.equal(gradedAttempt.earned, 8); assert.equal(gradedAttempt.percent, 80); assert.equal(gradedAttempt.passed, true);
+    assert.deepEqual(gradedAttempt.answers, { historical_question: { text: 'คำตอบเดิม' } });
+    assert.deepEqual(gradedAttempt.question_results, [{ question_id: 'historical_question', score: 8, max: 10, comment: 'ความคิดเห็นจากผู้สอน' }]);
+    assert.equal(JSON.stringify(gradedAttempt).includes('PRIVATE_'), false);
+    attemptChecks.push('graded-owned-original-snapshot-feedback-no-private-keys');
+    for (const name of ['certificate-foreign', 'attempt-admin-web']) await assert.rejects((await assessmentApiFor(name)).attempt(attemptFixtures.graded.id), error => error instanceof HttpClientError && error.status === 404);
+    await assert.rejects((await assessmentApiFor('certificate-admin')).attempt(attemptFixtures.graded.id), error => error instanceof HttpClientError && error.status === 401);
+    attemptChecks.push('foreign-instructor-admin404');
+    await assert.rejects((await assessmentApiFor('certificate-guest')).attempt(attemptFixtures.graded.id), error => error instanceof HttpClientError && error.status === 401);
+    attemptChecks.push('anonymous401');
+    await assert.rejects(ownAssessments.attempt(randomUUID()), error => error instanceof HttpClientError && error.status === 404);
+    attemptChecks.push('unknown404');
+    await assert.rejects(ownAssessments.attempt(attemptFixtures.bad.id), error => error instanceof HttpClientError && error.status === 500);
+    assert.deepEqual(await attemptRows(), beforeAttemptRows);
+    attemptChecks.push('invalid-stored-snapshot-safe500-no-repair');
+    await db.$disconnect(); await db.$connect(); assert.deepEqual(await ownAssessments.attempt(attemptFixtures.graded.id), gradedAttempt);
+    assert.deepEqual(await attemptRows(), beforeAttemptRows); assert.deepEqual(await counts(), beforeAttemptCounts);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    attemptChecks.push('reconnect-no-grade-completion-or-history-writes');
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -504,6 +562,8 @@ async function main() {
     logoutChecks.push('network-failure-without-mock-fallback');
     await assert.rejects(ownPayments.status(paymentFixtures.pending.id), error => error instanceof HttpClientError && error.kind === 'network');
     paymentChecks.push('network-failure-without-mock-fallback');
+    await assert.rejects(ownAssessments.attempt(attemptFixtures.graded.id), error => error instanceof HttpClientError && error.kind === 'network');
+    attemptChecks.push('network-failure-without-mock-fallback');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -561,6 +621,10 @@ async function main() {
       unchangedFrontendApiAndDecoder: true, actualNestAndPostgres: true, storedFinancialFixtures: true,
       noChargeOrGrant: true, noReadWrites: true, checkoutProviderGate: false,
       loginProviderGate: false, fullFeatureGate: false, browserAcceptance: false };
+    result.attemptRead = { component: 'ASSESS-02 single owned attempt read', checks: attemptChecks.length, checkNames: attemptChecks,
+      unchangedFrontendApiAndDecoder: true, actualNestAndPostgres: true, storedAcademicFixtures: true,
+      noGradeOrComplete: true, noReadWrites: true, bestResultSelectionGate: false,
+      attemptMutationGate: false, loginProviderGate: false, fullFeatureGate: false, browserAcceptance: false };
     const directory = path.resolve(process.env.EXECUTION_ARTIFACT_DIR || path.join(root, '../artifacts/nest-execution'));
     fs.mkdirSync(directory, { recursive: true });
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
@@ -568,6 +632,11 @@ async function main() {
   } finally {
     await stop();
     const ownedAccounts = [accountId, learnerId, adminId].filter(Boolean);
+    const ownedAttempts = await db.quizAttempt.findMany({ where: { enrollment: { accountId: { in: ownedAccounts } } }, select: { id: true } });
+    const ownedAttemptIds = ownedAttempts.map(row => row.id);
+    await db.answer.deleteMany({ where: { attemptId: { in: ownedAttemptIds } } });
+    await db.attemptQuestion.deleteMany({ where: { attemptId: { in: ownedAttemptIds } } });
+    await db.quizAttempt.deleteMany({ where: { id: { in: ownedAttemptIds } } });
     const ownedPayments = await db.payment.findMany({ where: { accountId: { in: ownedAccounts } }, select: { id: true } });
     await db.paymentEvent.deleteMany({ where: { paymentId: { in: ownedPayments.map(row => row.id) } } });
     await db.payment.deleteMany({ where: { accountId: { in: ownedAccounts } } });

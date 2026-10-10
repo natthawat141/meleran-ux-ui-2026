@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: assessments
 
 ต้องปิด D06
 
+Execution component 11 ต.ค.: `GET /learn/attempts/{id}` implemented bounded owned historical projection; 6 units + 15 actual HTTP/PG tests + 9 unchanged client checks. อ่าน [ATTEMPT_READ_COMPONENT](../ATTEMPT_READ_COMPONENT.md). Best-result endpoint/D06 ยังไม่ implement; stored Submitted vs canonical three-state conflict/normalized snapshot writer is explicit. Whole task ไม่ DONE; no original acceptance marked accepted.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

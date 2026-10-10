@@ -205,6 +205,8 @@ fingerprints อยู่ EXECUTION_STATUS.json; ไม่ rewrite historical ma
 
 ## Execution review 2026-10-11
 
+ASSESS-02 single-attempt review: Scope/DB Submitted state is absent from canonical WireAttemptView.status. No silent mapping; stored Submitted fails closed. Proposed future Submit transaction makes this an uncommitted intermediate before graded/pending_review; exposing committed Submitted requires approved canonical change. D10 and full ASSESS-01 remain open; single canonical-state self read is independently verified. Details: [ATTEMPT_READ_COMPONENT](ATTEMPT_READ_COMPONENT.md).
+
 Blog projection/authoring subreview D05/D16: [CONTRACT_STORAGE_GAPS](CONTRACT_STORAGE_GAPS.md)
 records missing plain content/category/reading_minutes and JSON null/omitted mapping.
 No server reading-time formula or category default is inferred. CATALOG-02 detail

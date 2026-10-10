@@ -184,6 +184,8 @@ REDEEM_TRANSACTION_COMPONENT.md. No cross-owner write or schema delta.
 
 ## 8. Agent read set and restrictions
 
+ASSESS-02 owned Attempt read: Assessments module/controller/service/DTO stay feature-local. Auth public self authority → own Enrollment shared → Attempt shared locks; declared historical read joins select only public snapshot fields in SQL. No current Quiz/Question dependency or cross-owner write. Future academic writers must hold Enrollment→Attempt exclusive before Answer/summary changes. Stored snapshot convention and unresolved Submitted wire state are in ATTEMPT_READ_COMPONENT.md; full ASSESS-01/Grade/Completion remains pending.
+
 อ่าน Architecture + task + generated contract subset + referenced transaction. Taskที่READYต้องไม่มีbusiness/protocol decisionค้าง.
 Scope/business case excerptsอยู่ในtaskเป็นprojectionพร้อมsource; ไม่ต้องอ่านhandbookทั้งระบบทุกครั้ง.
 Decisionใหม่→DECISIONS.md + impactedtask; เปลี่ยนcanonicalได้หลังapprovalและsyncตามdocs/AGENTS.md.
