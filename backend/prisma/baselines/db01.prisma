@@ -1,0 +1,156 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id                 String               @id @default(uuid())
+  displayName        String
+  username           String?              @unique
+  normalizedUsername String?              @unique
+  email              String?              @unique
+  normalizedEmail    String?              @unique
+  emailVerified      Boolean              @default(false)
+  avatarUrl          String?
+  origin             String               @default("admin_created")
+  roles              String               @default("learner")
+  disabled           Boolean              @default(false)
+  profileJson        String               @default("{}")
+  revision           Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  createdBy          String?
+  instructorAddedBy  String?
+  instructorAddedAt  DateTime?
+
+  localCredential    LocalCredential?
+  sessions           AppSession[]
+  externalIdentities ExternalIdentity[]
+  courses            Course[]
+  enrollments        Enrollment[]
+  reviewsSubmitted   CourseReview[] @relation("ReviewSubmitter")
+  reviewsPerformed   CourseReview[] @relation("ReviewActor")
+
+  @@map("accounts")
+}
+
+model LocalCredential {
+  accountId    String  @id
+  passwordHash String
+  account      Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("local_credentials")
+}
+
+model AppSession {
+  tokenHash String    @id
+  accountId String
+  audience  String
+  expiresAt DateTime
+  revokedAt DateTime?
+  account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, audience])
+  @@map("app_sessions")
+}
+
+model ExternalIdentity {
+  id        String  @id @default(uuid())
+  accountId String
+  provider  String  @default("firebase")
+  project   String  @default("")
+  subject   String  @default("")
+  method    String  @default("password")
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, project, subject])
+  @@map("external_identities")
+}
+
+model Course {
+  id           String          @id @default(uuid())
+  slug         String          @unique
+  title        String
+  subtitle     String?
+  coverUrl     String?
+  category     String
+  level        String
+  priceMinor   Int?
+  currency     String          @default("THB")
+  status       String          @default("draft")
+  revision     Int             @default(0)
+  aiEnabled    Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  publishedAt  DateTime?
+  description  String?
+  outcomesJson String          @default("[]")
+  instructorId String
+  instructor   Account         @relation(fields: [instructorId], references: [id])
+  chapters     CourseChapter[]
+  enrollments  Enrollment[]
+  reviews      CourseReview[]
+
+  @@index([status, publishedAt, id])
+  @@map("courses")
+}
+
+model CourseReview {
+  id                String   @id @default(uuid())
+  courseId          String
+  submittedRevision Int
+  submittedBy       String
+  submittedAt       DateTime @default(now())
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  result            String?
+  reason            String?
+  course            Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  submitter         Account  @relation("ReviewSubmitter", fields: [submittedBy], references: [id], onDelete: Restrict)
+  reviewer          Account? @relation("ReviewActor", fields: [reviewedBy], references: [id], onDelete: Restrict)
+
+  @@index([courseId, submittedRevision, submittedAt])
+  @@map("course_reviews")
+}
+
+model CourseChapter {
+  id       String       @id @default(uuid())
+  courseId String
+  title    String
+  position Int
+  course   Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  items    CourseItem[]
+
+  @@unique([courseId, position])
+  @@map("course_chapters")
+}
+
+model CourseItem {
+  id        String        @id @default(uuid())
+  chapterId String
+  title     String
+  type      String        @default("article")
+  position  Int
+  chapter   CourseChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([chapterId, position])
+  @@map("course_items")
+}
+
+model Enrollment {
+  id             String    @id @default(uuid())
+  accountId      String
+  courseId       String
+  source         String    @default("free")
+  grantedAt      DateTime  @default(now())
+  completedItems Int       @default(0)
+  completedAt    DateTime?
+  account        Account   @relation(fields: [accountId], references: [id])
+  course         Course    @relation(fields: [courseId], references: [id])
+
+  @@unique([accountId, courseId])
+  @@map("enrollments")
+}

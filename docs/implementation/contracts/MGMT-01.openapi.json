@@ -1,0 +1,1112 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Melearn V1 HTTP Contract",
+    "version": "1.0.0-draft.1",
+    "description": "Draft HTTP contracts for reviewed frontend projections and Final1.6 rules. 86 application operations defined, five real provider protocol operations deferred. Separate Web/Admin login/session confirmed2026-10-09. No Backend freeze or Production integration implied."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Draft, configurable per app/environment"
+    }
+  ],
+  "paths": {
+    "/admin/users": {
+      "post": {
+        "operationId": "post_admin_users",
+        "summary": "POST /admin/users",
+        "description": "Admin only. Username/email uniqueness server-side. Do not return password/hash. Username pattern differs from profile update in current mock; unification is an open decision.",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCreateUserResponse"
+                },
+                "example": {
+                  "user": {
+                    "id": "usr_0001",
+                    "display_name": "ผู้เรียนใหม่",
+                    "username": "new.learner",
+                    "email": null,
+                    "email_verified": false,
+                    "avatar_url": null,
+                    "roles": [
+                      "learner"
+                    ],
+                    "origin": "admin_created",
+                    "auth_methods": [
+                      "password"
+                    ],
+                    "learning_eligible": true,
+                    "profile": {}
+                  },
+                  "created_by": "usr_admin",
+                  "created_at": "2026-10-08T09:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "unauthenticated",
+                    "message": "กรุณาเข้าสู่ระบบ",
+                    "request_id": "mock-request-4"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "forbidden",
+                    "message": "ไม่มีสิทธิ์ใช้งานส่วนนี้",
+                    "request_id": "mock-request-3"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "email_taken",
+                    "message": "อีเมลนี้ถูกใช้แล้ว",
+                    "request_id": "mock-request-11",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "email",
+                          "code": "taken"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-8",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "username",
+                          "code": "invalid"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "user.create",
+        "x-retry": "No automatic mutation retries unless operation semantics explicitly permit replay.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreateUserRequest"
+              },
+              "example": {
+                "username": "new.learner",
+                "password": "password-123",
+                "display_name": "ผู้เรียนใหม่"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_admin_users",
+        "summary": "GET /admin/users",
+        "description": "Server validates authentication, permission and current principal resource scope.",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserPage"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": "usr_admin",
+                      "display_name": "ผู้ดูแลตัวอย่าง",
+                      "username": "admin",
+                      "email": null,
+                      "email_verified": false,
+                      "roles": [
+                        "admin"
+                      ],
+                      "origin": "admin_created",
+                      "avatar_url": null,
+                      "created_at": "2026-09-01T00:00:00Z",
+                      "status": "active"
+                    }
+                  ],
+                  "next_cursor": "o:1"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "forbidden",
+                    "message": "ไม่มีสิทธิ์ใช้งานส่วนนี้",
+                    "request_id": "mock-request-3"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "validation_failed",
+                    "message": "ข้อมูลที่ส่งไม่ถูกต้อง",
+                    "request_id": "mock-request-8",
+                    "details": {
+                      "fields": [
+                        {
+                          "field": "bogus",
+                          "code": "unsupported"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "Admin account management",
+        "x-retry": "No automatic mutation retries unless operation semantics explicitly permit replay."
+      }
+    },
+    "/admin/users/{id}": {
+      "get": {
+        "operationId": "get_admin_users_id",
+        "summary": "GET /admin/users/{id}",
+        "tags": [
+          "management"
+        ],
+        "description": "Server validates authentication, permission, ownership and lifecycle; see Thai flow spec.",
+        "security": [
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserDetailDto"
+                },
+                "example": {
+                  "id": "usr_admin",
+                  "display_name": "ผู้ดูแลตัวอย่าง",
+                  "username": "admin",
+                  "email": null,
+                  "email_verified": false,
+                  "avatar_url": null,
+                  "roles": [
+                    "admin"
+                  ],
+                  "origin": "admin_created",
+                  "created_at": "2026-09-01T00:00:00Z",
+                  "status": "active",
+                  "profile": {},
+                  "auth_methods": [
+                    "password"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "forbidden",
+                    "message": "ไม่มีสิทธิ์ใช้งานส่วนนี้",
+                    "request_id": "mock-request-6"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "Admin account management",
+        "x-source": "tools/provisional-api/management.ts",
+        "x-retry": "No automatic mutation retries without explicit replay/idempotency semantics."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminCreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "display_name"
+        ],
+        "additionalProperties": false
+      },
+      "AdminCreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/CurrentUser"
+          },
+          "created_by": {
+            "type": "string",
+            "minLength": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "user",
+          "created_by",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "AdminUserDetailDto": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "bio": {
+                "type": "string"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "firstNameEnglish": {
+                "type": "string"
+              },
+              "lastNameEnglish": {
+                "type": "string"
+              },
+              "certificateName": {
+                "type": "string"
+              },
+              "birthDate": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "school": {
+                "type": "string"
+              },
+              "educationLevel": {
+                "type": "string"
+              },
+              "interests": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "learningGoals": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "auth_methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "google",
+                "password"
+              ]
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "email_verified": {
+            "type": "boolean"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "instructor",
+                "learner",
+                "admin"
+              ]
+            }
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "self_email",
+              "google",
+              "admin_created"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile",
+          "auth_methods",
+          "id",
+          "display_name",
+          "username",
+          "email",
+          "email_verified",
+          "avatar_url",
+          "roles",
+          "origin",
+          "status",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "AdminUserPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminUserSummary"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "additionalProperties": false
+      },
+      "AdminUserSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email_verified": {
+            "type": "boolean"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "learner",
+                "instructor",
+                "admin"
+              ]
+            }
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "self_email",
+              "google",
+              "admin_created"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "pending"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "username",
+          "email",
+          "email_verified",
+          "avatar_url",
+          "roles",
+          "origin",
+          "status",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "CurrentUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email_verified": {
+            "type": "boolean"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "learner",
+                "instructor",
+                "admin"
+              ]
+            }
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "self_email",
+              "google",
+              "admin_created"
+            ]
+          },
+          "auth_methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "password",
+                "google"
+              ]
+            }
+          },
+          "learning_eligible": {
+            "type": "boolean"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/AccountProfile"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "username",
+          "email",
+          "email_verified",
+          "avatar_url",
+          "roles",
+          "origin",
+          "auth_methods",
+          "learning_eligible",
+          "profile"
+        ],
+        "additionalProperties": false
+      },
+      "AccountProfile": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "firstNameEnglish": {
+            "type": "string"
+          },
+          "lastNameEnglish": {
+            "type": "string"
+          },
+          "certificateName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "school": {
+            "type": "string"
+          },
+          "educationLevel": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30
+          },
+          "learningGoals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "message": {
+                "type": "string"
+              },
+              "request_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "details": {
+                "$ref": "#/components/schemas/ResourceErrorDetails"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "request_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceErrorDetails": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourceValidationField"
+            }
+          },
+          "current_revision": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ResourceValidationField": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "AdminSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_admin_session",
+        "description": "Draft cookie name/transport. Independent Admin login/session; server checks Admin role."
+      }
+    }
+  },
+  "x-derived-from": {
+    "path": "docs/api-contract/openapi.json",
+    "version": "1.0.0-draft.1",
+    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "status": "DRAFT; generated planning context, not a competing contract"
+  }
+}

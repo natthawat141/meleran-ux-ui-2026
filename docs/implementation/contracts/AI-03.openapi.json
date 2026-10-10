@@ -1,0 +1,672 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Melearn V1 HTTP Contract",
+    "version": "1.0.0-draft.1",
+    "description": "Draft HTTP contracts for reviewed frontend projections and Final1.6 rules. 86 application operations defined, five real provider protocol operations deferred. Separate Web/Admin login/session confirmed2026-10-09. No Backend freeze or Production integration implied."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Draft, configurable per app/environment"
+    }
+  ],
+  "paths": {
+    "/me/ai/conversations/{id}/messages": {
+      "post": {
+        "operationId": "post_me_ai_conversations_id_messages",
+        "summary": "POST /me/ai/conversations/{id}/messages",
+        "tags": [
+          "ai"
+        ],
+        "description": "20 succeeded prompts/day Asia/Bangkok; pending reserves and failed releases quota. Same request_id cannot double count. Production streaming/async retry/cancellation remain pending; synchronous mock is not provider architecture.",
+        "security": [
+          {
+            "WebSession": []
+          },
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiMessageResponse"
+                },
+                "example": {
+                  "message": {
+                    "id": "aim_0002",
+                    "role": "assistant",
+                    "kind": "text",
+                    "content": "",
+                    "status": "failed",
+                    "request_id": "request-failed-1",
+                    "created_at": "2026-10-08T09:00:00Z",
+                    "completed_at": null,
+                    "error_code": "ai_provider_error",
+                    "practice": null
+                  },
+                  "usage": {
+                    "limit": 2,
+                    "used": 0,
+                    "remaining": 2,
+                    "reset_at": "2026-10-09T17:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_state",
+                    "message": "คอร์สนี้ยังไม่เปิด AI",
+                    "request_id": "mock-request-10",
+                    "details": {
+                      "reason": "ai_disabled"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "ai_quota_exceeded",
+                    "message": "โควตา AI วันนี้ครบแล้ว",
+                    "request_id": "mock-request-9",
+                    "details": {
+                      "limit": 2,
+                      "used": 2,
+                      "remaining": 0,
+                      "reset_at": "2026-10-09T17:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "ai.history_self + course access/ai_enabled for context",
+        "x-source": "tools/provisional-api/flow-g-ai.ts",
+        "x-retry": "No automatic mutation retries without explicit replay/idempotency semantics.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiMessageRequest"
+              },
+              "example": {
+                "content": "one",
+                "request_id": "request-good-1"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/ai/usage": {
+      "get": {
+        "operationId": "get_me_ai_usage",
+        "summary": "GET /me/ai/usage",
+        "tags": [
+          "ai"
+        ],
+        "description": "Server validates authentication, permission, ownership and lifecycle; see Thai flow spec.",
+        "security": [
+          {
+            "WebSession": []
+          },
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WireAiUsage"
+                },
+                "example": {
+                  "limit": 2,
+                  "used": 2,
+                  "remaining": 0,
+                  "reset_at": "2026-10-09T17:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "ai.usage_self",
+        "x-source": "tools/provisional-api/flow-g-ai.ts",
+        "x-retry": "No automatic mutation retries without explicit replay/idempotency semantics."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AiMessageRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          },
+          "request_id": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64
+          },
+          "course_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "content",
+          "request_id"
+        ],
+        "additionalProperties": false
+      },
+      "AiMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/WireAiMessage"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/WireAiUsage"
+          }
+        },
+        "required": [
+          "message",
+          "usage"
+        ],
+        "additionalProperties": false
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "message": {
+                "type": "string"
+              },
+              "request_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "details": {
+                "$ref": "#/components/schemas/ResourceErrorDetails"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "request_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceErrorDetails": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourceValidationField"
+            }
+          },
+          "current_revision": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ResourceValidationField": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "WireAiMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "text",
+              "practice_set"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "succeeded",
+              "failed"
+            ]
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "practice": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "topic_id": {
+                    "type": "string"
+                  },
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/WireAiPracticeQuestion"
+                    }
+                  }
+                },
+                "required": [
+                  "topic_id",
+                  "questions"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "kind",
+          "content",
+          "status",
+          "request_id",
+          "created_at",
+          "completed_at",
+          "error_code",
+          "practice"
+        ],
+        "additionalProperties": false
+      },
+      "WireAiPracticeQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WireAiOption"
+            }
+          },
+          "answered": {
+            "type": "boolean"
+          },
+          "my_option_id": {
+            "type": "string"
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "correct": {
+                "type": "boolean"
+              },
+              "explanation": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "correct",
+              "explanation"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "prompt",
+          "options",
+          "answered"
+        ],
+        "additionalProperties": false
+      },
+      "WireAiOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "WireAiUsage": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number"
+          },
+          "used": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "number"
+          },
+          "reset_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "limit",
+          "used",
+          "remaining",
+          "reset_at"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "AdminSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_admin_session",
+        "description": "Draft cookie name/transport. Independent Admin login/session; server checks Admin role."
+      },
+      "WebSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_web_session",
+        "description": "Draft cookie name/transport. Independent Web login/session. HttpOnly/Secure/domain/CSRF/TTL require deployment agreement."
+      }
+    }
+  },
+  "x-derived-from": {
+    "path": "docs/api-contract/openapi.json",
+    "version": "1.0.0-draft.1",
+    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "status": "DRAFT; generated planning context, not a competing contract"
+  }
+}

@@ -1,0 +1,660 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Melearn V1 HTTP Contract",
+    "version": "1.0.0-draft.1",
+    "description": "Draft HTTP contracts for reviewed frontend projections and Final1.6 rules. 86 application operations defined, five real provider protocol operations deferred. Separate Web/Admin login/session confirmed2026-10-09. No Backend freeze or Production integration implied."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Draft, configurable per app/environment"
+    }
+  ],
+  "paths": {
+    "/me/certificates": {
+      "get": {
+        "operationId": "get_me_certificates",
+        "summary": "GET /me/certificates",
+        "tags": [
+          "assessment"
+        ],
+        "description": "Server validates authentication, permission, ownership and lifecycle; see Thai flow spec.",
+        "security": [
+          {
+            "WebSession": []
+          },
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificatePage"
+                },
+                "example": {
+                  "items": [],
+                  "next_cursor": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "certificate.read_self",
+        "x-source": "tools/provisional-api/flow-d-assessment.ts",
+        "x-retry": "No automatic mutation retries without explicit replay/idempotency semantics."
+      }
+    },
+    "/me/certificates/{id}": {
+      "get": {
+        "operationId": "get_me_certificates_id",
+        "summary": "GET /me/certificates/{id}",
+        "tags": [
+          "assessment"
+        ],
+        "description": "Server validates authentication, permission, ownership and lifecycle; see Thai flow spec.",
+        "security": [
+          {
+            "WebSession": []
+          },
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WireServerCertificate"
+                },
+                "example": {
+                  "id": "cert_0001",
+                  "code": "MLN-0001",
+                  "course_id": "crs_0001",
+                  "course_title": "Contract sample course",
+                  "learner_name": "ผู้เรียนตัวอย่าง",
+                  "issued_at": "2026-10-08T09:00:00Z",
+                  "enrollment_id": "enr_0001"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "ไม่พบข้อมูลที่ขอ",
+                    "request_id": "mock-request-30"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "certificate.read_self",
+        "x-source": "tools/provisional-api/flow-d-assessment.ts",
+        "x-retry": "No automatic mutation retries without explicit replay/idempotency semantics."
+      }
+    },
+    "/me/certificates/{id}/download": {
+      "get": {
+        "operationId": "get_me_certificates_id_download",
+        "summary": "GET /me/certificates/{id}/download",
+        "tags": [
+          "assessment"
+        ],
+        "description": "Current text JSON is mock compatibility only; real downloadable format/storage/signing pending. Do not freeze as a PDF service.",
+        "security": [
+          {
+            "WebSession": []
+          },
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDownload"
+                },
+                "example": {
+                  "filename": "MLN-0001.txt",
+                  "content_type": "text/plain",
+                  "content": "ใบรับรอง MLN-0001\nชื่อผู้เรียน: ผู้เรียนตัวอย่าง\nคอร์ส: พื้นฐานการออกแบบคอร์สออนไลน์ (ตัวอย่าง)\nวันที่ออก: 2026-10-08T09:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Common Draft error; exact applicability/codes in Thai flow spec",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-contract-status": "draft",
+        "x-permission": "certificate.read_self",
+        "x-source": "tools/provisional-api/flow-d-assessment.ts",
+        "x-retry": "No automatic mutation retries without explicit replay/idempotency semantics."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CertificateDownload": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string",
+            "enum": [
+              "text/plain"
+            ]
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "content_type",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "CertificatePage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WireServerCertificate"
+            }
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "additionalProperties": false
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "message": {
+                "type": "string"
+              },
+              "request_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "details": {
+                "$ref": "#/components/schemas/ResourceErrorDetails"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "request_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceErrorDetails": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourceValidationField"
+            }
+          },
+          "current_revision": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ResourceValidationField": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "WireServerCertificate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "course_id": {
+            "type": "string"
+          },
+          "course_title": {
+            "type": "string"
+          },
+          "learner_name": {
+            "type": "string"
+          },
+          "issued_at": {
+            "type": "string"
+          },
+          "enrollment_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "course_id",
+          "course_title",
+          "learner_name",
+          "issued_at",
+          "enrollment_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "AdminSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_admin_session",
+        "description": "Draft cookie name/transport. Independent Admin login/session; server checks Admin role."
+      },
+      "WebSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_web_session",
+        "description": "Draft cookie name/transport. Independent Web login/session. HttpOnly/Secure/domain/CSRF/TTL require deployment agreement."
+      }
+    }
+  },
+  "x-derived-from": {
+    "path": "docs/api-contract/openapi.json",
+    "version": "1.0.0-draft.1",
+    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "status": "DRAFT; generated planning context, not a competing contract"
+  }
+}

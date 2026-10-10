@@ -1,74 +1,31 @@
-# Melearn API
+# Melearn NestJS Backend
 
-ASP.NET Core .NET 10 · Clean Architecture + Feature-first / use cases · Backend foundation
+Execution target for the approved NestJS / TypeScript / Prisma / PostgreSQL V1 blueprint. Source of truth: [business scope](../docs/MELEARN_V1_SCOPE.md), [canonical Draft OpenAPI](../docs/api-contract/openapi.json), [architecture](../docs/implementation/ARCHITECTURE.md), [execution plan](../docs/implementation/EXECUTION_PLAN.md).
 
-Git: [natthawat141/meleran-tutor — backend/v1-foundation](https://github.com/natthawat141/meleran-tutor/tree/backend/v1-foundation). Branch นี้มี `frontend/` และ `backend/` วางคู่กัน; ASP.NET code อยู่ใน `backend/` และเอกสารกลางอยู่ใน `../docs`. `main` ของ repo ยังคงเป็น Frontend รูปแบบเดิม. ประวัติ Backend ครบ; repo `melearn-tutor-api` ที่สร้างผิด archive แล้ว ไม่ใช้ทำงานต่อ. ผู้ใช้สั่งพักการเขียน API วันที่ 10 ต.ค. 2026; ยังไม่ deploy Backend. `.env`/generated output ไม่ได้ขึ้น Git.
+## Current verified state — 11 October 2026
 
-เริ่มพัฒนา 10 ตุลาคม 2026 ตามคำสั่งผู้ใช้. มี EF Core/PostgreSQL adapter + migrations และ 13 business operations สำหรับ local Username Auth/Profile, Admin accounts/Instructor assignment และ Catalog/Free Enrollment. ยังไม่ apply Cloud SQL หรือทำ Firebase/provider integrations. Frontend ยังใช้ HTTP mock; ไม่เปลี่ยน base URL ทั้งระบบจน endpoint ที่เกี่ยวข้องพร้อม. [สถานะ feature และวิธีตั้งค่า](docs/FEATURE_DELIVERY_STATUS_TH.md).
+FOUNDATION-01 and DB-01/02/05/03/04 completed: shared HTTP bootstrap, strict TypeScript, canonical safe errors, typed LoginRequest boundary, local ENV loading, isolated PostgreSQL migrations and tests. Existing 13 prototype handlers remain partial; this does not mean 86 operations or 113 acceptance cases are complete. Firebase and other provider adapters are pending. See [current execution status](../docs/implementation/EXECUTION_STATUS.md).
 
-## เริ่มใช้งาน
+Use the existing Cloud SQL instance and dedicated melearn_test database. No STG, deployment, new instance or production migration. Runtime credentials and migration credentials are separate and stored only in ignored .env. Runtime does not seed or migrate; former demo seed is now a test fixture.
 
-ต้องมี SDK `10.0.400` ตาม `global.json` (รองรับ patch ใหม่ของ feature band เดียวกัน).
+## Targeted verification
 
-```powershell
-cd backend
-dotnet restore Melearn.slnx --locked-mode
-dotnet build Melearn.slnx --configuration Release --no-restore
-dotnet test Melearn.slnx --configuration Release --no-build --no-restore
-dotnet run --project src/Melearn.Api --launch-profile http
-```
+Node 22+ is required for native ENV parsing (verified locally on Node 24.14.0). Installed lockfile dependencies are reused. pnpm workspace build approvals now cover only the already-approved Nest/Prisma dependencies. Use frozen lockfile installs in CI.
 
-HTTP dev host: `http://127.0.0.1:5100`.
+- Typecheck: node node_modules/typescript/bin/tsc --noEmit --incremental false
+- Foundation: node node_modules/jest/bin/jest.js --config test/jest-foundation.json --runInBand
+- Build: node node_modules/@nestjs/cli/bin/nest.js build
+- Database: set ALLOW_TEST_DATABASE_RESET=yes for this process, then node node_modules/jest/bin/jest.js --config test/jest-database.json --runInBand
+- Runtime smoke after build: node scripts/smoke-test-api.cjs (temporary local API, dedicated TEST target, no seed/reset)
+- Migration status: node scripts/prisma-test.cjs status
+- Reviewed TEST migration only: set ALLOW_TEST_DATABASE_MIGRATION=yes for this process, then node scripts/prisma-test.cjs migrate
 
-### Local environment
+The database tests select TEST_DATABASE_URL only after verifying TEST_DATABASE_NAME, PostgreSQL scheme and explicit reset opt-in. They reject a configured application DATABASE_URL that identifies the same reset target. DATABASE_URL is intentionally blank until the local application target is selected; smoke checks inject the test target explicitly.
 
-Cloudflare R2: กรอก `CloudflareR2__AccountId`, `CloudflareR2__BucketName`, `CloudflareR2__ServiceUrl` (S3 API endpoint จาก Cloudflare), `CloudflareR2__AccessKeyId` และ `CloudflareR2__SecretAccessKey` ใน `.env` ฝั่ง Backend. `CloudflareR2__PublicBaseUrl` เป็น public/custom domain ถ้ามี; private bucket เว้นว่างได้. ยังไม่มี upload adapter; ช่องเหล่านี้เป็นการเตรียม configuration เท่านั้น.
+The old test:e2e suite is guarded before connecting or clearing data. Its 13 prototype tests are compatibility evidence only, not the full business acceptance suite. Do not run them against an application database.
 
-คัดลอก `.env.example` เป็น `.env` และกรอก `OpenRouter__ApiKey`, `OpenRouter__Model`, `Resend__ApiKey`, `Resend__From` และ Firebase project/credential path เมื่อพร้อม. `.env` ถูก Git ignore; private credential file ให้เก็บนอก repository. Frontend ใช้เฉพาะ Firebase public client config; ห้ามนำ OpenRouter/Resend API keys ไปใส่ `VITE_*`.
+## Environment and remaining work
 
-```powershell
-Copy-Item -LiteralPath .env.example -Destination .env # เฉพาะเมื่อยังไม่มี .env
-.\scripts\dev.ps1 -CheckOnly
-.\scripts\dev.ps1
-```
+Prepared .env contains Firebase public Web config and server project ID plus mapped OpenRouter/Resend/R2/Stripe settings. Public Web config is not an Admin credential. Explicit process environment takes precedence over local .env; no secrets or provider payloads are logged. Missing sender, Firebase server identity, Stripe webhook configuration and D01–D16 decisions remain visible in the plan. No provider smoke calls have been made.
 
-ASP.NET Core อ่าน process environment แต่ไม่อ่าน `.env` โดยอัตโนมัติ. Script นี้โหลดค่าแล้วเรียก `dotnet run --no-launch-profile` เพื่อให้ URL/environment จากไฟล์มีผล; หลังหยุด process จะคืนค่า environment เดิม. Blank placeholders ไม่ทับค่าที่ตั้งไว้ภายนอก. ไม่รองรับ multiline, variable interpolation หรือ inline comments; syntax check ไม่ได้ตรวจว่า key/model/sender ใช้งานกับ provider ได้จริง.
-
-OpenRouter key/model/base URL ตั้งผ่าน `OpenRouter__ApiKey`, `OpenRouter__Model`, `OpenRouter__BaseUrl` ใน `.env` ฝั่ง Backend เมื่อรันด้วย script หรือ process environment/secret configuration บน hosting. `appsettings*.json` ไม่มี OpenRouter model fallback; ไม่เลือก paid model โดยอัตโนมัติ. การรัน `dotnet run` ตรง ๆ ไม่โหลด `.env`.
-
-`bin/` และ `obj/` เป็น generated build output ที่ Git ignore. `bin/Release/net10.0` มี DLL ของแอป/dependencies, EXE app host, PDB debug symbols, deps/runtimeconfig JSON และสำเนา appsettings ตามปกติ. แก้ source/config ที่อยู่ใต้ `src/` แล้ว build ใหม่; ไม่แก้สำเนาใน bin. Deployment ใช้ผล `dotnet publish`.
-
-ชื่อ `OpenRouter__ApiKey` map เป็น configuration `OpenRouter:ApiKey` ตาม [ASP.NET environment configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-10.0). ค่า base URL อิง [OpenRouter API](https://openrouter.ai/docs/api/api-reference/models/get-models) และ [Resend API](https://resend.com/docs/api-reference/emails/send-email). AI/อีเมล/Firebase/R2 adapters ยังไม่ implement. Database ใช้ ConnectionStrings__Melearn; session/CORS/bootstrap ดูเอกสารสถานะ feature.
-
-| Endpoint | ผลที่คาดหวัง | ความหมาย |
-| --- | --- | --- |
-| `GET /health/live` | 200, `status: alive`, `stage: foundation` | API process ตอบ HTTP ได้ |
-| `GET /health/ready` | 503, `backend_not_ready` | ยังไม่เปิด runtime readiness; live DB/Firebase/Frontend acceptance ยังไม่ครบ |
-| `GET /api/v1/me` | 401 เมื่อไม่มี session | local Auth/Profile implement แล้ว; ต้องตั้ง DB และ provision account |
-| `GET /api/v1/courses` | 503 เมื่อยังไม่ตั้ง DB | ไม่มี mock fallback; ต้อง apply migrations ก่อน |
-| business routes ที่ยังไม่ implement | 404 ตาม error envelope | ยังไม่เปิด use case นั้น |
-
-Health routes เป็น operational endpoints ใหม่ของ host ไม่ใช่ส่วนหนึ่งของ 86 business operations ใน Frontend Draft. ยังไม่มี route สำหรับ Swagger หรือ draft contract projection; ไม่มี fake login/seed เพื่อให้ดูเหมือน Backend พร้อม.
-
-## เอกสารหลัก
-
-- [แผน Backend B0–B10 / สถานะ 14 ฟีเจอร์ / เกณฑ์ตรวจรับ](../docs/BACKEND_DELIVERY_PLAN_TH.md)
-- [Backend architecture และ decision register](docs/BACKEND_ARCHITECTURE.md)
-- [Feature delivery และ setup/ข้อจำกัด](docs/FEATURE_DELIVERY_STATUS_TH.md)
-- [Cloud SQL Bangkok และ environment setup](docs/CLOUD_SQL_SETUP_TH.md) — instance RUNNABLE; application DB connection ยังไม่ทดสอบ
-- [Auth decision: Firebase Email/Google และ .NET Username](docs/AUTH_DECISION_TH.md) — ยืนยัน provider แล้ว; session/HTTP changes เป็น Draft ยังไม่ได้เชื่อมจริง
-- Business scope: `../docs/MELEARN_V1_SCOPE.md` Final 1.6; ใน Frontend Git คือ `../melearn-tutor-frontend/docs/MELEARN_V1_SCOPE.md`
-- API handbook: `../docs/api-contract/API_CONTRACT_FEATURES_TH.md`
-- Canonical OpenAPI Draft: `../docs/api-contract/openapi.json`
-
-Paths ข้างต้นอ้าง sibling checkout ใน workspace นี้. ยังไม่คัดลอก JSON/DTO เป็น contract อีกชุด. ก่อนสร้าง business API ให้ตกลงวิธีอ้าง version/แจกจ่าย canonical contract ระหว่าง repositories แล้วเพิ่ม contract tests.
-
-## ผลตรวจ foundation
-
-วันที่ 10 ต.ค. 2026: Release build/test ผ่าน; architecture tests 6 และ HTTP integration tests 46 ผ่าน รวม 52 tests. Business tests ใช้ relational SQLite ใน ASP.NET test host; ไม่รัน Docker หรือ live Cloud SQL/provider. Response ของ Admin management ตรวจชนิด/required/nullable/enum/additional fields กับ snapshot ของ canonical schema. Snapshot ตรวจซ้ำได้ด้วย `scripts/sync-account-contract.ps1 -CheckOnly`; regenerate หลัง review contract change ด้วย script เดียวกัน. ผลล่าสุดและ coverage อยู่ในเอกสารสถานะ feature.
-
-ตรวจ Kestrel ชุดล่าสุดด้วย temporary port 5110 แล้ว: `/health/live` 200, `/health/ready` 503, `/api/v1/me` 401, `/api/v1/courses` 503 (persistence_not_configured) และ `/test-only/throw` 404. ปิด process ที่ใช้ตรวจแล้ว. Live Cloud SQL/Firebase acceptance ยังไม่ได้ตรวจ; ไม่ใช้ผล foundation เก่าแทนชุดนี้.
-
-Domain/Application/Infrastructure มี account/session/catalog/enrollment models, use cases และ EF adapters แล้ว. Migration SQL สร้างไว้เพื่อ review; ยังไม่ apply live DB. DTO ของ subset นี้อ้าง canonical Draft; Firebase/contract synchronization และ PostgreSQL acceptance ยังต้องทำต่อ.
-
-CI workflow เตรียมไว้ใน `.github/workflows/dotnet.yml` แต่จะไม่ถือว่าผ่าน GitHub CI จนมี remote repository และ hosted run จริง. ไม่อนุญาต deploy หรือสร้าง cloud resources โดยการมีไฟล์นี้.
+The authoritative Nest target is this fullstack backend on backend/v1-foundation. D13 is confirmed; root Nest CI is configured, and hosted results are tracked separately. The source-only pre-execution snapshot is in ../artifacts/nest-wave1-baseline-20261011 (ENV/databases excluded).

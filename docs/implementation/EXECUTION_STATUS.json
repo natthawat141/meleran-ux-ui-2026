@@ -1,0 +1,700 @@
+{
+  "objective": "ทำ wave 1 -17 เลย",
+  "date": "2026-10-11",
+  "scope": {
+    "tasks": 50,
+    "defined_operations": 86,
+    "deferred_operations": 5,
+    "acceptance_cases": 113
+  },
+  "contract": {
+    "version": "1.0.0-draft.1",
+    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "status": "DRAFT"
+  },
+  "verified": {
+    "foundation_tests": 49,
+    "database_tests": 39,
+    "typecheck": "PASS",
+    "nest_build": "PASS",
+    "runtime_smoke": "PASS",
+    "business_acceptance_cases": 0,
+    "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS"
+  },
+  "environment": {
+    "staging": false,
+    "cloud_sql_instance": "melearn-infra-prod:asia-southeast3:melearn-tutor-db",
+    "test_database": "melearn_test",
+    "runtime_role": "melearn_test_app",
+    "migration_role": "melearn_test_migrator",
+    "proxy": {
+      "host": "127.0.0.1",
+      "port": 5433,
+      "exec_session_id": 58523
+    },
+    "migrations": [
+      {
+        "name": "20261011002000_db01",
+        "sha256": "11836edf261e7e0111e004082db03a8a06c31fafc75ddec1c996ae9e95d841ae"
+      },
+      {
+        "name": "20261011010000_db02",
+        "sha256": "3232a6ceb8724c3c46dc6c73ca36db171e556cc6b8abbe2151cfb7ce874548a5"
+      },
+      {
+        "name": "20261011020000_db05",
+        "sha256": "5c8c27e078e013aea95a8d59b5d9675b37beeb1f28c71f9df6b29d26c55930e9"
+      },
+      {
+        "name": "20261011030000_db03",
+        "sha256": "726de5121ced61057fe4f43e9a2427743c043a10f6d30ae582b13b078aa85648"
+      },
+      {
+        "name": "20261011040000_db04",
+        "sha256": "684d41199be93bac7f368c8723cd89ec04cd9f46a360afe5b315152c8cb4d180"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "AUTH-01",
+      "module": "auth",
+      "priority": "P0",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-BASE-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "decision_ids": [
+        "D01",
+        "D02",
+        "D03"
+      ]
+    },
+    {
+      "id": "AUTH-02",
+      "module": "auth",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "id": "AUTH-03",
+      "module": "auth",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "decision_ids": [
+        "D03"
+      ]
+    },
+    {
+      "id": "ACCOUNT-01",
+      "module": "accounts",
+      "priority": "P0",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01"
+      ],
+      "decision_ids": [
+        "D02",
+        "D09"
+      ]
+    },
+    {
+      "id": "MGMT-01",
+      "module": "management",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01"
+      ],
+      "decision_ids": [
+        "D02",
+        "D03",
+        "D16"
+      ]
+    },
+    {
+      "id": "MGMT-02",
+      "module": "management",
+      "priority": "P2",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "MGMT-03",
+      "module": "management",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "COURSE-02",
+        "ENROLL-01",
+        "ASSESS-02"
+      ],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "id": "MGMT-04",
+      "module": "management",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "MGMT-03",
+        "GRADE-01"
+      ],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "id": "MGMT-05",
+      "module": "management",
+      "priority": "P2",
+      "state": "BLOCKED",
+      "dependencies": [
+        "MGMT-04",
+        "CERT-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "CATALOG-01",
+      "module": "courses",
+      "priority": "P0",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "id": "CATALOG-02",
+      "module": "courses",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "CATALOG-01"
+      ],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "id": "ENROLL-01",
+      "module": "enrollments",
+      "priority": "P0",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AUTH-01",
+        "CATALOG-01",
+        "DB-02"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "COURSE-01",
+      "module": "courses",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-02",
+        "DB-02"
+      ],
+      "decision_ids": [
+        "D10"
+      ]
+    },
+    {
+      "id": "COURSE-02",
+      "module": "courses",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "COURSE-01",
+        "DB-03"
+      ],
+      "decision_ids": [
+        "D04",
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "id": "VIDEO-01",
+      "module": "courses",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "FOUNDATION-01",
+        "AUTH-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "REVIEW-01",
+      "module": "courses",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "COURSE-02"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "REVIEW-02",
+      "module": "courses",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "REVIEW-01"
+      ],
+      "decision_ids": [
+        "D04"
+      ]
+    },
+    {
+      "id": "LEARN-01",
+      "module": "learning",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "ENROLL-01",
+        "COURSE-02"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "LEARN-02",
+      "module": "learning",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "LEARN-01",
+        "COMPLETION-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "ASSESS-01",
+      "module": "assessments",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "LEARN-01",
+        "DB-03",
+        "COMPLETION-01"
+      ],
+      "decision_ids": [
+        "D06",
+        "D09",
+        "D10"
+      ]
+    },
+    {
+      "id": "ASSESS-02",
+      "module": "assessments",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "ASSESS-01"
+      ],
+      "decision_ids": [
+        "D06"
+      ]
+    },
+    {
+      "id": "GRADE-01",
+      "module": "assessments",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "ASSESS-01",
+        "COMPLETION-01"
+      ],
+      "decision_ids": [
+        "D06",
+        "D10"
+      ]
+    },
+    {
+      "id": "CERT-01",
+      "module": "certificates",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "COMPLETION-01",
+        "AUTH-01"
+      ],
+      "decision_ids": [
+        "D07"
+      ]
+    },
+    {
+      "id": "PAY-01",
+      "module": "payments",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "ENROLL-01",
+        "DB-04"
+      ],
+      "decision_ids": [
+        "D08",
+        "D10"
+      ]
+    },
+    {
+      "id": "PAY-02",
+      "module": "payments",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "PAY-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "REDEEM-01",
+      "module": "redeem",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "COURSE-01",
+        "DB-04",
+        "AUTH-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "REDEEM-02",
+      "module": "redeem",
+      "priority": "P1",
+      "state": "BLOCKED",
+      "dependencies": [
+        "REDEEM-01",
+        "ENROLL-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "AI-01",
+      "module": "ai",
+      "priority": "P2",
+      "state": "BLOCKED",
+      "dependencies": [
+        "COURSE-02",
+        "DB-05"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "AI-02",
+      "module": "ai",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "DB-05"
+      ],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "id": "AI-05",
+      "module": "ai",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AI-02"
+      ],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "id": "AI-03",
+      "module": "ai",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AI-01",
+        "AI-02",
+        "ENROLL-01",
+        "DB-05",
+        "ASSESS-02"
+      ],
+      "decision_ids": [
+        "D12"
+      ]
+    },
+    {
+      "id": "AI-04",
+      "module": "ai",
+      "priority": "P2",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AI-03"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "BLOG-01",
+      "module": "blog",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-05"
+      ],
+      "decision_ids": [
+        "D16"
+      ]
+    },
+    {
+      "id": "BLOG-02",
+      "module": "blog",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-01",
+        "BLOG-01"
+      ],
+      "decision_ids": [
+        "D05",
+        "D09"
+      ]
+    },
+    {
+      "id": "BLOG-03",
+      "module": "blog",
+      "priority": "P2",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "BLOG-02"
+      ],
+      "decision_ids": [
+        "D11"
+      ]
+    },
+    {
+      "id": "FOUNDATION-01",
+      "module": "foundation",
+      "priority": "P0",
+      "state": "DONE",
+      "dependencies": [],
+      "decision_ids": []
+    },
+    {
+      "id": "DB-01",
+      "module": "database",
+      "priority": "P0",
+      "state": "DONE",
+      "dependencies": [
+        "FOUNDATION-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "DB-02",
+      "module": "database",
+      "priority": "P0",
+      "state": "DONE",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "DB-03",
+      "module": "database",
+      "priority": "P1",
+      "state": "DONE",
+      "dependencies": [
+        "DB-02"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "DB-04",
+      "module": "database",
+      "priority": "P1",
+      "state": "DONE",
+      "dependencies": [
+        "DB-02"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "DB-05",
+      "module": "database",
+      "priority": "P1",
+      "state": "DONE",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "COMPLETION-01",
+      "module": "enrollments",
+      "priority": "P1",
+      "state": "READY",
+      "dependencies": [
+        "DB-02"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "PROVIDER-AUTH-01",
+      "module": "auth",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "AUTH-BASE-01",
+        "DB-06"
+      ],
+      "decision_ids": [
+        "D01",
+        "D03"
+      ]
+    },
+    {
+      "id": "PROVIDER-STRIPE-01",
+      "module": "payments",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "PAY-01"
+      ],
+      "decision_ids": [
+        "D08",
+        "D10"
+      ]
+    },
+    {
+      "id": "INTEGRATION-01",
+      "module": "integration",
+      "priority": "P0",
+      "state": "BLOCKED",
+      "dependencies": [
+        "CATALOG-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "INTEGRATION-02",
+      "module": "integration",
+      "priority": "P0",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01",
+        "ENROLL-01",
+        "INTEGRATION-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "INTEGRATION-03",
+      "module": "integration",
+      "priority": "P2",
+      "state": "BLOCKED",
+      "dependencies": [
+        "AI-04",
+        "AI-05",
+        "AUTH-02",
+        "AUTH-03",
+        "BLOG-03",
+        "CATALOG-02",
+        "CI-01",
+        "INTEGRATION-02",
+        "LEARN-02",
+        "MGMT-05",
+        "PAY-02",
+        "PROVIDER-STRIPE-01",
+        "REDEEM-02",
+        "REVIEW-02",
+        "VIDEO-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "CI-01",
+      "module": "foundation",
+      "priority": "P1",
+      "state": "IN_PROGRESS",
+      "dependencies": [
+        "FOUNDATION-01",
+        "DB-01"
+      ],
+      "decision_ids": []
+    },
+    {
+      "id": "AUTH-BASE-01",
+      "module": "auth",
+      "priority": "P0",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "FOUNDATION-01",
+        "DB-01"
+      ],
+      "decision_ids": [
+        "D01",
+        "D02"
+      ]
+    },
+    {
+      "id": "DB-06",
+      "module": "database",
+      "priority": "P1",
+      "state": "NEEDS_DECISION",
+      "dependencies": [
+        "DB-01"
+      ],
+      "decision_ids": [
+        "D03"
+      ]
+    }
+  ],
+  "execution_target": "worktrees/melearn-fullstack/backend",
+  "github": {
+    "repository": "natthawat141/meleran-tutor",
+    "branch": "backend/v1-foundation",
+    "ci": "PENDING_HOSTED_RUN"
+  },
+  "remaining_decisions": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "D09",
+    "D10",
+    "D11",
+    "D12",
+    "D16"
+  ]
+}

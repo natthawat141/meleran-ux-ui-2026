@@ -1,0 +1,403 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id                 String               @id @default(uuid())
+  displayName        String
+  username           String?              @unique
+  normalizedUsername String?              @unique
+  email              String?              @unique
+  normalizedEmail    String?              @unique
+  emailVerified      Boolean              @default(false)
+  avatarUrl          String?
+  origin             String               @default("admin_created")
+  roles              String               @default("learner")
+  disabled           Boolean              @default(false)
+  profileJson        String               @default("{}")
+  revision           Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  createdBy          String?
+  instructorAddedBy  String?
+  instructorAddedAt  DateTime?
+
+  localCredential    LocalCredential?
+  sessions           AppSession[]
+  externalIdentities ExternalIdentity[]
+  courses            Course[]
+  enrollments        Enrollment[]
+  reviewsSubmitted   CourseReview[] @relation("ReviewSubmitter")
+  reviewsPerformed   CourseReview[] @relation("ReviewActor")
+  roleGrants         UserRole[]
+  blogPosts          BlogPost[]
+  transcriptsEdited  VideoTranscript[]
+  answersGraded      Answer[] @relation("AnswerGrader")
+  aiConversations    AIConversation[]
+  aiUsageDays        AIUsageDaily[]
+
+  @@map("accounts")
+}
+
+model LocalCredential {
+  accountId    String  @id
+  passwordHash String
+  account      Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("local_credentials")
+}
+
+model AppSession {
+  tokenHash String    @id
+  accountId String
+  audience  String
+  expiresAt DateTime
+  revokedAt DateTime?
+  account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, audience])
+  @@map("app_sessions")
+}
+
+model ExternalIdentity {
+  id        String  @id @default(uuid())
+  accountId String
+  provider  String  @default("firebase")
+  project   String  @default("")
+  subject   String  @default("")
+  method    String  @default("password")
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, project, subject])
+  @@map("external_identities")
+}
+
+model Course {
+  id           String          @id @default(uuid())
+  slug         String          @unique
+  title        String
+  subtitle     String?
+  coverUrl     String?
+  category     String
+  level        String
+  priceMinor   Int?
+  currency     String          @default("THB")
+  status       String          @default("draft")
+  revision     Int             @default(0)
+  aiEnabled    Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  publishedAt  DateTime?
+  description  String?
+  outcomesJson String          @default("[]")
+  instructorId String
+  instructor   Account         @relation(fields: [instructorId], references: [id])
+  chapters     CourseChapter[]
+  enrollments  Enrollment[]
+  reviews      CourseReview[]
+  aiConversations AIConversation[]
+
+  @@index([status, publishedAt, id])
+  @@map("courses")
+}
+
+model CourseReview {
+  id                String   @id @default(uuid())
+  courseId          String
+  submittedRevision Int
+  submittedBy       String
+  submittedAt       DateTime @default(now())
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  result            String?
+  reason            String?
+  course            Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  submitter         Account  @relation("ReviewSubmitter", fields: [submittedBy], references: [id], onDelete: Restrict)
+  reviewer          Account? @relation("ReviewActor", fields: [reviewedBy], references: [id], onDelete: Restrict)
+
+  @@index([courseId, submittedRevision, submittedAt])
+  @@map("course_reviews")
+}
+
+model CourseChapter {
+  id       String       @id @default(uuid())
+  courseId String
+  title    String
+  position Int
+  course   Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  items    CourseItem[]
+
+  @@unique([id, courseId])
+  @@unique([courseId, position])
+  @@map("course_chapters")
+}
+
+model CourseItem {
+  id        String        @id @default(uuid())
+  chapterId String
+  courseId  String
+  title     String
+  type      String        @default("article")
+  position  Int
+  chapter   CourseChapter @relation(fields: [chapterId, courseId], references: [id, courseId], onDelete: Cascade)
+  progress  Progress[]
+  transcript VideoTranscript?
+  quiz Quiz?
+  contentDoc Json? @db.JsonB
+  videoUrl String?
+  revision Int @default(0)
+
+  @@unique([id, courseId])
+  @@unique([id, type])
+  @@unique([id, courseId, type])
+  @@unique([chapterId, position])
+  @@map("course_items")
+}
+
+model Enrollment {
+  id             String    @id @default(uuid())
+  accountId      String
+  courseId       String
+  source         String    @default("free")
+  grantedAt      DateTime  @default(now())
+  completedItems Int       @default(0)
+  completedAt    DateTime?
+  completionSnapshot Json? @db.JsonB
+  progress       Progress[]
+  certificate    Certificate?
+  attempts       QuizAttempt[]
+  account        Account   @relation(fields: [accountId], references: [id])
+  course         Course    @relation(fields: [courseId], references: [id])
+
+  @@unique([id, courseId])
+  @@unique([accountId, courseId])
+  @@map("enrollments")
+}
+
+// Physical design reviewed by the Lead; existing role string is compatibility-only
+// until AUTH-BASE-01 switches every principal/role writer to this normalized owner.
+model UserRole {
+  accountId String
+  role      String
+  grantedAt DateTime @default(now()) @db.Timestamptz(3)
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  @@id([accountId, role])
+  @@map("user_roles")
+}
+
+model Progress {
+  id           String @id @default(uuid())
+  enrollmentId String
+  itemId       String
+  courseId     String
+  completedAt  DateTime? @db.Timestamptz(3)
+  resumeData   Json? @db.JsonB
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+  enrollment   Enrollment @relation(fields: [enrollmentId, courseId], references: [id, courseId], onDelete: Restrict)
+  item         CourseItem @relation(fields: [itemId, courseId], references: [id, courseId], onDelete: Restrict)
+  @@unique([enrollmentId, itemId])
+  @@index([enrollmentId, updatedAt])
+  @@map("progress")
+}
+
+model Certificate {
+  id            String @id @default(uuid())
+  code          String @unique
+  enrollmentId  String @unique
+  recipientName String
+  courseName    String
+  issuedAt      DateTime @default(now()) @db.Timestamptz(3)
+  enrollment    Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  @@map("certificates")
+}
+
+model BlogPost {
+  id String @id @default(uuid())
+  slug String @unique
+  title String
+  coverUrl String?
+  excerpt String?
+  contentDoc Json @db.JsonB
+  authorId String
+  status String @default("draft")
+  revision Int @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  publishedAt DateTime? @db.Timestamptz(3)
+  author Account @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  @@index([status, publishedAt, id])
+  @@map("blog_posts")
+}
+
+model VideoTranscript {
+  itemId String @id
+  itemType String @default("video")
+  text String
+  editedBy String
+  editedAt DateTime @updatedAt @db.Timestamptz(3)
+  item CourseItem @relation(fields: [itemId, itemType], references: [id, type], onDelete: Restrict)
+  editor Account @relation(fields: [editedBy], references: [id], onDelete: Restrict)
+  @@unique([itemId, itemType])
+  @@map("video_transcripts")
+}
+
+model AIConversation {
+  id String @id @default(uuid())
+  accountId String
+  courseId String
+  title String?
+  contextSnapshot Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  messages AIMessage[]
+  requests AIRequest[]
+  practices AIPractice[]
+  @@unique([id, accountId])
+  @@index([accountId, updatedAt, id])
+  @@map("ai_conversations")
+}
+
+model AIMessage {
+  id String @id @default(uuid())
+  conversationId String
+  accountId String
+  position Int
+  role String
+  content String
+  contextSnapshot Json @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  conversation AIConversation @relation(fields: [conversationId, accountId], references: [id, accountId], onDelete: Restrict)
+  @@unique([conversationId, position])
+  @@map("ai_messages")
+}
+
+model AIUsageDaily {
+  accountId String
+  usageDate DateTime @db.Date
+  successCount Int @default(0)
+  pendingCount Int @default(0)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  requests AIRequest[]
+  @@id([accountId, usageDate])
+  @@map("ai_usage_daily")
+}
+
+// Protocol expiry/cleanup is deliberately not scheduled until D10/D12 are closed.
+model AIRequest {
+  id String @id @default(uuid())
+  accountId String
+  requestId String
+  payloadHash String
+  usageDate DateTime @db.Date
+  conversationId String?
+  status String @default("pending")
+  result Json? @db.JsonB
+  errorCode String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  finalizedAt DateTime? @db.Timestamptz(3)
+  usage AIUsageDaily @relation(fields: [accountId, usageDate], references: [accountId, usageDate], onDelete: Restrict)
+  conversation AIConversation? @relation(fields: [conversationId, accountId], references: [id, accountId], onDelete: Restrict)
+  @@unique([accountId, requestId])
+  @@index([status, createdAt])
+  @@map("ai_requests")
+}
+
+model AIPractice {
+  id String @id @default(uuid())
+  conversationId String
+  accountId String
+  payloadSnapshot Json @db.JsonB
+  answers Json @default("{}") @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  conversation AIConversation @relation(fields: [conversationId, accountId], references: [id, accountId], onDelete: Restrict)
+  @@map("ai_practice")
+}
+
+model Quiz {
+  id String @id @default(uuid())
+  itemId String @unique
+  itemType String @default("quiz")
+  courseId String
+  title String
+  instructions Json? @db.JsonB
+  item CourseItem @relation(fields: [itemId, courseId, itemType], references: [id, courseId, type], onDelete: Restrict)
+  questions Question[]
+  attempts QuizAttempt[]
+  @@unique([itemId, courseId, itemType])
+  @@unique([id, courseId])
+  @@map("quizzes")
+}
+
+model Question {
+  id String @id @default(uuid())
+  quizId String
+  position Int
+  type String
+  prompt Json @db.JsonB
+  options Json @db.JsonB
+  correctKey Json @db.JsonB
+  maxScore Decimal @db.Decimal(65,30)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  @@unique([quizId, position])
+  @@map("questions")
+}
+
+model QuizAttempt {
+  id String @id @default(uuid())
+  enrollmentId String
+  quizId String
+  courseId String
+  number Int
+  status String @default("in_progress")
+  definitionSnapshot Json @db.JsonB
+  maxScore Decimal @db.Decimal(65,30)
+  earnedScore Decimal? @db.Decimal(65,30)
+  passed Boolean?
+  revision Int @default(0)
+  startedAt DateTime @default(now()) @db.Timestamptz(3)
+  submittedAt DateTime? @db.Timestamptz(3)
+  gradedAt DateTime? @db.Timestamptz(3)
+  enrollment Enrollment @relation(fields: [enrollmentId, courseId], references: [id, courseId], onDelete: Restrict)
+  quiz Quiz @relation(fields: [quizId, courseId], references: [id, courseId], onDelete: Restrict)
+  snapshotQuestions AttemptQuestion[]
+  @@unique([enrollmentId, quizId, number])
+  @@map("quiz_attempts")
+}
+
+// Snapshot rows do not FK the editable/deletable authoring Question.
+model AttemptQuestion {
+  attemptId String
+  questionId String
+  position Int
+  type String
+  payloadSnapshot Json @db.JsonB
+  maxScore Decimal @db.Decimal(65,30)
+  attempt QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
+  answer Answer?
+  @@id([attemptId, questionId])
+  @@unique([attemptId, position])
+  @@map("attempt_questions")
+}
+
+model Answer {
+  id String @id @default(uuid())
+  attemptId String
+  questionId String
+  response Json? @db.JsonB
+  score Decimal? @db.Decimal(65,30)
+  comment String?
+  gradedBy String?
+  gradedAt DateTime? @db.Timestamptz(3)
+  revision Int @default(0)
+  question AttemptQuestion @relation(fields: [attemptId, questionId], references: [attemptId, questionId], onDelete: Restrict)
+  grader Account? @relation("AnswerGrader", fields: [gradedBy], references: [id], onDelete: Restrict)
+  @@unique([attemptId, questionId])
+  @@map("answers")
+}

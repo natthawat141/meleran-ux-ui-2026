@@ -1,0 +1,9 @@
+{
+  "rootDir": "..",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "testEnvironment": "node",
+  "testMatch": ["<rootDir>/test/database/**/*.pg-spec.ts"],
+  "transform": { "^.+\\.ts$": "ts-jest" },
+  "testTimeout": 30000,
+  "maxWorkers": 1
+}
