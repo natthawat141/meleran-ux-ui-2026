@@ -68,6 +68,11 @@ function visit(id) {
   visiting.delete(id); visited.add(id);
 }
 for (const id of taskIds) visit(id);
+const migrationRoot = path.join(root, 'backend/prisma/migrations');
+const migrationNames = fs.readdirSync(migrationRoot, { withFileTypes: true })
+  .filter(entry => entry.isDirectory()).map(entry => entry.name).sort();
+assert.deepEqual(board.environment.migrations.map(migration => migration.name).sort(), migrationNames,
+  'Every migration batch must have a traceable checksum in the execution board');
 for (const migration of board.environment.migrations) {
   const bytes = fs.readFileSync(path.join(root, 'backend/prisma/migrations', migration.name, 'migration.sql'));
   assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), migration.sha256);

@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
 
 ต้องปิด D10
 
+Schema prerequisite update 11 ต.ค.: Course.createdBy now separates original creator from current instructorId, retaining truthful legacy NULL with FK/immutable audit. See [COURSE_CREATOR_AUDIT_SCHEMA](../COURSE_CREATOR_AUDIT_SCHEMA.md). Both future creation handlers must INSERT fresh actor ID with Course/createdAt atomically. Physical schema support is not evidence for HTTP creation, D10 approval, directories, full Auth or feature acceptance; whole task stays NEEDS_DECISION.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

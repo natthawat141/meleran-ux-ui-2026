@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 307,
+    "database_tests": 314,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -68,7 +68,8 @@
     "instructor_grant_http_postgres_tests": 18,
     "frontend_instructor_grant_transport_checks": 8,
     "managed_quiz_locator_http_postgres_tests": 13,
-    "frontend_managed_quiz_locator_transport_checks": 8
+    "frontend_managed_quiz_locator_transport_checks": 8,
+    "course_creator_schema_postgres_tests": 7
   },
   "environment": {
     "staging": false,
@@ -113,6 +114,10 @@
       {
         "name": "20261011044000_db05_practice_message_lock",
         "sha256": "3a23c0e8a4eccc4b7e16494e08f3990b4f05430241aea580f384f4524d632605"
+      },
+      {
+        "name": "20261011045000_db01_course_creator",
+        "sha256": "857c8152a11cdc4c5522efa903a53fdf80991ffeeaef44cfa5f4e127d9da0d8c"
       }
     ],
     "stripe_webhook": {
@@ -1186,7 +1191,31 @@
       "dependencies": [
         "FOUNDATION-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "components": [
+        {
+          "id": "course_creator_audit_schema",
+          "state": "COMPONENT_VERIFIED",
+          "postgres_tests": 7,
+          "migration": {
+            "name": "20261011045000_db01_course_creator",
+            "sha256": "857c8152a11cdc4c5522efa903a53fdf80991ffeeaef44cfa5f4e127d9da0d8c"
+          },
+          "protocol_document": "COURSE_CREATOR_AUDIT_SCHEMA.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01 original schema"
+          ],
+          "evidence": "Scope2.2 creator/Instructor gap repaired: distinct retained immutable Course.createdBy Account FK, truthful nullable legacy audit without guessed backfill. Actual old-row upgrade equality, all nine-batch DDL rollback/27 models, role/owner/reconnect retention, atomic rollback, FK and observed concurrent creator-delete lock wait. Prisma physical parity no DDL delta.",
+          "physical_schema_parity": "PASS_NO_DDL_DIFF",
+          "remaining": [
+            "COURSE-01 actual Instructor/Admin creation writers and D10 protocol",
+            "Auth/Management/directories/authoring browser gate"
+          ],
+          "new_http_operations": 0,
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "DB-02",
@@ -1702,7 +1731,7 @@
     "ci": "PASS",
     "verified_sha": "d56acfe409502305427191c3dbf29c447f33e0c7",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38095412874",
-    "latest_component_ci": "PASS_MANAGED_QUIZ_LOCATOR_CHECKPOINT",
+    "latest_component_ci": "PENDING_COURSE_CREATOR_SCHEMA_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
