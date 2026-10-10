@@ -92,7 +92,7 @@ Api รับ/validate/map HTTP DTO → Application ใช้ identity ที่
 
 ## Contract workflow
 
-Frontend Draft มี 86 operations และ 5 deferred provider operations; ยังไม่ Backend-frozen. Source คือ sibling `elearning-ux-v2/packages/contracts/openapi/openapi.json`; handbook เป็น generated readable projection.
+Frontend Draft มี 86 operations และ 5 deferred provider operations; ยังไม่ Backend-frozen. Source คือ sibling `docs/api-contract/openapi.json`; handbook เป็น generated readable projection.
 
 ก่อนทำแต่ละ flow:
 

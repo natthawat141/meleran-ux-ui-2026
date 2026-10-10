@@ -9,7 +9,7 @@ ASP.NET Core .NET 10 · Clean Architecture + Feature-first / use cases · Backen
 ต้องมี SDK `10.0.400` ตาม `global.json` (รองรับ patch ใหม่ของ feature band เดียวกัน).
 
 ```powershell
-cd D:\code\elearn-prod\melearn-api
+cd D:\code\elearn-prod\melearn-tutor-api
 dotnet restore Melearn.slnx --locked-mode
 dotnet build Melearn.slnx --configuration Release --no-restore
 dotnet test Melearn.slnx --configuration Release --no-build --no-restore
@@ -44,9 +44,9 @@ Health routes เป็น operational endpoints ใหม่ของ host ไ�
 
 - [Backend architecture และ decision register](docs/BACKEND_ARCHITECTURE.md)
 - [Auth decision: Firebase Email/Google และ .NET Username](docs/AUTH_DECISION_TH.md) — ยืนยัน provider แล้ว; session/HTTP changes เป็น Draft ยังไม่ได้เชื่อมจริง
-- Business scope: `../MELEARN_V1_SCOPE.md` Final 1.6; ใน Frontend Git คือ `../elearning-ux-v2/docs/MELEARN_V1_SCOPE.md`
-- API handbook: `../elearning-ux-v2/docs/API_CONTRACT_FEATURES_TH.md`
-- Canonical OpenAPI Draft: `../elearning-ux-v2/packages/contracts/openapi/openapi.json`
+- Business scope: `../docs/MELEARN_V1_SCOPE.md` Final 1.6; ใน Frontend Git คือ `../melearn-tutor-frontend/docs/MELEARN_V1_SCOPE.md`
+- API handbook: `../docs/api-contract/API_CONTRACT_FEATURES_TH.md`
+- Canonical OpenAPI Draft: `../docs/api-contract/openapi.json`
 
 Paths ข้างต้นอ้าง sibling checkout ใน workspace นี้. ยังไม่คัดลอก JSON/DTO เป็น contract อีกชุด. ก่อนสร้าง business API ให้ตกลงวิธีอ้าง version/แจกจ่าย canonical contract ระหว่าง repositories แล้วเพิ่ม contract tests.
 

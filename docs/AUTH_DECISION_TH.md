@@ -62,4 +62,4 @@ Google start/callback/link 4 operations ที่ deferred ต้อง review �
 - [Firebase ID token verification](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
 - [Firebase Email/Password](https://firebase.google.com/docs/auth/web/password-auth)
 - [Firebase custom authentication](https://firebase.google.com/docs/auth/admin/create-custom-tokens) — ทางเลือกที่ยังไม่ใช้
-- Final 1.6: workspace `../../MELEARN_V1_SCOPE.md` และ Frontend `../../elearning-ux-v2/docs/MELEARN_V1_SCOPE.md`
+- Final 1.6: workspace `../../MELEARN_V1_SCOPE.md` และ Frontend `../../melearn-tutor-frontend/docs/MELEARN_V1_SCOPE.md`
