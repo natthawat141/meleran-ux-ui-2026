@@ -5,14 +5,12 @@ import { AuthModule } from '../auth/auth.module';
 import { FreeEnrollmentService } from './free-enrollment.service';
 import { ResumeWriter } from './public/resume-writer.service';
 import { OwnEnrollmentListService } from './own-enrollment-list.service';
-import { CompletionCoordinator } from './public/completion-coordinator';
-import { CertificatesModule } from '../certificates/certificates.module';
-import { AssessmentsModule } from '../assessments/assessments.module';
+import { CompletionModule } from './completion.module';
 
 @Module({
-  imports: [AuthModule,CertificatesModule,AssessmentsModule],
+  imports: [AuthModule,CompletionModule],
   controllers: [EnrollmentsController],
-  providers: [EntitlementWriter, FreeEnrollmentService, ResumeWriter, OwnEnrollmentListService,CompletionCoordinator],
-  exports: [EntitlementWriter, ResumeWriter,CompletionCoordinator],
+  providers: [EntitlementWriter, FreeEnrollmentService, ResumeWriter, OwnEnrollmentListService],
+  exports: [EntitlementWriter, ResumeWriter,CompletionModule],
 })
 export class EnrollmentsModule {}

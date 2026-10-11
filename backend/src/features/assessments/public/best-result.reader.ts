@@ -1,22 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { summarizeSubmittedScores } from '../submitted-score';
+import { answerComplete } from '../answer-completeness';
 
 export interface BestQuizResult {
   attempt_id: string; earned: string; max: string; percent: number; passed: boolean;
   graded_at: string;
 }
 interface Candidate { id:string; maxScore:Prisma.Decimal; earnedScore:Prisma.Decimal; passed:boolean; gradedAt:Date; submittedAt:Date|null }
-interface Grade { type:string; maxScore:Prisma.Decimal; score:Prisma.Decimal|null; response:Prisma.JsonValue|null;gradedBy:string|null;gradedAt:Date|null }
+interface Grade { type:string; maxScore:Prisma.Decimal; score:Prisma.Decimal|null; response:Prisma.JsonValue|null;gradedBy:string|null;gradedAt:Date|null;responseMode?:unknown }
 const Exact = Prisma.Decimal.clone({precision:200});
-const object = (v:unknown):v is Record<string,unknown> => !!v&&typeof v==='object'&&!Array.isArray(v);
 function answered(row:Grade):boolean {
-  const r=row.response;if(!object(r))return false;
-  if(row.type==='single_choice'||row.type==='multiple_choice')return Array.isArray(r.option_ids)&&r.option_ids.length>0&&
-    (row.type!=='single_choice'||r.option_ids.length===1)&&r.option_ids.every(x=>typeof x==='string'&&x.length>0)&&new Set(r.option_ids).size===r.option_ids.length;
-  if(row.type==='essay')return typeof r.text==='string'&&r.text.trim().length>0;
-  if(row.type==='image')return typeof r.image_url==='string'&&r.image_url.length>0;
-  throw Error('Invalid persisted question type');
+  return answerComplete(row.type,row.response,row.responseMode);
 }
 
 /** Assessment-owned trusted proof. Caller holds Course SHARE then Enrollment UPDATE;
@@ -32,7 +27,7 @@ export class BestResultReader {
     let best:Candidate|null=null;
     for(const candidate of candidates){
       const grades=await tx.$queryRaw<Grade[]>(Prisma.sql`
-        SELECT q.type,q."maxScore",a.score,a.response,a."gradedBy",a."gradedAt" FROM attempt_questions q
+        SELECT q.type,q."maxScore",q."payloadSnapshot"->'response_mode' AS "responseMode",a.score,a.response,a."gradedBy",a."gradedAt" FROM attempt_questions q
         LEFT JOIN answers a ON a."attemptId"=q."attemptId" AND a."questionId"=q."questionId"
         WHERE q."attemptId"=${candidate.id} ORDER BY q.position,q."questionId"`);
       if(!candidate.submittedAt||!candidate.gradedAt||grades.some(g=>!answered(g)||

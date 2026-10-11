@@ -34,7 +34,8 @@ export function configureApplication(app: INestApplication, origins: string[]): 
     (request.method === 'POST' && /^\/api\/v1\/admin\/blog\/?$/i.test((request.url || '').split('?')[0])) ||
     (request.method === 'PATCH' && /^\/api\/v1\/admin\/blog\/[^/]+\/?$/i.test((request.url || '').split('?')[0])) ||
     (request.method === 'PATCH' && /^\/api\/v1\/courses\/[^/]+\/?$/i.test((request.url || '').split('?')[0])) ||
-    (request.method === 'POST' && /^\/api\/v1\/(?:instructor|admin)\/courses\/?$/i.test((request.url || '').split('?')[0]));
+    (request.method === 'POST' && /^\/api\/v1\/(?:instructor|admin)\/courses\/?$/i.test((request.url || '').split('?')[0])) ||
+    (request.method === 'PUT' && /^\/api\/v1\/learn\/attempts\/[^/]+\/answers\/?$/i.test((request.url || '').split('?')[0]));
   (app as NestExpressApplication).useBodyParser('json', { limit: '100kb',
     type: (request: IncomingMessage) => jsonRequest(request) && !transcriptRequest(request) && !largeWriteRequest(request) });
   (app as NestExpressApplication).useBodyParser('json', { limit: '3mb',

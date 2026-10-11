@@ -1026,6 +1026,63 @@ async function main() {
     assert.deepEqual(await counts(),beforeAdminPaymentCounts);assert.deepEqual(await paymentRows(),beforeAdminPaymentRows);
     adminPaymentChecks.push('Admin-read-reconnect-never-charges-or-grants');
 
+    phase = 'frontend-assessment-write-grade-completion';
+    const assessmentLifecycleChecks=[];
+    const assessmentCourse=await ownerResource('instructor/courses','POST',{title:tag+' assessment lifecycle',category:'test',level:'test'});
+    const assessmentAuthoring=await ownerResource('courses/'+assessmentCourse.id,'PATCH',{expected_revision:1,chapters:[{title:'Quiz chapter',items:[{type:'quiz',title:'Snapshot Quiz',quiz:{questions:[
+      {type:'single_choice',prompt:'Choice',points:3,options:[{text:'A'},{text:'B'}],correct_option_indices:[0]},
+      {type:'essay',prompt:'Essay',points:2,response_mode:'either'},
+      {type:'image',prompt:'Image evidence',points:0},
+    ],pass_percent:70}}]}]});
+    const assessmentReview=await ownerResource('courses/'+assessmentCourse.id+'/submit-review','POST',{expected_revision:2});
+    await adminResource('admin/course-reviews/'+assessmentReview.id+'/approve','POST',{expected_revision:2});
+    await ownerResource('courses/'+assessmentCourse.id+'/publish','POST',{});
+    const enrolledAssessment=await createCatalogApi(continuationHttp).enrollFree(assessmentCourse.id);
+    const assessmentItem=assessmentAuthoring.chapters[0].items[0],actualLearnerAssessments=await assessmentApiFor('continuation-learner'),actualOwnerAssessments=await assessmentApiFor('locator-owner');
+    const startedAssessment=await actualLearnerAssessments.start(assessmentItem.id);
+    phase='frontend-assessment-start';
+    assert.equal(startedAssessment.max,5);assert.equal(startedAssessment.status,'in_progress');
+    assert.equal((await actualLearnerAssessments.start(assessmentItem.id)).id,startedAssessment.id);
+    assessmentLifecycleChecks.push('actual-authoring-review-publication-enrollment-and-assessment-Start-clients');
+    assert.equal(JSON.stringify(startedAssessment).includes('correct_key'),false);
+    const [assessmentChoice,assessmentEssay,assessmentImage]=startedAssessment.questions;
+    await assert.rejects(actualLearnerAssessments.submit(startedAssessment.id),error=>error instanceof HttpClientError&&error.status===422);
+    const assessmentAnswers={[assessmentChoice.id]:{option_ids:[assessmentChoice.options[0].id]},[assessmentEssay.id]:{text:'Actual answer'},[assessmentImage.id]:{image_url:'https://example.test/answer.png'}};
+    await actualLearnerAssessments.saveAnswers(startedAssessment.id,assessmentAnswers);
+    const submittedAssessment=await actualLearnerAssessments.submit(startedAssessment.id);
+    assert.equal(submittedAssessment.status,'pending_review');assert.equal(submittedAssessment.earned,null);
+    assert.deepEqual(await actualLearnerAssessments.submit(startedAssessment.id),submittedAssessment);
+    await assert.rejects(actualLearnerAssessments.saveAnswers(startedAssessment.id,assessmentAnswers),error=>error instanceof HttpClientError&&error.status===409);
+    assessmentLifecycleChecks.push('actual-Save-Submit-pending-decoder-incomplete422-frozen409-and-submit-replay');
+    const actualQueue=await actualOwnerAssessments.gradingQueue();assert.ok(actualQueue.some(row=>row.attempt_id===startedAssessment.id&&row.questions_to_grade.length===2));
+    phase='frontend-assessment-queue';
+    assert.equal((await ownerResource('instructor/grading-queue')).items.find(row=>row.attempt_id===startedAssessment.id).questions_to_grade[1].max,0);
+    await assert.rejects(actualOwnerAssessments.grade(startedAssessment.id,assessmentEssay.id,2.5,null),error=>error instanceof HttpClientError&&error.status===422);
+    await assert.rejects((await assessmentApiFor('continuation-learner')).grade(startedAssessment.id,assessmentEssay.id,2,null),error=>error instanceof HttpClientError&&error.status===404);
+    assessmentLifecycleChecks.push('actual-owner-grading-queue-zero-point-decoder-overmax-and-foreign-grade-denials');
+    await actualOwnerAssessments.grade(startedAssessment.id,assessmentEssay.id,2,'checked');
+    const assessmentFinal=await actualOwnerAssessments.grade(startedAssessment.id,assessmentImage.id,0,null);
+    phase='frontend-assessment-final-grade';
+    assert.equal(assessmentFinal.passed,true);assert.equal(assessmentFinal.percent,100);
+    const resourceFinal=await ownerResource('instructor/attempts/'+startedAssessment.id+'/questions/'+assessmentImage.id+'/grade','PUT',{score:0,comment:null});
+    assert.equal(resourceFinal.id,assessmentFinal.id);assert.equal(resourceFinal.passed,assessmentFinal.passed);assert.deepEqual(resourceFinal.question_results,assessmentFinal.question_results);
+    assessmentLifecycleChecks.push('actual-last-grade-and-canonical-resource-serialize-full-result');
+    const assessmentResults=await foreignResource('learn/items/'+assessmentItem.id+'/results');assert.equal(assessmentResults.best.attempt_id,startedAssessment.id);assert.equal(assessmentResults.completed,true);
+    phase='frontend-assessment-results';
+    const assessmentLearning=await continuationLearning.course(assessmentCourse.id);assert.ok(assessmentLearning.certificate_id);assert.equal(assessmentLearning.progress.completed_items,1);
+    const certificateAfterQuiz=await (await certificateApiFor('continuation-learner')).get(assessmentLearning.certificate_id);assert.equal(certificateAfterQuiz.course_title,assessmentCourse.title);
+    assessmentLifecycleChecks.push('actual-results-Learning-and-Certificate-clients-see-atomic-last-grade-completion');
+    const assessmentSecond=await actualLearnerAssessments.start(assessmentItem.id);assert.equal(assessmentSecond.number,2);
+    await actualLearnerAssessments.saveAnswers(assessmentSecond.id,{...assessmentAnswers,[assessmentChoice.id]:{option_ids:[assessmentChoice.options[1].id]}});
+    await actualLearnerAssessments.submit(assessmentSecond.id);await actualOwnerAssessments.grade(assessmentSecond.id,assessmentEssay.id,0,null);await actualOwnerAssessments.grade(assessmentSecond.id,assessmentImage.id,0,null);
+    assert.equal((await foreignResource('learn/items/'+assessmentItem.id+'/results')).best.attempt_id,startedAssessment.id);
+    assert.equal((await continuationLearning.course(assessmentCourse.id)).certificate_id,assessmentLearning.certificate_id);
+    assessmentLifecycleChecks.push('actual-retake-lower-score-keeps-best-and-first-Certificate');
+    await db.$disconnect();await db.$connect();assert.deepEqual(await actualLearnerAssessments.attempt(startedAssessment.id),assessmentFinal);
+    assert.deepEqual(await (await certificateApiFor('continuation-learner')).get(assessmentLearning.certificate_id),certificateAfterQuiz);
+    assert.equal((await db.enrollment.findUniqueOrThrow({where:{id:enrolledAssessment.id}})).completedItems,1);
+    assessmentLifecycleChecks.push('reconnect-keeps-frozen-attempt-and-Certificate-snapshots');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -1167,6 +1224,7 @@ async function main() {
     result.managementHistory = {checks:historyChecks.length,checkNames:historyChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.adminPayment = {checks:adminPaymentChecks.length,checkNames:adminPaymentChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.authoringReview = {checks:authoringReviewChecks.length,checkNames:authoringReviewChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.assessmentLifecycle = {checks:assessmentLifecycleChecks.length,checkNames:assessmentLifecycleChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {

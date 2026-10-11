@@ -20,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 71,
+    "implemented_operations": 77,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -645,7 +645,7 @@
       "operationId": "post_learn_items_id_attempts",
       "task_id": "ASSESS-01",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "LEARN-01",
@@ -663,7 +663,7 @@
         "Q09",
         "Q10"
       ],
-      "remaining": "Unresolved behavior: D06, D09, D10; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/ASSESS-01.md",
         "contracts/ASSESS-01.openapi.json",
@@ -676,7 +676,7 @@
       "operationId": "put_learn_attempts_id_answers",
       "task_id": "ASSESS-01",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "LEARN-01",
@@ -694,7 +694,7 @@
         "Q09",
         "Q10"
       ],
-      "remaining": "Unresolved behavior: D06, D09, D10; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/ASSESS-01.md",
         "contracts/ASSESS-01.openapi.json",
@@ -707,7 +707,7 @@
       "operationId": "post_learn_attempts_id_submit",
       "task_id": "ASSESS-01",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "LEARN-01",
@@ -725,7 +725,7 @@
         "Q09",
         "Q10"
       ],
-      "remaining": "Unresolved behavior: D06, D09, D10; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/ASSESS-01.md",
         "contracts/ASSESS-01.openapi.json",
@@ -763,7 +763,7 @@
       "operationId": "get_learn_items_id_results",
       "task_id": "ASSESS-02",
       "wave": 13,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "ASSESS-01"
@@ -775,7 +775,7 @@
         "Q07",
         "AI21"
       ],
-      "remaining": "Unresolved behavior: D06; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/ASSESS-02.md",
         "contracts/ASSESS-02.openapi.json",
@@ -788,7 +788,7 @@
       "operationId": "get_instructor_grading-queue",
       "task_id": "GRADE-01",
       "wave": 13,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "ASSESS-01",
@@ -803,7 +803,7 @@
         "Q07",
         "Q11"
       ],
-      "remaining": "Unresolved behavior: D06, D10; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/GRADE-01.md",
         "contracts/GRADE-01.openapi.json",
@@ -816,7 +816,7 @@
       "operationId": "put_instructor_attempts_id_questions_question_id_grade",
       "task_id": "GRADE-01",
       "wave": 13,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "ASSESS-01",
@@ -831,7 +831,7 @@
         "Q07",
         "Q11"
       ],
-      "remaining": "Unresolved behavior: D06, D10; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/GRADE-01.md",
         "contracts/GRADE-01.openapi.json",
@@ -2420,13 +2420,13 @@
     {
       "wave": 12,
       "defined_operations": 8,
-      "implemented_operations": 5,
+      "implemented_operations": 8,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 13,
       "defined_operations": 4,
-      "implemented_operations": 1,
+      "implemented_operations": 4,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2455,12 +2455,12 @@
     }
   ],
   "checkpoint": {
-    "verified_sha": "89f46fdb4e2f8327476623b8712e3347fa9e765c",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38111054853",
-    "tests": 645,
-    "frontend_client_checks": 198,
+    "verified_sha": "bfa8c88ff06227839c628923b25c5dc6cd146f51",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173958",
+    "tests": 677,
+    "frontend_client_checks": 206,
     "full_acceptance": false,
-    "current_operations": 71,
+    "current_operations": 77,
     "current_hosted_status": "PENDING_PUSH"
   }
 }

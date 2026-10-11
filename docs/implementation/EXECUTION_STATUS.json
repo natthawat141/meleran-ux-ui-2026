@@ -16,7 +16,7 @@
   },
   "verified": {
     "foundation_tests": 53,
-    "database_tests": 560,
+    "database_tests": 585,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -24,7 +24,7 @@
     "boundary_gate": "PASS_ZERO_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 64,
+    "feature_component_unit_tests": 76,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
@@ -33,7 +33,7 @@
     "frontend_typecheck": "PASS_WEB_ADMIN_PACKAGES",
     "frontend_build": "PASS_WEB_ADMIN",
     "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500",
-    "frontend_hosted_tests": 173,
+    "frontend_hosted_tests": 174,
     "stripe_receiver_unit_tests": 5,
     "stripe_receiver_http_pg_tests": 10,
     "principal_resolution_postgres_tests": 8,
@@ -53,7 +53,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 206,
+    "frontend_client_checks_total": 213,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -76,7 +76,7 @@
     "frontend_admin_user_detail_transport_checks": 10,
     "local_auth_kernel_postgres_tests": 25,
     "local_password_unit_tests": 6,
-    "frontend_local_tests": 174,
+    "frontend_local_tests": 176,
     "frontend_contract_check": "PASS_DRAFT_2",
     "frontend_local_typecheck": "PASS_WEB_ADMIN_PACKAGES",
     "self_profile_patch_http_postgres_tests": 10,
@@ -87,12 +87,12 @@
     "current_checkpoint": {
       "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 560,
-      "feature_component_unit_tests": 64,
-      "total_tests": 677,
-      "regression_basis": "Previous645 exact-SHA hosted pass; Authoring/Review25 PG +7 units; current foundation53/typecheck/build/contracts/Web+Admin checks pass; all206 actual Frontend clients pass",
-      "frontend_client_checks": 206,
-      "frontend_tests": 174,
+      "database_tests": 585,
+      "feature_component_unit_tests": 76,
+      "total_tests": 714,
+      "regression_basis": "Previous677 exact hosted PASS;25 new PG+12 units;65 prior Attempt/Completion/Management PG regressions;53 foundation;213 actual Frontend clients;strict TS/build/contracts/Web+Admin tests176 pass",
+      "frontend_client_checks": 213,
+      "frontend_tests": 176,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
@@ -119,7 +119,7 @@
     "frontend_continuation_list_resume_checks": 10,
     "frontend_ai_history_checks": 5,
     "frontend_admin_directory_checks": 6,
-    "total_local_tests": 677,
+    "total_local_tests": 714,
     "learning_authoring_continuation": {
       "new_operations": 8,
       "postgres_tests": 49,
@@ -137,12 +137,12 @@
     "last_verified_checkpoint": {
       "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 535,
-      "feature_component_unit_tests": 57,
-      "total_tests": 645,
-      "regression_basis": "Previous617 checkpoint hosted passed; Management16 and Admin payment12 PG; existing managed detail25 and own payment16 pass after shared-reader extraction; current foundation53 and all198 Frontend client checks pass",
-      "frontend_client_checks": 198,
-      "frontend_tests": 173,
+      "database_tests": 560,
+      "feature_component_unit_tests": 64,
+      "total_tests": 677,
+      "regression_basis": "Previous645 exact-SHA hosted pass; Authoring/Review25 PG +7 units; current foundation53/typecheck/build/contracts/Web+Admin checks pass; all206 actual Frontend clients pass",
+      "frontend_client_checks": 206,
+      "frontend_tests": 174,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
@@ -151,8 +151,8 @@
       "schema_delta": false,
       "browser_acceptance": false,
       "hosted_status": "PASS",
-      "verified_sha": "89f46fdb4e2f8327476623b8712e3347fa9e765c",
-      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38111054853"
+      "verified_sha": "bfa8c88ff06227839c628923b25c5dc6cd146f51",
+      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173958"
     },
     "local_username_http": {
       "state": "COMPONENT_VERIFIED",
@@ -191,6 +191,17 @@
       "frontend_client_checks": 8,
       "local_targeted_status": "PASS",
       "protocol_document": "AUTHORING_REVIEW_COMPONENT.md",
+      "full_regression": "PENDING_HOSTED",
+      "hosted_status": "PASS_EXACT_BFA8C88",
+      "browser_acceptance": false
+    },
+    "assessment_lifecycle_continuation": {
+      "new_operations": 6,
+      "postgres_tests": 25,
+      "feature_units": 12,
+      "frontend_client_checks": 7,
+      "local_targeted_status": "PASS",
+      "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
       "full_regression": "PENDING_HOSTED",
       "hosted_status": "PENDING_PUSH",
       "browser_acceptance": false
@@ -1467,13 +1478,55 @@
           "tests": 8,
           "http_operation_verified": false,
           "evidence": "Submitted trusted snapshot grades; exact Decimal strict >70; pending -> no pass; per-question bounds; zero maximum not pass. No best-attempt policy D06 chosen, no Progress writes."
+        },
+        {
+          "id": "assessment_post_learn_items_id_attempts",
+          "method": "POST",
+          "path": "/learn/items/{id}/attempts",
+          "operationId": "post_learn_items_id_attempts",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/assessment-write.pg-spec.ts",
+          "shared_suite_tests": 25,
+          "tests_shared_across_operations": true,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG snapshots/scoring/normalized owner permissions/frozen drafts/replay/concurrent completion/rollback/history/results;7 actual Frontend lifecycle checks."
+        },
+        {
+          "id": "assessment_put_learn_attempts_id_answers",
+          "method": "PUT",
+          "path": "/learn/attempts/{id}/answers",
+          "operationId": "put_learn_attempts_id_answers",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/assessment-write.pg-spec.ts",
+          "shared_suite_tests": 25,
+          "tests_shared_across_operations": true,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG snapshots/scoring/normalized owner permissions/frozen drafts/replay/concurrent completion/rollback/history/results;7 actual Frontend lifecycle checks."
+        },
+        {
+          "id": "assessment_post_learn_attempts_id_submit",
+          "method": "POST",
+          "path": "/learn/attempts/{id}/submit",
+          "operationId": "post_learn_attempts_id_submit",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/assessment-write.pg-spec.ts",
+          "shared_suite_tests": 25,
+          "tests_shared_across_operations": true,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG snapshots/scoring/normalized owner permissions/frozen drafts/replay/concurrent completion/rollback/history/results;7 actual Frontend lifecycle checks."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -1514,13 +1567,27 @@
           "full_acceptance": false,
           "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600"
+        },
+        {
+          "id": "assessment_get_learn_items_id_results",
+          "method": "GET",
+          "path": "/learn/items/{id}/results",
+          "operationId": "get_learn_items_id_results",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/assessment-write.pg-spec.ts",
+          "shared_suite_tests": 25,
+          "tests_shared_across_operations": true,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG snapshots/scoring/normalized owner permissions/frozen drafts/replay/concurrent completion/rollback/history/results;7 actual Frontend lifecycle checks."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -1539,9 +1606,39 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "assessment_get_instructor_grading_queue",
+          "method": "GET",
+          "path": "/instructor/grading-queue",
+          "operationId": "get_instructor_grading-queue",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/assessment-write.pg-spec.ts",
+          "shared_suite_tests": 25,
+          "tests_shared_across_operations": true,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG snapshots/scoring/normalized owner permissions/frozen drafts/replay/concurrent completion/rollback/history/results;7 actual Frontend lifecycle checks."
+        },
+        {
+          "id": "assessment_put_instructor_attempts_id_questions_question_id_grade",
+          "method": "PUT",
+          "path": "/instructor/attempts/{id}/questions/{question_id}/grade",
+          "operationId": "put_instructor_attempts_id_questions_question_id_grade",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/assessment-write.pg-spec.ts",
+          "shared_suite_tests": 25,
+          "tests_shared_across_operations": true,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG snapshots/scoring/normalized owner permissions/frozen drafts/replay/concurrent completion/rollback/history/results;7 actual Frontend lifecycle checks."
+        }
+      ]
     },
     {
       "id": "CERT-01",
@@ -2902,6 +2999,13 @@
           "frontend_client_checks": 8,
           "protocol_document": "AUTHORING_REVIEW_COMPONENT.md",
           "full_acceptance": false
+        },
+        {
+          "id": "assessment_lifecycle_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 7,
+          "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -3112,19 +3216,20 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "89f46fdb4e2f8327476623b8712e3347fa9e765c",
+    "verified_sha": "bfa8c88ff06227839c628923b25c5dc6cd146f51",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
     "latest_component_ci": "PASS_PROFILE_REDEEM_MANAGED_ATTEMPT",
-    "frontend_ci": "PENDING_CURRENT_REVIEW_DECODER_PUSH",
+    "frontend_ci": "PENDING_CURRENT_ASSESSMENT_DECODER_PUSH",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421322",
     "frontend_ci_evidence_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
     "frontend_ci_evidence_note": "Exact ebcfd4d Frontend173 tests/typecheck/build/contracts and both container builds passed; Blog continuation changes Backend/harness/docs only.",
     "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
-    "current_checkpoint_ci": "PENDING_AUTHORING_PUSH",
-    "current_checkpoint_evidence": "Previous exact 89f46fd hosted645 tests/198 actual Frontend checks passed; current Authoring checkpoint full regression pending push.",
+    "current_checkpoint_ci": "PENDING_ASSESSMENT_PUSH",
+    "current_checkpoint_evidence": "Previous bfa hosted Backend677 tests/206 clients and Frontend174 tests both pass; current714 regression pending push.",
     "frontend_source_changed": true,
-    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38111054853"
+    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173958",
+    "last_frontend_ci_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173960"
   },
   "remaining_decisions": [
     "D01",

@@ -22,7 +22,13 @@ export class AttemptReadService {
         SELECT id,"definitionSnapshot"->'item_id' AS "itemId" FROM quiz_attempts
         WHERE id=${attemptId} AND "enrollmentId"=${grants[0].id} FOR SHARE`);
       if (!locked.length) throw ApiException.notFound('ไม่พบการทำแบบฝึกหัด');
-      const row = await tx.quizAttempt.findUniqueOrThrow({ where: { id: locked[0].id }, select: {
+      return this.readLocked(tx,locked[0].id,locked[0].itemId);
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted });
+  }
+
+  /** Assessment-local participant: caller holds scoped Enrollment/Attempt locks and fresh authority. */
+  async readLocked(tx:Prisma.TransactionClient,attemptId:string,itemId:unknown):Promise<AttemptView>{
+      const row = await tx.quizAttempt.findUniqueOrThrow({ where: { id: attemptId }, select: {
         id: true, courseId: true, number: true, status: true, startedAt: true, submittedAt: true, gradedAt: true,
         maxScore: true, earnedScore: true, passed: true,
       } });
@@ -31,10 +37,9 @@ export class AttemptReadService {
       const questions = await tx.$queryRaw<StoredQuestionRead[]>(Prisma.sql`
         SELECT q."questionId",q.type,q."maxScore",q."payloadSnapshot"->'prompt' AS prompt,
           q."payloadSnapshot"->'options' AS options,(q."payloadSnapshot" ? 'prompt_doc') AS "hasPromptDoc",
-          q."payloadSnapshot"->'prompt_doc' AS "promptDoc",a.id AS "answerId",a.response,a.score,a.comment
+          q."payloadSnapshot"->'prompt_doc' AS "promptDoc",q."payloadSnapshot"->'response_mode' AS "responseMode",a.id AS "answerId",a.response,a.score,a.comment
         FROM attempt_questions q LEFT JOIN answers a ON a."attemptId"=q."attemptId" AND a."questionId"=q."questionId"
         WHERE q."attemptId"=${row.id} ORDER BY q.position ASC,q."questionId" ASC`);
-      return projectAttempt({ ...row, itemId: locked[0].itemId }, questions);
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted });
+      return projectAttempt({ ...row, itemId }, questions);
   }
 }

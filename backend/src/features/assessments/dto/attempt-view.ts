@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { summarizeSubmittedScores } from '../submitted-score';
+import { answerComplete } from '../answer-completeness';
 
 type QuestionType = 'single_choice' | 'multiple_choice' | 'essay' | 'image';
 export interface AttemptQuestionView {
@@ -24,6 +25,7 @@ export interface StoredQuestionRead {
   questionId: string; type: string; prompt: unknown; options: unknown;
   hasPromptDoc: boolean; promptDoc: Prisma.JsonValue; maxScore: Prisma.Decimal;
   answerId: string | null; response: unknown; score: Prisma.Decimal | null; comment: string | null;
+  responseMode?: unknown;
 }
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const string = (v: unknown): v is string => typeof v === 'string';
@@ -65,14 +67,7 @@ export function projectAttempt(row: StoredAttemptRead, snapshots: readonly Store
   const total = summarizeSubmittedScores(snapshots.map(q => ({ maxScore: q.maxScore, score: q.score })));
   if (!total.maxScore.eq(row.maxScore)) throw new Error('Mismatched attempt maximum');
   const graded = row.status === 'graded';
-  const complete = (q: StoredQuestionRead) => {
-    if (!object(q.response)) return false;
-    if (q.type === 'single_choice' || q.type === 'multiple_choice')
-      return Array.isArray(q.response.option_ids) && q.response.option_ids.length > 0 &&
-        (q.type !== 'single_choice' || q.response.option_ids.length === 1);
-    const value = q.type === 'essay' ? q.response.text : q.response.image_url;
-    return string(value) && value.trim().length > 0;
-  };
+  const complete = (q: StoredQuestionRead) => answerComplete(q.type,q.response,q.responseMode);
   if (graded && (!row.gradedAt || !row.submittedAt || row.earnedScore === null || total.status !== 'graded' ||
       !total.score.eq(row.earnedScore) || row.passed !== total.passed || snapshots.some(q => !q.answerId || !complete(q))))
     throw new Error('Missing complete graded proof');

@@ -24,7 +24,7 @@ export class ManagedAttemptReader{
     const grants=await tx.$queryRaw<Array<{id:string;userId:string;displayName:string}>>(Prisma.sql`
       SELECT e.id,e."accountId" AS "userId",u."displayName" AS "displayName" FROM enrollments e
       JOIN quiz_attempts a ON a."enrollmentId"=e.id AND a."courseId"=e."courseId" JOIN accounts u ON u.id=e."accountId"
-      WHERE a.id=${scope.id} AND e."courseId"=${scope.courseId} FOR SHARE OF e,u`);
+      WHERE a.id=${scope.id} AND e."courseId"=${scope.courseId} FOR SHARE OF e`);
     if(!grants.length)throw ApiException.notFound();
     const locks=await tx.$queryRaw<Array<{itemId:unknown}>>(Prisma.sql`
       SELECT "definitionSnapshot"->'item_id' AS "itemId" FROM quiz_attempts WHERE id=${scope.id} AND "enrollmentId"=${grants[0].id} FOR SHARE`);

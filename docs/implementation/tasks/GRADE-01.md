@@ -88,3 +88,7 @@ Feature gate: **G-ASSESSMENT** ใน [Execution Plan](../EXECUTION_PLAN.md); �
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+## Assessment lifecycle execution override — 2026-10-11
+
+Latest user authorizes agent-selected documented protocols. [Evidence](../ASSESSMENT_LIFECYCLE_COMPONENT.md) and [decision record](../AUTONOMOUS_EXECUTION_DECISIONS.md) override earlier D06/D09/D10 waits for these implemented APIs. All package APIs have component evidence; shared25 PG/12 units/7 actual Frontend checks. Browser/original113 acceptance remain pending. No new HTTP shape/schema/dependency.

@@ -5,6 +5,19 @@ import { restoreQuizDraft } from '../packages/course-authoring/src/quiz-draft.ts
 import { createWorld, accounts } from './support/provisional-api.mjs';
 import { createHttpClient, HttpClientError } from '../packages/api-client/src/index.ts';
 
+test('canonical QuizResults preserves pending nulls and fractional result; rejects score leakage fields', () => {
+  const attempt={attempt_id:'a',number:1,status:'pending_review',submitted_at:'2026-10-11T00:00:00Z',graded_at:null,earned:null,max:3.75,percent:null,passed:null};
+  const results={attempts:[attempt],best:null,completed:false};
+  assert.doesNotThrow(()=>decode('learn/items/q/results','GET',results));
+  assert.throws(()=>decode('learn/items/q/results','GET',{...results,attempts:[{...attempt,correct_key:['x']}]}));
+  assert.throws(()=>decode('learn/items/q/results','GET',{...results,attempts:[{...attempt,max:'3.75'}]}));
+});
+test('canonical zero-point manual question and grade decode without positive-only assumption', () => {
+  const queue={items:[{attempt_id:'a',course_id:'c',item_id:'i',user_id:'u',learner_display_name:'Learner',submitted_at:'2026-10-11T00:00:00Z',
+    questions_to_grade:[{question_id:'q',type:'image',prompt:'Image',max:0,answer:{image_url:'https://example.test/a.png'}}]}],next_cursor:null};
+  assert.doesNotThrow(()=>decode('instructor/grading-queue','GET',queue));
+});
+
 async function context() {
   const w = createWorld();
   const owner = w.browser(),

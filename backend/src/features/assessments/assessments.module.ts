@@ -4,7 +4,11 @@ import { AttemptReadController } from './attempt-read.controller';
 import { AttemptReadService } from './attempt-read.service';
 import { ManagedAttemptReadService } from './managed-attempt-read.service';
 import { ManagedAttemptReadController } from './managed-attempt-read.controller';
-import { BestResultReader,ManagedAttemptReader } from './public/index';
+import { AssessmentReadModule } from './assessment-read.module';
+import { CompletionModule } from '../enrollments/completion.module';
+import { AssessmentWriteController } from './assessment-write.controller';
+import { AssessmentWriteService } from './assessment-write.service';
+import { AssessmentHistoryService } from './assessment-history.service';
 
-@Module({ imports: [AuthModule], controllers: [AttemptReadController,ManagedAttemptReadController], providers: [AttemptReadService,ManagedAttemptReadService,BestResultReader,ManagedAttemptReader], exports:[BestResultReader,ManagedAttemptReader] })
+@Module({ imports: [AuthModule,AssessmentReadModule,CompletionModule], controllers: [AttemptReadController,ManagedAttemptReadController,AssessmentWriteController], providers: [AttemptReadService,ManagedAttemptReadService,AssessmentWriteService,AssessmentHistoryService], exports:[AssessmentReadModule] })
 export class AssessmentsModule {}

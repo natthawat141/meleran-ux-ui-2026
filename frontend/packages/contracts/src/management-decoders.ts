@@ -28,6 +28,7 @@ const positive: Check = (v) => {
   number(v);
   if ((v as number) <= 0) fail();
 };
+const nonnegative: Check = (v) => { number(v); if ((v as number) < 0) fail(); };
 const revision: Check = (v) => {
   count(v);
   positive(v);
@@ -174,7 +175,7 @@ const questionFields = {
   id: identifier,
   type: values('single_choice', 'multiple_choice', 'essay', 'image'),
   prompt: text,
-  points: positive,
+  points: nonnegative,
   prompt_doc: jsonDoc,
   rubric: nullable(text),
   response_mode: values('text', 'image', 'either'),
@@ -383,10 +384,23 @@ const gradeResponse = object({
   percent: nullable(number),
   question_results: nullable(
     list(
-      object({ question_id: identifier, score: number, max: positive, comment: nullable(text) }),
+      object({ question_id: identifier, score: number, max: nonnegative, comment: nullable(text) }),
     ),
   ),
 });
+const quizResultsShape = object({
+  attempts: list(object({ attempt_id: identifier, number: revision, status: values('in_progress','pending_review','graded'),
+    submitted_at: nullable(date), graded_at: nullable(date), earned: nullable(number), max: nonnegative, percent: nullable(number), passed: nullable(boolean) })),
+  best: nullable(object({ attempt_id: identifier, earned: nullable(number), max: nonnegative, percent: nullable(number), passed: nullable(boolean) })),
+  completed: boolean,
+});
+const quizResults: Check = (v) => {
+  quizResultsShape(v);
+  const x=record(v),exact=(row:unknown,keys:string[])=>{if(Object.keys(record(row)).some(k=>!keys.includes(k)))fail();};
+  exact(x,['attempts','best','completed']);
+  for(const a of x.attempts as unknown[])exact(a,['attempt_id','number','status','submitted_at','graded_at','earned','max','percent','passed']);
+  if(x.best!==null)exact(x.best,['attempt_id','earned','max','percent','passed']);
+};
 const queueItem = object({
   attempt_id: identifier,
   course_id: identifier,
@@ -399,7 +413,7 @@ const queueItem = object({
       question_id: identifier,
       type: values('essay', 'image'),
       prompt: text,
-      max: positive,
+      max: nonnegative,
       answer: object({ text, image_url: text }, ['text', 'image_url']),
     }),
   ),
@@ -494,6 +508,7 @@ export function decodeManagementResponse(path: string, method: string, payload: 
   else if (/^(courses\/[^/]+\/attempts|admin\/users\/[^/]+\/attempts)$/.test(p) && m === 'GET')
     check = page(managedAttempt);
   else if (/^instructor\/attempts\/[^/]+$/.test(p) && m === 'GET') check = managedAttempt;
+  else if (/^learn\/items\/[^/]+\/results$/.test(p) && m === 'GET') check = quizResults;
   else if (/^instructor\/attempts\/[^/]+\/questions\/[^/]+\/grade$/.test(p) && m === 'PUT')
     check = gradeResponse;
   else if (p === 'instructor/grading-queue' && m === 'GET') check = page(queueItem);
