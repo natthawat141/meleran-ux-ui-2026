@@ -4,6 +4,8 @@ Status: **BLOCKED** · Priority: P1 · Module: courses
 
 รอ dependencies: COURSE-02
 
+Storage preflight 11 ต.ค.: [CONTRACT_STORAGE_GAPS](../CONTRACT_STORAGE_GAPS.md#course-02--review-01--authoring-readwrite-prerequisites) แยก confirmed revision/history requirement จาก proposed review payload storage. D04 ของ prerequisite ต้องกำหนด old-review detail/current-course stale behavior ก่อน reader; Scope §4.6 ไม่บังคับ full course-version system. ห้าม silently คืน current course เป็น submitted snapshot.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

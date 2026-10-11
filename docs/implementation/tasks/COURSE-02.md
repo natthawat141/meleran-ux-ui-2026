@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
 
 ต้องปิด D04, D05, D09
 
+Storage preflight 11 ต.ค.: [CONTRACT_STORAGE_GAPS](../CONTRACT_STORAGE_GAPS.md#course-02--review-01--authoring-readwrite-prerequisites) ระบุ publisher/legacy creator/revision0/optional plain metadata และ old-review projection gaps. ปิดเฉพาะ decisions ที่เกี่ยวข้องก่อนเลือก physical delta; ห้ามเดา creator/publisher, บวก revision ใน reader, ทิ้ง supplied fields หรือสร้าง full course-version requirement เอง. Preview ใช้ schema แยกจาก full authoring DTO.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
