@@ -29,4 +29,4 @@ Legacy Management detail getter removed. AST comparison proves all remaining pro
 
 Whole MGMT-01 remains NEEDS_DECISION: D02/D03 normalized creation/credentials/provider/status protocol, D16 directory/search/cursor and privacy review, complete Auth and actual Management browser gate/A07/A08. Original113 acceptance cases remain open. No schema/migration/library/contract/provider/cloud/STG/deploy change; all nine migration checksums retained.
 
-Local regression checkpoint: 49 foundation + 28 feature units + 332 PostgreSQL = 409 tests; 124 client/transport checks including10 detail checks. Hosted checkpoint pending; previous CI is historical evidence.
+Local regression checkpoint: 49 foundation + 28 feature units + 332 PostgreSQL = 409 tests; 124 client/transport checks including10 detail checks. [Hosted Nest CI 38097574321](https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321) passed exact code SHA `008c9e8cd62933e734330f5a1ae4d9531959d721`; full task/feature/acceptance remain open.
