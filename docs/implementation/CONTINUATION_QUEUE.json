@@ -20,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 48,
+    "implemented_operations": 57,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -1819,7 +1819,7 @@
       "operationId": "delete_admin_blog_id",
       "task_id": "BLOG-03",
       "wave": 7,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "BLOG-02"
@@ -1828,7 +1828,7 @@
         "B02",
         "B03"
       ],
-      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-03.md",
         "contracts/BLOG-03.openapi.json",
@@ -1841,7 +1841,7 @@
       "operationId": "patch_admin_blog_id",
       "task_id": "BLOG-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1853,7 +1853,7 @@
         "B03",
         "B04"
       ],
-      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-02.md",
         "contracts/BLOG-02.openapi.json",
@@ -1866,7 +1866,7 @@
       "operationId": "post_admin_blog_id_unpublish",
       "task_id": "BLOG-03",
       "wave": 7,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "BLOG-02"
@@ -1875,7 +1875,7 @@
         "B02",
         "B03"
       ],
-      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-03.md",
         "contracts/BLOG-03.openapi.json",
@@ -1888,7 +1888,7 @@
       "operationId": "get_blog",
       "task_id": "BLOG-01",
       "wave": 4,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "DB-05"
@@ -1898,7 +1898,7 @@
         "B02",
         "B04"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-01.md",
         "contracts/BLOG-01.openapi.json",
@@ -1911,7 +1911,7 @@
       "operationId": "get_blog_slug",
       "task_id": "BLOG-01",
       "wave": 4,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "DB-05"
@@ -1921,7 +1921,7 @@
         "B02",
         "B04"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-01.md",
         "contracts/BLOG-01.openapi.json",
@@ -1934,7 +1934,7 @@
       "operationId": "get_admin_blog",
       "task_id": "BLOG-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1946,7 +1946,7 @@
         "B03",
         "B04"
       ],
-      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-02.md",
         "contracts/BLOG-02.openapi.json",
@@ -1959,7 +1959,7 @@
       "operationId": "post_admin_blog",
       "task_id": "BLOG-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1971,7 +1971,7 @@
         "B03",
         "B04"
       ],
-      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-02.md",
         "contracts/BLOG-02.openapi.json",
@@ -1984,7 +1984,7 @@
       "operationId": "get_admin_blog_id_preview",
       "task_id": "BLOG-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1996,7 +1996,7 @@
         "B03",
         "B04"
       ],
-      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-02.md",
         "contracts/BLOG-02.openapi.json",
@@ -2009,7 +2009,7 @@
       "operationId": "post_admin_blog_id_publish",
       "task_id": "BLOG-03",
       "wave": 7,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "BLOG-02"
@@ -2018,7 +2018,7 @@
         "B02",
         "B03"
       ],
-      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/BLOG-03.md",
         "contracts/BLOG-03.openapi.json",
@@ -2372,7 +2372,7 @@
     {
       "wave": 4,
       "defined_operations": 4,
-      "implemented_operations": 2,
+      "implemented_operations": 4,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2384,13 +2384,13 @@
     {
       "wave": 6,
       "defined_operations": 20,
-      "implemented_operations": 10,
+      "implemented_operations": 14,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 7,
       "defined_operations": 10,
-      "implemented_operations": 6,
+      "implemented_operations": 9,
       "full_feature_acceptance": "PENDING"
     },
     {

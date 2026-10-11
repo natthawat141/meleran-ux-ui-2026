@@ -13,6 +13,7 @@ import { RedeemModule } from './features/redeem/redeem.module';
 import { CertificatesModule } from './features/certificates/certificates.module';
 import { AssessmentsModule } from './features/assessments/assessments.module';
 import { SessionGuard } from './shared/auth/session.guard';
+import { BlogModule } from './features/blog/blog.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SessionGuard } from './shared/auth/session.guard';
     RedeemModule,
     CertificatesModule,
     AssessmentsModule,
+    BlogModule,
   ],
   providers: [
     {

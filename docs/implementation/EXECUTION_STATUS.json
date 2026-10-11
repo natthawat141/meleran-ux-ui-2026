@@ -16,7 +16,7 @@
   },
   "verified": {
     "foundation_tests": 53,
-    "database_tests": 486,
+    "database_tests": 507,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -24,7 +24,7 @@
     "boundary_gate": "PASS_ZERO_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 53,
+    "feature_component_unit_tests": 57,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
@@ -53,7 +53,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 177,
+    "frontend_client_checks_total": 186,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -85,13 +85,13 @@
     "frontend_managed_attempt_client_checks": 5,
     "frontend_code_command_client_checks": 7,
     "current_checkpoint": {
-      "local_status": "PASS",
+      "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 486,
-      "feature_component_unit_tests": 53,
-      "total_tests": 592,
-      "full_regression_basis": "479 PG/36 suites passed; local-auth-kernel rerun25/25 including7 new HTTP tests; relevant HTTP foundation19 rerun after cutover",
-      "frontend_client_checks": 177,
+      "database_tests": 507,
+      "feature_component_unit_tests": 57,
+      "total_tests": 617,
+      "regression_basis": "Previous592 checkpoint hosted passed; new Blog21 PG+4 units and11-batch creator7/directory16 targeted rerun; current full foundation/parity/harness pass",
+      "frontend_client_checks": 186,
       "frontend_tests": 173,
       "typecheck": "PASS",
       "nest_build": "PASS",
@@ -119,7 +119,7 @@
     "frontend_continuation_list_resume_checks": 10,
     "frontend_ai_history_checks": 5,
     "frontend_admin_directory_checks": 6,
-    "total_local_tests": 592,
+    "total_local_tests": 617,
     "learning_authoring_continuation": {
       "new_operations": 8,
       "postgres_tests": 49,
@@ -137,20 +137,22 @@
     "last_verified_checkpoint": {
       "local_status": "PASS",
       "foundation_tests": 53,
-      "database_tests": 430,
-      "feature_component_unit_tests": 50,
-      "total_tests": 533,
-      "frontend_client_checks": 162,
+      "database_tests": 486,
+      "feature_component_unit_tests": 53,
+      "total_tests": 592,
+      "full_regression_basis": "479 PG/36 suites passed; local-auth-kernel rerun25/25 including7 new HTTP tests; relevant HTTP foundation19 rerun after cutover",
+      "frontend_client_checks": 177,
+      "frontend_tests": 173,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
       "blueprint_and_continuation": "PASS",
       "frontend_contract": "UNCHANGED_DRAFT_2",
-      "schema_delta": false,
+      "schema_delta": true,
       "browser_acceptance": false,
       "hosted_status": "PASS",
-      "verified_sha": "43f6cd52d681554d407931f9e03504a1318545bb",
-      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38107556685"
+      "verified_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
+      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421338"
     },
     "local_username_http": {
       "state": "COMPONENT_VERIFIED",
@@ -158,6 +160,17 @@
       "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
       "operation_counted": false,
       "remaining": "Firebase Email credential branch; AUTH-01 remains partial"
+    },
+    "blog_continuation": {
+      "new_operations": 9,
+      "postgres_tests": 21,
+      "feature_units": 4,
+      "frontend_client_checks": 9,
+      "local_targeted_status": "PASS",
+      "protocol_document": "BLOG_COMPONENT.md",
+      "full_regression": "PENDING_HOSTED",
+      "hosted_status": "PENDING_PUSH",
+      "browser_acceptance": false
     }
   },
   "environment": {
@@ -211,6 +224,11 @@
       {
         "name": "20261011050000_course_authoring",
         "sha256": "5204bffa343645c2d14d589829d51d54e9fae2487f430ef6a6fc75f96134ec8b",
+        "status": "APPLIED_ISOLATED_TEST_VERIFIED"
+      },
+      {
+        "name": "20261011051000_blog_authoring",
+        "sha256": "8f11a7d7278a00a74cc0190379aec24635fbf65816a6be72b42df95ae92f059d",
         "status": "APPLIED_ISOLATED_TEST_VERIFIED"
       }
     ],
@@ -1928,9 +1946,39 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "blog_get_blog",
+          "method": "GET",
+          "path": "/blog",
+          "operationId": "get_blog",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        },
+        {
+          "id": "blog_get_blog_slug",
+          "method": "GET",
+          "path": "/blog/{slug}",
+          "operationId": "get_blog_slug",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        }
+      ]
     },
     {
       "id": "BLOG-02",
@@ -1948,9 +1996,67 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 4,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "blog_patch_admin_blog_id",
+          "method": "PATCH",
+          "path": "/admin/blog/{id}",
+          "operationId": "patch_admin_blog_id",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        },
+        {
+          "id": "blog_get_admin_blog",
+          "method": "GET",
+          "path": "/admin/blog",
+          "operationId": "get_admin_blog",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        },
+        {
+          "id": "blog_post_admin_blog",
+          "method": "POST",
+          "path": "/admin/blog",
+          "operationId": "post_admin_blog",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        },
+        {
+          "id": "blog_get_admin_blog_id_preview",
+          "method": "GET",
+          "path": "/admin/blog/{id}/preview",
+          "operationId": "get_admin_blog_id_preview",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        }
+      ]
     },
     {
       "id": "BLOG-03",
@@ -1966,9 +2072,53 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "blog_delete_admin_blog_id",
+          "method": "DELETE",
+          "path": "/admin/blog/{id}",
+          "operationId": "delete_admin_blog_id",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        },
+        {
+          "id": "blog_post_admin_blog_id_unpublish",
+          "method": "POST",
+          "path": "/admin/blog/{id}/unpublish",
+          "operationId": "post_admin_blog_id_unpublish",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        },
+        {
+          "id": "blog_post_admin_blog_id_publish",
+          "method": "POST",
+          "path": "/admin/blog/{id}/publish",
+          "operationId": "post_admin_blog_id_publish",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/blog.pg-spec.ts",
+          "shared_suite_tests": 21,
+          "tests_shared_across_operations": true,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PG canonical/authorization/revision/concurrency/rollback/visibility/immutable audit/privacy/reconnect;9 unchanged Frontend client checks shared separately."
+        }
+      ]
     },
     {
       "id": "FOUNDATION-01",
@@ -2504,6 +2654,13 @@
           "frontend_client_checks": 9,
           "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
           "full_acceptance": false
+        },
+        {
+          "id": "blog_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 9,
+          "protocol_document": "BLOG_COMPONENT.md",
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -2714,19 +2871,19 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "43f6cd52d681554d407931f9e03504a1318545bb",
+    "verified_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
     "latest_component_ci": "PASS_PROFILE_REDEEM_MANAGED_ATTEMPT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
-    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533791",
-    "frontend_ci_evidence_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
-    "frontend_ci_evidence_note": "Previous hosted Frontend evidence retained; current preview decoder change verified locally and awaits exact-SHA CI.",
+    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421322",
+    "frontend_ci_evidence_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
+    "frontend_ci_evidence_note": "Exact ebcfd4d Frontend173 tests/typecheck/build/contracts and both container builds passed; Blog continuation changes Backend/harness/docs only.",
     "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
-    "current_checkpoint_ci": "PENDING_NEW_COMPONENTS",
+    "current_checkpoint_ci": "PENDING_BLOG_PUSH",
     "current_checkpoint_evidence": "Hosted Nest CI: 477 tests, build/smoke, blueprint/Auth delta/17-wave queue, 141 actual Frontend client checks. Full browser/provider acceptance remains pending.",
-    "frontend_source_changed": true,
-    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38107556685"
+    "frontend_source_changed": false,
+    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421338"
   },
   "remaining_decisions": [
     "D01",

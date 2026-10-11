@@ -53,7 +53,8 @@ async function main() {
          context.parentURL?.includes('/features/certificate/api/certificate-api.ts') ||
          context.parentURL?.includes('/features/ai/api/ai-api.ts') ||
          context.parentURL?.includes('/features/payment/api/payment-api.ts') ||
-         context.parentURL?.includes('/features/auth/api/auth-session.ts'))) {
+         context.parentURL?.includes('/features/auth/api/auth-session.ts') ||
+         context.parentURL?.includes('/features/blog/api/blog-api.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
       // endpoint builders/decoders and the real transport/fetch implementation.
       const name = new URL(context.parentURL).searchParams.get('learning-actor');
@@ -890,6 +891,39 @@ async function main() {
     assert.equal((await ownerResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring')).chapters[0].items[0].body,'เนื้อหาจริงจาก PostgreSQL');
     courseAuthoringChecks.push('created-course-audit-and-content-survive-reconnect');
 
+    phase = 'frontend-blog-lifecycle';
+    const blogChecks=[],blogSlug='article-'+randomUUID();
+    globalThis[learningClientSlot].set('blog-public',createHttpClient({baseUrl:globalThis[learningClientSlot].apiConfig.baseUrl,
+      headers:{},credentials:'omit',timeoutMs:5000,fetcher:fetch}));
+    const {blogApi}=await import(pathToFileURL(path.join(frontend,'apps/web/src/features/blog/api/blog-api.ts')).href+'?learning-actor=blog-public');
+    const blogDraft=await adminResource('admin/blog','POST',{title:'บทความที่บันทึกจริง',slug:blogSlug,category:'test',cover_url:null,excerpt:'คำเกริ่น',
+      content:'เนื้อหาแรก',content_doc:{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'ย่อหน้าแรก'}]}]}});
+    assert.equal(blogDraft.author_id,adminId);assert.equal(blogDraft.status,'draft');assert.equal((await adminResource('admin/blog/'+blogDraft.id+'/preview')).content,'เนื้อหาแรก');
+    blogChecks.push('actual-Admin-create-and-preview-decoders-preserve-rich-Draft');
+    await assert.rejects(blogApi.detail(blogSlug),error=>error instanceof HttpClientError&&error.status===404);
+    blogChecks.push('actual-public-client-cannot-read-Draft');
+    const publishedBlog=await adminResource('admin/blog/'+blogDraft.id+'/publish','POST',{expected_revision:1});
+    assert.equal(publishedBlog.status,'published');assert.equal((await blogApi.detail(blogSlug)).id,blogDraft.id);
+    assert.ok((await blogApi.list()).some(post=>post.id===blogDraft.id));
+    blogChecks.push('actual-Guest-Blog-list-and-detail-read-saved-Published-content');
+    const savedBlog=await adminResource('admin/blog/'+blogDraft.id,'PATCH',{expected_revision:2,content:'เนื้อหาที่แก้แล้ว'});
+    assert.equal((await blogApi.detail(blogSlug)).content,'เนื้อหาที่แก้แล้ว');assert.equal(savedBlog.published_at,publishedBlog.published_at);
+    blogChecks.push('actual-Published-save-is-immediate-and-preserves-publication');
+    await assert.rejects(adminResource('admin/blog/'+blogDraft.id,'PATCH',{expected_revision:2,content:'stale'}),error=>error instanceof HttpClientError&&error.status===409);
+    assert.equal((await adminResource('admin/blog/'+blogDraft.id+'/preview')).revision,3);
+    blogChecks.push('stale-revision409-keeps-saved-ID-and-content');
+    await adminResource('admin/blog/'+blogDraft.id+'/unpublish','POST',{expected_revision:3});
+    await assert.rejects(blogApi.detail(blogSlug),error=>error instanceof HttpClientError&&error.status===404);
+    blogChecks.push('actual-Admin-unpublish-hides-public-content');
+    assert.deepEqual(await adminResource('admin/blog/'+blogDraft.id,'DELETE',{expected_revision:4}),{id:blogDraft.id,deleted:true});
+    await assert.rejects(adminResource('admin/blog/'+blogDraft.id+'/preview'),error=>error instanceof HttpClientError&&error.status===404);
+    assert.equal((await db.blogPost.findUniqueOrThrow({where:{id:blogDraft.id}})).deletedBy,adminId);
+    blogChecks.push('actual-DELETE-JSON-precondition-retains-audit-and-hides-preview');
+    await assert.rejects(ownerResource('admin/blog'),error=>error instanceof HttpClientError&&error.status===401);
+    blogChecks.push('Instructor-Web-cannot-manage-Blog');
+    await db.$disconnect();await db.$connect();assert.equal((await db.blogPost.findUniqueOrThrow({where:{id:blogDraft.id}})).content,'เนื้อหาที่แก้แล้ว');
+    blogChecks.push('Blog-content-and-deletion-audit-survive-reconnect');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -1027,6 +1061,7 @@ async function main() {
     result.adminAccountDirectory = {checks:accountDirectoryChecks.length,checkNames:accountDirectoryChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.completion = {checks:completionChecks.length,checkNames:completionChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.courseAuthoring = {checks:courseAuthoringChecks.length,checkNames:courseAuthoringChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.blog = {checks:blogChecks.length,checkNames:blogChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
@@ -1053,6 +1088,7 @@ async function main() {
     if (accountId) await db.question.deleteMany({ where: { quiz: { item: { chapter: { course: { instructorId: accountId } } } } } });
     if (accountId) await db.quiz.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
     if (accountId) await db.course.deleteMany({ where: { instructorId: accountId } });
+    await db.blogPost.deleteMany({where:{authorId:{in:ownedAccounts}}});
     await db.appSession.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.localCredential.deleteMany({where:{accountId:{in:additionalFixtureAccounts}}});
     await db.userRole.deleteMany({ where: { accountId: { in: ownedAccounts } } });

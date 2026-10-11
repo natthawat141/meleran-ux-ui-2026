@@ -36,7 +36,9 @@ model Account {
   reviewsSubmitted   CourseReview[] @relation("ReviewSubmitter")
   reviewsPerformed   CourseReview[] @relation("ReviewActor")
   roleGrants         UserRole[]
-  blogPosts          BlogPost[]
+  blogPosts          BlogPost[] @relation("BlogAuthor")
+  blogPostsEdited    BlogPost[] @relation("BlogEditor")
+  blogPostsDeleted   BlogPost[] @relation("BlogDeleter")
   transcriptsEdited  VideoTranscript[]
   answersGraded      Answer[] @relation("AnswerGrader")
   aiConversations    AIConversation[]
@@ -245,13 +247,22 @@ model BlogPost {
   coverUrl String?
   excerpt String?
   contentDoc Json @db.JsonB
+  content String?
+  category String?
+  readingMinutes Int?
+  editorId String?
+  deletedAt DateTime? @db.Timestamptz(3)
+  deletedBy String?
   authorId String
   status String @default("draft")
   revision Int @default(0)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   publishedAt DateTime? @db.Timestamptz(3)
-  author Account @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  author Account @relation("BlogAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  editor Account? @relation("BlogEditor", fields: [editorId], references: [id], onDelete: Restrict)
+  deleter Account? @relation("BlogDeleter", fields: [deletedBy], references: [id], onDelete: Restrict)
+  @@index([deletedAt, status, updatedAt, id])
   @@index([status, publishedAt, id])
   @@map("blog_posts")
 }

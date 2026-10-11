@@ -37,7 +37,7 @@ describe('COURSE-01 Instructor/Admin create and directory + append-only authorin
   });
   it('records reviewed authoring migration checksum and rolls back the full chain without touching public data',async()=>{
     await assertMigration(migrator,'20261011050000_course_authoring');const batches=readdirSync(resolve(__dirname,'../../prisma/migrations')).filter(p=>/^\d+_/.test(p)).sort();
-    expect(batches).toHaveLength(10);await assertMigrationRollback(migrationUrl,migrator,batches,27);
+    expect(batches).toHaveLength(11);await assertMigrationRollback(migrationUrl,migrator,batches,27);
     const sql=readFileSync(resolve(__dirname,'../../prisma/migrations/20261011050000_course_authoring/migration.sql'),'utf8');expect(sql).not.toMatch(/UPDATE (?:courses|course_items)|DROP TABLE/);
   });
   it('Instructor create returns exact full authoring metadata with truthful creator and single owner',async()=>{

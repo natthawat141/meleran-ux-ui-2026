@@ -18012,12 +18012,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D11"
       ],
@@ -18279,12 +18281,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -18551,12 +18555,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D11"
       ],
@@ -18831,12 +18837,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -19085,12 +19093,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -19375,12 +19385,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -19633,12 +19645,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -19894,12 +19908,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -20166,12 +20182,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/blog",
+        "evidence": "BLOG_COMPONENT.md",
+        "known_gaps": [
+          "Authenticated browser/original acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D11"
       ],
@@ -29239,8 +29257,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -29343,8 +29361,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 4,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -29446,8 +29464,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
