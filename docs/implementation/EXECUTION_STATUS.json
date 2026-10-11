@@ -1757,7 +1757,7 @@
         },
         {
           "name": "approved-local-password-session-kernel",
-          "state": "COMPONENT_LOCAL_VERIFIED",
+          "state": "COMPONENT_VERIFIED",
           "postgres_tests": 18,
           "unit_tests": 6,
           "protocol_document": "AUTH_LOCAL_KERNEL_COMPONENT.md",
@@ -1772,7 +1772,9 @@
             "Legacy writer cutover",
             "Trusted reset proof caller",
             "Firebase exchange/link/recovery and real provider/browser gates"
-          ]
+          ],
+          "verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729"
         }
       ]
     },
@@ -1793,14 +1795,14 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PENDING_LOCAL_AUTH_CHECKPOINT",
-    "verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321",
-    "latest_component_ci": "LOCAL_PASS_HOSTED_PENDING",
+    "ci": "PASS",
+    "verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
+    "latest_component_ci": "PASS_APPROVED_LOCAL_AUTH_KERNEL",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
-    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
-    "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Frontend feature source unchanged; hosted Nest CI passed409 tests and124 actual client/transport checks including10 actual Admin resource/decoder detail checks. Creation/Auth/provider/query/status/disable/browser/full feature gates remain open.",
+    "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533791",
+    "frontend_ci_evidence_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
+    "frontend_ci_evidence_note": "Exact Auth checkpoint: Nest433 tests +124 actual client checks; Frontend172 tests/contracts/tokens/boundaries/typecheck/build and Web/Admin container smoke. No complete Firebase/Login/reset/browser acceptance.",
     "previous_verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
   },

@@ -23,3 +23,7 @@ Counts of accepted operations/tasks/waves/cases do not increase from this intern
 ## Reproduction
 
 From `backend/`, use existing lockfile dependencies: strict typecheck; boundary/blueprint checks; Jest foundation/components/database configs; Nest build; runtime smoke and actual Frontend client harness. PostgreSQL suite uses only isolated `melearn_test` with process-only `ALLOW_TEST_DATABASE_RESET=yes`; database suites/harness/smoke run sequentially. No runtime seed/migrate, STG, deploy, production mutation or legacy-data migration.
+
+## Exact hosted checkpoint
+
+Code SHA `52852919d7acce6cb7c8c4dd4bc82e328cb1bc06` pushed to `backend/v1-foundation`. [Nest CI 38103533729](https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729) passed49 foundation +34 units +350 PostgreSQL =433 tests,124 actual client checks/build/smoke/blueprint/boundaries. [Frontend CI 38103533791](https://github.com/natthawat141/meleran-tutor/actions/runs/38103533791) passed172 tests/contracts/typecheck/build and Web/Admin container smoke. No new defined HTTP operation or full provider/browser acceptance from this kernel.

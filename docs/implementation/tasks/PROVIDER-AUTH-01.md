@@ -82,3 +82,5 @@ Feature gate: **G-AUTH** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร�
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+Technical review packet: [Firebase exchange/link/recovery](../PROVIDER_AUTH_PROTOCOL_REVIEW.md). Approved direction is recorded; candidate wire delta remains separate from current Draft.2 operations.

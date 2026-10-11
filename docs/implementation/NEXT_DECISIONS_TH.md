@@ -78,3 +78,5 @@ Resend From ยังไม่พร้อมใน ENV; ไม่สร้า�
 DB constraints ที่ผ่านแล้วไม่ใช่หลักฐานว่าการตัดสิน policy เหล่านี้ผ่าน.
 เลือกทำ task ที่ dependencies/policy พร้อม; เป้าหมาย 86 operations และ 113 cases
 คงเดิม. Source/decision conflicts ต้องปรากฏใน execution board.
+
+Technical review packet: [Firebase exchange/link/recovery](PROVIDER_AUTH_PROTOCOL_REVIEW.md). Approved direction is recorded; candidate wire delta remains separate from current Draft.2 operations.
