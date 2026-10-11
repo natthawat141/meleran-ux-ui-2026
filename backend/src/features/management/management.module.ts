@@ -9,11 +9,16 @@ import { SummaryController } from './summary.controller';
 import { SummaryService } from './summary.service';
 import { AdminAccountCreateService } from './admin-account-create.service';
 import { AccountDirectoryService } from './account-directory.service';
+import { RosterReadService } from './roster-read.service';
+import { RosterReadController } from './roster-read.controller';
+import { AssessmentsModule } from '../assessments/assessments.module';
+import { AttemptListService } from './attempt-list.service';
+import { AttemptListController } from './attempt-list.controller';
 
 @Module({
-  imports: [AuthModule],
-  controllers: [ManagementController, ManagedQuizLocatorController, SummaryController],
+  imports: [AuthModule,AssessmentsModule],
+  controllers: [ManagementController, ManagedQuizLocatorController, SummaryController,RosterReadController,AttemptListController],
   providers: [AssignInstructorService, ManagedQuizLocatorService, AdminUserDetailService, SummaryService,
-    AdminAccountCreateService, AccountDirectoryService],
+    AdminAccountCreateService, AccountDirectoryService,RosterReadService,AttemptListService],
 })
 export class ManagementModule {}

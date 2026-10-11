@@ -87,3 +87,7 @@ Feature gate: **G-MANAGEMENT** ใน [Execution Plan](../EXECUTION_PLAN.md); �
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
 
 Continuation update 11 ต.ค.: 2/4 canonical operations component-verified; see [current checkpoint](../PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md). Outstanding feature gates/decisions are PENDING and do not block independent use cases.
+
+## Management history execution override — 2026-10-11
+
+Latest user permits documented technical choices. [Component evidence](../MANAGEMENT_HISTORY_COMPONENT.md) and [agent decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) supersede prior protocol/dependency waits for implemented reads. PAY-02 missing session is explicit empty string and event outcome is stored receipt state. All defined APIs in this package now have component proof; full browser/original acceptance pending.

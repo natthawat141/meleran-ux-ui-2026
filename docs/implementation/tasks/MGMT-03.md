@@ -85,3 +85,7 @@ Feature gate: **G-MANAGEMENT** ใน [Execution Plan](../EXECUTION_PLAN.md); �
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+## Management history execution override — 2026-10-11
+
+Latest user permits documented technical choices. [Component evidence](../MANAGEMENT_HISTORY_COMPONENT.md) and [agent decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) supersede prior protocol/dependency waits for implemented reads. PAY-02 missing session is explicit empty string and event outcome is stored receipt state. All defined APIs in this package now have component proof; full browser/original acceptance pending.

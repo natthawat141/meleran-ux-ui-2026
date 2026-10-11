@@ -9,6 +9,12 @@
 - HTTP paths/shapes ปัจจุบันคงเดิม; การเพิ่ม provider protocol ใช้ contract delta ที่ติดตามแยก
 - Technical/component evidence ไม่ใช่การตรวจรับ 113 cases ทั้งหมด
 
+## Management history / D16 and PAY-02 execution choices
+
+MGMT-03/04: canonical roster has one Enrollment/course per row; current curriculum completion percentage rounds for display; historical certificates/Attempt snapshots remain immutable. Fresh scoped Instructor/Admin authority, RepeatableRead and existing signed keysets apply. Assessments exposes a trusted scoped ManagedAttemptReader, retaining existing single owner detail semantics.
+
+PAY-02 prior protocol wait is overridden by renewed user permission to decide: retain Draft.2 string shape, missing checkout session is empty string meaning unallocated; receipt outcome is persisted processing state, never invented fulfilled/refund success. Both choices are reversible through a coordinated future contract revision. No Stripe read/retry/grant. Details, constraints and evidence: [MANAGEMENT_HISTORY_COMPONENT.md](MANAGEMENT_HISTORY_COMPONENT.md).
+
 ## Agent decisions: D16 read flows
 
 เลือกข้อเสนอ Catalog ใน CATALOG_QUERY_REVIEW.md: title contains แบบไม่สนตัวพิมพ์, trim q, exact category/level, free คือ null/0, paid >0; Published และ published_at เท่านั้น; sort published_at DESC,id ASC. Instructor courses ใช้ขอบเขต Instructor ที่มี normalized role และ Published เท่านั้น

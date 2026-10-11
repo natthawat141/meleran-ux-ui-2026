@@ -53,6 +53,7 @@ async function main() {
          context.parentURL?.includes('/features/certificate/api/certificate-api.ts') ||
          context.parentURL?.includes('/features/ai/api/ai-api.ts') ||
          context.parentURL?.includes('/features/payment/api/payment-api.ts') ||
+         context.parentURL?.includes('/features/payment/api/admin-payment-api.ts') ||
          context.parentURL?.includes('/features/auth/api/auth-session.ts') ||
          context.parentURL?.includes('/features/blog/api/blog-api.ts'))) {
       // Configuration injection only: retain the actual frontend singleton API,
@@ -924,6 +925,72 @@ async function main() {
     await db.$disconnect();await db.$connect();assert.equal((await db.blogPost.findUniqueOrThrow({where:{id:blogDraft.id}})).content,'เนื้อหาที่แก้แล้ว');
     blogChecks.push('Blog-content-and-deletion-audit-survive-reconnect');
 
+    phase = 'frontend-management-history';
+    const historyChecks = [];
+    const rosterPath='courses/'+encodeURIComponent(ids.published)+'/learners';
+    const attemptListPath='courses/'+encodeURIComponent(ids.published)+'/attempts';
+    // The earlier single-detail corruption proof intentionally owns a malformed fixture.
+    // Remove only that fixture after asserting fail-closed list behavior; no API repairs it.
+    await assert.rejects(ownerResource(attemptListPath),error=>error instanceof HttpClientError&&error.status===500);
+    await db.answer.deleteMany({where:{attemptId:attemptFixtures.bad.id}});
+    await db.attemptQuestion.deleteMany({where:{attemptId:attemptFixtures.bad.id}});
+    await db.quizAttempt.delete({where:{id:attemptFixtures.bad.id}});
+    delete attemptFixtures.bad;
+    const beforeHistoryCounts=await counts(),beforeHistoryRows=await attemptRows();
+    const rosterPage=await ownerResource(rosterPath+'?limit=50');
+    assert.ok(rosterPage.items.some(row=>row.user_id===learnerId&&row.course_id===ids.published));
+    assert.equal(JSON.stringify(rosterPage).includes('PRIVATE_'),false);
+    historyChecks.push('actual-owner-course-roster-archived-history-canonical-decoder');
+    assert.deepEqual(await adminResource(rosterPath+'?limit=50'),rosterPage);
+    const accountEnrollments=await adminResource('admin/users/'+encodeURIComponent(learnerId)+'/enrollments?limit=50');
+    assert.ok(accountEnrollments.items.some(row=>row.course_id===ids.published));
+    historyChecks.push('actual-Admin-course-and-account-enrollments');
+    const instructorLearners=await ownerResource('instructor/learners?limit=50');
+    assert.ok(instructorLearners.items.some(row=>row.user_id===learnerId&&row.course_id===ids.published));
+    historyChecks.push('actual-Instructor-learners-per-Enrollment');
+    const allLearners=await adminResource('admin/learners?limit=50');
+    assert.ok(allLearners.items.some(row=>row.user_id===learnerId&&row.course_id===ids.published));
+    historyChecks.push('actual-Admin-learners-directory');
+    const attemptsPage=await ownerResource(attemptListPath+'?limit=50');
+    assert.deepEqual(attemptsPage.items.find(row=>row.id===managed.id),managed);
+    assert.equal(JSON.stringify(attemptsPage).includes('PRIVATE_'),false);
+    historyChecks.push('actual-owner-course-Attempt-list-historical-snapshot-no-keys');
+    const accountAttempts=await adminResource('admin/users/'+encodeURIComponent(learnerId)+'/attempts?limit=50');
+    assert.deepEqual(accountAttempts.items.find(row=>row.id===managed.id),managed);
+    historyChecks.push('actual-Admin-account-Attempt-list');
+    await assert.rejects(foreignResource(rosterPath),error=>error instanceof HttpClientError&&error.status===404);
+    await assert.rejects(ownerResource('admin/learners'),error=>error instanceof HttpClientError&&error.status===401);
+    const firstHistoryPage=await ownerResource(attemptListPath+'?limit=1');
+    assert.ok(firstHistoryPage.next_cursor);
+    const nextHistoryPage=await ownerResource(attemptListPath+'?limit=1&cursor='+encodeURIComponent(firstHistoryPage.next_cursor));
+    assert.notEqual(firstHistoryPage.items[0].id,nextHistoryPage.items[0].id);
+    await assert.rejects(adminResource('admin/users/'+encodeURIComponent(learnerId)+'/attempts?limit=1&cursor='+encodeURIComponent(firstHistoryPage.next_cursor)),error=>error instanceof HttpClientError&&error.status===422);
+    historyChecks.push('ownership-namespace-and-signed-resource-cursor-isolation');
+    await db.$disconnect();await db.$connect();
+    assert.deepEqual(await ownerResource(attemptListPath+'?limit=50'),attemptsPage);
+    assert.deepEqual(await counts(),beforeHistoryCounts);assert.deepEqual(await attemptRows(),beforeHistoryRows);
+    historyChecks.push('reconnect-preserves-all-academic-model-counts');
+
+    phase = 'frontend-admin-payment-detail';
+    const adminPaymentChecks=[];
+    const adminPaymentApiFor=async name=>(await import(pathToFileURL(path.join(frontend,
+      'apps/admin/src/features/payment/api/admin-payment-api.ts')).href+'?learning-actor='+name)).adminPaymentApi;
+    const adminPayments=await adminPaymentApiFor('grant-admin'),beforeAdminPaymentRows=await paymentRows(),beforeAdminPaymentCounts=await counts();
+    const adminPending=await adminPayments.get(paymentFixtures.pending.id);
+    assert.equal(adminPending.user_id,learnerId);assert.equal(adminPending.status,'pending');assert.equal(adminPending.enrollment,null);
+    assert.equal(JSON.stringify(adminPending).includes('PRIVATE_'),false);
+    adminPaymentChecks.push('actual-Admin-payment-client-canonical-money-and-private-projection');
+    const adminGrant=await adminPayments.get(paymentFixtures.granted.id);
+    assert.deepEqual(adminGrant.enrollment,firstGrant);assert.equal(adminGrant.fulfillment_status,'granted');
+    adminPaymentChecks.push('Admin-lookup-retains-original-entitlement-source');
+    await assert.rejects((await adminPaymentApiFor('locator-owner')).get(paymentFixtures.pending.id),error=>error instanceof HttpClientError&&error.status===401);
+    await assert.rejects((await adminPaymentApiFor('grant-anonymous')).get(paymentFixtures.pending.id),error=>error instanceof HttpClientError&&error.status===401);
+    await assert.rejects(adminPayments.get(randomUUID()),error=>error instanceof HttpClientError&&error.status===404);
+    adminPaymentChecks.push('anonymous-Web-and-unknown-lookup-denied');
+    await db.$disconnect();await db.$connect();assert.deepEqual(await adminPayments.get(paymentFixtures.pending.id),adminPending);
+    assert.deepEqual(await counts(),beforeAdminPaymentCounts);assert.deepEqual(await paymentRows(),beforeAdminPaymentRows);
+    adminPaymentChecks.push('Admin-read-reconnect-never-charges-or-grants');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -1062,6 +1129,8 @@ async function main() {
     result.completion = {checks:completionChecks.length,checkNames:completionChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.courseAuthoring = {checks:courseAuthoringChecks.length,checkNames:courseAuthoringChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.blog = {checks:blogChecks.length,checkNames:blogChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.managementHistory = {checks:historyChecks.length,checkNames:historyChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.adminPayment = {checks:adminPaymentChecks.length,checkNames:adminPaymentChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {

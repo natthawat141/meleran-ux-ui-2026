@@ -16,7 +16,7 @@
   },
   "verified": {
     "foundation_tests": 53,
-    "database_tests": 507,
+    "database_tests": 535,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -53,7 +53,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 186,
+    "frontend_client_checks_total": 198,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -87,18 +87,18 @@
     "current_checkpoint": {
       "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 507,
+      "database_tests": 535,
       "feature_component_unit_tests": 57,
-      "total_tests": 617,
-      "regression_basis": "Previous592 checkpoint hosted passed; new Blog21 PG+4 units and11-batch creator7/directory16 targeted rerun; current full foundation/parity/harness pass",
-      "frontend_client_checks": 186,
+      "total_tests": 645,
+      "regression_basis": "Previous617 checkpoint hosted passed; Management16 and Admin payment12 PG; existing managed detail25 and own payment16 pass after shared-reader extraction; current foundation53 and all198 Frontend client checks pass",
+      "frontend_client_checks": 198,
       "frontend_tests": 173,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
       "blueprint_and_continuation": "PASS",
       "frontend_contract": "UNCHANGED_DRAFT_2",
-      "schema_delta": true,
+      "schema_delta": false,
       "browser_acceptance": false,
       "hosted_status": "PENDING_PUSH"
     },
@@ -119,7 +119,7 @@
     "frontend_continuation_list_resume_checks": 10,
     "frontend_ai_history_checks": 5,
     "frontend_admin_directory_checks": 6,
-    "total_local_tests": 617,
+    "total_local_tests": 645,
     "learning_authoring_continuation": {
       "new_operations": 8,
       "postgres_tests": 49,
@@ -135,13 +135,13 @@
       "browser_acceptance": false
     },
     "last_verified_checkpoint": {
-      "local_status": "PASS",
+      "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 486,
-      "feature_component_unit_tests": 53,
-      "total_tests": 592,
-      "full_regression_basis": "479 PG/36 suites passed; local-auth-kernel rerun25/25 including7 new HTTP tests; relevant HTTP foundation19 rerun after cutover",
-      "frontend_client_checks": 177,
+      "database_tests": 507,
+      "feature_component_unit_tests": 57,
+      "total_tests": 617,
+      "regression_basis": "Previous592 checkpoint hosted passed; new Blog21 PG+4 units and11-batch creator7/directory16 targeted rerun; current full foundation/parity/harness pass",
+      "frontend_client_checks": 186,
       "frontend_tests": 173,
       "typecheck": "PASS",
       "nest_build": "PASS",
@@ -151,8 +151,8 @@
       "schema_delta": true,
       "browser_acceptance": false,
       "hosted_status": "PASS",
-      "verified_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
-      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421338"
+      "verified_sha": "d3d659d4dc1d60b7773b5968eb07bd5ea14dc39c",
+      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38110022489"
     },
     "local_username_http": {
       "state": "COMPONENT_VERIFIED",
@@ -168,6 +168,18 @@
       "frontend_client_checks": 9,
       "local_targeted_status": "PASS",
       "protocol_document": "BLOG_COMPONENT.md",
+      "full_regression": "PENDING_HOSTED",
+      "hosted_status": "PASS_EXACT_D3D659D",
+      "browser_acceptance": false
+    },
+    "management_history_continuation": {
+      "new_operations": 7,
+      "postgres_tests": 28,
+      "existing_single_attempt_regression": 25,
+      "existing_own_payment_regression": 16,
+      "frontend_client_checks": 12,
+      "local_targeted_status": "PASS",
+      "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
       "full_regression": "PENDING_HOSTED",
       "hosted_status": "PENDING_PUSH",
       "browser_acceptance": false
@@ -564,9 +576,67 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 4,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "history_get_admin_users_id_enrollments",
+          "method": "GET",
+          "path": "/admin/users/{id}/enrollments",
+          "operationId": "get_admin_users_id_enrollments",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/management-history.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
+        },
+        {
+          "id": "history_get_admin_users_id_attempts",
+          "method": "GET",
+          "path": "/admin/users/{id}/attempts",
+          "operationId": "get_admin_users_id_attempts",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/management-history.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
+        },
+        {
+          "id": "history_get_courses_id_learners",
+          "method": "GET",
+          "path": "/courses/{id}/learners",
+          "operationId": "get_courses_id_learners",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/management-history.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
+        },
+        {
+          "id": "history_get_courses_id_attempts",
+          "method": "GET",
+          "path": "/courses/{id}/attempts",
+          "operationId": "get_courses_id_attempts",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/management-history.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
+        }
+      ]
     },
     {
       "id": "MGMT-04",
@@ -632,13 +702,41 @@
           ],
           "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
+        },
+        {
+          "id": "history_get_instructor_learners",
+          "method": "GET",
+          "path": "/instructor/learners",
+          "operationId": "get_instructor_learners",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/management-history.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
+        },
+        {
+          "id": "history_get_admin_learners",
+          "method": "GET",
+          "path": "/admin/learners",
+          "operationId": "get_admin_learners",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/management-history.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 2,
-        "state": "PARTIAL"
+        "implemented_operations": 4,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -1449,9 +1547,25 @@
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 1,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "history_get_admin_payments_id",
+          "method": "GET",
+          "path": "/admin/payments/{id}",
+          "operationId": "get_admin_payments_id",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/admin-payment-read.pg-spec.ts",
+          "shared_suite_tests": 12,
+          "tests_shared_across_operations": false,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Real HTTP/PostgreSQL canonical/authorization/history/privacy/keysets/no read writes/concurrent/reconnect; actual Frontend client proof."
+        }
+      ]
     },
     {
       "id": "REDEEM-01",
@@ -2661,6 +2775,13 @@
           "frontend_client_checks": 9,
           "protocol_document": "BLOG_COMPONENT.md",
           "full_acceptance": false
+        },
+        {
+          "id": "management_history_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 12,
+          "protocol_document": "MANAGEMENT_HISTORY_COMPONENT.md",
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -2871,7 +2992,7 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
+    "verified_sha": "d3d659d4dc1d60b7773b5968eb07bd5ea14dc39c",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
     "latest_component_ci": "PASS_PROFILE_REDEEM_MANAGED_ATTEMPT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
@@ -2880,10 +3001,10 @@
     "frontend_ci_evidence_note": "Exact ebcfd4d Frontend173 tests/typecheck/build/contracts and both container builds passed; Blog continuation changes Backend/harness/docs only.",
     "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
-    "current_checkpoint_ci": "PENDING_BLOG_PUSH",
+    "current_checkpoint_ci": "PENDING_MANAGEMENT_PUSH",
     "current_checkpoint_evidence": "Hosted Nest CI: 477 tests, build/smoke, blueprint/Auth delta/17-wave queue, 141 actual Frontend client checks. Full browser/provider acceptance remains pending.",
     "frontend_source_changed": false,
-    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421338"
+    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38110022489"
   },
   "remaining_decisions": [
     "D01",

@@ -20,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 57,
+    "implemented_operations": 64,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -1362,7 +1362,7 @@
       "operationId": "get_admin_payments_id",
       "task_id": "PAY-02",
       "wave": 8,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "PAY-01"
@@ -1370,7 +1370,7 @@
       "acceptance_ids": [
         "P03"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/PAY-02.md",
         "contracts/PAY-02.openapi.json",
@@ -2054,7 +2054,7 @@
       "operationId": "get_admin_users_id_enrollments",
       "task_id": "MGMT-03",
       "wave": 14,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-02",
@@ -2064,7 +2064,7 @@
       "acceptance_ids": [
         "A05"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/MGMT-03.md",
         "contracts/MGMT-03.openapi.json",
@@ -2077,7 +2077,7 @@
       "operationId": "get_admin_users_id_attempts",
       "task_id": "MGMT-03",
       "wave": 14,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-02",
@@ -2087,7 +2087,7 @@
       "acceptance_ids": [
         "A05"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/MGMT-03.md",
         "contracts/MGMT-03.openapi.json",
@@ -2100,7 +2100,7 @@
       "operationId": "get_courses_id_learners",
       "task_id": "MGMT-03",
       "wave": 14,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-02",
@@ -2110,7 +2110,7 @@
       "acceptance_ids": [
         "A05"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/MGMT-03.md",
         "contracts/MGMT-03.openapi.json",
@@ -2123,7 +2123,7 @@
       "operationId": "get_courses_id_attempts",
       "task_id": "MGMT-03",
       "wave": 14,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-02",
@@ -2133,7 +2133,7 @@
       "acceptance_ids": [
         "A05"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/MGMT-03.md",
         "contracts/MGMT-03.openapi.json",
@@ -2146,14 +2146,14 @@
       "operationId": "get_instructor_learners",
       "task_id": "MGMT-04",
       "wave": 15,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "MGMT-03",
         "GRADE-01"
       ],
       "acceptance_ids": [],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/MGMT-04.md",
         "contracts/MGMT-04.openapi.json",
@@ -2166,14 +2166,14 @@
       "operationId": "get_admin_learners",
       "task_id": "MGMT-04",
       "wave": 15,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "MGMT-03",
         "GRADE-01"
       ],
       "acceptance_ids": [],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/MGMT-04.md",
         "contracts/MGMT-04.openapi.json",
@@ -2396,7 +2396,7 @@
     {
       "wave": 8,
       "defined_operations": 3,
-      "implemented_operations": 2,
+      "implemented_operations": 3,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2432,13 +2432,13 @@
     {
       "wave": 14,
       "defined_operations": 6,
-      "implemented_operations": 1,
+      "implemented_operations": 5,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 15,
       "defined_operations": 5,
-      "implemented_operations": 3,
+      "implemented_operations": 5,
       "full_feature_acceptance": "PENDING"
     },
     {
