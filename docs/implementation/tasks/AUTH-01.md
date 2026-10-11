@@ -2,7 +2,7 @@
 
 Status: **NEEDS_DECISION** · Priority: P0 · Module: auth
 
-ต้องปิด D01, D02, D03
+ต้องปิด D01, D03; D02 constraints/profile semantics confirmed แล้ว
 
 Implemented subset: current-session `POST /auth/logout` ใช้ authoritative normalized identity, transaction/rollback และ isolated audience; 14 HTTP/PG tests + 7 unchanged client checks. อ่าน [component checkpoint](../LOGOUT_PAYMENT_COMPONENTS.md). Login/provider/browser transport ยังค้าง; ห้ามปิด whole task จาก Logout เพียง operation เดียว.
 
@@ -11,7 +11,7 @@ Implemented subset: current-session `POST /auth/logout` ใช้ authoritative 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.1 (line 169); §3.5 (line 475); §5.1 (line 993); §6.2 (line 1171)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - [OpenAPI subset](../contracts/AUTH-01.openapi.json) — schema, parameters, required/null, enums, every declared status/error และ security ครบ
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 
@@ -81,9 +81,9 @@ Feature gate: **G-AUTH** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร�
 
 ## Decisions / สิ่งที่ห้ามแก้
 
-- D01 — Session/security transport: Web/Admin isolation confirmed; cookie names/attributes/TTL/CSRF/CORS/origins/revocation/rate limits remain Draft. Strict/12h and omitted Secure in prototype are implementation observations, not approved policy. Resolution: Approve session/security policy and canonical mapping before AUTH-01/browser slice; allow public work.
-- D02 — Username/password/profile consistency: Canonical Admin-create/profile username patterns and password limits differ; prototype enforces 12 chars and profile null deletes values while Flow AB normalizes strings. CurrentUser responses omit required wire fields. Resolution: Review exact patterns/length/normalization and null/array semantics, then update canonical/mock/types together only when approved.
-- D03 — Firebase + Resend verification/recovery ownership: Firebase Email/Google confirmed later; Scope still requires Resend one-use 24h links. Canonical register/verify/reset and four legacy Google deferred protocols have not migrated. Local account adding verified email lacks a frozen safe operation. Resolution: Approve provider action-link ownership, proof freshness/link/collision rules and proposed exchange/link changes. Preserve A01–A20; no silent removal of legacy paths.
+- D01 — Session/security transport: Absolute session TTL 12h/no sliding, Web/Admin isolation, current-session Logout and all-app password-reset revocation confirmed 2026-10-11. Cookie/CSRF/CORS/origins/throttling remain technical/protocol review; do not reopen approved lifetime policy.
+- D02 — Username/password/profile consistency: Username ASCII 3–30, case-insensitive uniqueness/uppercase lookup, new passwords 8–128 characters and profile omitted/null/array semantics confirmed 2026-10-11; canonical Draft.2 reconciles Admin-create constraints. Implementation and provider email attachment are separate gates.
+- D03 — Firebase + Resend verification/recovery ownership: Firebase Email/Google credential ownership, Nest local Username/app sessions, explicit linking/no email auto-merge and necessary exchange/link contract design approved 2026-10-11. Wire/proof/recovery/error design, dependency justification and provider verification remain open; four Google deferred records are retained.
 
 - ห้ามเปลี่ยน business policy, canonical path/schema/security semantics หรือเติม endpoint ให้ CRUD ครบ
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test

@@ -2,7 +2,7 @@
 
 Status: **NEEDS_DECISION** · Priority: P2 · Module: management
 
-ต้องปิด D02, D03, D16
+ต้องปิด D03, D16; D02 constraints/profile semantics confirmed แล้ว
 
 Execution component 11 ต.ค.: GET /admin/users/{id} moved to Auth public bounded detail reader with fresh normalized Admin authority, sorted Account locks and canonical Admin inline profile semantics. See [ADMIN_USER_DETAIL_COMPONENT](../ADMIN_USER_DETAIL_COMPONENT.md) for18 HTTP/PG +10 real Admin-client checks, exact fields and pending status/disable interpretation. Component depends on FOUNDATION-01, DB-02 normalized roles and AUTH-BASE-01 fresh Admin proof; creation/query/provider/browser requirements and whole-task decisions remain open.
 
@@ -11,7 +11,7 @@ Execution component 11 ต.ค.: GET /admin/users/{id} moved to Auth public boun
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.1 (line 169); §2.2 (line 235); §3.4 (line 451); §6.2 (line 1171); §6.9 (line 1327)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - [OpenAPI subset](../contracts/MGMT-01.openapi.json) — schema, parameters, required/null, enums, every declared status/error และ security ครบ
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 
@@ -80,8 +80,8 @@ Feature gate: **G-MANAGEMENT** ใน [Execution Plan](../EXECUTION_PLAN.md); �
 
 ## Decisions / สิ่งที่ห้ามแก้
 
-- D02 — Username/password/profile consistency: Canonical Admin-create/profile username patterns and password limits differ; prototype enforces 12 chars and profile null deletes values while Flow AB normalizes strings. CurrentUser responses omit required wire fields. Resolution: Review exact patterns/length/normalization and null/array semantics, then update canonical/mock/types together only when approved.
-- D03 — Firebase + Resend verification/recovery ownership: Firebase Email/Google confirmed later; Scope still requires Resend one-use 24h links. Canonical register/verify/reset and four legacy Google deferred protocols have not migrated. Local account adding verified email lacks a frozen safe operation. Resolution: Approve provider action-link ownership, proof freshness/link/collision rules and proposed exchange/link changes. Preserve A01–A20; no silent removal of legacy paths.
+- D02 — Username/password/profile consistency: Username ASCII 3–30, case-insensitive uniqueness/uppercase lookup, new passwords 8–128 characters and profile omitted/null/array semantics confirmed 2026-10-11; canonical Draft.2 reconciles Admin-create constraints. Implementation and provider email attachment are separate gates.
+- D03 — Firebase + Resend verification/recovery ownership: Firebase Email/Google credential ownership, Nest local Username/app sessions, explicit linking/no email auto-merge and necessary exchange/link contract design approved 2026-10-11. Wire/proof/recovery/error design, dependency justification and provider verification remain open; four Google deferred records are retained.
 - D16 — List query, cursor and public/PII projection review: OpenAPI x-pending-decisions and Flow AB D7 still leave cursor expiry/search/sort/filter semantics and visibility/PII review open. Current schema fixes wire fields/limits, but a deterministic backend query/cursor design has not been reviewed. Resolution: Review per flow: keep canonical query/response fields, choose deterministic sort tuple and cursor binding to filters/principal, decide expiry and permitted search fields. Use public canonical projections only; do not broaden PII. Close the Catalog subset first so the public vertical slice need not wait for Auth/provider decisions.
 
 - ห้ามเปลี่ยน business policy, canonical path/schema/security semantics หรือเติม endpoint ให้ CRUD ครบ

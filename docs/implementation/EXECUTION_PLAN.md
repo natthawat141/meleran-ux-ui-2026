@@ -74,7 +74,7 @@ flowchart TD
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | [FOUNDATION-01](tasks/FOUNDATION-01.md) | foundation | 0 | P0 | READY | — | — |
 | 2 | [DB-01](tasks/DB-01.md) | database | 0 | P0 | BLOCKED | FOUNDATION-01 | — |
-| 3 | [AUTH-BASE-01](tasks/AUTH-BASE-01.md) | auth | 0 | P0 | NEEDS_DECISION | FOUNDATION-01, DB-01 | D01, D02 |
+| 3 | [AUTH-BASE-01](tasks/AUTH-BASE-01.md) | auth | 0 | P0 | READY | FOUNDATION-01, DB-01 | approved lifetime/constraints; technical transport review |
 | 3 | [CATALOG-01](tasks/CATALOG-01.md) | courses | 2 | P0 | NEEDS_DECISION | DB-01 | D16 |
 | 3 | [DB-02](tasks/DB-02.md) | database | 0 | P0 | BLOCKED | DB-01 | — |
 | 3 | [CI-01](tasks/CI-01.md) | foundation | 0 | P1 | NEEDS_DECISION | FOUNDATION-01, DB-01 | D13 |
@@ -173,3 +173,7 @@ Planningผ่านเมื่อstructuralchecksและ113mappingครบ�
 ## Execution correction — 2026-10-11
 
 D13 is confirmed: Nest backend is tracked in the fullstack branch; root CI passed. COMPLETION-01 depends on DB-03 as well as DB-02, and D06 best-result selection remains unresolved. This supplements the historical wave table; use EXECUTION_STATUS.json for current readiness. [Next decision packet](NEXT_DECISIONS_TH.md) keeps concrete proposals separate from approved requirements.
+
+## Auth approval / execution update — 11 ต.ค. 2026
+
+D01 session lifetime/revocation, D02 constraints/profile semantics และ D03 provider direction confirmed; ไม่ถามอนุมัติชุดเดิมซ้ำ. Draft.2 canonical constraints sync กับ task subsets และ Frontend types. AUTH-BASE-01 local kernel มี 18 PostgreSQL + 6 unit tests; ยังไม่เปลี่ยน Login HTTP เป็น production credential flow. ลำดับต่อ: kernel/transport cutover → reviewed Firebase exchange/link/recovery contract → PROVIDER-AUTH-01 → AUTH-01 full Username/Email → real browser/persistence gate. ดู AUTH_LOCAL_KERNEL_COMPONENT.md; technical tests ไม่เพิ่มจำนวน accepted operations/cases.

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Melearn V1 HTTP Contract",
-    "version": "1.0.0-draft.1",
+    "version": "1.0.0-draft.2",
     "description": "Draft HTTP contracts for reviewed frontend projections and Final1.6 rules. 86 application operations defined, five real provider protocol operations deferred. Separate Web/Admin login/session confirmed2026-10-09. No Backend freeze or Production integration implied."
   },
   "servers": [
@@ -665,8 +665,8 @@
   },
   "x-derived-from": {
     "path": "docs/api-contract/openapi.json",
-    "version": "1.0.0-draft.1",
-    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "version": "1.0.0-draft.2",
+    "sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
     "status": "DRAFT; generated planning context, not a competing contract"
   }
 }

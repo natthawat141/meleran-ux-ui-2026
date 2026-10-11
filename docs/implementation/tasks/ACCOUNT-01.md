@@ -10,14 +10,14 @@ tested on real HTTP/PostgreSQL. See [SELF_PROFILE_COMPONENT](../SELF_PROFILE_COM
 and EXECUTION_STATUS for current evidence. PATCH/D02/D09 and full Auth/provider/browser
 gates remain; this note does not close ACCOUNT-01/A03/A09 or approve PATCH semantics.
 
-ต้องปิด D02, D09
+ต้องปิด D09; D02 constraints/profile semantics confirmed แล้ว
 
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.1 (line 169); §3.5 (line 475); §6.2 (line 1171)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - [OpenAPI subset](../contracts/ACCOUNT-01.openapi.json) — schema, parameters, required/null, enums, every declared status/error และ security ครบ
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 
@@ -84,7 +84,7 @@ Feature gate: **G-AUTH** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร�
 
 ## Decisions / สิ่งที่ห้ามแก้
 
-- D02 — Username/password/profile consistency: Canonical Admin-create/profile username patterns and password limits differ; prototype enforces 12 chars and profile null deletes values while Flow AB normalizes strings. CurrentUser responses omit required wire fields. Resolution: Review exact patterns/length/normalization and null/array semantics, then update canonical/mock/types together only when approved.
+- D02 — Username/password/profile consistency: Username ASCII 3–30, case-insensitive uniqueness/uppercase lookup, new passwords 8–128 characters and profile omitted/null/array semantics confirmed 2026-10-11; canonical Draft.2 reconciles Admin-create constraints. Implementation and provider email attachment are separate gates.
 - D09 — Image/R2 upload missing contract: Profile/cover/blog/essay image upload has no frozen operation in 86; video upload explicitly disabled. R2 choice already confirmed. Resolution: Approve image protocol/schema/permission/size/lifecycle; track gap without inventing endpoint. Block image-dependent acceptance only.
 
 - ห้ามเปลี่ยน business policy, canonical path/schema/security semantics หรือเติม endpoint ให้ CRUD ครบ

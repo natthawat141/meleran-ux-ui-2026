@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Melearn V1 HTTP Contract",
-    "version": "1.0.0-draft.1",
+    "version": "1.0.0-draft.2",
     "description": "Draft HTTP contracts for reviewed frontend projections and Final1.6 rules. 86 application operations defined, five real provider protocol operations deferred. Separate Web/Admin login/session confirmed2026-10-09. No Backend freeze or Production integration implied."
   },
   "servers": [
@@ -16570,10 +16570,13 @@
         "type": "object",
         "properties": {
           "username": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.]{3,30}$"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
           },
           "display_name": {
             "type": "string"
@@ -22369,8 +22372,8 @@
     }
   ],
   "x-pending-decisions": [
-    "Cookie transport/names/domain/CSRF/TTL and environment origins (separate login/session confirmed)",
-    "Username pattern mismatch Admin create vs profile edit; unify or document compatibility",
+    "Absolute 12h/session audience/logout/reset scope confirmed2026-10-11; cookie security/CSRF/environment origins and throttling protocol still require technical review before Auth HTTP cutover",
+    "Username/password constraints and profile PATCH semantics confirmed2026-10-11; provider email attachment/account status interpretation and implementation cutover remain tracked in D02/D03",
     "Revision enforcement on return-review; Blog mutations now require expected_revision",
     "Idempotency key lifetime and payload mismatch/create/grade partial success behavior",
     "Pagination cursor expiry/search/sort/filter limits",
@@ -22380,5 +22383,43 @@
     "AI sync JSON vs async/streaming, retries/cancellation",
     "Deletion/retention/audit and visibility/PII scopes",
     "Publish currently accepts an empty request and checks approved review/current revision server-side; agree whether client expected_revision is also required before freeze."
-  ]
+  ],
+  "x-auth-approved-decisions": {
+    "approved_on": "2026-10-11",
+    "evidence": "User accepted the three summarized D01/D02/D03 proposals and profile PATCH semantics.",
+    "session": {
+      "absolute_ttl_hours": 12,
+      "sliding_refresh": false,
+      "audiences": [
+        "web",
+        "admin"
+      ],
+      "logout_scope": "current_audience_session",
+      "password_reset_revokes": "all_account_app_sessions"
+    },
+    "local_username": {
+      "pattern": "^[A-Za-z0-9_.]{3,30}$",
+      "case_insensitive_unique": true,
+      "lookup_normalization": "ASCII uppercase; no trimming of invalid usernames"
+    },
+    "new_password": {
+      "min_characters": 8,
+      "max_characters": 128,
+      "login_request_shape_unchanged": true
+    },
+    "profile_patch": {
+      "omitted": "preserve",
+      "nullable_null": "clear_nullable_field",
+      "arrays": "replace; empty array clears"
+    },
+    "provider_direction": {
+      "email_google_credential_owner": "Firebase",
+      "local_username_credential_owner": "Nest Auth",
+      "app_session_owner": "Nest Auth",
+      "linking": "explicit; never auto-merge by email",
+      "necessary_exchange_link_contract_design_authorized": true,
+      "exchange_link_paths_not_defined_in_this_revision": true
+    },
+    "remaining": "Provider wire/proof/recovery design, production origins and remaining unrelated decisions stay Draft. Approval is not provider/runtime/acceptance evidence."
+  }
 }

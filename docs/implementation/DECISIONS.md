@@ -1,6 +1,6 @@
 # Decisions / Conflicts — 10 ตุลาคม 2026
 
-Status register สำหรับ planning; ไม่มี canonical change หรือ policy freeze ในงานนี้. Blueprint D01–D16 เป็นรหัสของแผนนี้ แยกจาก Flow AB D1–D13; mapping อยู่ท้ายไฟล์.
+Planning baseline + execution decision register. Approval update 2026-10-11: canonical Draft.2 applies the confirmed subset below; unrelated decisions remain open. Blueprint D01–D16 เป็นรหัสของแผนนี้ แยกจาก Flow AB D1–D13; mapping อยู่ท้ายไฟล์.
 
 ## Confirmed sources
 
@@ -11,29 +11,26 @@ Status register สำหรับ planning; ไม่มี canonical change �
 - FirebaseEmail/GoogleกับlocalUsername; Web/Adminsharedaccountแต่แยกlogin/logoutsession; Resend/Stripe/R2/OpenRouterตามconfirmeddecisions.
 - ทำคนเดียว; Git/CI placement ปิด D13 ตามคำสั่ง 11 ต.ค. 2026; ไม่ spawn agents.
 
-## D01 — Session/security transport [UNRESOLVED]
+## D01 — Session/security transport [PARTIALLY_CONFIRMED]
 
-- Evidence/conflict: Web/Admin isolation confirmed; cookie names/attributes/TTL/CSRF/CORS/origins/revocation/rate limits remain Draft. Strict/12h and omitted Secure in prototype are implementation observations, not approved policy.
-- Proposed resolution / next action: Approve session/security policy and canonical mapping before AUTH-01/browser slice; allow public work.
-- Blocking tasks: AUTH-01, PROVIDER-AUTH-01, AUTH-BASE-01
-- Owner: Lead Architect prepares; User approves policy/contract changes
-- Approval evidence: Pending; proposed mechanism is subject to task review, unresolved policy/contract changes need approval
+- Confirmed: Absolute session TTL 12h/no sliding, Web/Admin isolation, current-session Logout and all-app password-reset revocation confirmed 2026-10-11. Cookie/CSRF/CORS/origins/throttling remain technical/protocol review; do not reopen approved lifetime policy.
+- Technical work: cookie attributes, CSRF/origin validation, session rotation and coordinated writer cutover need review/tests. No production origins or numeric throttle limits approved.
+- AUTH-BASE-01 local kernel can start; AUTH-01/browser cutover must finish the transport/provider gates.
+- Evidence: user accepted the preceding three-decision summary with “เอาตามนั้นเลย”; lifetime/logout/reset policy is no longer waiting for another approval.
 
-## D02 — Username/password/profile consistency [UNRESOLVED]
+## D02 — Username/password/profile consistency [CONFIRMED]
 
-- Evidence/conflict: Canonical Admin-create/profile username patterns and password limits differ; prototype enforces 12 chars and profile null deletes values while Flow AB normalizes strings. CurrentUser responses omit required wire fields.
-- Proposed resolution / next action: Review exact patterns/length/normalization and null/array semantics, then update canonical/mock/types together only when approved.
-- Blocking tasks: AUTH-01, ACCOUNT-01, MGMT-01, AUTH-BASE-01
-- Owner: Lead Architect prepares; User approves policy/contract changes
-- Approval evidence: Pending; proposed mechanism is subject to task review, unresolved policy/contract changes need approval
+- Confirmed: Username ASCII 3–30, case-insensitive uniqueness/uppercase lookup, new passwords 8–128 characters and profile omitted/null/array semantics confirmed 2026-10-11; canonical Draft.2 reconciles Admin-create constraints. Implementation and provider email attachment are separate gates.
+- Canonical revision: 1.0.0-draft.2, SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be. LoginRequest remains unchanged; no legacy account/hash migration.
+- Profile implementation and actual Admin-create persistence/authorization tests remain outstanding; policy approval is not feature acceptance.
+- Email attachment stays with D03; status/disable behavior must use Scope instead of inventing a policy.
 
-## D03 — Firebase + Resend verification/recovery ownership [UNRESOLVED]
+## D03 — Firebase + Resend verification/recovery ownership [PARTIALLY_CONFIRMED]
 
-- Evidence/conflict: Firebase Email/Google confirmed later; Scope still requires Resend one-use 24h links. Canonical register/verify/reset and four legacy Google deferred protocols have not migrated. Local account adding verified email lacks a frozen safe operation.
-- Proposed resolution / next action: Approve provider action-link ownership, proof freshness/link/collision rules and proposed exchange/link changes. Preserve A01–A20; no silent removal of legacy paths.
-- Blocking tasks: AUTH-01, AUTH-02, AUTH-03, MGMT-01, PROVIDER-AUTH-01, DB-06
-- Owner: Lead Architect prepares; User approves policy/contract changes
-- Approval evidence: Pending; proposed mechanism is subject to task review, unresolved policy/contract changes need approval
+- Confirmed: Firebase Email/Google credential ownership, Nest local Username/app sessions, explicit linking/no email auto-merge and necessary exchange/link contract design approved 2026-10-11. Wire/proof/recovery/error design, dependency justification and provider verification remain open; four Google deferred records are retained.
+- Proposed technical work: specify token verification, exchange/link response/errors, collision handling and delivery/recovery compatibility with Final 1.6. The approved direction permits preparing the necessary contract delta.
+- Remaining: exact provider proof/recovery protocol, 24h one-use link enforcement, production identity/From and sandbox evidence. No server SDK installed or new exchange/link path declared in Draft.2.
+- AUTH-01/02/03 and provider feature cannot be accepted from a Username-only kernel.
 
 ## D04 — Authoring aggregate/revision lifecycle [UNRESOLVED]
 

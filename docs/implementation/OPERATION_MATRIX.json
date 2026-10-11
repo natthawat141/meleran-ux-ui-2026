@@ -2,8 +2,8 @@
   "meta": {
     "generated_on": "2026-10-10",
     "scope": "Final 1.6",
-    "contract_version": "1.0.0-draft.1",
-    "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+    "contract_version": "1.0.0-draft.2",
+    "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
     "contract_status": "DRAFT_NOT_FROZEN",
     "defined_count": 86,
     "deferred_count": 5,
@@ -17,7 +17,8 @@
         "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
       },
       "docs/api-contract/openapi.json": {
-        "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+        "sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+        "previous_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
       },
       "docs/api-contract/API_CONTRACT_R4A_DRAFT_TH.md": {
         "sha256": "c15d874bc284ea8e85cf08068b4a1bf1d3882423c09c06cc779542deb31e321e"
@@ -68,7 +69,16 @@
       "READY": "no dependency/decision unresolved; design ready, not implemented",
       "BLOCKED": "dependency or test environment not satisfied",
       "NEEDS_DECISION": "explicit policy/protocol unresolved"
-    }
+    },
+    "contract_history": [
+      {
+        "version": "1.0.0-draft.1",
+        "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+        "generated_on": "2026-10-10"
+      }
+    ],
+    "execution_status_source": "docs/implementation/EXECUTION_STATUS.json",
+    "approval_update_on": "2026-10-11"
   },
   "defined_operations": [
     {
@@ -304,8 +314,8 @@
         "D03"
       ],
       "transaction_id": "TX-LINK",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-02.openapi.json"
     },
@@ -542,8 +552,8 @@
         "D03"
       ],
       "transaction_id": "TX-LINK",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-02.openapi.json"
     },
@@ -780,8 +790,8 @@
         "D03"
       ],
       "transaction_id": "TX-LINK",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-02.openapi.json"
     },
@@ -1036,8 +1046,8 @@
         "D03"
       ],
       "transaction_id": "TX-AUTH",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-01.openapi.json"
     },
@@ -1271,8 +1281,8 @@
         "D03"
       ],
       "transaction_id": "TX-AUTH",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-03.openapi.json"
     },
@@ -1506,8 +1516,8 @@
         "D03"
       ],
       "transaction_id": "TX-AUTH",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-03.openapi.json"
     },
@@ -1755,8 +1765,8 @@
         "D03"
       ],
       "transaction_id": "TX-AUTH",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AUTH-01.openapi.json"
     },
@@ -1990,8 +2000,8 @@
         "D09"
       ],
       "transaction_id": "TX-PROFILE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ACCOUNT-01.openapi.json"
     },
@@ -2232,8 +2242,8 @@
         "D09"
       ],
       "transaction_id": "TX-PROFILE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ACCOUNT-01.openapi.json"
     },
@@ -2488,8 +2498,8 @@
         "D16"
       ],
       "transaction_id": "TX-USER",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-01.openapi.json"
     },
@@ -2765,8 +2775,8 @@
         "D16"
       ],
       "transaction_id": "TX-USER",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-01.openapi.json"
     },
@@ -3019,8 +3029,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-USER",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-02.openapi.json"
     },
@@ -3276,8 +3286,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-USER",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-02.openapi.json"
     },
@@ -3562,8 +3572,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CATALOG-01.openapi.json"
     },
@@ -3802,8 +3812,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CATALOG-01.openapi.json"
     },
@@ -4116,8 +4126,8 @@
         "D09"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-02.openapi.json"
     },
@@ -4407,8 +4417,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-GRANT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ENROLL-01.openapi.json"
     },
@@ -4689,8 +4699,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-GRANT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ENROLL-01.openapi.json"
     },
@@ -4962,8 +4972,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/LEARN-01.openapi.json"
     },
@@ -5244,8 +5254,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/LEARN-01.openapi.json"
     },
@@ -5530,8 +5540,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/LEARN-01.openapi.json"
     },
@@ -5815,8 +5825,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-COMPLETE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/LEARN-02.openapi.json"
     },
@@ -6100,8 +6110,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-COMPLETE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/LEARN-02.openapi.json"
     },
@@ -6398,8 +6408,8 @@
         "D10"
       ],
       "transaction_id": "TX-ASSESS",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ASSESS-01.openapi.json"
     },
@@ -6684,8 +6694,8 @@
         "D10"
       ],
       "transaction_id": "TX-ASSESS",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ASSESS-01.openapi.json"
     },
@@ -6970,8 +6980,8 @@
         "D10"
       ],
       "transaction_id": "TX-ASSESS",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ASSESS-01.openapi.json"
     },
@@ -7230,8 +7240,8 @@
         "D06"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ASSESS-02.openapi.json"
     },
@@ -7490,8 +7500,8 @@
         "D06"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ASSESS-02.openapi.json"
     },
@@ -7766,8 +7776,8 @@
         "D10"
       ],
       "transaction_id": "TX-GRADE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/GRADE-01.openapi.json"
     },
@@ -8048,8 +8058,8 @@
         "D10"
       ],
       "transaction_id": "TX-GRADE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/GRADE-01.openapi.json"
     },
@@ -8339,8 +8349,8 @@
         "D07"
       ],
       "transaction_id": "TX-CERT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CERT-01.openapi.json"
     },
@@ -8620,8 +8630,8 @@
         "D07"
       ],
       "transaction_id": "TX-CERT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CERT-01.openapi.json"
     },
@@ -8901,8 +8911,8 @@
         "D07"
       ],
       "transaction_id": "TX-CERT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CERT-01.openapi.json"
     },
@@ -9163,8 +9173,8 @@
         "D10"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-01.openapi.json"
     },
@@ -9453,8 +9463,8 @@
         "D10"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-01.openapi.json"
     },
@@ -9715,8 +9725,8 @@
         "D10"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-01.openapi.json"
     },
@@ -10005,8 +10015,8 @@
         "D10"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-01.openapi.json"
     },
@@ -10312,8 +10322,8 @@
         "D09"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-02.openapi.json"
     },
@@ -10543,8 +10553,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "NO_WRITE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/VIDEO-01.openapi.json"
     },
@@ -10850,8 +10860,8 @@
         "D09"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-02.openapi.json"
     },
@@ -11161,8 +11171,8 @@
         "D09"
       ],
       "transaction_id": "TX-COURSE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/COURSE-02.openapi.json"
     },
@@ -11432,8 +11442,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REVIEW-01.openapi.json"
     },
@@ -11679,8 +11689,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REVIEW-01.openapi.json"
     },
@@ -11954,8 +11964,8 @@
         "D04"
       ],
       "transaction_id": "TX-REVIEW",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REVIEW-02.openapi.json"
     },
@@ -12229,8 +12239,8 @@
         "D04"
       ],
       "transaction_id": "TX-REVIEW",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REVIEW-02.openapi.json"
     },
@@ -12507,8 +12517,8 @@
         "D04"
       ],
       "transaction_id": "TX-REVIEW",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REVIEW-02.openapi.json"
     },
@@ -12798,8 +12808,8 @@
         "D10"
       ],
       "transaction_id": "TX-CHECKOUT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/PAY-01.openapi.json"
     },
@@ -13080,8 +13090,8 @@
         "D10"
       ],
       "transaction_id": "TX-CHECKOUT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/PAY-01.openapi.json"
     },
@@ -13327,8 +13337,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/PAY-02.openapi.json"
     },
@@ -13631,8 +13641,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REDEEM-02.openapi.json"
     },
@@ -13894,8 +13904,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REDEEM-01.openapi.json"
     },
@@ -14192,8 +14202,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REDEEM-01.openapi.json"
     },
@@ -14465,8 +14475,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REDEEM-01.openapi.json"
     },
@@ -14733,8 +14743,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-TRANSCRIPT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-01.openapi.json"
     },
@@ -15003,8 +15013,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-TRANSCRIPT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-01.openapi.json"
     },
@@ -15280,8 +15290,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-TRANSCRIPT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-01.openapi.json"
     },
@@ -15540,8 +15550,8 @@
         "D16"
       ],
       "transaction_id": "TX-CHAT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-02.openapi.json"
     },
@@ -15821,8 +15831,8 @@
         "D16"
       ],
       "transaction_id": "TX-CHAT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-02.openapi.json"
     },
@@ -16103,8 +16113,8 @@
         "D16"
       ],
       "transaction_id": "TX-CHAT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-02.openapi.json"
     },
@@ -16444,8 +16454,8 @@
         "D12"
       ],
       "transaction_id": "TX-AI",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-03.openapi.json"
     },
@@ -16706,8 +16716,8 @@
         "D11"
       ],
       "transaction_id": "TX-CHAT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-05.openapi.json"
     },
@@ -16954,8 +16964,8 @@
         "D11"
       ],
       "transaction_id": "TX-CHAT",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-05.openapi.json"
     },
@@ -17278,8 +17288,8 @@
         "D12"
       ],
       "transaction_id": "TX-AI",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-03.openapi.json"
     },
@@ -17564,8 +17574,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "TX-PRACTICE",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-04.openapi.json"
     },
@@ -17834,8 +17844,8 @@
         "D11"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-03.openapi.json"
     },
@@ -18101,8 +18111,8 @@
         "D09"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-02.openapi.json"
     },
@@ -18371,8 +18381,8 @@
         "D11"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-03.openapi.json"
     },
@@ -18650,8 +18660,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-01.openapi.json"
     },
@@ -18903,8 +18913,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-01.openapi.json"
     },
@@ -19193,8 +19203,8 @@
         "D09"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-02.openapi.json"
     },
@@ -19450,8 +19460,8 @@
         "D09"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-02.openapi.json"
     },
@@ -19710,8 +19720,8 @@
         "D09"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-02.openapi.json"
     },
@@ -19980,8 +19990,8 @@
         "D11"
       ],
       "transaction_id": "TX-BLOG",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/BLOG-03.openapi.json"
     },
@@ -20251,8 +20261,8 @@
         "D16"
       ],
       "transaction_id": "TX-USER",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-01.openapi.json"
     },
@@ -20531,8 +20541,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-03.openapi.json"
     },
@@ -20811,8 +20821,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-03.openapi.json"
     },
@@ -21094,8 +21104,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-03.openapi.json"
     },
@@ -21377,8 +21387,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-03.openapi.json"
     },
@@ -21638,8 +21648,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-04.openapi.json"
     },
@@ -21899,8 +21909,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-04.openapi.json"
     },
@@ -22153,8 +22163,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-04.openapi.json"
     },
@@ -22404,8 +22414,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-04.openapi.json"
     },
@@ -22643,8 +22653,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-05.openapi.json"
     },
@@ -22882,8 +22892,8 @@
       "execution_status": "BLOCKED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-05.openapi.json"
     },
@@ -23143,8 +23153,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CATALOG-02.openapi.json"
     },
@@ -23385,8 +23395,8 @@
         "D16"
       ],
       "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CATALOG-02.openapi.json"
     }
@@ -23464,8 +23474,8 @@
         "status": "provider-pending",
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "deferred_id": "DEFERRED-02",
@@ -23539,8 +23549,8 @@
         "status": "provider-pending",
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "deferred_id": "DEFERRED-03",
@@ -23614,8 +23624,8 @@
         "status": "provider-pending",
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "deferred_id": "DEFERRED-04",
@@ -23689,8 +23699,8 @@
         "status": "provider-pending",
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "deferred_id": "DEFERRED-05",
@@ -23775,8 +23785,8 @@
         "status": "provider-pending",
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     }
   ],
   "acceptance_cases": [
@@ -25493,7 +25503,6 @@
       ],
       "decision_ids": [
         "D01",
-        "D02",
         "D03"
       ],
       "transaction_id": "TX-AUTH",
@@ -25549,7 +25558,7 @@
         }
       ],
       "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D01, D02, D03",
+      "status_reason": "ต้องปิด D01 remaining transport, D03",
       "priority": "P0",
       "parallel_group": "auth",
       "feature_integration_gate": "G-AUTH",
@@ -25573,8 +25582,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AUTH-02",
@@ -25667,8 +25676,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AUTH-03",
@@ -25757,8 +25766,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "ACCOUNT-01",
@@ -25777,7 +25786,6 @@
         "AUTH-01"
       ],
       "decision_ids": [
-        "D02",
         "D09"
       ],
       "transaction_id": "TX-PROFILE",
@@ -25823,7 +25831,7 @@
         }
       ],
       "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D02, D09",
+      "status_reason": "ต้องปิด D09",
       "priority": "P0",
       "parallel_group": "accounts",
       "feature_integration_gate": "G-AUTH",
@@ -25843,8 +25851,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "MGMT-01",
@@ -25867,7 +25875,6 @@
         "ACCOUNT-01"
       ],
       "decision_ids": [
-        "D02",
         "D03",
         "D16"
       ],
@@ -25929,7 +25936,7 @@
         }
       ],
       "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D02, D03, D16",
+      "status_reason": "ต้องปิด D03, D16",
       "priority": "P2",
       "parallel_group": "management",
       "feature_integration_gate": "G-MANAGEMENT",
@@ -25949,8 +25956,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "MGMT-02",
@@ -26041,8 +26048,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "MGMT-03",
@@ -26141,8 +26148,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "MGMT-04",
@@ -26230,8 +26237,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "MGMT-05",
@@ -26315,8 +26322,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "CATALOG-01",
@@ -26403,8 +26410,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "CATALOG-02",
@@ -26485,8 +26492,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "ENROLL-01",
@@ -26604,8 +26611,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "COURSE-01",
@@ -26709,8 +26716,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "COURSE-02",
@@ -26850,8 +26857,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "VIDEO-01",
@@ -26924,8 +26931,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "REVIEW-01",
@@ -27007,8 +27014,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "REVIEW-02",
@@ -27110,8 +27117,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "LEARN-01",
@@ -27218,8 +27225,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "LEARN-02",
@@ -27331,8 +27338,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "ASSESS-01",
@@ -27448,8 +27455,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "ASSESS-02",
@@ -27545,8 +27552,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "GRADE-01",
@@ -27651,8 +27658,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "CERT-01",
@@ -27765,8 +27772,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "PAY-01",
@@ -27878,8 +27885,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "PAY-02",
@@ -27960,8 +27967,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "REDEEM-01",
@@ -28065,8 +28072,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "REDEEM-02",
@@ -28192,8 +28199,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AI-01",
@@ -28291,8 +28298,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AI-02",
@@ -28389,8 +28396,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AI-05",
@@ -28477,8 +28484,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AI-03",
@@ -28639,8 +28646,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AI-04",
@@ -28743,8 +28750,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "BLOG-01",
@@ -28837,8 +28844,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "BLOG-02",
@@ -28936,8 +28943,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "BLOG-03",
@@ -29034,8 +29041,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "FOUNDATION-01",
@@ -29080,8 +29087,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "DB-01",
@@ -29177,8 +29184,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "DB-02",
@@ -29256,8 +29263,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "DB-03",
@@ -29335,8 +29342,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "DB-04",
@@ -29413,8 +29420,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "DB-05",
@@ -29495,8 +29502,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "COMPLETION-01",
@@ -29615,8 +29622,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "PROVIDER-AUTH-01",
@@ -29714,8 +29721,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "PROVIDER-STRIPE-01",
@@ -29824,8 +29831,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "INTEGRATION-01",
@@ -29910,8 +29917,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "INTEGRATION-02",
@@ -29990,8 +29997,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "INTEGRATION-03",
@@ -30181,8 +30188,8 @@
         "AI28",
         "AI29"
       ],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "CI-01",
@@ -30230,8 +30237,8 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "AUTH-BASE-01",
@@ -30255,16 +30262,13 @@
         "FOUNDATION-01",
         "DB-01"
       ],
-      "decision_ids": [
-        "D01",
-        "D02"
-      ],
+      "decision_ids": [],
       "transaction_id": "TX-AUTH",
       "rules": [
         "Internal Auth interfaces เท่านั้น: resolve principal, issue/revoke app session, verify local Username credential และ trusted provider principal handoff; ไม่มี HTTP endpoint ใหม่",
         "Web/Admin ใช้ User เดียวแต่ session แยก; audience ไม่ให้ role และ Logout ไม่ปิด session อีก app",
-        "Credential hash/cookie/TTL/revocation/CSRF ตาม D01/D02 ที่ปิดแล้ว; ไม่ยก demo PBKDF2/Strict12h เป็น policy",
-        "Email/Google credential owner เป็น provider ตาม D03; kernel ไม่สร้าง fake Firebase email หรือเก็บ provider password ซ้ำ"
+        "Confirmed 12h/no sliding/current logout/all-app password-reset revocation and local username/password constraints; cookie/CSRF/CORS implementation review remains.",
+        "Confirmed Firebase Email/Google credential owner; trusted provider proof/handoff protocol remains separate; no fake email or duplicated provider password."
       ],
       "tests": [
         "unit session issue/resolve/revoke and wrong audience; expired/revoked proof",
@@ -30274,8 +30278,8 @@
       "rule_class_overrides": {
         "0": "PROPOSED_TECHNICAL",
         "1": "CONFIRMED_SCOPE",
-        "2": "UNRESOLVED_REQUIREMENT",
-        "3": "UNRESOLVED_REQUIREMENT"
+        "2": "CONFIRMED_APPROVAL",
+        "3": "CONFIRMED_DIRECTION"
       },
       "acceptance_ids": [],
       "source_sections": [
@@ -30315,8 +30319,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D01, D02",
+      "status": "READY",
+      "status_reason": "Confirmed lifetime/constraints; FOUNDATION-01 and DB-01 verified. Continue internal transport/handoff/cutover work; provider feature gate remains separate.",
       "priority": "P0",
       "parallel_group": "auth",
       "feature_integration_gate": "G-AUTH",
@@ -30331,17 +30335,17 @@
           "text": "Web/Admin ใช้ User เดียวแต่ session แยก; audience ไม่ให้ role และ Logout ไม่ปิด session อีก app"
         },
         {
-          "classification": "UNRESOLVED_REQUIREMENT",
-          "text": "Credential hash/cookie/TTL/revocation/CSRF ตาม D01/D02 ที่ปิดแล้ว; ไม่ยก demo PBKDF2/Strict12h เป็น policy"
+          "classification": "CONFIRMED_APPROVAL",
+          "text": "Confirmed 12h/no sliding/current logout/all-app password-reset revocation and local username/password constraints; cookie/CSRF/CORS implementation review remains."
         },
         {
-          "classification": "UNRESOLVED_REQUIREMENT",
-          "text": "Email/Google credential owner เป็น provider ตาม D03; kernel ไม่สร้าง fake Firebase email หรือเก็บ provider password ซ้ำ"
+          "classification": "CONFIRMED_DIRECTION",
+          "text": "Confirmed Firebase Email/Google credential owner; trusted provider proof/handoff protocol remains separate; no fake email or duplicated provider password."
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     },
     {
       "id": "DB-06",
@@ -30437,46 +30441,40 @@
         }
       ],
       "validation_acceptance_ids": [],
-      "contract_version": "1.0.0-draft.1",
-      "contract_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
     }
   ],
   "decisions": [
     {
       "id": "D01",
-      "state": "UNRESOLVED",
+      "state": "PARTIALLY_CONFIRMED",
       "title": "Session/security transport",
-      "conflict": "Web/Admin isolation confirmed; cookie names/attributes/TTL/CSRF/CORS/origins/revocation/rate limits remain Draft. Strict/12h and omitted Secure in prototype are implementation observations, not approved policy.",
-      "resolution": "Approve session/security policy and canonical mapping before AUTH-01/browser slice; allow public work.",
+      "conflict": "Lifetime/logout/reset scope confirmed; cookie/CSRF/CORS/origins/throttling protocol review remains.",
+      "resolution": "Implement approved lifetime/constraints and review technical transport; do not request lifetime approval again.",
       "blocks": [
         "AUTH-01",
-        "PROVIDER-AUTH-01",
-        "AUTH-BASE-01"
+        "PROVIDER-AUTH-01"
       ],
       "owner": "Lead Architect prepares; User approves policy/contract changes",
-      "approval_evidence": "Pending; proposed mechanism is subject to task review, unresolved policy/contract changes need approval"
+      "approval_evidence": "2026-10-11 user accepted the preceding three-decision summary: เอาตามนั้นเลย; approved subset recorded in canonical Draft.2 x-auth-approved-decisions."
     },
     {
       "id": "D02",
-      "state": "UNRESOLVED",
+      "state": "CONFIRMED",
       "title": "Username/password/profile consistency",
-      "conflict": "Canonical Admin-create/profile username patterns and password limits differ; prototype enforces 12 chars and profile null deletes values while Flow AB normalizes strings. CurrentUser responses omit required wire fields.",
-      "resolution": "Review exact patterns/length/normalization and null/array semantics, then update canonical/mock/types together only when approved.",
-      "blocks": [
-        "AUTH-01",
-        "ACCOUNT-01",
-        "MGMT-01",
-        "AUTH-BASE-01"
-      ],
+      "conflict": "Username/password/profile inconsistency resolved by approved canonical Draft.2 constraints/semantics.",
+      "resolution": "Implement approved constraints and verify HTTP/persistence/profile behavior. Provider email attachment follows D03.",
+      "blocks": [],
       "owner": "Lead Architect prepares; User approves policy/contract changes",
-      "approval_evidence": "Pending; proposed mechanism is subject to task review, unresolved policy/contract changes need approval"
+      "approval_evidence": "2026-10-11 user accepted the preceding three-decision summary: เอาตามนั้นเลย; approved subset recorded in canonical Draft.2 x-auth-approved-decisions."
     },
     {
       "id": "D03",
-      "state": "UNRESOLVED",
+      "state": "PARTIALLY_CONFIRMED",
       "title": "Firebase + Resend verification/recovery ownership",
-      "conflict": "Firebase Email/Google confirmed later; Scope still requires Resend one-use 24h links. Canonical register/verify/reset and four legacy Google deferred protocols have not migrated. Local account adding verified email lacks a frozen safe operation.",
-      "resolution": "Approve provider action-link ownership, proof freshness/link/collision rules and proposed exchange/link changes. Preserve A01–A20; no silent removal of legacy paths.",
+      "conflict": "Firebase Email/Google and Nest Username/session ownership, explicit linking and necessary contract design approved; exact proof/recovery wire design remains.",
+      "resolution": "Prepare reviewed exchange/link/recovery protocol while preserving Final1.6 and existing deferred records; integration proof required.",
       "blocks": [
         "AUTH-01",
         "AUTH-02",
@@ -30486,7 +30484,7 @@
         "DB-06"
       ],
       "owner": "Lead Architect prepares; User approves policy/contract changes",
-      "approval_evidence": "Pending; proposed mechanism is subject to task review, unresolved policy/contract changes need approval"
+      "approval_evidence": "2026-10-11 user accepted the preceding three-decision summary: เอาตามนั้นเลย; approved subset recorded in canonical Draft.2 x-auth-approved-decisions."
     },
     {
       "id": "D04",

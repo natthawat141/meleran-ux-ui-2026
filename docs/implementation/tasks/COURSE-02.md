@@ -2,7 +2,7 @@
 
 Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
 
-ต้องปิด D04, D05, D09
+ต้องปิด D04, D05, D09; D02 constraints/profile semantics confirmed แล้ว
 
 Storage preflight 11 ต.ค.: [CONTRACT_STORAGE_GAPS](../CONTRACT_STORAGE_GAPS.md#course-02--review-01--authoring-readwrite-prerequisites) ระบุ publisher/legacy creator/revision0/optional plain metadata และ old-review projection gaps. ปิดเฉพาะ decisions ที่เกี่ยวข้องก่อนเลือก physical delta; ห้ามเดา creator/publisher, บวก revision ใน reader, ทิ้ง supplied fields หรือสร้าง full course-version requirement เอง. Preview ใช้ schema แยกจาก full authoring DTO.
 
@@ -11,7 +11,7 @@ Storage preflight 11 ต.ค.: [CONTRACT_STORAGE_GAPS](../CONTRACT_STORAGE_GAPS.
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.3 (line 243); §3.4 (line 451); §4.5 (line 956); §5.2 (line 1008); §6.5 (line 1228)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - [OpenAPI subset](../contracts/COURSE-02.openapi.json) — schema, parameters, required/null, enums, every declared status/error และ security ครบ
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 

@@ -2,7 +2,7 @@
 
 Status: **NEEDS_DECISION** · Priority: P1 · Module: assessments
 
-ต้องปิด D06
+ต้องปิด D06; D02 constraints/profile semantics confirmed แล้ว
 
 Execution component 11 ต.ค.: `GET /learn/attempts/{id}` implemented bounded owned historical projection; 6 units + 15 actual HTTP/PG tests + 9 unchanged client checks. อ่าน [ATTEMPT_READ_COMPONENT](../ATTEMPT_READ_COMPONENT.md). Best-result endpoint/D06 ยังไม่ implement; stored Submitted vs canonical three-state conflict/normalized snapshot writer is explicit. Whole task ไม่ DONE; no original acceptance marked accepted.
 
@@ -11,7 +11,7 @@ Execution component 11 ต.ค.: `GET /learn/attempts/{id}` implemented bounded 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.6 (line 315); §3.5 (line 475); §5.6 (line 1080); §6.6 (line 1278)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - [OpenAPI subset](../contracts/ASSESS-02.openapi.json) — schema, parameters, required/null, enums, every declared status/error และ security ครบ
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 

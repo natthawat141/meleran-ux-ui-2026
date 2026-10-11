@@ -2,7 +2,7 @@
 
 Status: **NEEDS_DECISION** · Priority: P1 · Module: payments
 
-ต้องปิด D08, D10
+ต้องปิด D08, D10; D02 constraints/profile semantics confirmed แล้ว
 
 Execution checkpoint 11 ต.ค. 2026: ผู้ใช้สั่งทำ receiver แล้ว. Raw signature + durable receipt component มี implementation/tests; ดู [STRIPE_WEBHOOK_RECEIVER](../STRIPE_WEBHOOK_RECEIVER.md) และ current EXECUTION_STATUS. Task ยัง NEEDS_DECISION: payment processor/fulfillment/real provider contract ไม่เสร็จ; planning baseline ด้านล่างไม่ใช่รายการ work ที่เสร็จแล้ว.
 
@@ -11,7 +11,7 @@ Execution checkpoint 11 ต.ค. 2026: ผู้ใช้สั่งทำ rece
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §2.4 (line 264); §4.5 (line 956); §5.11 (line 1136); §6.5.1 (line 1253)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - ไม่มี defined HTTP operation ใน task นี้; internal foundation/coordination หรือ deferred protocol เท่านั้น
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 

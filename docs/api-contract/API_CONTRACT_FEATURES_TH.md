@@ -5193,9 +5193,9 @@ Google start/callback ต้องตกลง redirect, state, PKCE/code exchan
 
 ## 6. เรื่องที่ยังต้องตกลงก่อน freeze / สิ่งที่ไม่ต้องสร้าง
 
-- Cookie transport/names/domain/CSRF/TTL and environment origins (separate login/session confirmed)
+- Absolute 12h/session audience/logout/reset scope confirmed2026-10-11; cookie security/CSRF/environment origins and throttling protocol still require technical review before Auth HTTP cutover
 
-- Username pattern mismatch Admin create vs profile edit; unify or document compatibility
+- Username/password constraints and profile PATCH semantics confirmed2026-10-11; provider email attachment/account status interpretation and implementation cutover remain tracked in D02/D03
 
 - Revision enforcement on return-review; Blog mutations now require expected_revision
 
@@ -5340,8 +5340,8 @@ Type: object. ไม่รับ field นอก schema
 
 | Field | Type/schema | Required | Validation/description |
 | --- | --- | --- | --- |
-| `username` | string | required | — |
-| `password` | string | required | — |
+| `username` | string | required | pattern: "^[A-Za-z0-9_.]{3,30}$" |
+| `password` | string | required | minLength: 8; maxLength: 128 |
 | `display_name` | string | required | — |
 | `email` | null / anyOf / string | optional | — |
 
@@ -7243,4 +7243,4 @@ Type: object. ไม่รับ field นอก schema
 
 อัปเดต OpenAPI ก่อน แล้วรัน `node ../docs/api-contract/generate-handbook.mjs` เพื่อสร้าง Markdown นี้ใหม่; `node ../docs/api-contract/generate-handbook.mjs --check` ตรวจ drift. ไม่แก้ tables/JSON ในไฟล์ generated นี้โดยตรง. หากเปลี่ยน business/provider decisions ให้อัปเดต source + เอกสาร decision ที่เกี่ยวข้องพร้อมกัน.
 
-<!-- source-sha256: c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3 -->
+<!-- source-sha256: b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be -->

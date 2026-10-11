@@ -1,8 +1,8 @@
-# ข้อเสนอปิดคิวถัดไป — ยังไม่ถือว่าอนุมัติ
+# คิวถัดไป — แยกข้อที่อนุมัติแล้วจากข้อเสนอ
 
 11 ต.ค. 2026. Git/Cloud SQL placement ปิดแล้วตามคำสั่งล่าสุด. หน้านี้รวม
 **Proposed** ที่เหลือก่อนทำ browser/auth slice; ไม่เพิ่มกติกาธุรกิจใหม่ใน code.
-Contract ยัง Draft และไม่ถูกแก้ในชุดงานนี้.
+Contract เป็น Draft.2 หลังคำยืนยัน “เอาตามนั้นเลย”: session lifetime/logout/reset, username/password/profile semantics และ Firebase ownership/linking direction อนุมัติแล้ว. ตารางเดิมด้านล่างเป็น packet ที่กว้างกว่า summary ที่อนุมัติ; cookie/CSRF/numeric throttle/provider proof และ dependency details ยัง Proposed. ดู DECISIONS.md และ AUTH_LOCAL_KERNEL_COMPONENT.md สำหรับขอบเขตปัจจุบัน.
 
 ## ชุด A — Public Catalog / D16
 
@@ -27,7 +27,7 @@ signed cursor ผูกตัวกรอง/limit และไม่มี time
 | Password length | create/register/reset ใช้ 8–128 ตาม RegisterRequest; LoginRequest รับเดิมเพื่อ validate credential ไม่บังคับสร้างใหม่ | ต้อง sync create/reset ที่ไม่ตรง; ไม่ยึด min12 จาก prototype |
 | Profile PATCH | omitted=ไม่เปลี่ยน; explicit null=ล้างเฉพาะ nullable field; arrays=replace และ []=ล้าง; ไม่ใช้ truthy check ลบค่าที่ถูกต้อง | ต้องปิด conflict ระหว่าง Flow AB และ canonical |
 
-รายการข้างบนยัง Proposed. ก่อนเปิด Auth task ต้องอนุมัติ transport/limits และ
+Lifetime, logout/password-reset revocation, username/password constraints และ Profile PATCH confirmed แล้ว. รายการอื่นยัง Proposed/technical review; ก่อนเปิด Auth HTTP cutover ต้องตรวจ transport/limits และ
 แก้ canonical อย่างเจาะจง พร้อม regenerate/check frontend contract snapshot.
 Origins ของ production ยังไม่กำหนด; ไม่เปิด wildcard หรือ deploy ในงานนี้.
 

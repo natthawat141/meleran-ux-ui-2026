@@ -6,10 +6,14 @@ import { SelfProfileReader } from './public/self-profile.reader';
 import { LogoutService } from './logout.service';
 import { InstructorGrantWriter } from './public/instructor-grant.writer';
 import { AdminUserDetailReader } from './public/admin-user-detail.reader';
+import { LocalPasswordService } from './local-password.service';
+import { LocalAuthenticationService } from './local-authentication.service';
+import { SessionWriter } from './session-writer.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, PrincipalService, SelfProfileReader, LogoutService, InstructorGrantWriter, AdminUserDetailReader],
+  providers: [AuthService, PrincipalService, SelfProfileReader, LogoutService, InstructorGrantWriter, AdminUserDetailReader,
+    LocalPasswordService, LocalAuthenticationService, SessionWriter],
   exports: [AuthService, PrincipalService, SelfProfileReader, InstructorGrantWriter, AdminUserDetailReader],
 })
 export class AuthModule {}

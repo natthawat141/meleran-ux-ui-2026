@@ -8,13 +8,15 @@
     "acceptance_cases": 113
   },
   "contract": {
-    "version": "1.0.0-draft.1",
-    "sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3",
-    "status": "DRAFT"
+    "version": "1.0.0-draft.2",
+    "sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+    "status": "DRAFT",
+    "previous_version": "1.0.0-draft.1",
+    "previous_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 332,
+    "database_tests": 350,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -22,7 +24,7 @@
     "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 28,
+    "feature_component_unit_tests": 34,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
@@ -71,7 +73,12 @@
     "frontend_managed_quiz_locator_transport_checks": 8,
     "course_creator_schema_postgres_tests": 7,
     "admin_user_detail_http_postgres_tests": 18,
-    "frontend_admin_user_detail_transport_checks": 10
+    "frontend_admin_user_detail_transport_checks": 10,
+    "local_auth_kernel_postgres_tests": 18,
+    "local_password_unit_tests": 6,
+    "frontend_local_tests": 172,
+    "frontend_contract_check": "PASS_DRAFT_2",
+    "frontend_local_typecheck": "PASS_WEB_ADMIN_PACKAGES"
   },
   "environment": {
     "staging": false,
@@ -141,7 +148,6 @@
       ],
       "decision_ids": [
         "D01",
-        "D02",
         "D03"
       ],
       "components": [
@@ -207,7 +213,6 @@
         "AUTH-01"
       ],
       "decision_ids": [
-        "D02",
         "D09"
       ],
       "components": [
@@ -249,7 +254,6 @@
         "ACCOUNT-01"
       ],
       "decision_ids": [
-        "D02",
         "D03",
         "D16"
       ],
@@ -1672,15 +1676,12 @@
       "id": "AUTH-BASE-01",
       "module": "auth",
       "priority": "P0",
-      "state": "NEEDS_DECISION",
+      "state": "READY",
       "dependencies": [
         "FOUNDATION-01",
         "DB-01"
       ],
-      "decision_ids": [
-        "D01",
-        "D02"
-      ],
+      "decision_ids": [],
       "components": [
         {
           "name": "stored-session-and-normalized-principal-resolution",
@@ -1753,6 +1754,25 @@
           ],
           "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871"
+        },
+        {
+          "name": "approved-local-password-session-kernel",
+          "state": "COMPONENT_LOCAL_VERIFIED",
+          "postgres_tests": 18,
+          "unit_tests": 6,
+          "protocol_document": "AUTH_LOCAL_KERNEL_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01"
+          ],
+          "contract_revision": "1.0.0-draft.2",
+          "evidence": "Async versioned KDF, 12h non-sliding app sessions, fresh role/credential checks, atomic all-app reset/revocation and observed PostgreSQL blocking/rollback races. Internal only; no HTTP operation completed.",
+          "remaining": [
+            "Transport/cookie/CSRF/CORS review",
+            "Legacy writer cutover",
+            "Trusted reset proof caller",
+            "Firebase exchange/link/recovery and real provider/browser gates"
+          ]
         }
       ]
     },
@@ -1773,18 +1793,19 @@
   "github": {
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
-    "ci": "PASS",
+    "ci": "PENDING_LOCAL_AUTH_CHECKPOINT",
     "verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321",
-    "latest_component_ci": "PASS_ADMIN_USER_DETAIL_CHECKPOINT",
+    "latest_component_ci": "LOCAL_PASS_HOSTED_PENDING",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",
-    "frontend_ci_evidence_note": "Frontend feature source unchanged; hosted Nest CI passed409 tests and124 actual client/transport checks including10 actual Admin resource/decoder detail checks. Creation/Auth/provider/query/status/disable/browser/full feature gates remain open."
+    "frontend_ci_evidence_note": "Frontend feature source unchanged; hosted Nest CI passed409 tests and124 actual client/transport checks including10 actual Admin resource/decoder detail checks. Creation/Auth/provider/query/status/disable/browser/full feature gates remain open.",
+    "previous_verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
+    "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
   },
   "remaining_decisions": [
     "D01",
-    "D02",
     "D03",
     "D04",
     "D05",
@@ -1802,5 +1823,47 @@
     "fullstack_lf_sha256": "179c104ac0780d127e48a0dc2536d5cf659d7a9161da76217ae30a70264b60d8",
     "newline_normalization": "LF",
     "normalized_content_match": true
+  },
+  "approved_auth_decisions": {
+    "approved_on": "2026-10-11",
+    "evidence": "User accepted the three summarized D01/D02/D03 proposals and profile PATCH semantics.",
+    "session": {
+      "absolute_ttl_hours": 12,
+      "sliding_refresh": false,
+      "audiences": [
+        "web",
+        "admin"
+      ],
+      "logout_scope": "current_audience_session",
+      "password_reset_revokes": "all_account_app_sessions"
+    },
+    "local_username": {
+      "pattern": "^[A-Za-z0-9_.]{3,30}$",
+      "case_insensitive_unique": true,
+      "lookup_normalization": "ASCII uppercase; no trimming of invalid usernames"
+    },
+    "new_password": {
+      "min_characters": 8,
+      "max_characters": 128,
+      "login_request_shape_unchanged": true
+    },
+    "profile_patch": {
+      "omitted": "preserve",
+      "nullable_null": "clear_nullable_field",
+      "arrays": "replace; empty array clears"
+    },
+    "provider_direction": {
+      "email_google_credential_owner": "Firebase",
+      "local_username_credential_owner": "Nest Auth",
+      "app_session_owner": "Nest Auth",
+      "linking": "explicit; never auto-merge by email",
+      "necessary_exchange_link_contract_design_authorized": true,
+      "exchange_link_paths_not_defined_in_this_revision": true
+    },
+    "remaining": "Provider wire/proof/recovery design, production origins and remaining unrelated decisions stay Draft. Approval is not provider/runtime/acceptance evidence."
+  },
+  "remaining_decision_scopes": {
+    "D01": "Transport/CSRF/CORS/origins/throttling review; approved lifetime/logout/reset not reopened",
+    "D03": "Provider proof/exchange/link/recovery design and integration; approved ownership direction not reopened"
   }
 }

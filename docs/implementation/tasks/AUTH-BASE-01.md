@@ -1,17 +1,19 @@
 # AUTH-BASE-01 — Shared principal/session and local credential kernel
 
-Status: **NEEDS_DECISION** · Priority: P0 · Module: auth
+Status: **READY** · Priority: P0 · Module: auth
 
-ต้องปิด D01, D02
+D01 lifetime/revocation และ D02 constraints อนุมัติแล้ว; เริ่ม internal kernel/transport review ต่อได้. D03 provider gate ยังแยกจาก task นี้.
 
-Execution checkpoint: policy-free PrincipalService session resolution + fresh normalized roles + transaction authority locks มี 8 PostgreSQL tests; opt-in guard ใช้กับ Admin AI handlers. ดู [ADMIN_AI_COMPONENT](../ADMIN_AI_COMPONENT.md). ไม่ปิด cookie/TTL/password/provider decisions หรือเปลี่ยน role writers/prototype handlers ทั้งระบบ.
+Execution checkpoint: policy-free PrincipalService session resolution + fresh normalized roles + transaction authority locks มี 8 PostgreSQL tests; opt-in guard ใช้กับ Admin AI handlers. ดู [ADMIN_AI_COMPONENT](../ADMIN_AI_COMPONENT.md). หลักฐานนี้เดิมไม่ปิด policy; คำยืนยันใหม่ปิด TTL/password constraints แล้ว ส่วน cookie/provider design ยังต้องทำ หรือเปลี่ยน role writers/prototype handlers ทั้งระบบ.
+
+New component: [Local Auth Kernel](../AUTH_LOCAL_KERNEL_COMPONENT.md). 18 PostgreSQL + 6 unit tests; no new HTTP operation or complete Auth cutover.
 
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §1.2 (line 65); §2.1 (line 169); §3.1 (line 409); §4.5 (line 956); §5.8 (line 1101)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - อ่าน [AUTH-01 context](../contracts/AUTH-01.openapi.json) สำหรับ principal/CurrentUser fields และ D01/D02 ที่ปิดแล้ว; kernel ไม่มี HTTP operation ใหม่
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 
@@ -23,8 +25,8 @@ Execution checkpoint: policy-free PrincipalService session resolution + fresh no
 
 - [PROPOSED_TECHNICAL] Internal Auth interfaces เท่านั้น: resolve principal, issue/revoke app session, verify local Username credential และ trusted provider principal handoff; ไม่มี HTTP endpoint ใหม่
 - [CONFIRMED_SCOPE] Web/Admin ใช้ User เดียวแต่ session แยก; audience ไม่ให้ role และ Logout ไม่ปิด session อีก app
-- [UNRESOLVED_REQUIREMENT] Credential hash/cookie/TTL/revocation/CSRF ตาม D01/D02 ที่ปิดแล้ว; ไม่ยก demo PBKDF2/Strict12h เป็น policy
-- [UNRESOLVED_REQUIREMENT] Email/Google credential owner เป็น provider ตาม D03; kernel ไม่สร้าง fake Firebase email หรือเก็บ provider password ซ้ำ
+- [CONFIRMED] Absolute 12h, no sliding, current-session logout/all-app reset revocation และ username/password constraints ตาม approval. [TECHNICAL_REVIEW] Cookie/CSRF/CORS และ legacy writer cutover; ใช้ kernel ใหม่ ไม่ใช้ demo hash
+- [CONFIRMED_DIRECTION] Email/Google credential owner คือ Firebase ตาม D03; proof/handoff design ยังต้องตรวจ; kernel ไม่สร้าง fake Firebase email หรือเก็บ provider password ซ้ำ
 
 ## Data / transaction / dependencies
 
@@ -36,7 +38,7 @@ Execution checkpoint: policy-free PrincipalService session resolution + fresh no
 
 ## Expected files / modules
 
-- backend/src/features/auth/auth.module.ts + auth.service.ts/exported session/local credential helpers (reuse existing feature)
+- backend/src/features/auth/auth.module.ts + local-password.service.ts + local-authentication.service.ts + session-writer.service.ts (Auth-private; no cross-feature export)
 - backend/src/shared/auth/session.guard.ts + current-user.decorator.ts: consume Auth principal interface
 - feature-local session/credential/authorization/PostgreSQL tests; no new Auth HTTP endpoint or independent identity store
 
@@ -66,8 +68,8 @@ Feature gate: **G-AUTH** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร�
 
 ## Decisions / สิ่งที่ห้ามแก้
 
-- D01 — Session/security transport: Web/Admin isolation confirmed; cookie names/attributes/TTL/CSRF/CORS/origins/revocation/rate limits remain Draft. Strict/12h and omitted Secure in prototype are implementation observations, not approved policy. Resolution: Approve session/security policy and canonical mapping before AUTH-01/browser slice; allow public work.
-- D02 — Username/password/profile consistency: Canonical Admin-create/profile username patterns and password limits differ; prototype enforces 12 chars and profile null deletes values while Flow AB normalizes strings. CurrentUser responses omit required wire fields. Resolution: Review exact patterns/length/normalization and null/array semantics, then update canonical/mock/types together only when approved.
+- D01 — Session/security transport: Absolute session TTL 12h/no sliding, Web/Admin isolation, current-session Logout and all-app password-reset revocation confirmed 2026-10-11. Cookie/CSRF/CORS/origins/throttling remain technical/protocol review; do not reopen approved lifetime policy.
+- D02 — Username/password/profile consistency: Username ASCII 3–30, case-insensitive uniqueness/uppercase lookup, new passwords 8–128 characters and profile omitted/null/array semantics confirmed 2026-10-11; canonical Draft.2 reconciles Admin-create constraints. Implementation and provider email attachment are separate gates.
 
 - ห้ามเปลี่ยน business policy, canonical path/schema/security semantics หรือเติม endpoint ให้ CRUD ครบ
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test

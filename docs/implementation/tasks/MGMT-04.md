@@ -2,7 +2,7 @@
 
 Status: **NEEDS_DECISION** · Priority: P2 · Module: management
 
-ต้องปิด D16
+ต้องปิด D16; D02 constraints/profile semantics confirmed แล้ว
 
 Component update 11 ต.ค.: GET /managed-quizzes/{id} implemented and verified separately; see [MANAGED_QUIZ_LOCATOR_COMPONENT](../MANAGED_QUIZ_LOCATOR_COMPONENT.md) for exact authority, public CourseItem ID mapping, locks and tests. Locator dependencies are FOUNDATION-01, DB-02 normalized identity, DB-03 current Quiz linkage and AUTH-BASE-01 fresh authoring authority. It does not depend on unresolved roster query/PII or grading policy. Whole task remains NEEDS_DECISION until all four operations and feature gate pass; no silent relaxation of planning dependencies for directories/managed Attempt.
 
@@ -11,7 +11,7 @@ Component update 11 ต.ค.: GET /managed-quizzes/{id} implemented and verified
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 
 - [Scope Final 1.6](../../MELEARN_V1_SCOPE.md): §3.4 (line 451); §3.5 (line 475); §6.6 (line 1278)
-- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.1 / SHA-256 c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3
+- [Canonical OpenAPI](../../api-contract/openapi.json): 1.0.0-draft.2 / SHA-256 b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be
 - [OpenAPI subset](../contracts/MGMT-04.openapi.json) — schema, parameters, required/null, enums, every declared status/error และ security ครบ
 - [Flow AB decisions](../../api-contract/API_CONTRACT_R4A_FLOW_AB_DRAFT_TH.md) และ [Decision Register](../DECISIONS.md) เฉพาะ IDs ที่ระบุ
 
