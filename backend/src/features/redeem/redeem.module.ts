@@ -7,10 +7,12 @@ import { RevokeCodeController } from './revoke-code.controller';
 import { CodeCommandsController } from './code-commands.controller';
 import { CodeIssuanceService } from './code-issuance.service';
 import { RedeemCodeService } from './redeem-code.service';
+import { CodeListController } from './code-list.controller';
+import { CodeListService } from './code-list.service';
 
 @Module({
   imports: [AuthModule, EnrollmentsModule],
-  controllers: [RevokeCodeController, CodeCommandsController],
-  providers: [RedeemWriter, RevokeCodeService, CodeIssuanceService, RedeemCodeService],
+  controllers: [RevokeCodeController, CodeCommandsController, CodeListController],
+  providers: [RedeemWriter, RevokeCodeService, CodeIssuanceService, RedeemCodeService, CodeListService],
 })
 export class RedeemModule {}

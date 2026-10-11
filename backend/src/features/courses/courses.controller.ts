@@ -1,22 +1,17 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { Public } from '../../shared/auth/session.guard';
+import { CatalogListService } from './catalog-list.service';
+import { PageQuery, PageQueryPipe } from '../../shared/pagination/keyset';
 
 @Controller('courses')
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService, private readonly catalog: CatalogListService) {}
 
   @Public()
   @Get()
-  async list(
-    @Query('q') q?: string,
-    @Query('category') category?: string,
-    @Query('level') level?: string,
-    @Query('price_type') priceType?: string,
-    @Query('limit') limit = 20,
-    @Query('cursor') cursor?: string,
-  ) {
-    return this.coursesService.list(q, category, level, priceType, Number(limit), cursor);
+  async list(@Query(new PageQueryPipe(['q','category','level','price_type'])) query: PageQuery) {
+    return this.catalog.list(query);
   }
 
   @Public()

@@ -65,6 +65,7 @@ async function main() {
   } });
   const db = new PrismaClient({ datasources: { db: { url: target.toString() } } });
   let child, accountId, learnerId, adminId;
+  const additionalFixtureAccounts=[];
   async function stop() {
     if (child && child.exitCode === null) {
       const exited = new Promise(resolve => child.once('exit', resolve));
@@ -721,6 +722,107 @@ async function main() {
     assert.equal(await db.payment.count({ where: { courseId: freshPaid.id } }), 0);
     codeCommandChecks.push('reconnect-no-synthetic-payment');
 
+    phase = 'frontend-continuation-public-and-owned-lists';
+    const continuationChecks = [];
+    const continuationHttp = createHttpClient({ baseUrl: `http://127.0.0.1:${port}/api/v1`, credentials:'omit', timeoutMs:5000,
+      headers:{'x-melearn-app':'web',Cookie:`melearn_web_session=${sessions.learner}`},fetcher:globalThis.fetch.bind(globalThis) });
+    const continuationCatalog = createCatalogApi(continuationHttp);
+    globalThis[learningClientSlot].set('continuation-learner',continuationHttp);
+    const continuationLearning = await learningApiFor('continuation-learner');
+    await db.course.update({where:{id:ids.published},data:{status:'published',category:tag}});
+    await db.course.update({where:{id:freshPaid.id},data:{category:tag}});
+    // Earlier component deliberately proved malformed published detail ->500.
+    // Keep that fixture outside this valid Instructor-detail page projection.
+    await db.course.update({where:{id:ids.corrupt},data:{status:'draft',publishedAt:null}});
+    const catalogFirst = await continuationCatalog.listCourses({category:tag,limit:1});
+    const catalogSecond = await continuationCatalog.listCourses({category:tag,limit:1,cursor:catalogFirst.next_cursor});
+    assert.equal(catalogFirst.items.length,1);assert.equal(catalogSecond.items.length,1);
+    assert.notEqual(catalogFirst.items[0].id,catalogSecond.items[0].id);
+    continuationChecks.push('actual-Catalog-client-keyset-pagination-and-decoder');
+    await assert.rejects(continuationCatalog.listCourses({category:tag,limit:2,cursor:catalogFirst.next_cursor}),error=>error instanceof HttpClientError&&error.status===422);
+    continuationChecks.push('Catalog-filter-limit-binding422');
+    const publicCourses=await ownerResource('instructors/'+encodeURIComponent(accountId)+'/courses?limit=50');
+    assert.ok(publicCourses.items.some(row=>row.id===ids.published&&Array.isArray(row.outline)&&Array.isArray(row.outcomes)));
+    continuationChecks.push('actual-public-Instructor-page-resource-full-CourseDetail-shape');
+    const ownEnrollments=await continuationLearning.myEnrollments();
+    assert.ok(ownEnrollments.some(row=>row.enrollment.id===firstGrant.id&&row.progress.completed_items===0));
+    assert.equal(ownEnrollments.some(row=>row.enrollment.id===publicGrant.enrollment.id),true);
+    continuationChecks.push('actual-learning-owned-list-and-current-progress-decoder');
+    assert.deepEqual(await ownCertificateApi.list(),[expectedCertificate]);
+    assert.deepEqual(await (await certificateApiFor('certificate-admin')).list(),[]);
+    continuationChecks.push('actual-Certificate-list-historical-owner-snapshots');
+    const maskedCodes=await adminCodes.codes();
+    assert.ok(maskedCodes.some(row=>row.id===freshCodes[0].id&&row.status==='used'&&row.used_by===learnerId));
+    for(const code of [...issued,...freshCodes])assert.equal(JSON.stringify(maskedCodes).includes(code.code),false);
+    continuationChecks.push('actual-Admin-Redeem-list-mask-and-durable-used-audit');
+    await assert.rejects(anonymousCodes.codes(),error=>error instanceof HttpClientError&&error.status===401);
+    continuationChecks.push('anonymous-protected-list401');
+    const managedSummary=await ownerResource('instructor/summary'),adminSummary=await adminResource('admin/summary');
+    assert.equal(managedSummary.course_count,await db.course.count({where:{instructorId:accountId}}));
+    assert.equal(adminSummary.user_count,await db.account.count());assert.equal('user_count' in managedSummary,false);
+    continuationChecks.push('actual-management-summary-decoders-and-scope-counts');
+    const continuationResume=await continuationLearning.resume(videoItem.id,18);
+    assert.equal(continuationResume.resume.position_seconds,18);
+    assert.equal((await continuationLearning.course(ids.published)).resume_item_id,videoItem.id);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({where:{id:firstGrant.id}}),originalEnrollment);
+    continuationChecks.push('actual-resume-client-and-unchanged-completion-history');
+    await db.$disconnect();await db.$connect();
+    assert.equal((await continuationLearning.course(ids.published)).outline[0].items.find(row=>row.id===videoItem.id).resume.position_seconds,18);
+    continuationChecks.push('resume-read-back-after-reconnect');
+
+    phase = 'frontend-continuation-ai-history';
+    const aiHistoryChecks=[];
+    const newChat=await ownAi.createConversation(null);
+    assert.equal(newChat.title,'แชตใหม่');assert.equal(newChat.course_id,null);
+    aiHistoryChecks.push('actual-AI-create-client-and-persisted-owner');
+    const wireAt=new Date().toISOString();
+    const newMessage=await db.aIMessage.create({data:{accountId:learnerId,conversationId:newChat.id,position:0,role:'assistant',content:tag+' searchable answer',
+      contextSnapshot:{private:'PRIVATE_HISTORY_CONTEXT',_wire:{version:1,request_id:tag+'_history',kind:'text',status:'succeeded',completed_at:wireAt,error_code:null}}}});
+    const historyPage=await ownAi.conversations('searchable answer');
+    assert.deepEqual(historyPage.items.map(row=>row.id),[newChat.id]);
+    aiHistoryChecks.push('actual-AI-search-own-messages-and-conversation-decoder');
+    const messagePage=await ownAi.messages(newChat.id);assert.equal(messagePage.items[0].id,newMessage.id);
+    assert.equal(JSON.stringify(messagePage).includes('PRIVATE_'),false);
+    aiHistoryChecks.push('actual-AI-message-history-wire-decoder-and-private-projection');
+    await assert.rejects((await aiApiFor('certificate-admin')).messages(newChat.id),error=>error instanceof HttpClientError&&error.status===404);
+    await assert.rejects((await aiApiFor('certificate-foreign')).deleteConversation(newChat.id),error=>error instanceof HttpClientError&&error.status===404);
+    aiHistoryChecks.push('foreign-Admin-history-and-foreign-delete404');
+    const beforeDeleteQuota=await db.aIUsageDaily.findMany({where:{accountId:learnerId}});
+    assert.equal(await ownAi.deleteConversation(newChat.id),undefined);assert.equal(await ownAi.deleteConversation(newChat.id),undefined);
+    assert.ok((await db.aIConversation.findUniqueOrThrow({where:{id:newChat.id}})).deletedAt);
+    assert.equal((await ownAi.conversations('searchable answer')).items.length,0);
+    await assert.rejects(ownAi.messages(newChat.id),error=>error instanceof HttpClientError&&error.status===404);
+    assert.deepEqual(await db.aIUsageDaily.findMany({where:{accountId:learnerId}}),beforeDeleteQuota);
+    aiHistoryChecks.push('actual-AI-delete-repeat204-tombstone-without-quota-refund');
+
+    phase = 'frontend-Admin-account-create-and-directories';
+    const accountDirectoryChecks=[];
+    const adminCreatedInput={username:'new_'+randomUUID().replaceAll('-','').slice(0,20),password:'FixturePassword_123',display_name:tag+' new account'};
+    const adminCreated=await adminResource('admin/users','POST',adminCreatedInput);additionalFixtureAccounts.push(adminCreated.user.id);
+    assert.deepEqual(adminCreated.user.roles,['learner']);assert.equal(adminCreated.user.learning_eligible,true);
+    assert.equal(adminCreated.user.email,null);assert.equal(adminCreated.created_by,adminId);
+    assert.equal((await db.localCredential.findUniqueOrThrow({where:{accountId:adminCreated.user.id}})).passwordHash.includes(adminCreatedInput.password),false);
+    accountDirectoryChecks.push('actual-Admin-create-resource-and-canonical-CurrentUser-decoder');
+    const accountDirectory=await adminResource('admin/users?q='+encodeURIComponent(adminCreatedInput.username)+'&limit=1');
+    assert.deepEqual(accountDirectory.items.map(row=>row.id),[adminCreated.user.id]);
+    assert.equal(JSON.stringify(accountDirectory).includes('FixturePassword'),false);
+    accountDirectoryChecks.push('actual-Admin-user-search-directory-decoder');
+    const addedInstructor=await adminResource('admin/users/'+encodeURIComponent(adminCreated.user.id)+'/instructor','POST',{});
+    assert.ok(addedInstructor.user.roles.includes('instructor'));
+    const instructorDirectory=await adminResource('admin/instructors?limit=50');
+    assert.ok(instructorDirectory.items.some(row=>row.id===adminCreated.user.id));
+    assert.deepEqual(Object.keys(instructorDirectory.items.find(row=>row.id===adminCreated.user.id)).sort(),['avatar_url','display_name','id']);
+    accountDirectoryChecks.push('actual-Admin-Instructor-grant-to-directory-canonical-projection');
+    await assert.rejects(adminResource('admin/users','POST',adminCreatedInput),error=>error instanceof HttpClientError&&error.status===409);
+    accountDirectoryChecks.push('duplicate-create409-without-extra-user');
+    await assert.rejects(anonymousResource('admin/users'),error=>error instanceof HttpClientError&&error.status===401);
+    await assert.rejects(anonymousResource('admin/instructors'),error=>error instanceof HttpClientError&&error.status===401);
+    accountDirectoryChecks.push('anonymous-directory401');
+    await db.$disconnect();await db.$connect();
+    assert.equal((await adminResource('admin/users/'+encodeURIComponent(adminCreated.user.id))).id,adminCreated.user.id);
+    assert.equal(await db.appSession.count({where:{accountId:adminCreated.user.id}}),0);
+    accountDirectoryChecks.push('created-identity-reconnect-and-no-auto-session');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -853,11 +955,14 @@ async function main() {
     result.selfProfilePatch = { checks: profilePatchChecks.length, checkNames: profilePatchChecks, actualNestAndPostgres: true, browserAcceptance: false };
     result.managedAttemptRead = { checks: managedAttemptChecks.length, checkNames: managedAttemptChecks, actualNestAndPostgres: true, browserAcceptance: false };
     result.codeCommands = { checks: codeCommandChecks.length, checkNames: codeCommandChecks, actualNestAndPostgres: true, browserAcceptance: false };
+    result.continuationListsResume = {checks:continuationChecks.length,checkNames:continuationChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.aiHistory = {checks:aiHistoryChecks.length,checkNames:aiHistoryChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.adminAccountDirectory = {checks:accountDirectoryChecks.length,checkNames:accountDirectoryChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
     await stop();
-    const ownedAccounts = [accountId, learnerId, adminId].filter(Boolean);
+    const ownedAccounts = [accountId, learnerId, adminId,...additionalFixtureAccounts].filter(Boolean);
     const ownedAttempts = await db.quizAttempt.findMany({ where: { enrollment: { accountId: { in: ownedAccounts } } }, select: { id: true } });
     const ownedAttemptIds = ownedAttempts.map(row => row.id);
     await db.answer.deleteMany({ where: { attemptId: { in: ownedAttemptIds } } });
@@ -880,6 +985,7 @@ async function main() {
     if (accountId) await db.quiz.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
     if (accountId) await db.course.deleteMany({ where: { instructorId: accountId } });
     await db.appSession.deleteMany({ where: { accountId: { in: ownedAccounts } } });
+    await db.localCredential.deleteMany({where:{accountId:{in:additionalFixtureAccounts}}});
     await db.userRole.deleteMany({ where: { accountId: { in: ownedAccounts } } });
     await db.account.deleteMany({ where: { id: { in: ownedAccounts } } });
     await db.$disconnect(); hook.deregister(); delete globalThis[learningClientSlot];
@@ -888,5 +994,10 @@ async function main() {
 main().catch(error => {
   const code = typeof error.code === 'string' && /^(?:ERR_[A-Z_]+|P\d{4})$/.test(error.code) ? error.code : 'WITHHELD';
   console.error(`Frontend-detail component failed at ${phase} (${code}); credential-bearing diagnostics withheld.`);
+  // Stack locations only; never print assertion values, URLs or error messages.
+  for (const location of String(error.stack||'').split('\n').slice(1,5)) {
+    const match=location.match(/(?:[A-Za-z]:[\\/]|\/)[^()\n]+:\d+:\d+/);
+    if(match)console.error('at '+match[0]);
+  }
   process.exitCode = 1;
 });

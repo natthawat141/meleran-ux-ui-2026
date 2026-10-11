@@ -1,6 +1,8 @@
 export { PrincipalService } from './principal.service';
 export { SelfProfileReader } from './self-profile.reader';
 export { SelfProfileWriter } from './self-profile.writer';
+export { AdminAccountWriter } from './admin-account.writer';
+export type { AdminAccountInput, AdminAccountResult } from './admin-account.writer';
 export type { SelfProfilePatch } from './self-profile.writer';
 export { InstructorGrantWriter } from './instructor-grant.writer';
 export { AdminUserDetailReader } from './admin-user-detail.reader';

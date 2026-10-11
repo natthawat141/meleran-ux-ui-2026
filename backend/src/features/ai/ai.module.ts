@@ -9,6 +9,8 @@ import { AiUsageController } from './ai-usage.controller';
 import { AiUsageService } from './ai-usage.service';
 import { RenameConversationController } from './rename-conversation.controller';
 import { RenameConversationService } from './rename-conversation.service';
+import { ConversationHistoryController } from './conversation-history.controller';
+import { ConversationHistoryService } from './conversation-history.service';
 
-@Module({ imports: [AuthModule, CoursesModule], controllers: [AdminAiController, PracticeAnswerController, AiUsageController, RenameConversationController], providers: [AdminAiService, PracticeAnswerService, AiUsageService, RenameConversationService] })
+@Module({ imports: [AuthModule, CoursesModule], controllers: [AdminAiController, PracticeAnswerController, AiUsageController, RenameConversationController, ConversationHistoryController], providers: [AdminAiService, PracticeAnswerService, AiUsageService, RenameConversationService, ConversationHistoryService] })
 export class AiModule {}

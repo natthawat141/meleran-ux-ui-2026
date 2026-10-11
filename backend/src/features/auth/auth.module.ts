@@ -10,11 +10,12 @@ import { AdminUserDetailReader } from './public/admin-user-detail.reader';
 import { LocalPasswordService } from './local-password.service';
 import { LocalAuthenticationService } from './local-authentication.service';
 import { SessionWriter } from './session-writer.service';
+import { AdminAccountWriter } from './public/admin-account.writer';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, PrincipalService, SelfProfileReader, LogoutService, InstructorGrantWriter, AdminUserDetailReader,
-    LocalPasswordService, LocalAuthenticationService, SessionWriter, SelfProfileWriter],
-  exports: [AuthService, PrincipalService, SelfProfileReader, InstructorGrantWriter, AdminUserDetailReader, SelfProfileWriter],
+    LocalPasswordService, LocalAuthenticationService, SessionWriter, SelfProfileWriter, AdminAccountWriter],
+  exports: [AuthService, PrincipalService, SelfProfileReader, InstructorGrantWriter, AdminUserDetailReader, SelfProfileWriter, AdminAccountWriter],
 })
 export class AuthModule {}

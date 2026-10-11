@@ -4,10 +4,28 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { PrincipalService, VerifiedSessionReference } from '../auth/public/index';
 import { ApiException } from '../../shared/errors/api-exception';
 import { CertificateDetailDto } from './dto/certificate-detail.dto';
+import { Page, PageQuery, decodeCursor, page } from '../../shared/pagination/keyset';
 
 @Injectable()
 export class CertificateReadService {
   constructor(private readonly prisma: PrismaService, private readonly principals: PrincipalService) {}
+
+  list(reference: VerifiedSessionReference, query: PageQuery): Promise<Page<CertificateDetailDto>> {
+    return this.prisma.$transaction(async tx => {
+      const actor = await this.principals.requireSelfRead(tx, reference);
+      const cursor = decodeCursor('own-certificates', query, actor.accountId);
+      const where: Prisma.CertificateWhereInput = { enrollment: { accountId: actor.accountId } };
+      if (cursor) where.OR = [{ issuedAt: { lt: cursor.at } }, { issuedAt: cursor.at, id: { gt: cursor.id } }];
+      const rows = await tx.certificate.findMany({ where, orderBy: [{ issuedAt:'desc' }, { id:'asc' }], take:query.limit+1,
+        select:{id:true,code:true,courseName:true,recipientName:true,issuedAt:true,enrollmentId:true,
+          enrollment:{select:{courseId:true,completedAt:true}}} });
+      return page('own-certificates',query,rows,row=>({id:row.id,at:row.issuedAt}),row=>{
+        if (!row.enrollment.completedAt) throw Error('Missing certificate completion proof');
+        return {id:row.id,code:row.code,course_id:row.enrollment.courseId,course_title:row.courseName,
+          learner_name:row.recipientName,issued_at:row.issuedAt.toISOString(),enrollment_id:row.enrollmentId};
+      },actor.accountId);
+    },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead});
+  }
 
   async detail(reference: VerifiedSessionReference, certificateId: string): Promise<CertificateDetailDto> {
     return this.prisma.$transaction(async tx => {

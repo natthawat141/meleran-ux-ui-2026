@@ -18,6 +18,9 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      # Ephemeral CI protocol key, never a deployed/provider credential.
+      CURSOR_SIGNING_SECRET: ci-pagination-protocol-test-key-only-20261011
     services:
       postgres:
         image: postgres:16

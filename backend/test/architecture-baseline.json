@@ -1,12 +1,1 @@
-{
-  "src/features/accounts/accounts.service.ts": {
-    "sha256": "95f592ed8b9c626ee034b14be8ef0c07d4d27afe7a40e82f318f04dda301e7c3",
-    "remove_by": "ACCOUNT-01",
-    "reason": "Unchanged prototype writes Account directly; replace through Auth owner when dependent task is unblocked."
-  },
-  "src/features/management/management.service.ts": {
-    "sha256": "401f26e9114a4d78a4ff81b8d72580ba0aa6ba57a126057e23c760a9c06df922",
-    "remove_by": "MGMT-01/MGMT-02",
-    "reason": "Remaining unchanged prototype Account-create writer only; Instructor grant and Admin detail moved to Auth public facades. AST comparison confirms all remaining methods unchanged. Replace creation through Auth under MGMT-01."
-  }
-}
+{}

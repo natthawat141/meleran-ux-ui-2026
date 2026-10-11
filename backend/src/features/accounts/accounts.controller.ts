@@ -1,6 +1,5 @@
 import { Controller, Get, Patch, Body } from '@nestjs/common';
-import { AccountsService } from './accounts.service';
-import { CurrentUser, CurrentPrincipal } from '../../shared/auth/current-user.decorator';
+import { CurrentPrincipal } from '../../shared/auth/current-user.decorator';
 import { AuthoritativeAudience } from '../../shared/auth/session.guard';
 import { AuthPrincipal } from '../auth/public/index';
 import { SelfProfileService } from './self-profile.service';
@@ -10,7 +9,7 @@ import { SelfProfilePatch } from '../auth/public/index';
 
 @Controller('me')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService, private readonly selfProfile: SelfProfileService,
+  constructor(private readonly selfProfile: SelfProfileService,
     private readonly updates: SelfProfileUpdateService) {}
 
   @Get()

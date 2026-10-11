@@ -8,9 +8,11 @@
     "previous_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
   },
   "policy": {
-    "scope": "Wave 1–17; prioritize missing independently specified APIs in Wave 1–13",
-    "pending_behavior": "Mark PENDING and skip locally; no idle wait when independent work exists",
-    "user_authorization": "Explicit latest /goal continuation instruction",
+    "scope": "Wave 1–17; prioritize missing APIs in Wave 1–13",
+    "pending_behavior": "Decide authorized technical details with a written record; skip only unavailable dependencies/capabilities locally without idle waiting",
+    "user_authorization": "Latest user explicitly permits agent decisions with documentation for later correction",
+    "agent_may_decide": true,
+    "decision_record": "AUTONOMOUS_EXECUTION_DECISIONS.md",
     "solo": true
   },
   "scope": {
@@ -18,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 25,
+    "implemented_operations": 40,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -257,7 +259,7 @@
       "operationId": "post_admin_users",
       "task_id": "MGMT-01",
       "wave": 7,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -267,7 +269,7 @@
         "A07",
         "A08"
       ],
-      "remaining": "Unresolved behavior: D03, D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/MGMT-01.md",
         "contracts/MGMT-01.openapi.json",
@@ -280,7 +282,7 @@
       "operationId": "get_admin_users",
       "task_id": "MGMT-01",
       "wave": 7,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -290,7 +292,7 @@
         "A07",
         "A08"
       ],
-      "remaining": "Unresolved behavior: D03, D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/MGMT-01.md",
         "contracts/MGMT-01.openapi.json",
@@ -325,7 +327,7 @@
       "operationId": "get_admin_instructors",
       "task_id": "MGMT-02",
       "wave": 8,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -334,7 +336,7 @@
       "acceptance_ids": [
         "A04"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/MGMT-02.md",
         "contracts/MGMT-02.openapi.json",
@@ -347,7 +349,7 @@
       "operationId": "get_courses",
       "task_id": "CATALOG-01",
       "wave": 3,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "DB-01"
@@ -357,7 +359,7 @@
         "C09",
         "AI05"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/CATALOG-01.md",
         "contracts/CATALOG-01.openapi.json",
@@ -463,7 +465,7 @@
       "operationId": "get_me_enrollments",
       "task_id": "ENROLL-01",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -479,7 +481,7 @@
         "E02",
         "E10"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/ENROLL-01.md",
         "contracts/ENROLL-01.openapi.json",
@@ -614,7 +616,7 @@
       "operationId": "put_learn_items_id_resume",
       "task_id": "LEARN-02",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "LEARN-01",
@@ -630,7 +632,7 @@
         "F03",
         "F05"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/LEARN-02.md",
         "contracts/LEARN-02.openapi.json",
@@ -842,7 +844,7 @@
       "operationId": "get_me_certificates",
       "task_id": "CERT-01",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COMPLETION-01",
@@ -858,7 +860,7 @@
         "F07",
         "F08"
       ],
-      "remaining": "Unresolved behavior: D07; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/CERT-01.md",
         "contracts/CERT-01.openapi.json",
@@ -1443,7 +1445,7 @@
       "operationId": "get_admin_redeem-codes",
       "task_id": "REDEEM-01",
       "wave": 10,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-01",
@@ -1456,7 +1458,7 @@
         "E12",
         "E13"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/REDEEM-01.md",
         "contracts/REDEEM-01.openapi.json",
@@ -1579,7 +1581,7 @@
       "operationId": "post_me_ai_conversations",
       "task_id": "AI-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1591,7 +1593,7 @@
         "AI15",
         "AI23"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/AI-02.md",
         "contracts/AI-02.openapi.json",
@@ -1604,7 +1606,7 @@
       "operationId": "get_me_ai_conversations",
       "task_id": "AI-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1616,7 +1618,7 @@
         "AI15",
         "AI23"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/AI-02.md",
         "contracts/AI-02.openapi.json",
@@ -1629,7 +1631,7 @@
       "operationId": "get_me_ai_conversations_id_messages",
       "task_id": "AI-02",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1641,7 +1643,7 @@
         "AI15",
         "AI23"
       ],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/AI-02.md",
         "contracts/AI-02.openapi.json",
@@ -1722,7 +1724,7 @@
       "operationId": "delete_me_ai_conversations_id",
       "task_id": "AI-05",
       "wave": 7,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AI-02"
@@ -1732,7 +1734,7 @@
         "AI14",
         "AI15"
       ],
-      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/AI-05.md",
         "contracts/AI-05.openapi.json",
@@ -2224,14 +2226,14 @@
       "operationId": "get_admin_summary",
       "task_id": "MGMT-05",
       "wave": 16,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "MGMT-04",
         "CERT-01"
       ],
       "acceptance_ids": [],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/MGMT-05.md",
         "contracts/MGMT-05.openapi.json",
@@ -2244,14 +2246,14 @@
       "operationId": "get_instructor_summary",
       "task_id": "MGMT-05",
       "wave": 16,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "MGMT-04",
         "CERT-01"
       ],
       "acceptance_ids": [],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/MGMT-05.md",
         "contracts/MGMT-05.openapi.json",
@@ -2264,13 +2266,13 @@
       "operationId": "get_instructors_id_courses",
       "task_id": "CATALOG-02",
       "wave": 4,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "CATALOG-01"
       ],
       "acceptance_ids": [],
-      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "remaining": "Full feature/Frontend browser/provider gates remain separate",
       "read_set": [
         "tasks/CATALOG-02.md",
         "contracts/CATALOG-02.openapi.json",
@@ -2336,16 +2338,16 @@
   ],
   "next_design_work": [
     {
-      "task": "DB-06",
-      "work": "Turn approved set C logical proof/binding/reconciliation design into reviewed physical delta; no live migrations"
+      "task": "COURSE-01/COURSE-02/REVIEW-01/REVIEW-02",
+      "work": "Choose D04/D05 conventions under renewed authorization; implement authoring/review with reviewed append-only test schema delta"
     },
     {
-      "task": "MGMT-05",
-      "work": "Resolve counter definitions from scope/contract; pending distinct learner and pending-grading projection semantics"
+      "task": "COMPLETION-01/ASSESS-01/ASSESS-02/GRADE-01",
+      "work": "Choose D06 percent best-score convention; reuse immutable snapshots and owner grading; complete academic transaction gates"
     },
     {
-      "task": "REDEEM-01",
-      "work": "Masked paginated list after D16 query/cursor decision; issuance and redemption already execute independently"
+      "task": "DB-06/PROVIDER-AUTH-01",
+      "work": "Implement approved Firebase ownership/design with physical proof/binding/recovery delta; live credentials/From are external capability gates, not a reason to stop other features"
     }
   ],
   "wave_progress": [
@@ -2364,13 +2366,13 @@
     {
       "wave": 3,
       "defined_operations": 2,
-      "implemented_operations": 1,
+      "implemented_operations": 2,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 4,
       "defined_operations": 4,
-      "implemented_operations": 1,
+      "implemented_operations": 2,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2382,19 +2384,19 @@
     {
       "wave": 6,
       "defined_operations": 20,
-      "implemented_operations": 5,
+      "implemented_operations": 10,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 7,
       "defined_operations": 10,
-      "implemented_operations": 3,
+      "implemented_operations": 6,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 8,
       "defined_operations": 3,
-      "implemented_operations": 1,
+      "implemented_operations": 2,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2406,7 +2408,7 @@
     {
       "wave": 10,
       "defined_operations": 7,
-      "implemented_operations": 2,
+      "implemented_operations": 3,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2418,7 +2420,7 @@
     {
       "wave": 12,
       "defined_operations": 8,
-      "implemented_operations": 0,
+      "implemented_operations": 1,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2442,7 +2444,7 @@
     {
       "wave": 16,
       "defined_operations": 2,
-      "implemented_operations": 0,
+      "implemented_operations": 2,
       "full_feature_acceptance": "PENDING"
     },
     {

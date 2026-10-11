@@ -4,6 +4,8 @@
 
 ## 1. Source precedence และ execution target
 
+Execution overlay 11 ต.ค.: ผู้ใช้อนุญาต agent เลือก technical details ที่ค้างพร้อมบันทึก ไม่ idle-wait; ดู AUTONOMOUS_EXECUTION_DECISIONS.md. Shared pagination utility มี scalar query validation/HMAC keyset เท่านั้น ไม่ query entities/authorize. Auth PrincipalService.requireSelfWrite ถือ Account UPDATE ก่อน resolve เพื่อไม่เกิด lock upgrade ใน simultaneous commands. AI wire metadata `_wire` version1 เป็น bounded private storage format; Sender ต้องเขียนตาม format, readers fail closed สำหรับ legacy missing metadata. Tombstone delete ไม่ทำลาย quota/dedupe
+
 - CONFIRMED: Final 1.6 กำหนด business behavior; canonical OpenAPI กำหนด HTTP shape ปัจจุบันในฐานะ Draft.
 - คำสั่งล่าสุดให้ใช้ NestJS ที่มีต่อ จึงแทนคำตอบก่อนหน้าที่เลือกสร้างฐานใหม่แยก. Target: D:/code/elearn-prod/worktrees/melearn-fullstack/backend (D13 confirmed 2026-10-11).
 - ASP.NET และ NestJS README ที่อ้างเทียบ 13 operations เป็น implementation/reference evidence ไม่ใช่ business specification.

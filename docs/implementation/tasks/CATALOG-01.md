@@ -87,3 +87,7 @@ Feature gate: **G-COURSE** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร
 ## Component evidence — 2026-10-11
 
 get_courses_id implemented/tested against real Nest HTTP/Test PostgreSQL: 6 cases covering canonical success/errors, published visibility, public fields only, chapter/item order, paid/free mapping, reconnect, invalid stored shape and no writes. Typed feature-local DTO. get_courses listing remains D16-blocked; task stays NEEDS_DECISION and does not claim full feature/frontend acceptance.
+
+## Renewed authorization continuation — 2026-10-11
+
+Latest user permits agent decisions with a written record. See [technical decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) and [current component evidence](../AUTONOMOUS_CONTINUATION_COMPONENT.md). The current EXECUTION_STATUS/CONTINUATION_QUEUE override old planning waits above. No idle user-decision blocker for the implemented subset; full feature acceptance is still tracked separately.

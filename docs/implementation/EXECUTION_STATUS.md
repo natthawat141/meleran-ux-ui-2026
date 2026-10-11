@@ -4,6 +4,8 @@
 
 ## Checkpoint ปัจจุบัน — เดินงานต่อโดยข้ามเฉพาะ PENDING
 
+**Renewed authorization/current local continuation:** เพิ่มอีก **15 operations** เป็น **40/86**, เหลือ46; APIs ครบทุก operationใน **14 packages**. [Evidence](AUTONOMOUS_CONTINUATION_COMPONENT.md) / [Agent decisions](AUTONOMOUS_EXECUTION_DECISIONS.md). Targeted PostgreSQL46, foundation53 และ feature units50 ผ่าน; actual Frontend client integrationเพิ่ม21 เป็น162 checks. Full regression **533 testsผ่าน** (foundation53 + units50 + PG430); hosted CIของชุดนี้ยังไม่ผ่านจนกว่าจะ push/test SHA จริง. ไม่มี schema delta/library install/cloud/deploy. Checkpoint25ด้านล่างเป็นประวัติ ไม่ใช่จำนวนปัจจุบัน.
+
 - Implemented HTTP components **25/86** (เพิ่ม PATCH /me, owner Managed Attempt,
   Admin issue codes และ public Redeem); **61 operations PENDING**. Backend APIs ครบ
   ทุก operation ใน 5 packages: ACCOUNT-01, VIDEO-01, REDEEM-02, AI-01, AI-04;

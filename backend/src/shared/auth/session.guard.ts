@@ -6,8 +6,6 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import * as crypto from 'crypto';
-import { PrismaService } from '../../prisma/prisma.service';
 import { ApiException } from '../errors/api-exception';
 import { AppAudience, AuthPrincipal, PrincipalService } from '../../features/auth/public';
 
@@ -18,7 +16,7 @@ export const ROLES_KEY = 'roles';
 export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
 
 export const AUTHORITATIVE_AUDIENCE_KEY = 'authoritative_audience';
-/** Opt-in verified feature boundary; legacy transport remains pending D01. */
+/** Explicit session namespace; normalized grants determine permission. */
 export const AuthoritativeAudience = (audience: AppAudience, ...additional: AppAudience[]) =>
   SetMetadata(AUTHORITATIVE_AUDIENCE_KEY, additional.length ? [audience, ...additional] : audience);
 export interface PrincipalRequest extends Request { principal?: AuthPrincipal }
@@ -27,7 +25,6 @@ export interface PrincipalRequest extends Request { principal?: AuthPrincipal }
 export class SessionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly prisma: PrismaService,
     private readonly principals: PrincipalService,
   ) {}
 
@@ -38,6 +35,9 @@ export class SessionGuard implements CanActivate {
     ]);
 
     const request = context.switchToHttp().getRequest<Request>();
+    // Public routes authenticate their own provider boundary if required.
+    // An unrelated or stale browser cookie must never alter public behavior.
+    if (isPublic) return true;
     const configuredAudience = this.reflector.getAllAndOverride<AppAudience | AppAudience[]>(AUTHORITATIVE_AUDIENCE_KEY, [
       context.getHandler(), context.getClass(),
     ]);
@@ -60,55 +60,8 @@ export class SessionGuard implements CanActivate {
       (request as PrincipalRequest).principal = principal;
       return true;
     }
-    const audienceHeader = request.headers['x-melearn-app'] as string;
-    const audience = audienceHeader === 'admin' ? 'admin' : 'web';
-
-    const cookieName = `melearn_${audience}_session`;
-    const secret = request.cookies?.[cookieName];
-
-    if (!secret) {
-      if (isPublic) return true;
-      throw ApiException.unauthorized();
-    }
-
-    const tokenHash = crypto.createHash('sha256').update(secret).digest('hex').toUpperCase();
-
-    const session = await this.prisma.appSession.findUnique({
-      where: { tokenHash },
-      include: { account: true },
-    });
-
-    if (
-      !session ||
-      session.audience !== audience ||
-      session.revokedAt ||
-      session.expiresAt <= new Date() ||
-      session.account.disabled
-    ) {
-      if (isPublic) return true;
-      throw ApiException.unauthorized();
-    }
-
-    if (audience === 'admin' && !session.account.roles.split(',').includes('admin')) {
-      throw new ApiException('audience_not_allowed', 403, 'บัญชีนี้เข้าส่วนผู้ดูแลไม่ได้');
-    }
-
-    (request as any).user = session.account;
-    (request as any).session = session;
-
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    if (requiredRoles && requiredRoles.length > 0) {
-      const userRoles = session.account.roles.split(',');
-      const hasRole = requiredRoles.some((role) => userRoles.includes(role));
-      if (!hasRole) {
-        throw ApiException.forbidden();
-      }
-    }
-
-    return true;
+    // A protected handler without an explicit namespace is an implementation error.
+    // Never fall back to compatibility CSV roles or attach a full Account record.
+    throw ApiException.unauthorized();
   }
 }

@@ -2498,16 +2498,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/management/management.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/management",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
         "known_gaps": [
-          "optional email rejected",
-          "password limit and username pattern are prototype policies",
-          "response schema/audit/search completeness must be reviewed"
+          "Full feature and original browser/provider acceptance remain pending"
         ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D03",
         "D16"
@@ -2517,7 +2515,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-01.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -2775,16 +2774,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/management/management.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/management",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
         "known_gaps": [
-          "optional email rejected",
-          "password limit and username pattern are prototype policies",
-          "response schema/audit/search completeness must be reviewed"
+          "Full feature and original browser/provider acceptance remain pending"
         ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D03",
         "D16"
@@ -2794,7 +2791,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-01.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "POST",
@@ -3296,23 +3294,22 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/management/management.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/management",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
         "known_gaps": [
-          "optional email rejected",
-          "password limit and username pattern are prototype policies",
-          "response schema/audit/search completeness must be reviewed"
+          "Full feature and original browser/provider acceptance remain pending"
         ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-USER",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-02.openapi.json",
-      "previous_execution_status": "BLOCKED"
+      "previous_execution_status": "BLOCKED",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -3581,16 +3578,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/courses/courses.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
         "known_gaps": [
-          "SQLite only; price currency hardcoded THB",
-          "DTO/wire fields and public privacy need complete schema check",
-          "no PostgreSQL acceptance"
+          "Full feature and original browser/provider acceptance remain pending"
         ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -3599,7 +3594,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CATALOG-01.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -4724,23 +4720,22 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/enrollments/enrollments.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/enrollments",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
         "known_gaps": [
-          "check then create is not a protected grant transaction",
-          "unique conflict/race recovery absent",
-          "no PostgreSQL concurrency verification"
+          "Full feature and original browser/provider acceptance remain pending"
         ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-GRANT",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/ENROLL-01.openapi.json",
-      "previous_execution_status": "BLOCKED"
+      "previous_execution_status": "BLOCKED",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -6152,19 +6147,22 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/learning",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-COMPLETE",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/LEARN-02.openapi.json",
-      "previous_execution_status": "BLOCKED"
+      "previous_execution_status": "BLOCKED",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "POST",
@@ -8401,12 +8399,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/certificates",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D07"
       ],
@@ -8415,7 +8415,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CERT-01.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -14299,19 +14300,22 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/redeem",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/REDEEM-01.openapi.json",
-      "previous_execution_status": "BLOCKED"
+      "previous_execution_status": "BLOCKED",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "POST",
@@ -15666,12 +15670,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/ai",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -15680,7 +15686,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-02.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -15948,12 +15955,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/ai",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -15962,7 +15971,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-02.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -16231,12 +16241,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/ai",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -16245,7 +16257,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-02.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "POST",
@@ -17089,12 +17102,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/ai",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D11"
       ],
@@ -17103,7 +17118,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/AI-05.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -22822,19 +22838,22 @@
       "acceptance_ids": [],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/management",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-05.openapi.json",
-      "previous_execution_status": "BLOCKED"
+      "previous_execution_status": "BLOCKED",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -23062,19 +23081,22 @@
       "acceptance_ids": [],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/management",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/MGMT-05.openapi.json",
-      "previous_execution_status": "BLOCKED"
+      "previous_execution_status": "BLOCKED",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -23322,12 +23344,14 @@
       "acceptance_ids": [],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+        "known_gaps": [
+          "Full feature and original browser/provider acceptance remain pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -23336,7 +23360,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
       "context_file": "contracts/CATALOG-02.openapi.json",
-      "previous_execution_status": "NEEDS_DECISION"
+      "previous_execution_status": "NEEDS_DECISION",
+      "resolved_decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md"
     },
     {
       "method": "GET",
@@ -25773,7 +25798,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "AUTH-02",
@@ -25867,7 +25897,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "AUTH-03",
@@ -25957,7 +25992,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "ACCOUNT-01",
@@ -26042,7 +26082,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "MGMT-01",
@@ -26147,7 +26192,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "MGMT-02",
@@ -26239,7 +26289,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "MGMT-03",
@@ -26339,7 +26394,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "MGMT-04",
@@ -26428,7 +26488,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "MGMT-05",
@@ -26513,7 +26578,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "CATALOG-01",
@@ -26601,7 +26671,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "CATALOG-02",
@@ -26683,7 +26758,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "ENROLL-01",
@@ -26802,7 +26882,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "COURSE-01",
@@ -26907,7 +26992,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "COURSE-02",
@@ -27048,7 +27138,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "VIDEO-01",
@@ -27122,7 +27217,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "REVIEW-01",
@@ -27205,7 +27305,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "REVIEW-02",
@@ -27308,7 +27413,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "LEARN-01",
@@ -27416,7 +27526,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "LEARN-02",
@@ -27529,7 +27644,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "ASSESS-01",
@@ -27646,7 +27766,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "ASSESS-02",
@@ -27743,7 +27868,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "GRADE-01",
@@ -27849,7 +27979,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "CERT-01",
@@ -27963,7 +28098,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "PAY-01",
@@ -28076,7 +28216,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "PAY-02",
@@ -28158,7 +28303,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "REDEEM-01",
@@ -28263,7 +28413,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "REDEEM-02",
@@ -28390,7 +28545,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "AI-01",
@@ -28489,7 +28649,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "AI-02",
@@ -28587,7 +28752,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "AI-05",
@@ -28675,7 +28845,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "AI-03",
@@ -28837,7 +29012,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "AI-04",
@@ -28941,7 +29121,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "BLOG-01",
@@ -29035,7 +29220,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "BLOG-02",
@@ -29134,7 +29324,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "BLOG-03",
@@ -29232,7 +29427,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "FOUNDATION-01",
@@ -29278,7 +29478,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-01",
@@ -29375,7 +29580,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-02",
@@ -29454,7 +29664,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-03",
@@ -29533,7 +29748,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-04",
@@ -29611,7 +29831,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-05",
@@ -29693,7 +29918,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "COMPLETION-01",
@@ -29813,7 +30043,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "PROVIDER-AUTH-01",
@@ -29912,7 +30147,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "PROVIDER-STRIPE-01",
@@ -30022,7 +30262,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "INTEGRATION-01",
@@ -30108,7 +30353,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "INTEGRATION-02",
@@ -30188,7 +30438,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "INTEGRATION-03",
@@ -30379,7 +30634,12 @@
         "AI29"
       ],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "CI-01",
@@ -30428,7 +30688,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "AUTH-BASE-01",
@@ -30535,7 +30800,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-06",
@@ -30632,7 +30902,12 @@
       ],
       "validation_acceptance_ids": [],
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     }
   ],
   "decisions": [

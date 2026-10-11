@@ -7,50 +7,39 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  Headers,
 } from '@nestjs/common';
-import { ManagementService } from './management.service';
-import { CurrentUser } from '../../shared/auth/current-user.decorator';
 import { CurrentPrincipal } from '../../shared/auth/current-user.decorator';
 import { AuthoritativeAudience, Roles } from '../../shared/auth/session.guard';
-import { ApiException } from '../../shared/errors/api-exception';
 import { AuthPrincipal } from '../auth/public/index';
 import { EmptyRequestPipe } from '../../shared/validation/empty-request.pipe';
 import { AssignInstructorService } from './assign-instructor.service';
 import { AdminUserDetailService } from './admin-user-detail.service';
+import { AdminAccountCreateService } from './admin-account-create.service';
+import { AccountDirectoryService } from './account-directory.service';
+import { CreateUserInput, CreateUserPipe } from './dto/create-user.pipe';
+import { PageQuery, PageQueryPipe } from '../../shared/pagination/keyset';
 
 @Roles('admin')
 @Controller('admin')
 export class ManagementController {
-  constructor(private readonly managementService: ManagementService, private readonly instructorGrants: AssignInstructorService,
-    private readonly userDetails: AdminUserDetailService) {}
-
-  private checkAdminAudience(appHeader?: string) {
-    if (appHeader !== 'admin') {
-      throw new ApiException('audience_not_allowed', 403, 'ต้องเข้าสู่ระบบฝั่ง Admin');
-    }
-  }
+  constructor(private readonly instructorGrants: AssignInstructorService,
+    private readonly userDetails: AdminUserDetailService, private readonly accounts:AdminAccountCreateService,
+    private readonly directory:AccountDirectoryService) {}
 
   @Get('users')
-  async listUsers(
-    @Query('q') q?: string,
-    @Query('limit') limit = 20,
-    @Query('cursor') cursor?: string,
-    @Headers('x-melearn-app') appHeader?: string,
-  ) {
-    this.checkAdminAudience(appHeader);
-    return this.managementService.listUsers(q, Number(limit), cursor);
+  @AuthoritativeAudience('admin')
+  async listUsers(@CurrentPrincipal() actor:AuthPrincipal,@Query(new PageQueryPipe(['q'])) query:PageQuery) {
+    return this.directory.list(actor.session,query,false);
   }
 
   @Post('users')
+  @AuthoritativeAudience('admin')
   @HttpCode(HttpStatus.CREATED)
   async createUser(
-    @CurrentUser() actor: any,
-    @Body() body: any,
-    @Headers('x-melearn-app') appHeader?: string,
+    @CurrentPrincipal() actor: AuthPrincipal,
+    @Body(new CreateUserPipe()) body: CreateUserInput,
   ) {
-    this.checkAdminAudience(appHeader);
-    return this.managementService.createUser(actor.id, body);
+    return this.accounts.create(actor.session,body);
   }
 
   @Get('users/:id')
@@ -74,12 +63,8 @@ export class ManagementController {
   }
 
   @Get('instructors')
-  async listInstructors(
-    @Query('limit') limit = 20,
-    @Query('cursor') cursor?: string,
-    @Headers('x-melearn-app') appHeader?: string,
-  ) {
-    this.checkAdminAudience(appHeader);
-    return this.managementService.listInstructors(Number(limit), cursor);
+  @AuthoritativeAudience('admin')
+  async listInstructors(@CurrentPrincipal() actor:AuthPrincipal,@Query(new PageQueryPipe()) query:PageQuery) {
+    return this.directory.list(actor.session,query,true);
   }
 }

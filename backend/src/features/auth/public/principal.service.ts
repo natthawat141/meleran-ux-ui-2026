@@ -93,6 +93,16 @@ export class PrincipalService {
   }
 
   /** Identity for owned historical records; does not grant learning eligibility. */
+  async requireSelfWrite(tx: Prisma.TransactionClient, reference: VerifiedSessionReference): Promise<AuthPrincipal> {
+    // Acquire the strongest Account lock before shared identity resolution.
+    // Avoid SHARE -> UPDATE upgrades when simultaneous commands use one account.
+    await tx.$queryRaw(Prisma.sql`
+      SELECT a.id FROM app_sessions s JOIN accounts a ON a.id=s."accountId"
+      WHERE s."tokenHash"=${reference.tokenHash} FOR SHARE OF s FOR UPDATE OF a`);
+    return this.requireSelfRead(tx, reference);
+  }
+
+  /** Identity for owned historical records; does not grant learning eligibility. */
   async requireSelfRead(tx: Prisma.TransactionClient, reference: VerifiedSessionReference): Promise<AuthPrincipal> {
     if (!['web', 'admin'].includes(reference.audience)) throw ApiException.unauthorized();
     const accounts = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`

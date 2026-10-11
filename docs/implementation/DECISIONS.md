@@ -2,6 +2,8 @@
 
 Planning baseline + execution decision register. Approval update 2026-10-11: canonical Draft.2 applies the confirmed subset below; unrelated decisions remain open. Blueprint D01–D16 เป็นรหัสของแผนนี้ แยกจาก Flow AB D1–D13; mapping อยู่ท้ายไฟล์.
 
+**Renewed execution authorization:** ผู้ใช้อนุญาตให้ agent เลือกประเด็นที่ค้างพร้อมบันทึกเพื่อแก้ภายหลัง ไม่รอการตัดสินใจเฉย ๆ. [AUTONOMOUS_EXECUTION_DECISIONS](AUTONOMOUS_EXECUTION_DECISIONS.md) เป็น execution overlay ที่ระบุสิ่งที่เลือกจริง; ข้อความ UNRESOLVED/await approval ด้านล่างเป็น planning history เมื่อขัดกับ overlay. D16 Catalog/owned Enrollment/Certificate/Redeem/AI history และ MGMT-05 counters/resume optional input เลือกและ implement แล้ว. D01/D03/D04–D12 ส่วนที่เหลือคือ design/implementation work ที่ agent เดินต่อได้ ไม่ใช่เหตุให้รอผู้ใช้; missing external credentials/capabilities และ acceptance gates ยังต้องมีหลักฐานจริง
+
 ## Confirmed sources
 
 - Final1.6และ113casesเป็นbusiness source; OpenAPI86defined+5deferredเป็นHTTPDraft.

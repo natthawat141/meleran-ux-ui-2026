@@ -15,8 +15,8 @@
     "previous_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
   },
   "verified": {
-    "foundation_tests": 49,
-    "database_tests": 384,
+    "foundation_tests": 53,
+    "database_tests": 430,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -24,7 +24,7 @@
     "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 44,
+    "feature_component_unit_tests": 50,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
@@ -53,7 +53,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 141,
+    "frontend_client_checks_total": 162,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -86,23 +86,38 @@
     "frontend_code_command_client_checks": 7,
     "current_checkpoint": {
       "local_status": "PASS",
-      "foundation_tests": 49,
-      "database_tests": 384,
-      "feature_component_unit_tests": 44,
-      "total_tests": 477,
-      "frontend_client_checks": 141,
+      "foundation_tests": 53,
+      "database_tests": 430,
+      "feature_component_unit_tests": 50,
+      "total_tests": 533,
+      "frontend_client_checks": 162,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
       "blueprint_and_continuation": "PASS",
-      "frontend_contract": "PASS_DRAFT_2",
+      "frontend_contract": "UNCHANGED_DRAFT_2",
       "schema_delta": false,
-      "provider_design": "DELIVERED_PROPOSED_DELTA",
       "browser_acceptance": false,
-      "hosted_status": "PASS",
-      "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
-      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
-    }
+      "hosted_status": "PENDING_PUSH"
+    },
+    "autonomous_continuation": {
+      "local_targeted_status": "PASS",
+      "new_operations": 15,
+      "postgres_suite_tests": 46,
+      "pagination_unit_tests": 4,
+      "ai_history_unit_tests": 3,
+      "admin_create_unit_tests": 3,
+      "frontend_client_checks": 21,
+      "canonical_changed": false,
+      "schema_delta": false,
+      "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+      "hosted_status": "PENDING_CHECKPOINT",
+      "browser_acceptance": false
+    },
+    "frontend_continuation_list_resume_checks": 10,
+    "frontend_ai_history_checks": 5,
+    "frontend_admin_directory_checks": 6,
+    "total_local_tests": 533
   },
   "environment": {
     "staging": false,
@@ -313,7 +328,10 @@
         "defined_operations": 2,
         "implemented_operations": 2,
         "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
-      }
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "MGMT-01",
@@ -352,14 +370,45 @@
           "full_acceptance": false,
           "verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
+        },
+        {
+          "id": "autonomous_post_admin_users",
+          "method": "POST",
+          "path": "/admin/users",
+          "operationId": "post_admin_users",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/admin-account-directory.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        },
+        {
+          "id": "autonomous_get_admin_users",
+          "method": "GET",
+          "path": "/admin/users",
+          "operationId": "get_admin_users",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/admin-account-directory.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "MGMT-02",
@@ -395,14 +444,31 @@
           "full_acceptance": false,
           "verified_sha": "fc622a25b1f4a2f52f16b97e0e8f78ac463ddd29",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38094636720"
+        },
+        {
+          "id": "autonomous_get_admin_instructors",
+          "method": "GET",
+          "path": "/admin/instructors",
+          "operationId": "get_admin_instructors",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/admin-account-directory.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "MGMT-03",
@@ -510,9 +576,42 @@
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "autonomous_get_admin_summary",
+          "method": "GET",
+          "path": "/admin/summary",
+          "operationId": "get_admin_summary",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        },
+        {
+          "id": "autonomous_get_instructor_summary",
+          "method": "GET",
+          "path": "/instructor/summary",
+          "operationId": "get_instructor_summary",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        }
+      ],
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "CATALOG-01",
@@ -535,21 +634,29 @@
           "evidence": "Actual Nest HTTP and isolated PostgreSQL: canonical success/error, visibility, privacy, ordered outline, paid/free, reconnect, fail-closed stored shape, no writes."
         },
         {
+          "id": "autonomous_get_courses",
           "method": "GET",
           "path": "/courses",
           "operationId": "get_courses",
-          "state": "NEEDS_DECISION",
-          "decisions": [
-            "D16"
-          ]
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "CATALOG-02",
@@ -577,21 +684,29 @@
           "evidence": "Actual Nest HTTP/PostgreSQL: canonical public projection, normalized Instructor grant, non-Instructor/missing 404, reconnect, corrupt bio fails closed, no academic writes. No published-course prerequisite invented."
         },
         {
+          "id": "autonomous_get_instructors_id_courses",
           "method": "GET",
           "path": "/instructors/{id}/courses",
           "operationId": "get_instructors_id_courses",
-          "state": "NEEDS_DECISION",
-          "decisions": [
-            "D16"
-          ]
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "ENROLL-01",
@@ -636,14 +751,31 @@
           "full_acceptance": false,
           "verified_sha": "e28d8abff1bad684f6693ceb12d1e4c79658a18b",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38081191962"
+        },
+        {
+          "id": "autonomous_get_me_enrollments",
+          "method": "GET",
+          "path": "/me/enrollments",
+          "operationId": "get_me_enrollments",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "COURSE-01",
@@ -725,7 +857,10 @@
         "defined_operations": 1,
         "implemented_operations": 1,
         "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
-      }
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "REVIEW-01",
@@ -881,13 +1016,27 @@
           "full_acceptance": false,
           "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
+        },
+        {
+          "id": "autonomous_put_learn_items_id_resume",
+          "method": "PUT",
+          "path": "/learn/items/{id}/resume",
+          "operationId": "put_learn_items_id_resume",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 1,
+        "state": "PARTIAL"
       }
     },
     {
@@ -1025,12 +1174,26 @@
           "full_acceptance": false,
           "verified_sha": "5142d752125b7f43b801b4cf4c3f975abefab939",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38086767802"
+        },
+        {
+          "id": "autonomous_get_me_certificates",
+          "method": "GET",
+          "path": "/me/certificates",
+          "operationId": "get_me_certificates",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 1,
+        "implemented_operations": 2,
         "state": "PARTIAL"
       }
     },
@@ -1156,14 +1319,31 @@
           ],
           "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
+        },
+        {
+          "id": "autonomous_get_admin_redeem_codes",
+          "method": "GET",
+          "path": "/admin/redeem-codes",
+          "operationId": "get_admin_redeem-codes",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/continuation-lists-resume.pg-spec.ts",
+          "shared_suite_tests": 20,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 2,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "REDEEM-02",
@@ -1229,7 +1409,10 @@
         "defined_operations": 1,
         "implemented_operations": 1,
         "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
-      }
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "AI-01",
@@ -1314,7 +1497,10 @@
         "defined_operations": 3,
         "implemented_operations": 3,
         "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
-      }
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "AI-02",
@@ -1331,9 +1517,56 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "autonomous_post_me_ai_conversations",
+          "method": "POST",
+          "path": "/me/ai/conversations",
+          "operationId": "post_me_ai_conversations",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/ai-history.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        },
+        {
+          "id": "autonomous_get_me_ai_conversations",
+          "method": "GET",
+          "path": "/me/ai/conversations",
+          "operationId": "get_me_ai_conversations",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/ai-history.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        },
+        {
+          "id": "autonomous_get_me_ai_conversations_id_messages",
+          "method": "GET",
+          "path": "/me/ai/conversations/{id}/messages",
+          "operationId": "get_me_ai_conversations_id_messages",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/ai-history.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        }
+      ],
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "AI-05",
@@ -1372,14 +1605,31 @@
           "full_acceptance": false,
           "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867"
+        },
+        {
+          "id": "autonomous_delete_me_ai_conversations_id",
+          "method": "DELETE",
+          "path": "/me/ai/conversations/{id}",
+          "operationId": "delete_me_ai_conversations_id",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/ai-history.pg-spec.ts",
+          "shared_suite_tests": 13,
+          "tests_shared_across_operations": true,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
-      }
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "AI-03",
@@ -1473,7 +1723,10 @@
         "defined_operations": 1,
         "implemented_operations": 1,
         "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
-      }
+      },
+      "remaining": [
+        "Full feature integration/acceptance gates; not waiting for the user to select already authorized technical proposals"
+      ]
     },
     {
       "id": "BLOG-01",
@@ -2029,6 +2282,27 @@
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
           "full_acceptance": false,
           "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md"
+        },
+        {
+          "id": "autonomous_lists_resume_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 10,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "full_acceptance": false
+        },
+        {
+          "id": "autonomous_ai_history_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 5,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "full_acceptance": false
+        },
+        {
+          "id": "autonomous_admin_directory_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 6,
+          "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -2248,7 +2522,7 @@
     "frontend_ci_evidence_note": "Full Frontend CI evidence remains on 52852919d7acce6cb7c8c4dd4bc82e328cb1bc06; source unchanged in this checkpoint. Current unchanged clients tested against real Nest/PG in exact code CI; contract generation check passed locally.",
     "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
-    "current_checkpoint_ci": "PASS_EXACT_CODE_SHA",
+    "current_checkpoint_ci": "PENDING_NEW_COMPONENTS",
     "current_checkpoint_evidence": "Hosted Nest CI: 477 tests, build/smoke, blueprint/Auth delta/17-wave queue, 141 actual Frontend client checks. Full browser/provider acceptance remains pending.",
     "frontend_source_changed": false
   },
@@ -2313,16 +2587,18 @@
       "design_document": "FIREBASE_PROVIDER_DESIGN.md",
       "proposed_delta": "contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json"
     },
-    "remaining": "Provider wire/proof/recovery design, production origins and remaining unrelated decisions stay Draft. Approval is not provider/runtime/acceptance evidence."
+    "remaining": "Latest user authorizes remaining technical choices with decision records; missing provider runtime and full acceptance still require real evidence."
   },
   "remaining_decision_scopes": {
     "D01": "Transport/CSRF/CORS/origins/throttling review; approved lifetime/logout/reset not reopened",
     "D03": "Provider proof/exchange/link/recovery design and integration; approved ownership direction not reopened"
   },
   "continuation_policy": {
-    "scope": "Wave 1–17; prioritize missing independently specified APIs in Wave 1–13",
-    "pending_behavior": "Mark PENDING and skip locally; no idle wait when independent work exists",
-    "user_authorization": "Explicit latest /goal continuation instruction",
+    "scope": "Wave 1–17; prioritize missing APIs in Wave 1–13",
+    "pending_behavior": "Decide authorized technical details with a written record; skip only unavailable dependencies/capabilities locally without idle waiting",
+    "user_authorization": "Latest user explicitly permits agent decisions with documentation for later correction",
+    "agent_may_decide": true,
+    "decision_record": "AUTONOMOUS_EXECUTION_DECISIONS.md",
     "solo": true
   }
 }

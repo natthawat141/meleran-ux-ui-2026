@@ -7,11 +7,12 @@ import { AiSupportWriter } from './public/ai-support-writer.service';
 import { AuthModule } from '../auth/auth.module';
 import { VideoUploadController } from './video-upload.controller';
 import { VideoUploadService } from './video-upload.service';
+import { CatalogListService } from './catalog-list.service';
 
 @Module({
   imports: [AuthModule],
   controllers: [CoursesController, PublicInstructorController, VideoUploadController],
-  providers: [CoursesService, PublicInstructorService, AiSupportWriter, VideoUploadService],
+  providers: [CoursesService, PublicInstructorService, AiSupportWriter, VideoUploadService, CatalogListService],
   exports: [CoursesService, AiSupportWriter],
 })
 export class CoursesModule {}

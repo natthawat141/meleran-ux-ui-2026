@@ -1,0 +1,48 @@
+# Execution decisions under renewed authorization — 2026-10-11
+
+ผู้ใช้อนุญาตให้เดิน Wave 1–17 ต่อ เลือกรายละเอียดที่ยังค้างและบันทึกให้แก้ภายหลังได้ ไม่รอคำตอบเฉย ๆ การอนุญาตนี้แทนเงื่อนไขรอผู้ใช้เลือกข้อเสนอในเอกสาร planning เดิมเฉพาะงานที่อยู่ใน Scope ไม่มี STG/deploy/new instance/live migration/force push และไม่เปลี่ยนกติกาที่ Scope ยืนยันแล้ว
+
+## Confirmed instructions
+
+- ทำคนเดียวต่อจาก fullstack checkout; schema/migration owner คือ Lead
+- เลือก protocol/implementation details ได้พร้อมเหตุผล; external capability ที่ยังไม่มีให้ PENDING เฉพาะจุด
+- HTTP paths/shapes ปัจจุบันคงเดิม; การเพิ่ม provider protocol ใช้ contract delta ที่ติดตามแยก
+- Technical/component evidence ไม่ใช่การตรวจรับ 113 cases ทั้งหมด
+
+## Agent decisions: D16 read flows
+
+เลือกข้อเสนอ Catalog ใน CATALOG_QUERY_REVIEW.md: title contains แบบไม่สนตัวพิมพ์, trim q, exact category/level, free คือ null/0, paid >0; Published และ published_at เท่านั้น; sort published_at DESC,id ASC. Instructor courses ใช้ขอบเขต Instructor ที่มี normalized role และ Published เท่านั้น
+
+ใช้ opaque versioned keyset cursor signed ด้วย HMAC-SHA256 และ key แยก CURSOR_SIGNING_SECRET; bind route/filter/limit/current owner. ไม่มี time expiry; key rotation ทำให้ cursor เดิม invalid. Public fields ตาม canonical เท่านั้น ไม่มี snapshot guarantee ข้ามหน้า. Reject unknown/repeated query, malformed limit, invalid/tampered/mismatched cursor ด้วย 422; limit default20/1–50. Configuration secret ไม่ commit; test-only key ใช้ใน CI. Shared utility ใช้ร่วมเพราะหลาย feature ต้องรักษา wire pagination เดียวกัน
+
+Own enrollments เรียง granted_at DESC,id ASC; นับ completed_items จาก current item Progress แทน compatibility counter. ส่งเฉพาะ Published courses เพื่อรักษา CourseSummary ที่ต้องมี published_at และ public visibility; historical certificates ยังอ่านได้เมื่อคอร์สเปลี่ยนสถานะ
+
+Certificates เรียง issued_at DESC,id ASC; issue-time snapshots เท่านั้น. Redeem list เรียง issued_at DESC,id ASC; Admin เท่านั้น; code_masked แสดง prefix MLN- และท้าย4ตัว ไม่มี full secret (full code คืนเฉพาะ issuance)
+
+## Agent decisions: MGMT-05
+
+Counts คำนวณใน coherent read transaction: course_count ทุกคอร์สใน management scope; enrollment_count ทุก Enrollment ในขอบเขต; learner_count distinct accountId ของ Enrollment ในขอบเขต; pending_grading_count จำนวน attempts ที่ pending_review และยังมี written answer ที่ score เป็น null. Admin user_count ทุก Account และ pending_course_count คอร์ส pending_review; Instructor scope เฉพาะ instructorId ตนเองและไม่ส่ง Admin counters. ไม่เพิ่มผลเรียนหรือใช้ mock counters
+
+## Agent decisions: resume optional input
+
+PUT /learn/items/{id}/resume: omitted position_seconds รักษาค่าตำแหน่งเดิม (ไม่มีเดิมเป็น null), explicit null ล้างตำแหน่ง, 0 เป็นตำแหน่งจริง. Article/Quiz ส่งตำแหน่งตัวเลขไม่ได้; null/omitted ใช้ระบุรายการเรียนต่อล่าสุดได้. ทุกคำสั่งบันทึก server timestamp/order ใหม่ แต่ไม่ complete/grade/grant. Fresh Web learning eligibility + Published + own Enrollment; owner Instructor ใช้ Preview ไม่สร้างผลเรียน
+
+## Agent decisions: AI-02 / AI-05 (D11/D16 subset)
+
+History อยู่ใน scope เจ้าของแม้ Admin; search ชื่อหรือข้อความแบบ contains insensitive; sort activity DESC,id ASC. Messages เรียง position ASC และ cursor ผูก conversation/owner/limit; เอกสาร metadata ภายใน `contextSnapshot._wire` version1 ระบุ request_id/kind/status/completed_at/error_code โดยไม่ส่ง context/knowledge/private provider fields. ข้อมูลเก่าที่ไม่มี metadata ไม่เดา request/status และ fail closed; sender ใน AI-03 ต้องเขียน format นี้
+
+Create ค่า title ที่ไม่ส่งใช้ “แชตใหม่”; course_id optional เป็น context ไม่ใช่ grant. หากระบุคอร์สต้องมีสิทธิ์อ่านและเปิด AI; Instructor owner/Admin ใช้ขอบเขตจัดการ ผู้เรียนต้องมี Published Enrollment และบัญชีพร้อมเรียน. General conversation ไม่สร้าง Prompt/usage
+
+Delete เป็น owner-scoped tombstone แบบ repeat-safe 204; เก็บ quota และ finalized request dedupe ตาม FK ไม่ hard-delete/คืนโควตา; ไม่มี retention timer ที่คิดขึ้นเอง. Pending finalizer ใช้ lock Conversation เดียวกันและต้องไม่ทำให้ deleted chat กลับมาแสดง. Practice history คืนโจทย์เดิม; เฉลย/คำอธิบายเฉพาะข้อที่ตอบแล้ว; topic_id ใช้ persisted Practice id ไม่เรียก provider ใหม่
+
+## Agent decisions: MGMT-01 / MGMT-02 remaining operations
+
+Admin user list ค้น display_name/username/email เท่านั้น (Admin permission), เรียง created_at DESC,id ASC; Instructor directory เรียง created_at DESC,id ASC แต่ส่งแค่ InstructorSummary. normalized UserRole เป็นสิทธิ์จริง ไม่ใช้ CSV role string. Create ตั้ง origin admin_created, Learner grant, email_verified=false, immutable created_by/created_at; Username hash ใช้ Auth owner/kernel เดิม. Optional email เป็น metadata สำหรับเพิ่ม/ยืนยันภายหลัง ไม่สร้าง Firebase credential หรือถือว่ายืนยันอัตโนมัติ. Display name stringไม่ว่าง, ไม่ normalize/ตัดข้อความ; email null/omitted→null, ที่ส่งต้องรูปแบบอีเมลไม่เกิน254และไม่มี whitespace; normalizedEmail uppercase สำหรับ unique lookup เดิม. Duplicate username/email→409. ไม่มี creation retry/idempotency key ที่ contract ไม่กำหนด
+
+## Evidence
+
+เพิ่มหลักฐานเฉพาะเมื่อ tests ผ่านจริงใน EXECUTION_STATUS และ task components; เอกสารนี้เป็น decision record ไม่ใช่คำอ้างว่าการ implement หรือ feature acceptance เสร็จแล้ว
+
+## Agent decisions: D06 / COMPLETION-01
+
+เปรียบเทียบผลที่ตรวจครบด้วยอัตรา earned/max (คำนวณ cross multiplication ด้วย Decimal ไม่ปัดเปอร์เซ็นต์) เมื่อคะแนนเต็มเปลี่ยนข้ามฉบับ; tieเลือก attempt numberที่น้อยกว่า/idตามลำดับเพื่อคงผลเดิม. ใช้เฉพาะ submitted + fully graded + ทุกคำตอบครบ; >70% เท่านั้น. ผลต่ำกว่า/รอตรวจภายหลังไม่ล้าง Progressที่เคยผ่าน. completion coordinatorล็อก Course SHARE → Enrollment UPDATE → Attempts SHARE; authoring/assessmentต้องใช้ลำดับเดียวกัน. snapshot version1เก็บ current item IDs/types/completed_at และ quiz attempt/result exact decimals ณ first completion. Certificateชื่อผู้เรียน/คอร์สและเวลาใช้ค่าจริง ณ transaction เดียว, unique Enrollment; รหัส opaque random, ไม่มี public issuance endpoint. ไม่สร้าง PDF/provider networkภายใน transaction. Historical completed Enrollmentรักษา snapshot/Certificateแม้เพิ่มหรือแก้เนื้อหา.
