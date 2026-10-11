@@ -4,6 +4,8 @@ Status: **NEEDS_DECISION** · Priority: P2 · Module: management
 
 ต้องปิด D02, D03, D16
 
+Execution component 11 ต.ค.: GET /admin/users/{id} moved to Auth public bounded detail reader with fresh normalized Admin authority, sorted Account locks and canonical Admin inline profile semantics. See [ADMIN_USER_DETAIL_COMPONENT](../ADMIN_USER_DETAIL_COMPONENT.md) for18 HTTP/PG +10 real Admin-client checks, exact fields and pending status/disable interpretation. Component depends on FOUNDATION-01, DB-02 normalized roles and AUTH-BASE-01 fresh Admin proof; creation/query/provider/browser requirements and whole-task decisions remain open.
+
 ## Read set และ traceability
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.

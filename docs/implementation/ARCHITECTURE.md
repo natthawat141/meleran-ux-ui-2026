@@ -189,6 +189,8 @@ ASSESS-02 owned Attempt read: Assessments module/controller/service/DTO stay fea
 
 MGMT-04 locator: Management-local read uses Auth public fresh authoring authority → Course shared → Item/Quiz shared; Course owner Instructor or normalized Admin only. Select two IDs after scoped same-course/type predicate, no question/key/PII read. Public authoring quiz ID is CourseItem.id; internal Quiz.id is not an alternate HTTP namespace. Future aggregate authoring writers hold Course exclusive first. See MANAGED_QUIZ_LOCATOR_COMPONENT.md; roster query/PII, grading and browser feature gates remain open.
 
+MGMT-01 Admin detail: Management supplies transaction to Auth public AdminUserDetailReader; Session → sorted actor/target Accounts shared → fresh normalized Admin/target roles → bounded metadata/profile projection. No hash/provider subject, entity spread, role-string fallback or identity write. Sorted Account order matches Instructor grant; profile array limits follow each operation's canonical schema (Admin inline no cap, CurrentUser default30). Pending/active is Draft projection, not authorization/disable-policy approval. See ADMIN_USER_DETAIL_COMPONENT.md; whole creation/query/Auth/browser gates remain open.
+
 อ่าน Architecture + task + generated contract subset + referenced transaction. Taskที่READYต้องไม่มีbusiness/protocol decisionค้าง.
 Scope/business case excerptsอยู่ในtaskเป็นprojectionพร้อมsource; ไม่ต้องอ่านhandbookทั้งระบบทุกครั้ง.
 Decisionใหม่→DECISIONS.md + impactedtask; เปลี่ยนcanonicalได้หลังapprovalและsyncตามdocs/AGENTS.md.

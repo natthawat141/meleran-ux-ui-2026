@@ -14,7 +14,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 314,
+    "database_tests": 332,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -51,7 +51,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 114,
+    "frontend_client_checks_total": 124,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -69,7 +69,9 @@
     "frontend_instructor_grant_transport_checks": 8,
     "managed_quiz_locator_http_postgres_tests": 13,
     "frontend_managed_quiz_locator_transport_checks": 8,
-    "course_creator_schema_postgres_tests": 7
+    "course_creator_schema_postgres_tests": 7,
+    "admin_user_detail_http_postgres_tests": 18,
+    "frontend_admin_user_detail_transport_checks": 10
   },
   "environment": {
     "staging": false,
@@ -250,6 +252,30 @@
         "D02",
         "D03",
         "D16"
+      ],
+      "components": [
+        {
+          "id": "bounded_admin_user_detail",
+          "method": "GET",
+          "path": "/admin/users/{id}",
+          "operationId": "get_admin_users_id",
+          "state": "COMPONENT_VERIFIED",
+          "http_postgres_tests": 18,
+          "frontend_transport_checks": 10,
+          "protocol_document": "ADMIN_USER_DETAIL_COMPONENT.md",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-02 normalized roles",
+            "AUTH-BASE-01 fresh Admin authority"
+          ],
+          "evidence": "Management caller transaction -> Auth public reader; Session -> sorted actor/target Accounts shared -> fresh normalized Admin/target roles. Canonical bounded identity/profile/method/date, no raw hash/provider subject/role-string fallback. Admin inline profile arrays have no cap; self/grant preserve30. Real target writer wait/opposite Admin grant, safe storage failures/reconnect/no writes. Legacy getter removed; AST proves remaining prototype methods unchanged.",
+          "remaining": [
+            "D02/D03 normalized creation/credentials/provider and Draft status/disable interpretation",
+            "D16 directory/query/privacy protocol",
+            "Complete Auth and actual Management browser/A07/A08"
+          ],
+          "full_acceptance": false
+        }
       ]
     },
     {
@@ -1573,6 +1599,19 @@
           "full_feature_gate": false,
           "verified_sha": "d56acfe409502305427191c3dbf29c447f33e0c7",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38095412874"
+        },
+        {
+          "id": "admin_user_detail_transport",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 10,
+          "protocol_document": "ADMIN_USER_DETAIL_COMPONENT.md",
+          "evidence": "Unchanged actual Admin resources.ts + management decoder -> built Nest/Test PG. Exact detail/null metadata, normalized grant parity,31-item inline Admin arrays, namespaces/nonadmin/unknown/anonymous, reconnect/all-model/academic preservation, network failure.",
+          "session_fixture": true,
+          "user_creation_gate": false,
+          "directory_query_gate": false,
+          "login_provider_gate": false,
+          "browser_acceptance": false,
+          "full_feature_gate": false
         }
       ]
     },
@@ -1733,7 +1772,7 @@
     "ci": "PASS",
     "verified_sha": "621a27ed079ba1c3290645d84c598e0f9984492b",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38096201158",
-    "latest_component_ci": "PASS_COURSE_CREATOR_SCHEMA_CHECKPOINT",
+    "latest_component_ci": "PENDING_ADMIN_USER_DETAIL_CHECKPOINT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38076634194",
     "frontend_ci_evidence_sha": "ea942cb8eceed9fe19a2e2644f8baa1e265f9fdb",

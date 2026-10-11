@@ -606,6 +606,54 @@ async function main() {
     assert.deepEqual(await counts(), beforeLocatorCounts);
     assert.deepEqual(await locatorDefinitions(), beforeLocatorDefinitions);
     locatorChecks.push('reconnect-read-preserves-all-models-definition-and-academic-history');
+    phase = 'frontend-admin-user-detail';
+    const adminDetailChecks = [];
+    const nonAdminSecret = randomUUID();
+    await db.appSession.create({ data: { accountId: learnerId, audience: 'admin',
+      tokenHash: createHash('sha256').update(nonAdminSecret).digest('hex').toUpperCase(), expiresAt: new Date(Date.now() + 3600000) } });
+    const nonAdminResource = await adminResourceFor('detail-nonadmin', createHttpClient({
+      baseUrl: `http://127.0.0.1:${port}/api/v1`, credentials: 'omit', timeoutMs: 5000,
+      headers: { 'x-melearn-app': 'admin', Cookie: `melearn_admin_session=${nonAdminSecret}` }, fetcher: globalThis.fetch.bind(globalThis),
+    }));
+    const detailPath = 'admin/users/' + encodeURIComponent(learnerId);
+    const beforeAdminDetailCounts = await counts();
+    const beforeAdminDetailAccount = await db.account.findUniqueOrThrow({ where: { id: learnerId } });
+    const adminDetail = await adminResource(detailPath);
+    assert.equal(adminDetail.id, learnerId); assert.equal(adminDetail.created_at, beforeAdminDetailAccount.createdAt.toISOString());
+    assert.deepEqual(adminDetail.roles, ['instructor', 'learner']);
+    assert.equal(Object.hasOwn(adminDetail, 'learning_eligible'), false);
+    adminDetailChecks.push('actual-admin-resource-canonical-bounded-identity-detail');
+    const adminSelf = await adminResource('admin/users/' + encodeURIComponent(adminId));
+    const otherInstructor = await adminResource('admin/users/' + encodeURIComponent(accountId));
+    assert.deepEqual(adminSelf.roles, ['admin']); assert.deepEqual(adminSelf.profile, {}); assert.deepEqual(adminSelf.auth_methods, []);
+    assert.equal(adminSelf.email, null); assert.equal(adminSelf.username, null); assert.deepEqual(otherInstructor.roles, ['instructor']);
+    adminDetailChecks.push('self-and-other-role-details-nullable-unlinked-fields');
+    assert.deepEqual(adminDetail.profile, grantResult.user.profile); assert.deepEqual(adminDetail.auth_methods, grantResult.user.auth_methods);
+    assert.deepEqual(adminDetail.roles, grantResult.user.roles);
+    adminDetailChecks.push('normalized-grant-to-detail-consistency');
+    const longInterests = Array.from({ length: 31 }, (_, i) => 'หัวข้อ ' + i);
+    try {
+      await db.account.update({ where: { id: learnerId }, data: { profileJson: JSON.stringify({ interests: longInterests }) } });
+      const stored = await db.account.findUniqueOrThrow({ where: { id: learnerId } });
+      assert.deepEqual((await adminResource(detailPath)).profile.interests, longInterests);
+      assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), stored);
+      adminDetailChecks.push('Admin-inline-profile-array-limit-does-not-inherit-CurrentUser-cap');
+    } finally { await db.account.update({ where: { id: learnerId }, data: { profileJson: beforeAdminDetailAccount.profileJson } }); }
+    await assert.rejects(wrongResource(detailPath), error => error instanceof HttpClientError && error.status === 403);
+    adminDetailChecks.push('wrong-admin-namespace403');
+    await assert.rejects(nonAdminResource(detailPath), error => error instanceof HttpClientError && error.status === 403);
+    adminDetailChecks.push('nonadmin-normalized-proof403');
+    await assert.rejects(adminResource('admin/users/unknown'), error => error instanceof HttpClientError && error.status === 404);
+    adminDetailChecks.push('unknown404');
+    await assert.rejects(anonymousResource(detailPath), error => error instanceof HttpClientError && error.status === 401);
+    adminDetailChecks.push('anonymous401');
+    await db.$disconnect(); await db.$connect();
+    for (const result of await Promise.all([adminResource(detailPath), adminResource(detailPath)])) assert.deepEqual(result, adminDetail);
+    assert.deepEqual(await counts(), beforeAdminDetailCounts);
+    assert.deepEqual(await db.account.findUniqueOrThrow({ where: { id: learnerId } }), beforeAdminDetailAccount);
+    assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    adminDetailChecks.push('reconnect-all-model-identity-and-academic-preservation');
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -657,6 +705,8 @@ async function main() {
     instructorGrantChecks.push('network-failure-without-mock-fallback');
     await assert.rejects(ownerResource(locatorPath), error => error instanceof HttpClientError && error.kind === 'network');
     locatorChecks.push('network-failure-without-mock-fallback');
+    await assert.rejects(adminResource(detailPath), error => error instanceof HttpClientError && error.kind === 'network');
+    adminDetailChecks.push('network-failure-without-mock-fallback');
     assert.equal(uploadSuccessDecodes, 0);
     assert.equal(learningRequests, 11);
     assert.equal(requests, 7);
@@ -727,6 +777,11 @@ async function main() {
       unchangedWebAdminResourcesAndDecoder: true, actualNestAndPostgres: true, publicCourseItemID: true,
       actualPureAuthoringForm: true, noReadWrites: true, sessionFixture: true,
       authoringHttpGate: false, managementDirectoryGate: false, loginProviderGate: false,
+      browserAcceptance: false, fullFeatureGate: false };
+    result.adminUserDetail = { component: 'MGMT-01 detail', checks: adminDetailChecks.length, checkNames: adminDetailChecks,
+      unchangedAdminResourceAndDecoder: true, actualNestAndPostgres: true, normalizedTargetRoles: true,
+      boundedCanonicalProfileAndMethods: true, noReadWrites: true, sessionFixture: true,
+      userCreationGate: false, directoryQueryGate: false, loginProviderGate: false,
       browserAcceptance: false, fullFeatureGate: false };
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));

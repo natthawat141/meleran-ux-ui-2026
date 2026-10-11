@@ -17,11 +17,13 @@ import { ApiException } from '../../shared/errors/api-exception';
 import { AuthPrincipal } from '../auth/public/index';
 import { EmptyRequestPipe } from '../../shared/validation/empty-request.pipe';
 import { AssignInstructorService } from './assign-instructor.service';
+import { AdminUserDetailService } from './admin-user-detail.service';
 
 @Roles('admin')
 @Controller('admin')
 export class ManagementController {
-  constructor(private readonly managementService: ManagementService, private readonly instructorGrants: AssignInstructorService) {}
+  constructor(private readonly managementService: ManagementService, private readonly instructorGrants: AssignInstructorService,
+    private readonly userDetails: AdminUserDetailService) {}
 
   private checkAdminAudience(appHeader?: string) {
     if (appHeader !== 'admin') {
@@ -52,12 +54,12 @@ export class ManagementController {
   }
 
   @Get('users/:id')
+  @AuthoritativeAudience('admin')
   async getUserDetail(
+    @CurrentPrincipal() actor: AuthPrincipal,
     @Param('id') id: string,
-    @Headers('x-melearn-app') appHeader?: string,
   ) {
-    this.checkAdminAudience(appHeader);
-    return this.managementService.getUserDetail(id);
+    return this.userDetails.read(actor.session, id);
   }
 
   @Post('users/:id/instructor')

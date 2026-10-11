@@ -110,30 +110,6 @@ export class ManagementService {
     };
   }
 
-  async getUserDetail(id: string) {
-    const account = await this.prisma.account.findUnique({
-      where: { id },
-    });
-    if (!account) throw ApiException.notFound('ไม่พบบัญชีผู้ใช้');
-
-    const authMethods = await this.authService.getAuthMethods(id);
-
-    return {
-      id: account.id,
-      display_name: account.displayName,
-      username: account.username,
-      email: account.email,
-      email_verified: account.emailVerified,
-      avatar_url: account.avatarUrl,
-      roles: account.roles.split(','),
-      origin: account.origin,
-      status: account.origin === 'self_email' && !account.emailVerified ? 'pending' : 'active',
-      created_at: account.createdAt,
-      profile: JSON.parse(account.profileJson || '{}'),
-      auth_methods: authMethods,
-    };
-  }
-
   async listInstructors(limit = 20, cursor?: string) {
     if (limit < 1 || limit > 50) {
       throw ApiException.validationFailed('Limit ต้องอยู่ระหว่าง 1 ถึง 50');
