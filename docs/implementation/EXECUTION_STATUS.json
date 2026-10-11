@@ -16,7 +16,7 @@
   },
   "verified": {
     "foundation_tests": 53,
-    "database_tests": 585,
+    "database_tests": 593,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -33,7 +33,7 @@
     "frontend_typecheck": "PASS_WEB_ADMIN_PACKAGES",
     "frontend_build": "PASS_WEB_ADMIN",
     "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500",
-    "frontend_hosted_tests": 174,
+    "frontend_hosted_tests": 176,
     "stripe_receiver_unit_tests": 5,
     "stripe_receiver_http_pg_tests": 10,
     "principal_resolution_postgres_tests": 8,
@@ -53,7 +53,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 213,
+    "frontend_client_checks_total": 217,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -87,11 +87,11 @@
     "current_checkpoint": {
       "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 585,
+      "database_tests": 593,
       "feature_component_unit_tests": 76,
-      "total_tests": 714,
-      "regression_basis": "Previous677 exact hosted PASS;25 new PG+12 units;65 prior Attempt/Completion/Management PG regressions;53 foundation;213 actual Frontend clients;strict TS/build/contracts/Web+Admin tests176 pass",
-      "frontend_client_checks": 213,
+      "total_tests": 722,
+      "regression_basis": "Previous exact714 hosted pass;8 download PG;217 actual Frontend client checks;strict TS/Nest build. No new Frontend/schema/dependency change",
+      "frontend_client_checks": 217,
       "frontend_tests": 176,
       "typecheck": "PASS",
       "nest_build": "PASS",
@@ -119,7 +119,7 @@
     "frontend_continuation_list_resume_checks": 10,
     "frontend_ai_history_checks": 5,
     "frontend_admin_directory_checks": 6,
-    "total_local_tests": 714,
+    "total_local_tests": 722,
     "learning_authoring_continuation": {
       "new_operations": 8,
       "postgres_tests": 49,
@@ -137,12 +137,12 @@
     "last_verified_checkpoint": {
       "local_status": "PASS_TARGETED",
       "foundation_tests": 53,
-      "database_tests": 560,
-      "feature_component_unit_tests": 64,
-      "total_tests": 677,
-      "regression_basis": "Previous645 exact-SHA hosted pass; Authoring/Review25 PG +7 units; current foundation53/typecheck/build/contracts/Web+Admin checks pass; all206 actual Frontend clients pass",
-      "frontend_client_checks": 206,
-      "frontend_tests": 174,
+      "database_tests": 585,
+      "feature_component_unit_tests": 76,
+      "total_tests": 714,
+      "regression_basis": "Previous677 exact hosted PASS;25 new PG+12 units;65 prior Attempt/Completion/Management PG regressions;53 foundation;213 actual Frontend clients;strict TS/build/contracts/Web+Admin tests176 pass",
+      "frontend_client_checks": 213,
+      "frontend_tests": 176,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
@@ -151,8 +151,8 @@
       "schema_delta": false,
       "browser_acceptance": false,
       "hosted_status": "PASS",
-      "verified_sha": "bfa8c88ff06227839c628923b25c5dc6cd146f51",
-      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173958"
+      "verified_sha": "0caca8e48776403168035bf8fdad0a73446b7dba",
+      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38113305361"
     },
     "local_username_http": {
       "state": "COMPONENT_VERIFIED",
@@ -203,6 +203,15 @@
       "local_targeted_status": "PASS",
       "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
       "full_regression": "PENDING_HOSTED",
+      "hosted_status": "PASS_EXACT_0CACA8E",
+      "browser_acceptance": false
+    },
+    "certificate_download_continuation": {
+      "new_operations": 1,
+      "postgres_tests": 8,
+      "frontend_client_checks": 4,
+      "local_targeted_status": "PASS",
+      "protocol_document": "CERTIFICATE_DOWNLOAD_COMPONENT.md",
       "hosted_status": "PENDING_PUSH",
       "browser_acceptance": false
     }
@@ -1690,13 +1699,26 @@
           "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
           "full_acceptance": false,
           "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        },
+        {
+          "id": "certificate_download",
+          "method": "GET",
+          "path": "/me/certificates/{id}/download",
+          "operationId": "get_me_certificates_id_download",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/certificate-download.pg-spec.ts",
+          "component_tests": 8,
+          "frontend_client_checks": 4,
+          "protocol_document": "CERTIFICATE_DOWNLOAD_COMPONENT.md",
+          "full_acceptance": false,
+          "evidence": "Actual owner-scoped immutable text download;contract/permissions/replay/concurrency/reconnect/render failure no writes;PDF/storage not frozen"
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 2,
-        "state": "PARTIAL"
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -3006,6 +3028,13 @@
           "frontend_client_checks": 7,
           "protocol_document": "ASSESSMENT_LIFECYCLE_COMPONENT.md",
           "full_acceptance": false
+        },
+        {
+          "id": "certificate_download_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 4,
+          "protocol_document": "CERTIFICATE_DOWNLOAD_COMPONENT.md",
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -3216,20 +3245,20 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "bfa8c88ff06227839c628923b25c5dc6cd146f51",
+    "verified_sha": "0caca8e48776403168035bf8fdad0a73446b7dba",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
     "latest_component_ci": "PASS_PROFILE_REDEEM_MANAGED_ATTEMPT",
-    "frontend_ci": "PENDING_CURRENT_ASSESSMENT_DECODER_PUSH",
+    "frontend_ci": "PASS_EXACT_0CACA8E",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38109421322",
     "frontend_ci_evidence_sha": "ebcfd4dcfdc1dd356eafc66900fa8a420d955482",
     "frontend_ci_evidence_note": "Exact ebcfd4d Frontend173 tests/typecheck/build/contracts and both container builds passed; Blog continuation changes Backend/harness/docs only.",
     "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
-    "current_checkpoint_ci": "PENDING_ASSESSMENT_PUSH",
-    "current_checkpoint_evidence": "Previous bfa hosted Backend677 tests/206 clients and Frontend174 tests both pass; current714 regression pending push.",
-    "frontend_source_changed": true,
-    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173958",
-    "last_frontend_ci_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173960"
+    "current_checkpoint_ci": "PENDING_CERTIFICATE_PUSH",
+    "current_checkpoint_evidence": "Previous exact0caca8e hosted Backend714/213 actual clients and Frontend176 tests pass;current download722/217 awaiting hosted regression",
+    "frontend_source_changed": false,
+    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38113305361",
+    "last_frontend_ci_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38113305360"
   },
   "remaining_decisions": [
     "D01",

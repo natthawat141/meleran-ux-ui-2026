@@ -20,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 77,
+    "implemented_operations": 78,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -902,7 +902,7 @@
       "operationId": "get_me_certificates_id_download",
       "task_id": "CERT-01",
       "wave": 6,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COMPLETION-01",
@@ -918,7 +918,7 @@
         "F07",
         "F08"
       ],
-      "remaining": "Unresolved behavior: D07; approved subsets are not reopened",
+      "remaining": "Browser/original acceptance and future PDF/storage contract choices",
       "read_set": [
         "tasks/CERT-01.md",
         "contracts/CERT-01.openapi.json",
@@ -2384,7 +2384,7 @@
     {
       "wave": 6,
       "defined_operations": 20,
-      "implemented_operations": 14,
+      "implemented_operations": 15,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2455,12 +2455,12 @@
     }
   ],
   "checkpoint": {
-    "verified_sha": "bfa8c88ff06227839c628923b25c5dc6cd146f51",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38112173958",
-    "tests": 677,
-    "frontend_client_checks": 206,
+    "verified_sha": "0caca8e48776403168035bf8fdad0a73446b7dba",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38113305361",
+    "tests": 714,
+    "frontend_client_checks": 213,
     "full_acceptance": false,
-    "current_operations": 77,
+    "current_operations": 78,
     "current_hosted_status": "PENDING_PUSH"
   }
 }

@@ -102,3 +102,7 @@ Feature gate: **G-CERTIFICATE** ใน [Execution Plan](../EXECUTION_PLAN.md); �
 ## Renewed authorization continuation — 2026-10-11
 
 Latest user permits agent decisions with a written record. See [technical decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) and [current component evidence](../AUTONOMOUS_CONTINUATION_COMPONENT.md). The current EXECUTION_STATUS/CONTINUATION_QUEUE override old planning waits above. No idle user-decision blocker for the implemented subset; full feature acceptance is still tracked separately.
+
+## Download execution override — 2026-10-11
+
+All3 canonical CERT APIs now have component proof. Latest user-authorized D07 technical selection retains text/plain JSON and actual persisted issuance. [Download evidence](../CERTIFICATE_DOWNLOAD_COMPONENT.md);8 PG/4 unchanged actual Frontend checks. PDF/storage/signing not frozen;full browser/original acceptance pending.

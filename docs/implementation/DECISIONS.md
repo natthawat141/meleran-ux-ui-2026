@@ -223,3 +223,7 @@ Execution conflict PAY-02 (11 ต.ค.): required string `WireAdminPayment.check
 ## Assessment execution override
 
 Latest user permits agent decisions with written record. D06/D09/D10 scoped implementation choices are recorded in [ASSESSMENT_LIFECYCLE_COMPONENT](ASSESSMENT_LIFECYCLE_COMPONENT.md),including pending-review retakes,first-grade immutability and image transport bounds. No silent Contract freeze or global provider/upload resolution.
+
+## D07 execution override
+
+Latest user permits documented agent choice: current canonical text/plain download implemented from actual immutable issuance;future PDF/storage/signing contract remains separate. See [evidence](CERTIFICATE_DOWNLOAD_COMPONENT.md).

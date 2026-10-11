@@ -82,3 +82,7 @@ Public list: first published_at descending/id ascending, title/excerpt/content t
 ## Assessment lifecycle — authorized D06/D09/D10 choices
 
 [Exact operation protocols and verification](ASSESSMENT_LIFECYCLE_COMPONENT.md) record Start/resume/retake,per-question draft patch,complete Submit,frozen exact-set auto-grades,first manual grade replay/conflict,exact earned/max best comparison and atomic completion. Agent chooses pending-review retakes,first-grade immutability,bounded image reference transport,queue/results order. These are documented technical selections under latest user authorization,changeable later; not new Scope text. Public HTTP remains canonical Draft. Read/completion modules split to avoid cycles; managed readers do not invert learner Account/Enrollment locks. No dependency or database delta.
+
+## Certificate download — D07 scoped choice
+
+Implement actual immutable private issuance as current canonical text/plain JSON so existing Frontend can download UTF8 text. Deterministic safe filename,original names/date/code,no disk/network/DB writes. Failures retry same Certificate,never recomplete/reissue. [Evidence](CERTIFICATE_DOWNLOAD_COMPONENT.md). This completes current HTTP component;PDF/storage/signing require future reviewed contract,not claimed here.

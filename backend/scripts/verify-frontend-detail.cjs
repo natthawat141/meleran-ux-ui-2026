@@ -1083,6 +1083,23 @@ async function main() {
     assert.equal((await db.enrollment.findUniqueOrThrow({where:{id:enrolledAssessment.id}})).completedItems,1);
     assessmentLifecycleChecks.push('reconnect-keeps-frozen-attempt-and-Certificate-snapshots');
 
+    phase='frontend-certificate-download';
+    const certificateDownloadChecks=[];
+    const beforeDownloadRows=await db.certificate.findMany({where:{enrollment:{accountId:learnerId}},orderBy:{id:'asc'}}),beforeDownloadCounts=await counts();
+    const downloadedHistorical=await ownCertificateApi.download(historicalCertificate.id);
+    assert.equal(downloadedHistorical.content_type,'text/plain');assert.match(downloadedHistorical.filename,/^melearn-certificate-[a-f0-9]{20}\.txt$/);
+    assert.ok(downloadedHistorical.content.includes(historicalCertificate.courseName));assert.ok(downloadedHistorical.content.includes(historicalCertificate.recipientName));
+    certificateDownloadChecks.push('actual-Certificate-download-client-private-canonical-text-from-original-snapshot');
+    assert.deepEqual(await ownCertificateApi.download(historicalCertificate.id),downloadedHistorical);
+    certificateDownloadChecks.push('repeat-download-stable-bytes-no-second-issuance');
+    await assert.rejects((await certificateApiFor('certificate-foreign')).download(historicalCertificate.id),error=>error instanceof HttpClientError&&error.status===404);
+    await assert.rejects((await certificateApiFor('certificate-admin')).download(historicalCertificate.id),error=>error instanceof HttpClientError&&error.status===404);
+    await assert.rejects((await certificateApiFor('certificate-guest')).download(historicalCertificate.id),error=>error instanceof HttpClientError&&error.status===401);
+    certificateDownloadChecks.push('actual-foreign-Admin-and-Guest-download-denials');
+    await db.$disconnect();await db.$connect();assert.deepEqual(await ownCertificateApi.download(historicalCertificate.id),downloadedHistorical);
+    assert.deepEqual(await db.certificate.findMany({where:{enrollment:{accountId:learnerId}},orderBy:{id:'asc'}}),beforeDownloadRows);assert.deepEqual(await counts(),beforeDownloadCounts);
+    certificateDownloadChecks.push('reconnect-download-preserves-academic-and-all-model-counts');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -1225,6 +1242,7 @@ async function main() {
     result.adminPayment = {checks:adminPaymentChecks.length,checkNames:adminPaymentChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.authoringReview = {checks:authoringReviewChecks.length,checkNames:authoringReviewChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.assessmentLifecycle = {checks:assessmentLifecycleChecks.length,checkNames:assessmentLifecycleChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.certificateDownload = {checks:certificateDownloadChecks.length,checkNames:certificateDownloadChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
