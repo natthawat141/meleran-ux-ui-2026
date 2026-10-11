@@ -1,6 +1,6 @@
 # REDEEM-01 — Issue/list/revoke codes
 
-Status: **BLOCKED** · Priority: P1 · Module: redeem
+Status: **PENDING** · Priority: P1 · Module: redeem
 
 รอ dependencies: COURSE-01, DB-04, AUTH-01
 
@@ -92,3 +92,5 @@ Feature gate: **G-REDEEM** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+Continuation update 11 ต.ค.: 2/3 canonical operations component-verified; see [current checkpoint](../PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md). Outstanding feature gates/decisions are PENDING and do not block independent use cases.

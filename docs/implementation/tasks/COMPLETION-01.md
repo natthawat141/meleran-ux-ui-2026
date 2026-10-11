@@ -1,6 +1,6 @@
 # COMPLETION-01 — Shared completion transaction service (no new HTTP operation)
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: enrollments
+Status: **PENDING** · Priority: P1 · Module: enrollments
 
 Dependencies passed: DB-02, DB-03; pending D06 for best-result selection.
 

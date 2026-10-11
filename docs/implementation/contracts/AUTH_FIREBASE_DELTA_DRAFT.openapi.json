@@ -1,0 +1,587 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Melearn Firebase Auth — proposed additive delta",
+    "version": "0.1.0-proposed"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Draft, configurable per app/environment"
+    }
+  ],
+  "x-status": "PROPOSED_NOT_CANONICAL",
+  "x-approved-ownership": "User confirmed set C on 2026-10-11; concrete contract delta/provider design authorized.",
+  "x-canonical-baseline": {
+    "version": "1.0.0-draft.2",
+    "sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+    "defined_operations": 86,
+    "deferred_operations": 5,
+    "acceptance_cases": 113
+  },
+  "x-pending-review": [
+    "first Email/Google binding protocol",
+    "recovery proof ownership and remote consistency",
+    "proof freshness",
+    "token size/error/retry protocol",
+    "cookie/CSRF transport",
+    "SDK version and provider environment"
+  ],
+  "x-deferred-mapping": [
+    {
+      "flow": "auth",
+      "method": "GET",
+      "path": "/auth/google/start",
+      "source": "tools/provisional-api/flow-a-auth.ts",
+      "status": "provider-pending",
+      "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events.",
+      "disposition": "PROPOSED_SUPERSEDED_AFTER_CANONICAL_REVIEW",
+      "replacement_operations": [
+        "post_auth_firebase_exchange"
+      ]
+    },
+    {
+      "flow": "auth",
+      "method": "GET",
+      "path": "/auth/google/callback",
+      "source": "tools/provisional-api/flow-a-auth.ts",
+      "status": "provider-pending",
+      "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events.",
+      "disposition": "PROPOSED_SUPERSEDED_AFTER_CANONICAL_REVIEW",
+      "replacement_operations": [
+        "post_auth_firebase_exchange"
+      ]
+    },
+    {
+      "flow": "auth",
+      "method": "POST",
+      "path": "/me/auth-identities/google",
+      "source": "tools/provisional-api/flow-a-auth.ts",
+      "status": "provider-pending",
+      "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events.",
+      "disposition": "PROPOSED_SUPERSEDED_AFTER_CANONICAL_REVIEW",
+      "replacement_operations": [
+        "post_auth_firebase_link"
+      ]
+    },
+    {
+      "flow": "auth",
+      "method": "GET",
+      "path": "/me/auth-identities/google/callback",
+      "source": "tools/provisional-api/flow-a-auth.ts",
+      "status": "provider-pending",
+      "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events.",
+      "disposition": "PROPOSED_SUPERSEDED_AFTER_CANONICAL_REVIEW",
+      "replacement_operations": [
+        "post_auth_firebase_link"
+      ]
+    },
+    {
+      "flow": "payment",
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "source": "tools/provisional-api/flow-f-payments.ts",
+      "status": "provider-pending",
+      "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events.",
+      "disposition": "RETAINED",
+      "replacement_operations": []
+    }
+  ],
+  "paths": {
+    "/auth/firebase/exchange": {
+      "post": {
+        "operationId": "post_auth_firebase_exchange",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Exchange verified Firebase identity for an app session",
+        "x-status": "PROPOSED_HTTP_DELTA",
+        "x-source-decision": "D03",
+        "x-permission": "server_verified_identity; Admin app requires local Admin grant",
+        "security": [],
+        "parameters": [
+          {
+            "name": "x-melearn-app",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "web",
+                "admin"
+              ]
+            },
+            "description": "Exchange audience must match this header; link uses the bound session namespace."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirebaseExchangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Selected app session cookie and canonical user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Proposed error code credentials_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "credentials_invalid"
+          },
+          "403": {
+            "description": "Proposed error code forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "forbidden"
+          },
+          "409": {
+            "description": "Proposed error code firebase_identity_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "firebase_identity_conflict"
+          },
+          "422": {
+            "description": "Proposed error code validation_failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "validation_failed"
+          },
+          "503": {
+            "description": "Proposed error code auth_provider_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "auth_provider_unavailable"
+          }
+        }
+      }
+    },
+    "/auth/firebase/link": {
+      "post": {
+        "operationId": "post_auth_firebase_link",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Explicitly bind a verified Firebase identity to the current account",
+        "x-status": "PROPOSED_HTTP_DELTA",
+        "x-source-decision": "D03",
+        "x-permission": "self_account; no identity transfer or email auto-merge",
+        "security": [
+          {
+            "WebSession": []
+          },
+          {
+            "AdminSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-melearn-app",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "web",
+                "admin"
+              ]
+            },
+            "description": "Exchange audience must match this header; link uses the bound session namespace."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirebaseLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Original account, no session rotation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUser"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Proposed error code credentials_invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "credentials_invalid"
+          },
+          "403": {
+            "description": "Proposed error code forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "forbidden"
+          },
+          "409": {
+            "description": "Proposed error code firebase_identity_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "firebase_identity_conflict"
+          },
+          "422": {
+            "description": "Proposed error code validation_failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "validation_failed"
+          },
+          "503": {
+            "description": "Proposed error code auth_provider_unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "x-proposed-error-code": "auth_provider_unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "WebSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_web_session",
+        "description": "Draft cookie name/transport. Independent Web login/session. HttpOnly/Secure/domain/CSRF/TTL require deployment agreement."
+      },
+      "AdminSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "melearn_admin_session",
+        "description": "Draft cookie name/transport. Independent Admin login/session; server checks Admin role."
+      }
+    },
+    "schemas": {
+      "FirebaseExchangeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id_token",
+          "audience"
+        ],
+        "properties": {
+          "id_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16384,
+            "writeOnly": true
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "web",
+              "admin"
+            ]
+          }
+        }
+      },
+      "FirebaseLinkRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id_token"
+        ],
+        "properties": {
+          "id_token": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16384,
+            "writeOnly": true
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/CurrentUser"
+          }
+        },
+        "required": [
+          "user"
+        ],
+        "additionalProperties": false
+      },
+      "CurrentUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email_verified": {
+            "type": "boolean"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "learner",
+                "instructor",
+                "admin"
+              ]
+            }
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "self_email",
+              "google",
+              "admin_created"
+            ]
+          },
+          "auth_methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "password",
+                "google"
+              ]
+            }
+          },
+          "learning_eligible": {
+            "type": "boolean"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/AccountProfile"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "username",
+          "email",
+          "email_verified",
+          "avatar_url",
+          "roles",
+          "origin",
+          "auth_methods",
+          "learning_eligible",
+          "profile"
+        ],
+        "additionalProperties": false
+      },
+      "AccountProfile": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "firstNameEnglish": {
+            "type": "string"
+          },
+          "lastNameEnglish": {
+            "type": "string"
+          },
+          "certificateName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "school": {
+            "type": "string"
+          },
+          "educationLevel": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30
+          },
+          "learningGoals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "message": {
+                "type": "string"
+              },
+              "request_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "details": {
+                "$ref": "#/components/schemas/ResourceErrorDetails"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "request_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "ResourceErrorDetails": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourceValidationField"
+            }
+          },
+          "current_revision": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ResourceValidationField": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

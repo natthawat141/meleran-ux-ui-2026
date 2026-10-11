@@ -1,6 +1,6 @@
 # ENROLL-01 — Free grant and own enrollments
 
-Status: **BLOCKED** · Priority: P0 · Module: enrollments
+Status: **PENDING** · Priority: P0 · Module: enrollments
 
 รอ dependencies: AUTH-01, CATALOG-01, DB-02
 

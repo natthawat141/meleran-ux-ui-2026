@@ -1,5 +1,7 @@
 export { PrincipalService } from './principal.service';
 export { SelfProfileReader } from './self-profile.reader';
+export { SelfProfileWriter } from './self-profile.writer';
+export type { SelfProfilePatch } from './self-profile.writer';
 export { InstructorGrantWriter } from './instructor-grant.writer';
 export { AdminUserDetailReader } from './admin-user-detail.reader';
 export type { AdminUserDetailDto } from './admin-user-detail.reader';

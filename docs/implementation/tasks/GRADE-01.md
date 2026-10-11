@@ -1,6 +1,6 @@
 # GRADE-01 — Owner Instructor grading
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: assessments
+Status: **PENDING** · Priority: P1 · Module: assessments
 
 ต้องปิด D06, D10; D02 constraints/profile semantics confirmed แล้ว
 

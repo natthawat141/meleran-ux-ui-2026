@@ -1,6 +1,6 @@
 # BLOG-01 — Public published blog reads
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: blog
+Status: **PENDING** · Priority: P2 · Module: blog
 
 ต้องปิด D05, D16 และ storage projection gaps; D02 constraints/profile semantics confirmed แล้ว
 

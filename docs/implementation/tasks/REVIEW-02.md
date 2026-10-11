@@ -1,6 +1,6 @@
 # REVIEW-02 — Approve/return/publish lifecycle
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
+Status: **PENDING** · Priority: P1 · Module: courses
 
 ต้องปิด D04; D02 constraints/profile semantics confirmed แล้ว
 

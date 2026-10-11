@@ -1,6 +1,6 @@
 # INTEGRATION-03 — Cross-feature acceptance/release evidence
 
-Status: **BLOCKED** · Priority: P2 · Module: integration
+Status: **PENDING** · Priority: P2 · Module: integration
 
 รอ dependencies: AI-04, AI-05, AUTH-02, AUTH-03, BLOG-03, CATALOG-02, CI-01, INTEGRATION-02, LEARN-02, MGMT-05, PAY-02, PROVIDER-STRIPE-01, REDEEM-02, REVIEW-02, VIDEO-01
 

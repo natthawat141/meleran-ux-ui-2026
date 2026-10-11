@@ -654,6 +654,73 @@ async function main() {
     assert.deepEqual(await db.enrollment.findUniqueOrThrow({ where: { id: firstGrant.id } }), originalEnrollment);
     assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
     adminDetailChecks.push('reconnect-all-model-identity-and-academic-preservation');
+    phase = 'frontend-profile-patch';
+    const profilePatchChecks = [];
+    const academicBeforePatch = await attemptRows(), sessionsBeforePatch = await profileSessions();
+    const patched = await ownAuth.updateProfile({ display_name: 'ชื่อแก้ผ่าน API จริง', profile: { bio: null, interests: [], learningGoals: ['เรียนต่อ'] }, avatar_url: null });
+    assert.equal(patched.display_name, 'ชื่อแก้ผ่าน API จริง'); assert.equal(patched.avatar_url, null);
+    assert.deepEqual(patched.profile, { bio: '', interests: [], learningGoals: ['เรียนต่อ'] });
+    assert.equal(JSON.parse((await db.account.findUniqueOrThrow({ where: { id: learnerId } })).profileJson).internalAudit, 'PRIVATE_AUDIT');
+    profilePatchChecks.push('actual-frontend-profile-update-and-canonical-decoder');
+    await db.$disconnect(); await db.$connect(); assert.deepEqual(await ownAuth.me(), patched);
+    profilePatchChecks.push('persistence-reconnect-omission-null-array-semantics');
+    await assert.rejects(ownAuth.updateProfile({ roles: ['admin'] }), error => error instanceof HttpClientError && error.status === 422);
+    profilePatchChecks.push('forged-role422');
+    await assert.rejects((await authApiFor('certificate-guest')).updateProfile({}), error => error instanceof HttpClientError && error.status === 401);
+    profilePatchChecks.push('anonymous401');
+    assert.deepEqual(await attemptRows(), academicBeforePatch); assert.deepEqual(await profileSessions(), sessionsBeforePatch);
+    assert.deepEqual(await db.certificate.findUniqueOrThrow({ where: { id: historicalCertificate.id } }), historicalCertificate);
+    profilePatchChecks.push('credential-session-academic-history-preserved');
+
+    phase = 'frontend-managed-attempt-read';
+    const managedAttemptChecks = [], managedPath = 'instructor/attempts/' + encodeURIComponent(attemptFixtures.graded.id);
+    const beforeManagedRows = await attemptRows(), beforeManagedCounts = await counts();
+    const managed = await ownerResource(managedPath);
+    assert.equal(managed.user_id, learnerId); assert.equal(managed.learner_display_name, patched.display_name);
+    assert.equal(managed.item_id, quizItem.id); assert.equal(managed.max, 10); assert.equal(managed.earned, 8);
+    assert.deepEqual(managed.grades, { historical_question: { score: 8, comment: 'ความคิดเห็นจากผู้สอน' } });
+    assert.equal(JSON.stringify(managed).includes('PRIVATE_'), false);
+    managedAttemptChecks.push('actual-owner-resource-and-management-decoder-historical-snapshot');
+    await assert.rejects(foreignResource(managedPath), error => error instanceof HttpClientError && error.status === 404);
+    managedAttemptChecks.push('enrolled-foreign-instructor404');
+    await assert.rejects(adminResource(managedPath), error => error instanceof HttpClientError && error.status === 401);
+    managedAttemptChecks.push('Admin-session-cannot-grade');
+    await assert.rejects(ownerResource('instructor/attempts/unknown'), error => error instanceof HttpClientError && error.status === 404);
+    managedAttemptChecks.push('unknown404');
+    await db.$disconnect(); await db.$connect(); assert.deepEqual(await ownerResource(managedPath), managed);
+    assert.deepEqual(await attemptRows(), beforeManagedRows); assert.deepEqual(await counts(), beforeManagedCounts);
+    managedAttemptChecks.push('reconnect-no-academic-or-identity-writes');
+
+    phase = 'frontend-code-issue-redeem';
+    const codeCommandChecks = [];
+    const issued = await adminCodes.create(paid.id, 2); assert.equal(issued.length, 2); assert.notEqual(issued[0].code, issued[1].code);
+    for (const item of issued) { const row = await db.redeemCode.findUniqueOrThrow({ where: { id: item.id } });
+      assert.equal(row.issuedBy, adminId); assert.equal(row.usedBy, null); assert.equal(row.status, 'unused'); }
+    codeCommandChecks.push('actual-admin-code-issue-client-and-durable-audit');
+    const redeemed = await ownPayments.redeem(issued[0].code);
+    assert.equal(redeemed.already_enrolled, true); assert.equal(redeemed.enrollment.id, grant.enrollment.id);
+    assert.equal((await db.redeemCode.findUniqueOrThrow({ where: { id: issued[0].id } })).status, 'unused');
+    codeCommandChecks.push('already-enrolled-preserves-new-code-and-original-source');
+    phase = 'frontend-fresh-public-redeem';
+    const freshPaid = await db.course.create({ data: { slug: tag + '_paid_public_redeem', title: tag, category: 'test', level: 'test',
+      instructorId: accountId, status: 'published', publishedAt: new Date(), priceMinor: 12000 } });
+    const freshCodes = await adminCodes.create(freshPaid.id, 1), publicGrant = await ownPayments.redeem(freshCodes[0].code);
+    assert.equal(publicGrant.already_enrolled, false); assert.equal(publicGrant.enrollment.source, 'redeem');
+    assert.equal((await db.redeemCode.findUniqueOrThrow({ where: { id: freshCodes[0].id } })).enrollmentId, publicGrant.enrollment.id);
+    codeCommandChecks.push('actual-web-redeem-client-and-durable-one-use-grant');
+    await assert.rejects(ownPayments.redeem(freshCodes[0].code), error => error instanceof HttpClientError && error.status === 404);
+    codeCommandChecks.push('used-code404');
+    await assert.rejects(wrongAppCodes.create(freshPaid.id, 1), error => error instanceof HttpClientError && error.status === 403);
+    await assert.rejects(anonymousCodes.create(freshPaid.id, 1), error => error instanceof HttpClientError && error.status === 401);
+    codeCommandChecks.push('wrong-namespace-and-anonymous-issue-denied');
+    await db.course.update({ where: { id: freshPaid.id }, data: { priceMinor: null } });
+    await assert.rejects(adminCodes.create(freshPaid.id, 1), error => error instanceof HttpClientError && error.status === 409);
+    codeCommandChecks.push('free-course-issue409');
+    await db.$disconnect(); await db.$connect();
+    assert.equal((await db.enrollment.findUniqueOrThrow({ where: { id: publicGrant.enrollment.id } })).accountId, learnerId);
+    assert.equal(await db.payment.count({ where: { courseId: freshPaid.id } }), 0);
+    codeCommandChecks.push('reconnect-no-synthetic-payment');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -783,6 +850,9 @@ async function main() {
       boundedCanonicalProfileAndMethods: true, noReadWrites: true, sessionFixture: true,
       userCreationGate: false, directoryQueryGate: false, loginProviderGate: false,
       browserAcceptance: false, fullFeatureGate: false };
+    result.selfProfilePatch = { checks: profilePatchChecks.length, checkNames: profilePatchChecks, actualNestAndPostgres: true, browserAcceptance: false };
+    result.managedAttemptRead = { checks: managedAttemptChecks.length, checkNames: managedAttemptChecks, actualNestAndPostgres: true, browserAcceptance: false };
+    result.codeCommands = { checks: codeCommandChecks.length, checkNames: codeCommandChecks, actualNestAndPostgres: true, browserAcceptance: false };
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {

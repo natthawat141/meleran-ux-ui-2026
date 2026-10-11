@@ -1,6 +1,6 @@
 # CATALOG-01 — Public course list/detail
 
-Status: **NEEDS_DECISION** · Priority: P0 · Module: courses
+Status: **PENDING** · Priority: P0 · Module: courses
 
 ต้องปิด D16; D02 constraints/profile semantics confirmed แล้ว
 

@@ -1,6 +1,6 @@
 # AUTH-01 — Local Username login/logout
 
-Status: **NEEDS_DECISION** · Priority: P0 · Module: auth
+Status: **PENDING** · Priority: P0 · Module: auth
 
 ต้องปิด D01, D03; D02 constraints/profile semantics confirmed แล้ว
 

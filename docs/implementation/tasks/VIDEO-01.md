@@ -1,6 +1,6 @@
 # VIDEO-01 — Unavailable video upload contract
 
-Status: **BLOCKED** · Priority: P1 · Module: courses
+Status: **PENDING** · Priority: P1 · Module: courses
 
 รอ dependencies: FOUNDATION-01, AUTH-01
 

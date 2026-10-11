@@ -16,7 +16,7 @@
   },
   "verified": {
     "foundation_tests": 49,
-    "database_tests": 350,
+    "database_tests": 384,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
@@ -24,7 +24,7 @@
     "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 34,
+    "feature_component_unit_tests": 44,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
@@ -43,7 +43,7 @@
     "learning_read_http_postgres_tests": 13,
     "frontend_learning_read_client_checks": 11,
     "resume_writer_postgres_tests": 8,
-    "redeem_transaction_postgres_tests": 21,
+    "redeem_transaction_postgres_tests": 35,
     "frontend_admin_revoke_client_checks": 7,
     "video_unavailable_http_postgres_tests": 14,
     "frontend_video_unavailable_transport_checks": 6,
@@ -53,12 +53,12 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 124,
+    "frontend_client_checks_total": 141,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
     "frontend_ai_rename_client_checks": 7,
-    "self_profile_http_postgres_tests": 14,
+    "self_profile_http_postgres_tests": 24,
     "frontend_self_profile_client_checks": 8,
     "logout_http_postgres_tests": 14,
     "own_payment_read_http_postgres_tests": 16,
@@ -78,7 +78,28 @@
     "local_password_unit_tests": 6,
     "frontend_local_tests": 172,
     "frontend_contract_check": "PASS_DRAFT_2",
-    "frontend_local_typecheck": "PASS_WEB_ADMIN_PACKAGES"
+    "frontend_local_typecheck": "PASS_WEB_ADMIN_PACKAGES",
+    "self_profile_patch_http_postgres_tests": 10,
+    "managed_attempt_http_postgres_tests": 10,
+    "frontend_self_profile_patch_client_checks": 5,
+    "frontend_managed_attempt_client_checks": 5,
+    "frontend_code_command_client_checks": 7,
+    "current_checkpoint": {
+      "local_status": "PASS",
+      "foundation_tests": 49,
+      "database_tests": 384,
+      "feature_component_unit_tests": 44,
+      "total_tests": 477,
+      "frontend_client_checks": 141,
+      "typecheck": "PASS",
+      "nest_build": "PASS",
+      "runtime_smoke": "PASS",
+      "blueprint_and_continuation": "PASS",
+      "frontend_contract": "PASS_DRAFT_2",
+      "schema_delta": false,
+      "provider_design": "DELIVERED_PROPOSED_DELTA",
+      "browser_acceptance": false
+    }
   },
   "environment": {
     "staging": false,
@@ -141,7 +162,7 @@
       "id": "AUTH-01",
       "module": "auth",
       "priority": "P0",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-BASE-01",
         "PROVIDER-AUTH-01"
@@ -176,39 +197,57 @@
           "verified_sha": "df236a23fe9a54abf194df1224bb4ae8739c0d8b",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38092340554"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "AUTH-02",
       "module": "auth",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "PROVIDER-AUTH-01"
       ],
       "decision_ids": [
         "D03"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "AUTH-03",
       "module": "auth",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "PROVIDER-AUTH-01"
       ],
       "decision_ids": [
         "D03"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "ACCOUNT-01",
       "module": "accounts",
       "priority": "P0",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01"
       ],
@@ -233,22 +272,49 @@
           ],
           "evidence": "Accounts caller transaction -> Auth public bound self identity projection; exact CurrentUser, nullable identity, normalized roles, linked-method metadata without sensitive selects, profile whitelist/no defaults or read repair. Post-guard disable, actual SQL safe500, real identity-edit lock wait and reconnect/parallel no writes tested.",
           "remaining": [
-            "PATCH/D02 username/null/array semantics",
-            "D09 image protocol",
-            "Complete Auth D01/D03 and actual Firebase/Email providers",
-            "Authenticated browser G-AUTH and A03/A09"
+            "D09 actual image upload feature gate",
+            "Auth/provider and authenticated browser G-AUTH/A03/A09"
           ],
           "full_acceptance": false,
           "verified_sha": "d3230b4e4013a6df135ec2a802065e91fa9bd64c",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38090915871"
+        },
+        {
+          "task": "ACCOUNT-01",
+          "id": "self_profile_patch",
+          "method": "PATCH",
+          "path": "/me",
+          "operationId": "patch_me",
+          "http_postgres_tests": 10,
+          "frontend_client_checks": 5,
+          "handler_file": "backend/src/features/accounts/accounts.controller.ts",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/isolated PostgreSQL targeted tests and unchanged Frontend client/decoder integration; full regression checkpoint recorded separately.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01",
+            "DB-02",
+            "AUTH-BASE-01 fresh principal"
+          ],
+          "remaining": [
+            "Full authenticated browser/provider feature gates"
+          ]
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "MGMT-01",
       "module": "management",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "ACCOUNT-01"
@@ -282,13 +348,19 @@
           "verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "MGMT-02",
       "module": "management",
       "priority": "P2",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "MGMT-01"
@@ -319,13 +391,19 @@
           "verified_sha": "fc622a25b1f4a2f52f16b97e0e8f78ac463ddd29",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38094636720"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "MGMT-03",
       "module": "management",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "COURSE-02",
         "ENROLL-01",
@@ -333,13 +411,19 @@
       ],
       "decision_ids": [
         "D16"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "MGMT-04",
       "module": "management",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "MGMT-03",
         "GRADE-01"
@@ -373,25 +457,61 @@
           "full_acceptance": false,
           "verified_sha": "d56acfe409502305427191c3dbf29c447f33e0c7",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38095412874"
+        },
+        {
+          "task": "MGMT-04",
+          "id": "managed_attempt_read",
+          "method": "GET",
+          "path": "/instructor/attempts/{id}",
+          "operationId": "get_instructor_attempts_id",
+          "http_postgres_tests": 10,
+          "frontend_client_checks": 5,
+          "handler_file": "backend/src/features/assessments/managed-attempt-read.controller.ts",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/isolated PostgreSQL targeted tests and unchanged Frontend client/decoder integration; full regression checkpoint recorded separately.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01",
+            "DB-02",
+            "AUTH-BASE-01 fresh principal",
+            "DB-03 historical snapshots"
+          ],
+          "remaining": [
+            "Full authenticated browser/provider feature gates"
+          ]
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "MGMT-05",
       "module": "management",
       "priority": "P2",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "MGMT-04",
         "CERT-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "CATALOG-01",
       "module": "courses",
       "priority": "P0",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "DB-01"
       ],
@@ -416,13 +536,19 @@
             "D16"
           ]
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "CATALOG-02",
       "module": "courses",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "CATALOG-01"
       ],
@@ -452,13 +578,19 @@
             "D16"
           ]
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "ENROLL-01",
       "module": "enrollments",
       "priority": "P0",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "CATALOG-01",
@@ -498,13 +630,19 @@
           "verified_sha": "e28d8abff1bad684f6693ceb12d1e4c79658a18b",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38081191962"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "COURSE-01",
       "module": "courses",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "MGMT-02",
@@ -512,13 +650,19 @@
       ],
       "decision_ids": [
         "D10"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "COURSE-02",
       "module": "courses",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "COURSE-01",
         "DB-03"
@@ -527,13 +671,19 @@
         "D04",
         "D05",
         "D09"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "VIDEO-01",
       "module": "courses",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "FOUNDATION-01",
         "AUTH-01"
@@ -562,35 +712,53 @@
           "verified_sha": "78aee05c5d85828041c83e48b0ca428913e35c34",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38085878574"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "REVIEW-01",
       "module": "courses",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "COURSE-02"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "REVIEW-02",
       "module": "courses",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "REVIEW-01"
       ],
       "decision_ids": [
         "D04"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "LEARN-01",
       "module": "learning",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "ENROLL-01",
         "COURSE-02"
@@ -665,13 +833,19 @@
             "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
           }
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "LEARN-02",
       "module": "learning",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "LEARN-01",
         "COMPLETION-01"
@@ -701,13 +875,19 @@
           "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "ASSESS-01",
       "module": "assessments",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "LEARN-01",
         "DB-03",
@@ -727,13 +907,19 @@
           "http_operation_verified": false,
           "evidence": "Submitted trusted snapshot grades; exact Decimal strict >70; pending -> no pass; per-question bounds; zero maximum not pass. No best-attempt policy D06 chosen, no Progress writes."
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "ASSESS-02",
       "module": "assessments",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "ASSESS-01"
       ],
@@ -768,13 +954,19 @@
           "verified_sha": "5b2e7e6c857d0e2250a78b57a24b572895da8e50",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38093313600"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "GRADE-01",
       "module": "assessments",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "ASSESS-01",
         "COMPLETION-01"
@@ -782,13 +974,19 @@
       "decision_ids": [
         "D06",
         "D10"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "CERT-01",
       "module": "certificates",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "COMPLETION-01",
         "AUTH-01"
@@ -821,13 +1019,19 @@
           "verified_sha": "5142d752125b7f43b801b4cf4c3f975abefab939",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38086767802"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "PAY-01",
       "module": "payments",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "ENROLL-01",
         "DB-04"
@@ -861,23 +1065,35 @@
           "verified_sha": "df236a23fe9a54abf194df1224bb4ae8739c0d8b",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38092340554"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "PAY-02",
       "module": "payments",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "PAY-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "REDEEM-01",
       "module": "redeem",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "COURSE-01",
         "DB-04",
@@ -906,14 +1122,45 @@
           "frontend_client_checks": 7,
           "verified_sha": "371a0304148910fa87cd5fe6b15cc342f6b4b996",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38084954707"
+        },
+        {
+          "task": "REDEEM-01",
+          "id": "code_issuance",
+          "method": "POST",
+          "path": "/admin/redeem-codes",
+          "operationId": "post_admin_redeem-codes",
+          "http_postgres_tests": 5,
+          "frontend_client_checks": 7,
+          "handler_file": "backend/src/features/redeem/code-commands.controller.ts",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/isolated PostgreSQL targeted tests and unchanged Frontend client/decoder integration; full regression checkpoint recorded separately.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01",
+            "DB-02",
+            "AUTH-BASE-01 fresh principal",
+            "DB-04",
+            "ENROLL-01 central entitlement"
+          ],
+          "remaining": [
+            "Full authenticated browser/provider feature gates"
+          ]
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "REDEEM-02",
       "module": "redeem",
       "priority": "P1",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "REDEEM-01",
         "ENROLL-01"
@@ -934,22 +1181,50 @@
           "evidence": "Caller-owned Course->Code->Entitlement transaction: consume only new grant; preserve existing source/audit/history; same-code and cross-code convergence; rollback and both directions of revoke lock wait.",
           "http_operation_verified": false,
           "remaining": [
-            "Public exact code-input normalization and Course-state mapping",
-            "HTTP fresh eligibility/owner orchestration and 200/201 integration",
-            "Issue/list/Auth/Course prerequisites",
-            "Full G-REDEEM delivered with G-AI"
+            "G-REDEEM/G-AI browser/provider integration remains pending; public orchestration now implemented"
           ],
           "full_acceptance": false,
           "verified_sha": "371a0304148910fa87cd5fe6b15cc342f6b4b996",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38084954707"
+        },
+        {
+          "task": "REDEEM-02",
+          "id": "public_redemption",
+          "method": "POST",
+          "path": "/me/redeem",
+          "operationId": "post_me_redeem",
+          "http_postgres_tests": 9,
+          "frontend_client_checks": 7,
+          "handler_file": "backend/src/features/redeem/code-commands.controller.ts",
+          "state": "COMPONENT_VERIFIED",
+          "protocol_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/isolated PostgreSQL targeted tests and unchanged Frontend client/decoder integration; full regression checkpoint recorded separately.",
+          "component_dependencies": [
+            "FOUNDATION-01",
+            "DB-01",
+            "DB-02",
+            "AUTH-BASE-01 fresh principal",
+            "DB-04",
+            "ENROLL-01 central entitlement"
+          ],
+          "remaining": [
+            "Full authenticated browser/provider feature gates"
+          ]
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "AI-01",
       "module": "ai",
       "priority": "P2",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "COURSE-02",
         "DB-05"
@@ -1022,26 +1297,38 @@
           "verified_sha": "8c07b42ef34fcd8a754f1c089f1e83545098c9a0",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38080093084"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "AI-02",
       "module": "ai",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "DB-05"
       ],
       "decision_ids": [
         "D16"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "AI-05",
       "module": "ai",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AI-02"
       ],
@@ -1075,13 +1362,19 @@
           "verified_sha": "dc2bf7830eceaf214fc0686175926d9a39de2cb4",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089906867"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "AI-03",
       "module": "ai",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AI-01",
         "AI-02",
@@ -1118,13 +1411,19 @@
           "verified_sha": "702b776f8b0399f4627ae3745931cca1f1e6f8fb",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38089235653"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 1,
+        "state": "PARTIAL"
+      }
     },
     {
       "id": "AI-04",
       "module": "ai",
       "priority": "P2",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "AI-03"
       ],
@@ -1157,13 +1456,19 @@
           "verified_sha": "926c1eb5f51accc353415146a86b0b3f787cc6f2",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 1,
+        "implemented_operations": 1,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      }
     },
     {
       "id": "BLOG-01",
       "module": "blog",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "DB-05"
       ],
@@ -1179,13 +1484,19 @@
           "content_doc null/omitted mapping"
         ],
         "reference": "CONTRACT_STORAGE_GAPS.md"
+      },
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 2,
+        "implemented_operations": 0,
+        "state": "PENDING"
       }
     },
     {
       "id": "BLOG-02",
       "module": "blog",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "BLOG-01"
@@ -1193,19 +1504,31 @@
       "decision_ids": [
         "D05",
         "D09"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 4,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "BLOG-03",
       "module": "blog",
       "priority": "P2",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "BLOG-02"
       ],
       "decision_ids": [
         "D11"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 3,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "FOUNDATION-01",
@@ -1213,7 +1536,12 @@
       "priority": "P0",
       "state": "DONE",
       "dependencies": [],
-      "decision_ids": []
+      "decision_ids": [],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-01",
@@ -1249,7 +1577,12 @@
           "verified_sha": "621a27ed079ba1c3290645d84c598e0f9984492b",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38096201158"
         }
-      ]
+      ],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-02",
@@ -1259,7 +1592,12 @@
       "dependencies": [
         "DB-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-03",
@@ -1269,7 +1607,12 @@
       "dependencies": [
         "DB-02"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-04",
@@ -1279,7 +1622,12 @@
       "dependencies": [
         "DB-02"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-05",
@@ -1312,13 +1660,18 @@
           "verified_sha": "926c1eb5f51accc353415146a86b0b3f787cc6f2",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38088612736"
         }
-      ]
+      ],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "COMPLETION-01",
       "module": "enrollments",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "DB-02",
         "DB-03"
@@ -1326,13 +1679,19 @@
       "decision_ids": [
         "D06"
       ],
-      "note": "Task consumes QuizAttempt and best completed proof; across changed max-score selection remains D06, not a new policy."
+      "note": "Task consumes QuizAttempt and best completed proof; across changed max-score selection remains D06, not a new policy.",
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "PROVIDER-AUTH-01",
       "module": "auth",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-BASE-01",
         "DB-06"
@@ -1340,13 +1699,19 @@
       "decision_ids": [
         "D01",
         "D03"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "PROVIDER-STRIPE-01",
       "module": "payments",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "PAY-01"
       ],
@@ -1378,13 +1743,19 @@
           "verified_sha": "26cb18665d1ba04cdb8a41f39babd50189845326",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38078316359"
         }
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "INTEGRATION-01",
       "module": "integration",
       "priority": "P0",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "CATALOG-01"
       ],
@@ -1621,26 +1992,38 @@
           "verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
         }
-      ]
+      ],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "INTEGRATION-02",
       "module": "integration",
       "priority": "P0",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "AUTH-01",
         "ACCOUNT-01",
         "ENROLL-01",
         "INTEGRATION-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "INTEGRATION-03",
       "module": "integration",
       "priority": "P2",
-      "state": "BLOCKED",
+      "state": "PENDING",
       "dependencies": [
         "AI-04",
         "AI-05",
@@ -1658,7 +2041,13 @@
         "REVIEW-02",
         "VIDEO-01"
       ],
-      "decision_ids": []
+      "decision_ids": [],
+      "previous_planning_state": "BLOCKED",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "CI-01",
@@ -1670,7 +2059,12 @@
         "DB-01"
       ],
       "decision_ids": [],
-      "evidence": "Hosted Nest CI 38076634181 success on ea942cb: 49 foundation + 11 feature units + 60 PostgreSQL/HTTP; 6 real frontend-client integration checks. Frontend CI 38076634194: 172 tests, contracts/tokens/boundaries/typecheck/build and both container smoke jobs passed."
+      "evidence": "Hosted Nest CI 38076634181 success on ea942cb: 49 foundation + 11 feature units + 60 PostgreSQL/HTTP; 6 real frontend-client integration checks. Frontend CI 38076634194: 172 tests, contracts/tokens/boundaries/typecheck/build and both container smoke jobs passed.",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "AUTH-BASE-01",
@@ -1776,19 +2170,30 @@
           "verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729"
         }
-      ]
+      ],
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     },
     {
       "id": "DB-06",
       "module": "database",
       "priority": "P1",
-      "state": "NEEDS_DECISION",
+      "state": "PENDING",
       "dependencies": [
         "DB-01"
       ],
       "decision_ids": [
         "D03"
-      ]
+      ],
+      "previous_planning_state": "NEEDS_DECISION",
+      "api_implementation": {
+        "defined_operations": 0,
+        "implemented_operations": 0,
+        "state": "PENDING"
+      }
     }
   ],
   "execution_target": "worktrees/melearn-fullstack/backend",
@@ -1804,7 +2209,8 @@
     "frontend_ci_evidence_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "frontend_ci_evidence_note": "Exact Auth checkpoint: Nest433 tests +124 actual client checks; Frontend172 tests/contracts/tokens/boundaries/typecheck/build and Web/Admin container smoke. No complete Firebase/Login/reset/browser acceptance.",
     "previous_verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
-    "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
+    "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321",
+    "current_checkpoint_ci": "PENDING_NEW_SHA"
   },
   "remaining_decisions": [
     "D01",
@@ -1860,12 +2266,23 @@
       "app_session_owner": "Nest Auth",
       "linking": "explicit; never auto-merge by email",
       "necessary_exchange_link_contract_design_authorized": true,
-      "exchange_link_paths_not_defined_in_this_revision": true
+      "exchange_link_paths_not_defined_in_this_revision": true,
+      "explicit_set_c_evidence": "User confirmed set C and requested contract delta/provider design on 2026-10-11",
+      "verification_reset_proof_owner": "Nest Auth; Scope-defined 24h single use",
+      "delivery_owner": "Resend",
+      "design_document": "FIREBASE_PROVIDER_DESIGN.md",
+      "proposed_delta": "contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json"
     },
     "remaining": "Provider wire/proof/recovery design, production origins and remaining unrelated decisions stay Draft. Approval is not provider/runtime/acceptance evidence."
   },
   "remaining_decision_scopes": {
     "D01": "Transport/CSRF/CORS/origins/throttling review; approved lifetime/logout/reset not reopened",
     "D03": "Provider proof/exchange/link/recovery design and integration; approved ownership direction not reopened"
+  },
+  "continuation_policy": {
+    "scope": "Wave 1–17; prioritize missing independently specified APIs in Wave 1–13",
+    "pending_behavior": "Mark PENDING and skip locally; no idle wait when independent work exists",
+    "user_authorization": "Explicit latest /goal continuation instruction",
+    "solo": true
   }
 }

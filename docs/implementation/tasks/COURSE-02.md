@@ -1,6 +1,6 @@
 # COURSE-02 — Authoring aggregate/preview/submit
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
+Status: **PENDING** · Priority: P1 · Module: courses
 
 ต้องปิด D04, D05, D09; D02 constraints/profile semantics confirmed แล้ว
 

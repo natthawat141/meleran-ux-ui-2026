@@ -1,0 +1,2455 @@
+{
+  "date": "2026-10-11",
+  "contract": {
+    "version": "1.0.0-draft.2",
+    "sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+    "status": "DRAFT",
+    "previous_version": "1.0.0-draft.1",
+    "previous_sha256": "c52e240ed1467df9c4a5af99045292f83814f23b86d64532441d98b64da160c3"
+  },
+  "policy": {
+    "scope": "Wave 1–17; prioritize missing independently specified APIs in Wave 1–13",
+    "pending_behavior": "Mark PENDING and skip locally; no idle wait when independent work exists",
+    "user_authorization": "Explicit latest /goal continuation instruction",
+    "solo": true
+  },
+  "scope": {
+    "tasks": 50,
+    "defined_operations": 86,
+    "deferred_operations": 5,
+    "acceptance_cases": 113,
+    "implemented_operations": 25,
+    "full_accepted_cases": 0
+  },
+  "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
+  "operations": [
+    {
+      "method": "POST",
+      "path": "/auth/register",
+      "operationId": "post_auth_register",
+      "task_id": "AUTH-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A14",
+        "A15",
+        "A17",
+        "A18",
+        "A19",
+        "A20"
+      ],
+      "remaining": "Unresolved behavior: D03; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AUTH-02.md",
+        "contracts/AUTH-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/verify-email",
+      "operationId": "post_auth_verify-email",
+      "task_id": "AUTH-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A14",
+        "A15",
+        "A17",
+        "A18",
+        "A19",
+        "A20"
+      ],
+      "remaining": "Unresolved behavior: D03; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AUTH-02.md",
+        "contracts/AUTH-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/resend-verification-email",
+      "operationId": "post_auth_resend-verification-email",
+      "task_id": "AUTH-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A14",
+        "A15",
+        "A17",
+        "A18",
+        "A19",
+        "A20"
+      ],
+      "remaining": "Unresolved behavior: D03; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AUTH-02.md",
+        "contracts/AUTH-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "operationId": "post_auth_login",
+      "task_id": "AUTH-01",
+      "wave": 5,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-BASE-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A07",
+        "A11",
+        "A15",
+        "C12"
+      ],
+      "remaining": "Unresolved behavior: D01, D02, D03; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AUTH-01.md",
+        "contracts/AUTH-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/password-reset/request",
+      "operationId": "post_auth_password-reset_request",
+      "task_id": "AUTH-03",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A11",
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "remaining": "Unresolved behavior: D03; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AUTH-03.md",
+        "contracts/AUTH-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/password-reset/confirm",
+      "operationId": "post_auth_password-reset_confirm",
+      "task_id": "AUTH-03",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A11",
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "remaining": "Unresolved behavior: D03; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AUTH-03.md",
+        "contracts/AUTH-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "operationId": "post_auth_logout",
+      "task_id": "AUTH-01",
+      "wave": 5,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-BASE-01",
+        "PROVIDER-AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A07",
+        "A11",
+        "A15",
+        "C12"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AUTH-01.md",
+        "contracts/AUTH-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "operationId": "get_me",
+      "task_id": "ACCOUNT-01",
+      "wave": 6,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A03",
+        "A09"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/ACCOUNT-01.md",
+        "contracts/ACCOUNT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/me",
+      "operationId": "patch_me",
+      "task_id": "ACCOUNT-01",
+      "wave": 6,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A03",
+        "A09"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/ACCOUNT-01.md",
+        "contracts/ACCOUNT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users",
+      "operationId": "post_admin_users",
+      "task_id": "MGMT-01",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01"
+      ],
+      "acceptance_ids": [
+        "A07",
+        "A08"
+      ],
+      "remaining": "Unresolved behavior: D02, D03, D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-01.md",
+        "contracts/MGMT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users",
+      "operationId": "get_admin_users",
+      "task_id": "MGMT-01",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01"
+      ],
+      "acceptance_ids": [
+        "A07",
+        "A08"
+      ],
+      "remaining": "Unresolved behavior: D02, D03, D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-01.md",
+        "contracts/MGMT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users/{id}/instructor",
+      "operationId": "post_admin_users_id_instructor",
+      "task_id": "MGMT-02",
+      "wave": 8,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-01"
+      ],
+      "acceptance_ids": [
+        "A04"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/MGMT-02.md",
+        "contracts/MGMT-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/instructors",
+      "operationId": "get_admin_instructors",
+      "task_id": "MGMT-02",
+      "wave": 8,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-01"
+      ],
+      "acceptance_ids": [
+        "A04"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/MGMT-02.md",
+        "contracts/MGMT-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses",
+      "operationId": "get_courses",
+      "task_id": "CATALOG-01",
+      "wave": 3,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "DB-01"
+      ],
+      "acceptance_ids": [
+        "C05",
+        "C09",
+        "AI05"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/CATALOG-01.md",
+        "contracts/CATALOG-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}",
+      "operationId": "get_courses_id",
+      "task_id": "CATALOG-01",
+      "wave": 3,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "DB-01"
+      ],
+      "acceptance_ids": [
+        "C05",
+        "C09",
+        "AI05"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/CATALOG-01.md",
+        "contracts/CATALOG-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/courses/{id}",
+      "operationId": "patch_courses_id",
+      "task_id": "COURSE-02",
+      "wave": 10,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-03"
+      ],
+      "acceptance_ids": [
+        "A05",
+        "C01",
+        "C02",
+        "C04",
+        "C07",
+        "C08",
+        "C09",
+        "C10",
+        "C11",
+        "V01",
+        "V03",
+        "E03",
+        "Q08",
+        "F03",
+        "F04",
+        "F05",
+        "F08",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-02.md",
+        "contracts/COURSE-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/enroll",
+      "operationId": "post_courses_id_enroll",
+      "task_id": "ENROLL-01",
+      "wave": 6,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "CATALOG-01",
+        "DB-02"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A02",
+        "A06",
+        "A07",
+        "E01",
+        "E02",
+        "E10"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/ENROLL-01.md",
+        "contracts/ENROLL-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/enrollments",
+      "operationId": "get_me_enrollments",
+      "task_id": "ENROLL-01",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "CATALOG-01",
+        "DB-02"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A02",
+        "A06",
+        "A07",
+        "E01",
+        "E02",
+        "E10"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/ENROLL-01.md",
+        "contracts/ENROLL-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/learn/courses/{id}",
+      "operationId": "get_learn_courses_id",
+      "task_id": "LEARN-01",
+      "wave": 11,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "ENROLL-01",
+        "COURSE-02"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A06",
+        "A09",
+        "C08",
+        "V01",
+        "V03",
+        "Q02",
+        "Q12",
+        "F03",
+        "AI05"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/LEARN-01.md",
+        "contracts/LEARN-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/learn/courses/{id}/items/{item_id}",
+      "operationId": "get_learn_courses_id_items_item_id",
+      "task_id": "LEARN-01",
+      "wave": 11,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "ENROLL-01",
+        "COURSE-02"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A06",
+        "A09",
+        "C08",
+        "V01",
+        "V03",
+        "Q02",
+        "Q12",
+        "F03",
+        "AI05"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/LEARN-01.md",
+        "contracts/LEARN-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/progress",
+      "operationId": "get_me_progress",
+      "task_id": "LEARN-01",
+      "wave": 11,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "ENROLL-01",
+        "COURSE-02"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A06",
+        "A09",
+        "C08",
+        "V01",
+        "V03",
+        "Q02",
+        "Q12",
+        "F03",
+        "AI05"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/LEARN-01.md",
+        "contracts/LEARN-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/learn/items/{id}/complete",
+      "operationId": "post_learn_items_id_complete",
+      "task_id": "LEARN-02",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "LEARN-01",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "V03",
+        "Q01",
+        "Q02",
+        "Q04",
+        "Q12",
+        "F03",
+        "F05"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/LEARN-02.md",
+        "contracts/LEARN-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/learn/items/{id}/resume",
+      "operationId": "put_learn_items_id_resume",
+      "task_id": "LEARN-02",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "LEARN-01",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "V03",
+        "Q01",
+        "Q02",
+        "Q04",
+        "Q12",
+        "F03",
+        "F05"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/LEARN-02.md",
+        "contracts/LEARN-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/learn/items/{id}/attempts",
+      "operationId": "post_learn_items_id_attempts",
+      "task_id": "ASSESS-01",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "LEARN-01",
+        "DB-03",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "Q03",
+        "Q04",
+        "Q05",
+        "Q06",
+        "Q07",
+        "Q08",
+        "Q09",
+        "Q10"
+      ],
+      "remaining": "Unresolved behavior: D06, D09, D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/ASSESS-01.md",
+        "contracts/ASSESS-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/learn/attempts/{id}/answers",
+      "operationId": "put_learn_attempts_id_answers",
+      "task_id": "ASSESS-01",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "LEARN-01",
+        "DB-03",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "Q03",
+        "Q04",
+        "Q05",
+        "Q06",
+        "Q07",
+        "Q08",
+        "Q09",
+        "Q10"
+      ],
+      "remaining": "Unresolved behavior: D06, D09, D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/ASSESS-01.md",
+        "contracts/ASSESS-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/learn/attempts/{id}/submit",
+      "operationId": "post_learn_attempts_id_submit",
+      "task_id": "ASSESS-01",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "LEARN-01",
+        "DB-03",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "Q03",
+        "Q04",
+        "Q05",
+        "Q06",
+        "Q07",
+        "Q08",
+        "Q09",
+        "Q10"
+      ],
+      "remaining": "Unresolved behavior: D06, D09, D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/ASSESS-01.md",
+        "contracts/ASSESS-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/learn/attempts/{id}",
+      "operationId": "get_learn_attempts_id",
+      "task_id": "ASSESS-02",
+      "wave": 13,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "ASSESS-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "A09",
+        "Q06",
+        "Q07",
+        "AI21"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/ASSESS-02.md",
+        "contracts/ASSESS-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/learn/items/{id}/results",
+      "operationId": "get_learn_items_id_results",
+      "task_id": "ASSESS-02",
+      "wave": 13,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "ASSESS-01"
+      ],
+      "acceptance_ids": [
+        "A06",
+        "A09",
+        "Q06",
+        "Q07",
+        "AI21"
+      ],
+      "remaining": "Unresolved behavior: D06; approved subsets are not reopened",
+      "read_set": [
+        "tasks/ASSESS-02.md",
+        "contracts/ASSESS-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/grading-queue",
+      "operationId": "get_instructor_grading-queue",
+      "task_id": "GRADE-01",
+      "wave": 13,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "ASSESS-01",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A05",
+        "E03",
+        "Q04",
+        "Q05",
+        "Q06",
+        "Q07",
+        "Q11"
+      ],
+      "remaining": "Unresolved behavior: D06, D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/GRADE-01.md",
+        "contracts/GRADE-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/instructor/attempts/{id}/questions/{question_id}/grade",
+      "operationId": "put_instructor_attempts_id_questions_question_id_grade",
+      "task_id": "GRADE-01",
+      "wave": 13,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "ASSESS-01",
+        "COMPLETION-01"
+      ],
+      "acceptance_ids": [
+        "A05",
+        "E03",
+        "Q04",
+        "Q05",
+        "Q06",
+        "Q07",
+        "Q11"
+      ],
+      "remaining": "Unresolved behavior: D06, D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/GRADE-01.md",
+        "contracts/GRADE-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/certificates",
+      "operationId": "get_me_certificates",
+      "task_id": "CERT-01",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COMPLETION-01",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A09",
+        "Q05",
+        "F01",
+        "F02",
+        "F04",
+        "F06",
+        "F07",
+        "F08"
+      ],
+      "remaining": "Unresolved behavior: D07; approved subsets are not reopened",
+      "read_set": [
+        "tasks/CERT-01.md",
+        "contracts/CERT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/certificates/{id}",
+      "operationId": "get_me_certificates_id",
+      "task_id": "CERT-01",
+      "wave": 6,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "COMPLETION-01",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A09",
+        "Q05",
+        "F01",
+        "F02",
+        "F04",
+        "F06",
+        "F07",
+        "F08"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/CERT-01.md",
+        "contracts/CERT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/certificates/{id}/download",
+      "operationId": "get_me_certificates_id_download",
+      "task_id": "CERT-01",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COMPLETION-01",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "A09",
+        "Q05",
+        "F01",
+        "F02",
+        "F04",
+        "F06",
+        "F07",
+        "F08"
+      ],
+      "remaining": "Unresolved behavior: D07; approved subsets are not reopened",
+      "read_set": [
+        "tasks/CERT-01.md",
+        "contracts/CERT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/instructor/courses",
+      "operationId": "post_instructor_courses",
+      "task_id": "COURSE-01",
+      "wave": 9,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-02",
+        "DB-02"
+      ],
+      "acceptance_ids": [
+        "C01",
+        "C02"
+      ],
+      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-01.md",
+        "contracts/COURSE-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/courses",
+      "operationId": "get_instructor_courses",
+      "task_id": "COURSE-01",
+      "wave": 9,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-02",
+        "DB-02"
+      ],
+      "acceptance_ids": [
+        "C01",
+        "C02"
+      ],
+      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-01.md",
+        "contracts/COURSE-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/courses",
+      "operationId": "post_admin_courses",
+      "task_id": "COURSE-01",
+      "wave": 9,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-02",
+        "DB-02"
+      ],
+      "acceptance_ids": [
+        "C01",
+        "C02"
+      ],
+      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-01.md",
+        "contracts/COURSE-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/courses",
+      "operationId": "get_admin_courses",
+      "task_id": "COURSE-01",
+      "wave": 9,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "MGMT-02",
+        "DB-02"
+      ],
+      "acceptance_ids": [
+        "C01",
+        "C02"
+      ],
+      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-01.md",
+        "contracts/COURSE-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}/authoring",
+      "operationId": "get_courses_id_authoring",
+      "task_id": "COURSE-02",
+      "wave": 10,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-03"
+      ],
+      "acceptance_ids": [
+        "A05",
+        "C01",
+        "C02",
+        "C04",
+        "C07",
+        "C08",
+        "C09",
+        "C10",
+        "C11",
+        "V01",
+        "V03",
+        "E03",
+        "Q08",
+        "F03",
+        "F04",
+        "F05",
+        "F08",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-02.md",
+        "contracts/COURSE-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/videos/uploads",
+      "operationId": "post_courses_id_videos_uploads",
+      "task_id": "VIDEO-01",
+      "wave": 6,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "FOUNDATION-01",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "V02"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/VIDEO-01.md",
+        "contracts/VIDEO-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}/authoring-preview",
+      "operationId": "get_courses_id_authoring-preview",
+      "task_id": "COURSE-02",
+      "wave": 10,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-03"
+      ],
+      "acceptance_ids": [
+        "A05",
+        "C01",
+        "C02",
+        "C04",
+        "C07",
+        "C08",
+        "C09",
+        "C10",
+        "C11",
+        "V01",
+        "V03",
+        "E03",
+        "Q08",
+        "F03",
+        "F04",
+        "F05",
+        "F08",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-02.md",
+        "contracts/COURSE-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/submit-review",
+      "operationId": "post_courses_id_submit-review",
+      "task_id": "COURSE-02",
+      "wave": 10,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-03"
+      ],
+      "acceptance_ids": [
+        "A05",
+        "C01",
+        "C02",
+        "C04",
+        "C07",
+        "C08",
+        "C09",
+        "C10",
+        "C11",
+        "V01",
+        "V03",
+        "E03",
+        "Q08",
+        "F03",
+        "F04",
+        "F05",
+        "F08",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/COURSE-02.md",
+        "contracts/COURSE-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/course-reviews",
+      "operationId": "get_admin_course-reviews",
+      "task_id": "REVIEW-01",
+      "wave": 11,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02"
+      ],
+      "acceptance_ids": [
+        "C04",
+        "C12"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/REVIEW-01.md",
+        "contracts/REVIEW-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/course-reviews/{id}",
+      "operationId": "get_admin_course-reviews_id",
+      "task_id": "REVIEW-01",
+      "wave": 11,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02"
+      ],
+      "acceptance_ids": [
+        "C04",
+        "C12"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/REVIEW-01.md",
+        "contracts/REVIEW-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/course-reviews/{id}/approve",
+      "operationId": "post_admin_course-reviews_id_approve",
+      "task_id": "REVIEW-02",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "REVIEW-01"
+      ],
+      "acceptance_ids": [
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "C11"
+      ],
+      "remaining": "Unresolved behavior: D04; approved subsets are not reopened",
+      "read_set": [
+        "tasks/REVIEW-02.md",
+        "contracts/REVIEW-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/course-reviews/{id}/return",
+      "operationId": "post_admin_course-reviews_id_return",
+      "task_id": "REVIEW-02",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "REVIEW-01"
+      ],
+      "acceptance_ids": [
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "C11"
+      ],
+      "remaining": "Unresolved behavior: D04; approved subsets are not reopened",
+      "read_set": [
+        "tasks/REVIEW-02.md",
+        "contracts/REVIEW-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/courses/{id}/publish",
+      "operationId": "post_courses_id_publish",
+      "task_id": "REVIEW-02",
+      "wave": 12,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "REVIEW-01"
+      ],
+      "acceptance_ids": [
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "C11"
+      ],
+      "remaining": "Unresolved behavior: D04; approved subsets are not reopened",
+      "read_set": [
+        "tasks/REVIEW-02.md",
+        "contracts/REVIEW-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/me/payments/checkout",
+      "operationId": "post_me_payments_checkout",
+      "task_id": "PAY-01",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "ENROLL-01",
+        "DB-04"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "remaining": "Unresolved behavior: D08, D10; approved subsets are not reopened",
+      "read_set": [
+        "tasks/PAY-01.md",
+        "contracts/PAY-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/payments/{id}",
+      "operationId": "get_me_payments_id",
+      "task_id": "PAY-01",
+      "wave": 7,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "ENROLL-01",
+        "DB-04"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/PAY-01.md",
+        "contracts/PAY-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/payments/{id}",
+      "operationId": "get_admin_payments_id",
+      "task_id": "PAY-02",
+      "wave": 8,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "PAY-01"
+      ],
+      "acceptance_ids": [
+        "P03"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/PAY-02.md",
+        "contracts/PAY-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/me/redeem",
+      "operationId": "post_me_redeem",
+      "task_id": "REDEEM-02",
+      "wave": 11,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "REDEEM-01",
+        "ENROLL-01"
+      ],
+      "acceptance_ids": [
+        "A01",
+        "A07",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E09",
+        "E10",
+        "E11",
+        "E12",
+        "E13",
+        "P08",
+        "P12"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/REDEEM-02.md",
+        "contracts/REDEEM-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/redeem-codes",
+      "operationId": "post_admin_redeem-codes",
+      "task_id": "REDEEM-01",
+      "wave": 10,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-04",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "E05",
+        "E11",
+        "E12",
+        "E13"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/REDEEM-01.md",
+        "contracts/REDEEM-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/redeem-codes",
+      "operationId": "get_admin_redeem-codes",
+      "task_id": "REDEEM-01",
+      "wave": 10,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-04",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "E05",
+        "E11",
+        "E12",
+        "E13"
+      ],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/REDEEM-01.md",
+        "contracts/REDEEM-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/redeem-codes/{id}/revoke",
+      "operationId": "post_admin_redeem-codes_id_revoke",
+      "task_id": "REDEEM-01",
+      "wave": 10,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-01",
+        "DB-04",
+        "AUTH-01"
+      ],
+      "acceptance_ids": [
+        "E05",
+        "E11",
+        "E12",
+        "E13"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/REDEEM-01.md",
+        "contracts/REDEEM-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/courses/{id}/ai-support",
+      "operationId": "patch_admin_courses_id_ai-support",
+      "task_id": "AI-01",
+      "wave": 11,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "AI01",
+        "AI02",
+        "AI03",
+        "AI04",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AI-01.md",
+        "contracts/AI-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+      "operationId": "get_admin_courses_id_videos_itemId_ai-transcript",
+      "task_id": "AI-01",
+      "wave": 11,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "AI01",
+        "AI02",
+        "AI03",
+        "AI04",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AI-01.md",
+        "contracts/AI-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/courses/{id}/videos/{itemId}/ai-transcript",
+      "operationId": "put_admin_courses_id_videos_itemId_ai-transcript",
+      "task_id": "AI-01",
+      "wave": 11,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "AI01",
+        "AI02",
+        "AI03",
+        "AI04",
+        "AI05",
+        "AI09",
+        "AI10"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AI-01.md",
+        "contracts/AI-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/me/ai/conversations",
+      "operationId": "post_me_ai_conversations",
+      "task_id": "AI-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "AI11",
+        "AI12",
+        "AI15",
+        "AI23"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AI-02.md",
+        "contracts/AI-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/ai/conversations",
+      "operationId": "get_me_ai_conversations",
+      "task_id": "AI-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "AI11",
+        "AI12",
+        "AI15",
+        "AI23"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AI-02.md",
+        "contracts/AI-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/ai/conversations/{id}/messages",
+      "operationId": "get_me_ai_conversations_id_messages",
+      "task_id": "AI-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "AI11",
+        "AI12",
+        "AI15",
+        "AI23"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AI-02.md",
+        "contracts/AI-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/me/ai/conversations/{id}/messages",
+      "operationId": "post_me_ai_conversations_id_messages",
+      "task_id": "AI-03",
+      "wave": 14,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AI-01",
+        "AI-02",
+        "ENROLL-01",
+        "DB-05",
+        "ASSESS-02"
+      ],
+      "acceptance_ids": [
+        "AI06",
+        "AI07",
+        "AI08",
+        "AI11",
+        "AI13",
+        "AI14",
+        "AI15",
+        "AI16",
+        "AI17",
+        "AI18",
+        "AI19",
+        "AI20",
+        "AI21",
+        "AI22",
+        "AI23",
+        "AI24",
+        "AI25",
+        "AI26",
+        "AI27",
+        "AI28",
+        "AI29"
+      ],
+      "remaining": "Unresolved behavior: D12; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AI-03.md",
+        "contracts/AI-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/me/ai/conversations/{id}",
+      "operationId": "patch_me_ai_conversations_id",
+      "task_id": "AI-05",
+      "wave": 7,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AI-02"
+      ],
+      "acceptance_ids": [
+        "AI13",
+        "AI14",
+        "AI15"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AI-05.md",
+        "contracts/AI-05.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/me/ai/conversations/{id}",
+      "operationId": "delete_me_ai_conversations_id",
+      "task_id": "AI-05",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AI-02"
+      ],
+      "acceptance_ids": [
+        "AI13",
+        "AI14",
+        "AI15"
+      ],
+      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "read_set": [
+        "tasks/AI-05.md",
+        "contracts/AI-05.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/me/ai/usage",
+      "operationId": "get_me_ai_usage",
+      "task_id": "AI-03",
+      "wave": 14,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AI-01",
+        "AI-02",
+        "ENROLL-01",
+        "DB-05",
+        "ASSESS-02"
+      ],
+      "acceptance_ids": [
+        "AI06",
+        "AI07",
+        "AI08",
+        "AI11",
+        "AI13",
+        "AI14",
+        "AI15",
+        "AI16",
+        "AI17",
+        "AI18",
+        "AI19",
+        "AI20",
+        "AI21",
+        "AI22",
+        "AI23",
+        "AI24",
+        "AI25",
+        "AI26",
+        "AI27",
+        "AI28",
+        "AI29"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AI-03.md",
+        "contracts/AI-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/me/ai/conversations/{id}/messages/{messageId}/practice/answers",
+      "operationId": "put_me_ai_conversations_id_messages_messageId_practice_answers",
+      "task_id": "AI-04",
+      "wave": 15,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AI-03"
+      ],
+      "acceptance_ids": [
+        "AI22",
+        "AI24",
+        "AI25",
+        "AI26",
+        "AI27",
+        "AI28",
+        "AI29"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/AI-04.md",
+        "contracts/AI-04.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/blog/{id}",
+      "operationId": "delete_admin_blog_id",
+      "task_id": "BLOG-03",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "BLOG-02"
+      ],
+      "acceptance_ids": [
+        "B02",
+        "B03"
+      ],
+      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-03.md",
+        "contracts/BLOG-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/blog/{id}",
+      "operationId": "patch_admin_blog_id",
+      "task_id": "BLOG-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "BLOG-01"
+      ],
+      "acceptance_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04"
+      ],
+      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-02.md",
+        "contracts/BLOG-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/blog/{id}/unpublish",
+      "operationId": "post_admin_blog_id_unpublish",
+      "task_id": "BLOG-03",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "BLOG-02"
+      ],
+      "acceptance_ids": [
+        "B02",
+        "B03"
+      ],
+      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-03.md",
+        "contracts/BLOG-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/blog",
+      "operationId": "get_blog",
+      "task_id": "BLOG-01",
+      "wave": 4,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "B01",
+        "B02",
+        "B04"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-01.md",
+        "contracts/BLOG-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/blog/{slug}",
+      "operationId": "get_blog_slug",
+      "task_id": "BLOG-01",
+      "wave": 4,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "DB-05"
+      ],
+      "acceptance_ids": [
+        "B01",
+        "B02",
+        "B04"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-01.md",
+        "contracts/BLOG-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/blog",
+      "operationId": "get_admin_blog",
+      "task_id": "BLOG-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "BLOG-01"
+      ],
+      "acceptance_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04"
+      ],
+      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-02.md",
+        "contracts/BLOG-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/blog",
+      "operationId": "post_admin_blog",
+      "task_id": "BLOG-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "BLOG-01"
+      ],
+      "acceptance_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04"
+      ],
+      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-02.md",
+        "contracts/BLOG-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/blog/{id}/preview",
+      "operationId": "get_admin_blog_id_preview",
+      "task_id": "BLOG-02",
+      "wave": 6,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "BLOG-01"
+      ],
+      "acceptance_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04"
+      ],
+      "remaining": "Unresolved behavior: D05, D09; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-02.md",
+        "contracts/BLOG-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/admin/blog/{id}/publish",
+      "operationId": "post_admin_blog_id_publish",
+      "task_id": "BLOG-03",
+      "wave": 7,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "BLOG-02"
+      ],
+      "acceptance_ids": [
+        "B02",
+        "B03"
+      ],
+      "remaining": "Unresolved behavior: D11; approved subsets are not reopened",
+      "read_set": [
+        "tasks/BLOG-03.md",
+        "contracts/BLOG-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/{id}",
+      "operationId": "get_admin_users_id",
+      "task_id": "MGMT-01",
+      "wave": 7,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "AUTH-01",
+        "ACCOUNT-01"
+      ],
+      "acceptance_ids": [
+        "A07",
+        "A08"
+      ],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/MGMT-01.md",
+        "contracts/MGMT-01.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/{id}/enrollments",
+      "operationId": "get_admin_users_id_enrollments",
+      "task_id": "MGMT-03",
+      "wave": 14,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "ENROLL-01",
+        "ASSESS-02"
+      ],
+      "acceptance_ids": [
+        "A05"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-03.md",
+        "contracts/MGMT-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users/{id}/attempts",
+      "operationId": "get_admin_users_id_attempts",
+      "task_id": "MGMT-03",
+      "wave": 14,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "ENROLL-01",
+        "ASSESS-02"
+      ],
+      "acceptance_ids": [
+        "A05"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-03.md",
+        "contracts/MGMT-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}/learners",
+      "operationId": "get_courses_id_learners",
+      "task_id": "MGMT-03",
+      "wave": 14,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "ENROLL-01",
+        "ASSESS-02"
+      ],
+      "acceptance_ids": [
+        "A05"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-03.md",
+        "contracts/MGMT-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/courses/{id}/attempts",
+      "operationId": "get_courses_id_attempts",
+      "task_id": "MGMT-03",
+      "wave": 14,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "COURSE-02",
+        "ENROLL-01",
+        "ASSESS-02"
+      ],
+      "acceptance_ids": [
+        "A05"
+      ],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-03.md",
+        "contracts/MGMT-03.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/learners",
+      "operationId": "get_instructor_learners",
+      "task_id": "MGMT-04",
+      "wave": 15,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "MGMT-03",
+        "GRADE-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-04.md",
+        "contracts/MGMT-04.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/learners",
+      "operationId": "get_admin_learners",
+      "task_id": "MGMT-04",
+      "wave": 15,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "MGMT-03",
+        "GRADE-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/MGMT-04.md",
+        "contracts/MGMT-04.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/managed-quizzes/{id}",
+      "operationId": "get_managed-quizzes_id",
+      "task_id": "MGMT-04",
+      "wave": 15,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "MGMT-03",
+        "GRADE-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/MGMT-04.md",
+        "contracts/MGMT-04.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/attempts/{id}",
+      "operationId": "get_instructor_attempts_id",
+      "task_id": "MGMT-04",
+      "wave": 15,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "MGMT-03",
+        "GRADE-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/MGMT-04.md",
+        "contracts/MGMT-04.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/admin/summary",
+      "operationId": "get_admin_summary",
+      "task_id": "MGMT-05",
+      "wave": 16,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "MGMT-04",
+        "CERT-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/MGMT-05.md",
+        "contracts/MGMT-05.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructor/summary",
+      "operationId": "get_instructor_summary",
+      "task_id": "MGMT-05",
+      "wave": 16,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "MGMT-04",
+        "CERT-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "read_set": [
+        "tasks/MGMT-05.md",
+        "contracts/MGMT-05.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructors/{id}/courses",
+      "operationId": "get_instructors_id_courses",
+      "task_id": "CATALOG-02",
+      "wave": 4,
+      "state": "PENDING",
+      "full_acceptance": false,
+      "dependencies": [
+        "CATALOG-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Unresolved behavior: D16; approved subsets are not reopened",
+      "read_set": [
+        "tasks/CATALOG-02.md",
+        "contracts/CATALOG-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/instructors/{id}",
+      "operationId": "get_instructors_id",
+      "task_id": "CATALOG-02",
+      "wave": 4,
+      "state": "IMPLEMENTED",
+      "full_acceptance": false,
+      "dependencies": [
+        "CATALOG-01"
+      ],
+      "acceptance_ids": [],
+      "remaining": "Feature/browser/provider gate remains separate",
+      "read_set": [
+        "tasks/CATALOG-02.md",
+        "contracts/CATALOG-02.openapi.json",
+        "DECISIONS.md"
+      ]
+    }
+  ],
+  "deferred_operations": [
+    {
+      "deferred_id": "DEFERRED-01",
+      "method": "GET",
+      "path": "/auth/google/start",
+      "state": "PENDING",
+      "reason": "Approved set C design delivered; canonical activation/provider verification pending"
+    },
+    {
+      "deferred_id": "DEFERRED-02",
+      "method": "GET",
+      "path": "/auth/google/callback",
+      "state": "PENDING",
+      "reason": "Approved set C design delivered; canonical activation/provider verification pending"
+    },
+    {
+      "deferred_id": "DEFERRED-03",
+      "method": "POST",
+      "path": "/me/auth-identities/google",
+      "state": "PENDING",
+      "reason": "Approved set C design delivered; canonical activation/provider verification pending"
+    },
+    {
+      "deferred_id": "DEFERRED-04",
+      "method": "GET",
+      "path": "/me/auth-identities/google/callback",
+      "state": "PENDING",
+      "reason": "Approved set C design delivered; canonical activation/provider verification pending"
+    },
+    {
+      "deferred_id": "DEFERRED-05",
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "state": "PENDING",
+      "reason": "Receiver component exists; real Stripe provider contract/sandbox gate pending"
+    }
+  ],
+  "next_design_work": [
+    {
+      "task": "DB-06",
+      "work": "Turn approved set C logical proof/binding/reconciliation design into reviewed physical delta; no live migrations"
+    },
+    {
+      "task": "MGMT-05",
+      "work": "Resolve counter definitions from scope/contract; pending distinct learner and pending-grading projection semantics"
+    },
+    {
+      "task": "REDEEM-01",
+      "work": "Masked paginated list after D16 query/cursor decision; issuance and redemption already execute independently"
+    }
+  ],
+  "wave_progress": [
+    {
+      "wave": 1,
+      "defined_operations": 0,
+      "implemented_operations": 0,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 2,
+      "defined_operations": 0,
+      "implemented_operations": 0,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 3,
+      "defined_operations": 2,
+      "implemented_operations": 1,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 4,
+      "defined_operations": 4,
+      "implemented_operations": 1,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 5,
+      "defined_operations": 2,
+      "implemented_operations": 1,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 6,
+      "defined_operations": 20,
+      "implemented_operations": 5,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 7,
+      "defined_operations": 10,
+      "implemented_operations": 3,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 8,
+      "defined_operations": 3,
+      "implemented_operations": 1,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 9,
+      "defined_operations": 4,
+      "implemented_operations": 0,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 10,
+      "defined_operations": 7,
+      "implemented_operations": 2,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 11,
+      "defined_operations": 9,
+      "implemented_operations": 6,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 12,
+      "defined_operations": 8,
+      "implemented_operations": 0,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 13,
+      "defined_operations": 4,
+      "implemented_operations": 1,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 14,
+      "defined_operations": 6,
+      "implemented_operations": 1,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 15,
+      "defined_operations": 5,
+      "implemented_operations": 3,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 16,
+      "defined_operations": 2,
+      "implemented_operations": 0,
+      "full_feature_acceptance": "PENDING"
+    },
+    {
+      "wave": 17,
+      "defined_operations": 0,
+      "implemented_operations": 0,
+      "full_feature_acceptance": "PENDING"
+    }
+  ]
+}

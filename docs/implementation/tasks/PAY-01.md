@@ -1,6 +1,6 @@
 # PAY-01 — Checkout and own payment status
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: payments
+Status: **PENDING** · Priority: P1 · Module: payments
 
 ต้องปิด D08, D10; D02 constraints/profile semantics confirmed แล้ว
 

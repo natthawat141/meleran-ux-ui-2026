@@ -32,6 +32,9 @@ Planning baseline + execution decision register. Approval update 2026-10-11: can
 - Remaining: exact provider proof/recovery protocol, 24h one-use link enforcement, production identity/From and sandbox evidence. No server SDK installed or new exchange/link path declared in Draft.2.
 - AUTH-01/02/03 and provider feature cannot be accepted from a Username-only kernel.
 
+- Additional explicit approval: user confirmed “ชุด C ให้จัดทำ contract delta และ provider design” on 2026-10-11. Delivered [FIREBASE_PROVIDER_DESIGN](FIREBASE_PROVIDER_DESIGN.md) and [two-operation proposed delta](contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json). Ownership is CONFIRMED; exact new wire/recovery/freshness remains a proposed design, not active canonical or installed SDK.
+- Continuation rule confirmed: unresolved behavior is PENDING and skipped locally; continue independently specified operations through Wave 17. Do not wait for a decision when another use case can execute.
+
 ## D04 — Authoring aggregate/revision lifecycle [UNRESOLVED]
 
 - Evidence/conflict: Canonical PATCH aggregate replacement vs partial and review return/publish revision enforcement are still pending. Scope confirms pending_review; archived is in Draft enum but excluded from V1.

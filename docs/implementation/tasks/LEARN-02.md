@@ -1,6 +1,6 @@
 # LEARN-02 — Complete article/video and resume
 
-Status: **BLOCKED** · Priority: P1 · Module: learning
+Status: **PENDING** · Priority: P1 · Module: learning
 
 รอ dependencies: LEARN-01, COMPLETION-01
 

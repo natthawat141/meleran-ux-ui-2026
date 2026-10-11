@@ -7,6 +7,7 @@ import { AppModule } from '../../src/app.module';
 import { configureApplication } from '../../src/bootstrap';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { SelfProfileService } from '../../src/features/accounts/self-profile.service';
+import { SelfProfileUpdateService } from '../../src/features/accounts/self-profile-update.service';
 import { testConnections } from '../support/postgres';
 import { assertErrorContract, assertTaskContract } from '../support/contract-validator';
 
@@ -47,6 +48,9 @@ describe('ACCOUNT-01 GET /me / actual HTTP and PostgreSQL identity projection', 
     }
     if (migrator) await migrator.$disconnect();
   });
+
+  const patch = (body: object, name = 'learner', audience = 'web') => request(app.getHttpServer()).patch('/api/v1/me')
+    .set('x-melearn-app', audience).set('Cookie', `melearn_${audience}_session=${secrets[name + '_' + audience]}`).send(body);
 
   it('returns all eleven canonical fields with normalized roles and explicit nullable identity', async () => {
     const before = await stored(), response = await read().expect(200); canonical(response.body);
@@ -191,5 +195,82 @@ describe('ACCOUNT-01 GET /me / actual HTTP and PostgreSQL identity projection', 
       expect(response.body.display_name).toBe(before.displayName); await mutation;
       const next = await read().expect(200); canonical(next.body); expect(next.body.display_name).toBe(tag + '_after'); expect(next.body.profile).toEqual({ bio: 'หลังแก้' });
     } finally { release(); await Promise.allSettled([command, mutation]); spy.mockRestore(); }
+  });
+  it('PATCH persists only owned fields, preserves omitted/private metadata and returns the canonical profile', async () => {
+    await db.account.update({ where: { id: accounts.learner }, data: { profileJson: '{"bio":"old","school":"old school","privateAudit":"PRIVATE_META"}' } });
+    const foreign = await stored('instructor'), before = await stored();
+    const response = await patch({ display_name: 'ชื่อใหม่', username: 'p' + randomUUID().replace(/-/g, '').slice(0, 20),
+      avatar_url: 'https://example.test/own.png', profile: { bio: 'ใหม่', interests: ['AI'] } }).expect(200);
+    canonical(response.body); expect(response.body.display_name).toBe('ชื่อใหม่');
+    expect(response.body.profile).toEqual({ bio: 'ใหม่', school: 'old school', interests: ['AI'] });
+    const changed = await stored(); expect(changed.revision).toBe(before.revision + 1);
+    expect(changed.normalizedUsername).toBe(response.body.username.toUpperCase());
+    expect(JSON.parse(changed.profileJson).privateAudit).toBe('PRIVATE_META');
+    for (const key of ['email', 'emailVerified', 'origin', 'roles', 'disabled'] as const) expect(changed[key]).toEqual(before[key]);
+    expect(await stored('instructor')).toEqual(foreign); expect((await read().expect(200)).body).toEqual(response.body);
+  });
+  it('PATCH nullable text clears to canonical empty string, arrays replace and avatar null clears', async () => {
+    const response = await patch({ avatar_url: null, profile: { bio: null, interests: [], learningGoals: ['one'] } }).expect(200);
+    canonical(response.body); expect(response.body.avatar_url).toBeNull();
+    expect(response.body.profile).toMatchObject({ bio: '', interests: [], learningGoals: ['one'] });
+    expect(response.body.profile.school).toBe('old school');
+  });
+  it('PATCH empty payload performs no persistence mutation', async () => {
+    const before = await stored(), beforeCounts = await counts();
+    canonical((await patch({}).expect(200)).body); expect(await stored()).toEqual(before); expect(await counts()).toEqual(beforeCounts);
+  });
+  it('PATCH rejects privilege/identity injection and malformed nested input atomically', async () => {
+    const before = await stored();
+    for (const body of [{ roles: ['admin'] }, { email: 'foreign@example.test' }, { profile: { interests: null } },
+      { display_name: 'valid', profile: { phone: 123 } }, { username: 'ab' }]) {
+      const response = await patch(body).expect(422); assertErrorContract(response.body); expect(await stored()).toEqual(before);
+    }
+  });
+  it('PATCH case-insensitive Username uniqueness returns canonical conflict without partial edits', async () => {
+    const name = 'u' + randomUUID().replace(/-/g, '').slice(0, 20);
+    await db.account.update({ where: { id: accounts.instructor }, data: { username: name, normalizedUsername: name.toUpperCase() } });
+    const before = await stored(), response = await patch({ username: name.toUpperCase(), display_name: 'discard' }).expect(409);
+    assertErrorContract(response.body); expect(response.body.error.code).toBe('username_taken'); expect(await stored()).toEqual(before);
+  });
+  it('PATCH two concurrent Username claims have exactly one winner', async () => {
+    const name = 'r' + randomUUID().replace(/-/g, '').slice(0, 20);
+    const responses = await Promise.all([patch({ username: name }, 'learner'), patch({ username: name.toUpperCase() }, 'instructor')]);
+    expect(responses.map(r => r.status).sort()).toEqual([200, 409]);
+    expect(await db.account.count({ where: { normalizedUsername: name.toUpperCase() } })).toBe(1);
+  });
+  it('PATCH allows unverified self editing and Admin own profile but enforces audience and anonymous boundaries', async () => {
+    await db.account.update({ where: { id: accounts.learner }, data: { origin: 'self_email', emailVerified: false } });
+    const result = await patch({ display_name: 'unverified own' }).expect(200); canonical(result.body); expect(result.body.learning_eligible).toBe(false);
+    canonical((await patch({ display_name: 'admin own' }, 'admin', 'admin').expect(200)).body);
+    await patch({}, 'learner', 'admin').expect(403);
+    await request(app.getHttpServer()).patch('/api/v1/me').set('x-melearn-app', 'web').send({}).expect(401);
+    await request(app.getHttpServer()).patch('/api/v1/me').set('x-melearn-app', 'admin')
+      .set('Cookie', `melearn_web_session=${secrets.learner_web}`).send({}).expect(401);
+  });
+  it('PATCH rechecks revoked session after the guard and leaves the account untouched', async () => {
+    const service = app.get(SelfProfileUpdateService), original = service.update.bind(service), before = await stored();
+    const spy = jest.spyOn(service, 'update').mockImplementationOnce(async (reference, body) => {
+      await db.appSession.update({ where: { tokenHash: reference.tokenHash }, data: { revokedAt: new Date() } });
+      return original(reference, body);
+    });
+    try { await patch({ display_name: 'discard' }).expect(401); expect(await stored()).toEqual(before); }
+    finally { spy.mockRestore(); await db.appSession.update({ where: { tokenHash: hash(secrets.learner_web) }, data: { revokedAt: null } }); }
+  });
+  it('PATCH rolls back the mutation on an actual database failure without leaking diagnostics', async () => {
+    const prisma = app.get(PrismaService), original = prisma.$transaction.bind(prisma), before = await stored();
+    const failing = ((callback: (tx: Prisma.TransactionClient) => Promise<unknown>, options: { isolationLevel: Prisma.TransactionIsolationLevel }) =>
+      original(async tx => { await callback(tx); await tx.$queryRaw`SELECT 1/0`; }, options)) as typeof prisma.$transaction;
+    const spy = jest.spyOn(prisma, '$transaction').mockImplementationOnce(failing), log = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    try { const response = await patch({ display_name: 'rolled back' }).expect(500); assertErrorContract(response.body);
+      expect(await stored()).toEqual(before); expect(JSON.stringify(response.body)).not.toMatch(/division|postgresql/); }
+    finally { spy.mockRestore(); log.mockRestore(); }
+  });
+  it('PATCH reconnect preserves profile and does not write credential, session or academic records', async () => {
+    const beforeCounts = await counts(), sessions = await db.appSession.findMany({ where: { accountId: accounts.learner }, orderBy: { tokenHash: 'asc' } });
+    const credential = await db.localCredential.findUnique({ where: { accountId: accounts.learner } });
+    const response = await patch({ profile: { phone: '123', learningGoals: [] } }).expect(200); canonical(response.body);
+    await db.$disconnect(); await db.$connect(); expect((await read().expect(200)).body).toEqual(response.body);
+    expect(await counts()).toEqual(beforeCounts); expect(await db.localCredential.findUnique({ where: { accountId: accounts.learner } })).toEqual(credential);
+    expect(await db.appSession.findMany({ where: { accountId: accounts.learner }, orderBy: { tokenHash: 'asc' } })).toEqual(sessions);
   });
 });

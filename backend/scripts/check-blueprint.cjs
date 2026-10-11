@@ -79,3 +79,35 @@ for (const migration of board.environment.migrations) {
 }
 console.log('Blueprint PASS: 86 canonical operations, 5 deferred, 113 exact scope cases, 50-task DAG and migration checksums.');
 console.log(`${matrix.defined_operations.filter(operation => !operation.acceptance_ids.length).length} read operations have no dedicated original numbered case; targeted feature tests remain required.`);
+
+// Proposed provider paths are review artifacts, never counted as canonical APIs.
+const delta = load('docs/implementation/contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json');
+assert.equal(delta['x-status'], 'PROPOSED_NOT_CANONICAL');
+assert.equal(delta['x-canonical-baseline'].sha256, hash);
+assert.deepEqual(Object.keys(delta.paths).sort(), ['/auth/firebase/exchange', '/auth/firebase/link']);
+assert.deepEqual(delta['x-deferred-mapping'].map(({ method, path: route }) => ({ method, path: route })),
+  contract['x-deferred-operations'].map(({ method, path: route }) => ({ method, path: route })));
+function checkDeltaRefs(value) {
+  if (!value || typeof value !== 'object') return;
+  if (value.$ref) {
+    assert.ok(value.$ref.startsWith('#/components/schemas/'));
+    assert.ok(delta.components.schemas[value.$ref.split('/').at(-1)], 'Unresolved proposed Auth schema');
+  }
+  for (const child of Object.values(value)) checkDeltaRefs(child);
+}
+checkDeltaRefs(delta);
+const queue = load('docs/implementation/CONTINUATION_QUEUE.json');
+assert.equal(queue.contract.sha256, hash);
+assert.equal(queue.operations.length, 86); assert.equal(queue.deferred_operations.length, 5);
+assert.deepEqual(new Set(queue.operations.map(operation => `${operation.method} ${operation.path}`)), seen);
+assert.equal(queue.wave_progress.length, 17);
+assert.equal(queue.wave_progress.reduce((sum, wave) => sum + wave.defined_operations, 0), 86);
+const implemented = new Set(board.tasks.flatMap(task => (task.components || [])
+  .filter(component => component.operationId && component.state === 'COMPONENT_VERIFIED').map(component => component.operationId)));
+assert.equal(queue.scope.implemented_operations, implemented.size);
+for (const operation of queue.operations) {
+  assert.equal(operation.state, implemented.has(operation.operationId) ? 'IMPLEMENTED' : 'PENDING');
+  assert.ok(Number.isInteger(operation.wave) && operation.wave >= 1 && operation.wave <= 17);
+  assert.deepEqual(operation.acceptance_ids, matrix.defined_operations.find(row => row.operationId === operation.operationId).acceptance_ids);
+}
+console.log(`Continuation and Auth design PASS: ${implemented.size}/86 component APIs; 2 proposed Auth paths kept separate; all 17 waves mapped.`);

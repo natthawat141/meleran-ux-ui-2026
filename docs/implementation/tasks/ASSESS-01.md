@@ -1,6 +1,6 @@
 # ASSESS-01 — Attempt snapshot/answer/submit
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: assessments
+Status: **PENDING** · Priority: P1 · Module: assessments
 
 ต้องปิด D06, D09, D10; D02 constraints/profile semantics confirmed แล้ว
 

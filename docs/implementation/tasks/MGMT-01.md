@@ -1,6 +1,6 @@
 # MGMT-01 — Admin create/list/detail users
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: management
+Status: **PENDING** · Priority: P2 · Module: management
 
 ต้องปิด D03, D16; D02 constraints/profile semantics confirmed แล้ว
 

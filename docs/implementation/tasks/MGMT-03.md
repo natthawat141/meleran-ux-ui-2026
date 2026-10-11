@@ -1,6 +1,6 @@
 # MGMT-03 — Course/user roster and attempts
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: management
+Status: **PENDING** · Priority: P2 · Module: management
 
 ต้องปิด D16; D02 constraints/profile semantics confirmed แล้ว
 

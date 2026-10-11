@@ -1,6 +1,6 @@
 # LEARN-01 — Authorized learning/content/progress reads
 
-Status: **BLOCKED** · Priority: P1 · Module: learning
+Status: **PENDING** · Priority: P1 · Module: learning
 
 รอ dependencies: ENROLL-01, COURSE-02
 

@@ -1,6 +1,6 @@
 # BLOG-03 — Publish/unpublish/delete blog
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: blog
+Status: **PENDING** · Priority: P2 · Module: blog
 
 ต้องปิด D11; D02 constraints/profile semantics confirmed แล้ว
 

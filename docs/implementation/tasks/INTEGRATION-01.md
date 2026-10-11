@@ -1,6 +1,6 @@
 # INTEGRATION-01 — Public Catalog early vertical slice
 
-Status: **BLOCKED** · Priority: P0 · Module: integration
+Status: **PENDING** · Priority: P0 · Module: integration
 
 รอ dependencies: CATALOG-01
 

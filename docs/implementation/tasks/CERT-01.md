@@ -1,6 +1,6 @@
 # CERT-01 — Own certificate list/detail/download
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: certificates
+Status: **PENDING** · Priority: P2 · Module: certificates
 
 ต้องปิด D07; D02 constraints/profile semantics confirmed แล้ว
 

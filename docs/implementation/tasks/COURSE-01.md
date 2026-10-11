@@ -1,6 +1,6 @@
 # COURSE-01 — Instructor/Admin create and list courses
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
+Status: **PENDING** · Priority: P1 · Module: courses
 
 ต้องปิด D10; D02 constraints/profile semantics confirmed แล้ว
 

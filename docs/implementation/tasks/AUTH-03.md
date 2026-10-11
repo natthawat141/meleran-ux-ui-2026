@@ -1,6 +1,6 @@
 # AUTH-03 — Password reset
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: auth
+Status: **PENDING** · Priority: P1 · Module: auth
 
 ต้องปิด D03; D02 constraints/profile semantics confirmed แล้ว
 

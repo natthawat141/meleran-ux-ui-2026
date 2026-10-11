@@ -1,6 +1,6 @@
 # ACCOUNT-01 — Read/update own profile
 
-Status: **NEEDS_DECISION** · Priority: P0 · Module: accounts
+Status: **PENDING** · Priority: P0 · Module: accounts
 
 Execution 11 ต.ค. 2026: GET /me implemented as a separate confirmed read component;
 Auth public SelfProfileReader owns bounded identity/credential projection; Accounts
@@ -91,3 +91,5 @@ Feature gate: **G-AUTH** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร�
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+Continuation update 11 ต.ค.: 2/2 canonical operations component-verified; see [current checkpoint](../PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md). Outstanding feature gates/decisions are PENDING and do not block independent use cases.

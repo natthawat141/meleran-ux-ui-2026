@@ -38,7 +38,7 @@ Origins ของ production ยังไม่กำหนด; ไม่เป�
 กำหนดใช้ครั้งเดียวภายใน 24 ชั่วโมง. Firebase public Web config ไม่ทดแทน server
 identity/credential หรือการตรวจ proof.
 
-**Proposed:** Nest เป็น owner ของ verification/reset proof ในระบบและกติกา 24h;
+**Confirmed ชุด C (คำยืนยันเพิ่มเติม 11 ต.ค.):** Nest เป็น owner ของ verification/reset proof ในระบบและกติกา 24h;
 Firebase เป็น owner ของ Email/Google credential; Resend ส่งลิงก์. Username password
 เป็น local credential อิสระ; ไม่ใช้ fake Firebase email และไม่ sync password
 ระหว่าง provider/local อัตโนมัติ. Link ต้องมี app session และ Firebase proof
@@ -52,7 +52,7 @@ Server ตรวจ ID token signature/issuer/audience/expiry และ revocati
 อายุ proof ของ Melearn และ recovery ownership ต้องตรวจให้ตรง Final 1.6 ก่อน
 เลือก provider action mechanism ไม่อนุมานว่า link ทุกชนิดมีอายุ 24h.
 
-**Contract delta ที่ต้องตัดสิน:** เสนอ `POST /auth/firebase/exchange`
+**Contract delta ที่ผู้ใช้สั่งให้จัดทำแล้ว:** เสนอ `POST /auth/firebase/exchange`
 `{id_token,audience}` และ `POST /auth/firebase/link` `{id_token}` เพื่อแทนที่
 4 Google routes ที่ Deferred. Proposed เท่านั้น ยังไม่เพิ่ม endpoint และยัง
 ติดตาม 5 Deferred records เดิม. ต้องออกแบบ response/error/link freshness และ
@@ -80,3 +80,5 @@ DB constraints ที่ผ่านแล้วไม่ใช่หลัก�
 คงเดิม. Source/decision conflicts ต้องปรากฏใน execution board.
 
 Technical review packet: [Firebase exchange/link/recovery](PROVIDER_AUTH_PROTOCOL_REVIEW.md). Approved direction is recorded; candidate wire delta remains separate from current Draft.2 operations.
+
+Concrete design: [FIREBASE_PROVIDER_DESIGN](FIREBASE_PROVIDER_DESIGN.md) และ [proposed OpenAPI delta](contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json). ไม่ถาม ownership ชุด C ซ้ำ; exact wire/provider side-effect review ยัง PENDING. คิวที่ข้ามงานค้างเฉพาะจุดอยู่ [CONTINUATION_QUEUE](CONTINUATION_QUEUE.json).

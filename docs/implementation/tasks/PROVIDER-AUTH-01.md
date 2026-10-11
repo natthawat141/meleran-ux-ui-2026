@@ -1,6 +1,6 @@
 # PROVIDER-AUTH-01 — Resolve/implement Firebase verified session/link protocol
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: auth
+Status: **PENDING** · Priority: P1 · Module: auth
 
 ต้องปิด D01, D03; D02 constraints/profile semantics confirmed แล้ว
 

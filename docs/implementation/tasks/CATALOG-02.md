@@ -1,6 +1,6 @@
 # CATALOG-02 — Public Instructor profile/courses
 
-Status: **NEEDS_DECISION** · Priority: P1 · Module: courses
+Status: **PENDING** · Priority: P1 · Module: courses
 
 ต้องปิด D16; D02 constraints/profile semantics confirmed แล้ว
 

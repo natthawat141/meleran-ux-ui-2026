@@ -309,7 +309,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D03"
       ],
@@ -317,7 +317,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-02.openapi.json"
+      "context_file": "contracts/AUTH-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -547,7 +548,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D03"
       ],
@@ -555,7 +556,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-02.openapi.json"
+      "context_file": "contracts/AUTH-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -785,7 +787,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D03"
       ],
@@ -793,7 +795,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-02.openapi.json"
+      "context_file": "contracts/AUTH-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -1039,7 +1042,7 @@
           "no demonstrated origin/CSRF/rate-limit acceptance"
         ]
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D01",
         "D02",
@@ -1049,7 +1052,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-01.openapi.json"
+      "context_file": "contracts/AUTH-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -1276,7 +1280,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D03"
       ],
@@ -1284,7 +1288,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-03.openapi.json"
+      "context_file": "contracts/AUTH-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -1511,7 +1516,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D03"
       ],
@@ -1519,7 +1524,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-03.openapi.json"
+      "context_file": "contracts/AUTH-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -1748,17 +1754,12 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/auth/auth.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": [
-          "local only; Firebase absent",
-          "12h/Strict/Secure and credential policy not frozen",
-          "CurrentUser wire projection incomplete",
-          "no demonstrated origin/CSRF/rate-limit acceptance"
-        ]
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/auth/auth.controller.ts",
+        "evidence_document": "LOGOUT_PAYMENT_COMPONENTS.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D01",
         "D02",
@@ -1768,7 +1769,18 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AUTH-01.openapi.json"
+      "context_file": "contracts/AUTH-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "PARTIAL_UNVERIFIED",
+        "handler_file": "melearn-nest-api/src/features/auth/auth.controller.ts",
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": [
+          "local only; Firebase absent",
+          "12h/Strict/Secure and credential policy not frozen",
+          "CurrentUser wire projection incomplete",
+          "no demonstrated origin/CSRF/rate-limit acceptance"
+        ]
+      }
     },
     {
       "method": "GET",
@@ -1985,6 +1997,19 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/accounts/accounts.controller.ts",
+        "evidence_document": "SELF_PROFILE_COMPONENT.md",
+        "full_acceptance": false
+      },
+      "execution_status": "COMPONENT_VERIFIED",
+      "unresolved_decisions": [],
+      "transaction_id": "TX-PROFILE",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "contract_status": "DRAFT",
+      "context_file": "contracts/ACCOUNT-01.openapi.json",
+      "historical_implementation_status": {
         "state": "PARTIAL_UNVERIFIED",
         "handler_file": "melearn-nest-api/src/features/accounts/accounts.controller.ts",
         "evidence": "static controller/service inspection; no tests rerun",
@@ -1993,17 +2018,7 @@
           "nested profile validation/null semantics drift",
           "optimistic concurrency not enforced"
         ]
-      },
-      "execution_status": "NEEDS_DECISION",
-      "unresolved_decisions": [
-        "D02",
-        "D09"
-      ],
-      "transaction_id": "TX-PROFILE",
-      "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
-      "contract_status": "DRAFT",
-      "context_file": "contracts/ACCOUNT-01.openapi.json"
+      }
     },
     {
       "method": "PATCH",
@@ -2227,6 +2242,19 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/accounts/accounts.controller.ts",
+        "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+        "full_acceptance": false
+      },
+      "execution_status": "COMPONENT_VERIFIED",
+      "unresolved_decisions": [],
+      "transaction_id": "TX-PROFILE",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "contract_status": "DRAFT",
+      "context_file": "contracts/ACCOUNT-01.openapi.json",
+      "historical_implementation_status": {
         "state": "PARTIAL_UNVERIFIED",
         "handler_file": "melearn-nest-api/src/features/accounts/accounts.controller.ts",
         "evidence": "static controller/service inspection; no tests rerun",
@@ -2235,17 +2263,7 @@
           "nested profile validation/null semantics drift",
           "optimistic concurrency not enforced"
         ]
-      },
-      "execution_status": "NEEDS_DECISION",
-      "unresolved_decisions": [
-        "D02",
-        "D09"
-      ],
-      "transaction_id": "TX-PROFILE",
-      "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
-      "contract_status": "DRAFT",
-      "context_file": "contracts/ACCOUNT-01.openapi.json"
+      }
     },
     {
       "method": "POST",
@@ -2491,7 +2509,7 @@
           "response schema/audit/search completeness must be reviewed"
         ]
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D02",
         "D03",
@@ -2501,7 +2519,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-01.openapi.json"
+      "context_file": "contracts/MGMT-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -2768,7 +2787,7 @@
           "response schema/audit/search completeness must be reviewed"
         ]
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D02",
         "D03",
@@ -2778,7 +2797,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-01.openapi.json"
+      "context_file": "contracts/MGMT-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -3017,6 +3037,19 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/management/management.controller.ts",
+        "evidence_document": "INSTRUCTOR_GRANT_COMPONENT.md",
+        "full_acceptance": false
+      },
+      "execution_status": "COMPONENT_VERIFIED",
+      "unresolved_decisions": [],
+      "transaction_id": "TX-USER",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "contract_status": "DRAFT",
+      "context_file": "contracts/MGMT-02.openapi.json",
+      "historical_implementation_status": {
         "state": "PARTIAL_UNVERIFIED",
         "handler_file": "melearn-nest-api/src/features/management/management.controller.ts",
         "evidence": "static controller/service inspection; no tests rerun",
@@ -3025,14 +3058,7 @@
           "password limit and username pattern are prototype policies",
           "response schema/audit/search completeness must be reviewed"
         ]
-      },
-      "execution_status": "BLOCKED",
-      "unresolved_decisions": [],
-      "transaction_id": "TX-USER",
-      "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
-      "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-02.openapi.json"
+      }
     },
     {
       "method": "GET",
@@ -3283,13 +3309,14 @@
           "response schema/audit/search completeness must be reviewed"
         ]
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "TX-USER",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-02.openapi.json"
+      "context_file": "contracts/MGMT-02.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "GET",
@@ -3567,7 +3594,7 @@
           "no PostgreSQL acceptance"
         ]
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -3575,7 +3602,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/CATALOG-01.openapi.json"
+      "context_file": "contracts/CATALOG-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -3798,6 +3826,21 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/courses/courses.controller.ts",
+        "evidence_document": "EXECUTION_STATUS.json",
+        "full_acceptance": false
+      },
+      "execution_status": "COMPONENT_VERIFIED",
+      "unresolved_decisions": [
+        "D16"
+      ],
+      "transaction_id": "READ",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "contract_status": "DRAFT",
+      "context_file": "contracts/CATALOG-01.openapi.json",
+      "historical_implementation_status": {
         "state": "PARTIAL_UNVERIFIED",
         "handler_file": "melearn-nest-api/src/features/courses/courses.controller.ts",
         "evidence": "static controller/service inspection; no tests rerun",
@@ -3806,16 +3849,7 @@
           "DTO/wire fields and public privacy need complete schema check",
           "no PostgreSQL acceptance"
         ]
-      },
-      "execution_status": "NEEDS_DECISION",
-      "unresolved_decisions": [
-        "D16"
-      ],
-      "transaction_id": "READ",
-      "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
-      "contract_status": "DRAFT",
-      "context_file": "contracts/CATALOG-01.openapi.json"
+      }
     },
     {
       "method": "PATCH",
@@ -4119,7 +4153,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04",
         "D05",
@@ -4129,7 +4163,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-02.openapi.json"
+      "context_file": "contracts/COURSE-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -4405,6 +4440,19 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/enrollments/enrollments.controller.ts",
+        "evidence_document": "FREE_ENROLL_COMPONENT.md",
+        "full_acceptance": false
+      },
+      "execution_status": "COMPONENT_VERIFIED",
+      "unresolved_decisions": [],
+      "transaction_id": "TX-GRANT",
+      "contract_version": "1.0.0-draft.2",
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "contract_status": "DRAFT",
+      "context_file": "contracts/ENROLL-01.openapi.json",
+      "historical_implementation_status": {
         "state": "PARTIAL_UNVERIFIED",
         "handler_file": "melearn-nest-api/src/features/enrollments/enrollments.controller.ts",
         "evidence": "static controller/service inspection; no tests rerun",
@@ -4413,14 +4461,7 @@
           "unique conflict/race recovery absent",
           "no PostgreSQL concurrency verification"
         ]
-      },
-      "execution_status": "BLOCKED",
-      "unresolved_decisions": [],
-      "transaction_id": "TX-GRANT",
-      "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
-      "contract_status": "DRAFT",
-      "context_file": "contracts/ENROLL-01.openapi.json"
+      }
     },
     {
       "method": "GET",
@@ -4696,13 +4737,14 @@
           "no PostgreSQL concurrency verification"
         ]
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "TX-GRANT",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/ENROLL-01.openapi.json"
+      "context_file": "contracts/ENROLL-01.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "GET",
@@ -4964,18 +5006,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "LEARNING_READ_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/LEARN-01.openapi.json"
+      "context_file": "contracts/LEARN-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -5246,18 +5293,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "LEARNING_READ_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/LEARN-01.openapi.json"
+      "context_file": "contracts/LEARN-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -5537,13 +5589,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/LEARN-01.openapi.json"
+      "context_file": "contracts/LEARN-01.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "POST",
@@ -5822,13 +5875,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "TX-COMPLETE",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/LEARN-02.openapi.json"
+      "context_file": "contracts/LEARN-02.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "PUT",
@@ -6107,13 +6161,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "TX-COMPLETE",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/LEARN-02.openapi.json"
+      "context_file": "contracts/LEARN-02.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "POST",
@@ -6401,7 +6456,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D06",
         "D09",
@@ -6411,7 +6466,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/ASSESS-01.openapi.json"
+      "context_file": "contracts/ASSESS-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "PUT",
@@ -6687,7 +6743,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D06",
         "D09",
@@ -6697,7 +6753,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/ASSESS-01.openapi.json"
+      "context_file": "contracts/ASSESS-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -6973,7 +7030,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D06",
         "D09",
@@ -6983,7 +7040,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/ASSESS-01.openapi.json"
+      "context_file": "contracts/ASSESS-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -7230,12 +7288,11 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "ATTEMPT_READ_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D06"
       ],
@@ -7243,7 +7300,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/ASSESS-02.openapi.json"
+      "context_file": "contracts/ASSESS-02.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -7495,7 +7558,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D06"
       ],
@@ -7503,7 +7566,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/ASSESS-02.openapi.json"
+      "context_file": "contracts/ASSESS-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -7770,7 +7834,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D06",
         "D10"
@@ -7779,7 +7843,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/GRADE-01.openapi.json"
+      "context_file": "contracts/GRADE-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "PUT",
@@ -8052,7 +8117,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D06",
         "D10"
@@ -8061,7 +8126,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/GRADE-01.openapi.json"
+      "context_file": "contracts/GRADE-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -8344,7 +8410,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D07"
       ],
@@ -8352,7 +8418,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/CERT-01.openapi.json"
+      "context_file": "contracts/CERT-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -8620,12 +8687,11 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "CERTIFICATE_DETAIL_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D07"
       ],
@@ -8633,7 +8699,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/CERT-01.openapi.json"
+      "context_file": "contracts/CERT-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -8906,7 +8978,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D07"
       ],
@@ -8914,7 +8986,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/CERT-01.openapi.json"
+      "context_file": "contracts/CERT-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -9168,7 +9241,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D10"
       ],
@@ -9176,7 +9249,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-01.openapi.json"
+      "context_file": "contracts/COURSE-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -9458,7 +9532,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D10"
       ],
@@ -9466,7 +9540,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-01.openapi.json"
+      "context_file": "contracts/COURSE-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -9720,7 +9795,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D10"
       ],
@@ -9728,7 +9803,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-01.openapi.json"
+      "context_file": "contracts/COURSE-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -10010,7 +10086,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D10"
       ],
@@ -10018,7 +10094,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-01.openapi.json"
+      "context_file": "contracts/COURSE-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -10315,7 +10392,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04",
         "D05",
@@ -10325,7 +10402,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-02.openapi.json"
+      "context_file": "contracts/COURSE-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -10545,18 +10623,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "VIDEO_UNAVAILABLE_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "NO_WRITE",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/VIDEO-01.openapi.json"
+      "context_file": "contracts/VIDEO-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -10853,7 +10936,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04",
         "D05",
@@ -10863,7 +10946,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-02.openapi.json"
+      "context_file": "contracts/COURSE-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -11164,7 +11248,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04",
         "D05",
@@ -11174,7 +11258,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/COURSE-02.openapi.json"
+      "context_file": "contracts/COURSE-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -11439,13 +11524,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REVIEW-01.openapi.json"
+      "context_file": "contracts/REVIEW-01.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "GET",
@@ -11686,13 +11772,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REVIEW-01.openapi.json"
+      "context_file": "contracts/REVIEW-01.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "POST",
@@ -11959,7 +12046,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04"
       ],
@@ -11967,7 +12054,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REVIEW-02.openapi.json"
+      "context_file": "contracts/REVIEW-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -12234,7 +12322,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04"
       ],
@@ -12242,7 +12330,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REVIEW-02.openapi.json"
+      "context_file": "contracts/REVIEW-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -12512,7 +12601,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D04"
       ],
@@ -12520,7 +12609,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REVIEW-02.openapi.json"
+      "context_file": "contracts/REVIEW-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -12802,7 +12892,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D08",
         "D10"
@@ -12811,7 +12901,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/PAY-01.openapi.json"
+      "context_file": "contracts/PAY-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -13079,12 +13170,11 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "LOGOUT_PAYMENT_COMPONENTS.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D08",
         "D10"
@@ -13093,7 +13183,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/PAY-01.openapi.json"
+      "context_file": "contracts/PAY-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -13334,13 +13430,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/PAY-02.openapi.json"
+      "context_file": "contracts/PAY-02.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "POST",
@@ -13633,18 +13730,24 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/redeem/code-commands.controller.ts",
+        "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REDEEM-02.openapi.json"
+      "context_file": "contracts/REDEEM-02.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "POST",
@@ -13896,18 +13999,24 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/redeem/code-commands.controller.ts",
+        "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REDEEM-01.openapi.json"
+      "context_file": "contracts/REDEEM-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -14199,13 +14308,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REDEEM-01.openapi.json"
+      "context_file": "contracts/REDEEM-01.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "POST",
@@ -14467,18 +14577,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "REDEEM_TRANSACTION_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-REDEEM",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/REDEEM-01.openapi.json"
+      "context_file": "contracts/REDEEM-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "PATCH",
@@ -14735,18 +14850,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "ADMIN_AI_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-TRANSCRIPT",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-01.openapi.json"
+      "context_file": "contracts/AI-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -15005,18 +15125,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "ADMIN_AI_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-TRANSCRIPT",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-01.openapi.json"
+      "context_file": "contracts/AI-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "PUT",
@@ -15282,18 +15407,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "ADMIN_AI_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-TRANSCRIPT",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-01.openapi.json"
+      "context_file": "contracts/AI-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "POST",
@@ -15545,7 +15675,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -15553,7 +15683,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-02.openapi.json"
+      "context_file": "contracts/AI-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -15826,7 +15957,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -15834,7 +15965,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-02.openapi.json"
+      "context_file": "contracts/AI-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -16108,7 +16240,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -16116,7 +16248,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-02.openapi.json"
+      "context_file": "contracts/AI-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -16449,7 +16582,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D12"
       ],
@@ -16457,7 +16590,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-03.openapi.json"
+      "context_file": "contracts/AI-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "PATCH",
@@ -16706,12 +16840,11 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "AI_RENAME_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D11"
       ],
@@ -16719,7 +16852,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-05.openapi.json"
+      "context_file": "contracts/AI-05.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "DELETE",
@@ -16959,7 +17098,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D11"
       ],
@@ -16967,7 +17106,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-05.openapi.json"
+      "context_file": "contracts/AI-05.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -17278,12 +17418,11 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "AI_USAGE_READ_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D12"
       ],
@@ -17291,7 +17430,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-03.openapi.json"
+      "context_file": "contracts/AI-03.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "PUT",
@@ -17566,18 +17711,23 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "AI_PRACTICE_ANSWER_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-PRACTICE",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/AI-04.openapi.json"
+      "context_file": "contracts/AI-04.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "DELETE",
@@ -17839,7 +17989,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D11"
       ],
@@ -17847,7 +17997,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-03.openapi.json"
+      "context_file": "contracts/BLOG-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "PATCH",
@@ -18105,7 +18256,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -18114,7 +18265,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-02.openapi.json"
+      "context_file": "contracts/BLOG-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -18376,7 +18528,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D11"
       ],
@@ -18384,7 +18536,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-03.openapi.json"
+      "context_file": "contracts/BLOG-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -18655,7 +18808,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -18663,7 +18816,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-01.openapi.json"
+      "context_file": "contracts/BLOG-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -18908,7 +19062,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -18916,7 +19070,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-01.openapi.json"
+      "context_file": "contracts/BLOG-01.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -19197,7 +19352,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -19206,7 +19361,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-02.openapi.json"
+      "context_file": "contracts/BLOG-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -19454,7 +19610,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -19463,7 +19619,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-02.openapi.json"
+      "context_file": "contracts/BLOG-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -19714,7 +19871,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D05",
         "D09"
@@ -19723,7 +19880,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-02.openapi.json"
+      "context_file": "contracts/BLOG-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "POST",
@@ -19985,7 +20143,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D11"
       ],
@@ -19993,7 +20151,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/BLOG-03.openapi.json"
+      "context_file": "contracts/BLOG-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -20245,16 +20404,12 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "PARTIAL_UNVERIFIED",
-        "handler_file": "melearn-nest-api/src/features/management/management.controller.ts",
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": [
-          "optional email rejected",
-          "password limit and username pattern are prototype policies",
-          "response schema/audit/search completeness must be reviewed"
-        ]
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/management/management.controller.ts",
+        "evidence_document": "ADMIN_USER_DETAIL_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D02",
         "D03",
@@ -20264,7 +20419,17 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-01.openapi.json"
+      "context_file": "contracts/MGMT-01.openapi.json",
+      "historical_implementation_status": {
+        "state": "PARTIAL_UNVERIFIED",
+        "handler_file": "melearn-nest-api/src/features/management/management.controller.ts",
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": [
+          "optional email rejected",
+          "password limit and username pattern are prototype policies",
+          "response schema/audit/search completeness must be reviewed"
+        ]
+      }
     },
     {
       "method": "GET",
@@ -20536,7 +20701,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -20544,7 +20709,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-03.openapi.json"
+      "context_file": "contracts/MGMT-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -20816,7 +20982,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -20824,7 +20990,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-03.openapi.json"
+      "context_file": "contracts/MGMT-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -21099,7 +21266,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -21107,7 +21274,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-03.openapi.json"
+      "context_file": "contracts/MGMT-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -21382,7 +21550,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -21390,7 +21558,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-03.openapi.json"
+      "context_file": "contracts/MGMT-03.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -21643,7 +21812,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -21651,7 +21820,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-04.openapi.json"
+      "context_file": "contracts/MGMT-04.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -21904,7 +22074,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -21912,7 +22082,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-04.openapi.json"
+      "context_file": "contracts/MGMT-04.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -22153,12 +22324,11 @@
       "acceptance_ids": [],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "MANAGED_QUIZ_LOCATOR_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -22166,7 +22336,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-04.openapi.json"
+      "context_file": "contracts/MGMT-04.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -22404,12 +22580,12 @@
       "acceptance_ids": [],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "backend/src/features/assessments/managed-attempt-read.controller.ts",
+        "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -22417,7 +22593,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-04.openapi.json"
+      "context_file": "contracts/MGMT-04.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     },
     {
       "method": "GET",
@@ -22650,13 +22832,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-05.openapi.json"
+      "context_file": "contracts/MGMT-05.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "GET",
@@ -22889,13 +23072,14 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "BLOCKED",
+      "execution_status": "PENDING",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/MGMT-05.openapi.json"
+      "context_file": "contracts/MGMT-05.openapi.json",
+      "previous_execution_status": "BLOCKED"
     },
     {
       "method": "GET",
@@ -23148,7 +23332,7 @@
         "evidence": "static controller/service inspection; no tests rerun",
         "known_gaps": []
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D16"
       ],
@@ -23156,7 +23340,8 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/CATALOG-02.openapi.json"
+      "context_file": "contracts/CATALOG-02.openapi.json",
+      "previous_execution_status": "NEEDS_DECISION"
     },
     {
       "method": "GET",
@@ -23385,12 +23570,11 @@
       "acceptance_ids": [],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "evidence_document": "EXECUTION_STATUS.json",
+        "full_acceptance": false
       },
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D16"
       ],
@@ -23398,7 +23582,13 @@
       "contract_version": "1.0.0-draft.2",
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "contract_status": "DRAFT",
-      "context_file": "contracts/CATALOG-02.openapi.json"
+      "context_file": "contracts/CATALOG-02.openapi.json",
+      "historical_implementation_status": {
+        "state": "NOT_IMPLEMENTED",
+        "handler_file": null,
+        "evidence": "static controller/service inspection; no tests rerun",
+        "known_gaps": []
+      }
     }
   ],
   "deferred_operations": [
@@ -23460,7 +23650,7 @@
         "A16"
       ],
       "implementation_status": "NOT_IMPLEMENTED",
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D01",
         "D03"
@@ -23475,7 +23665,8 @@
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "pending_reason": "Approved set C design delivered; canonical activation/provider verification pending"
     },
     {
       "deferred_id": "DEFERRED-02",
@@ -23535,7 +23726,7 @@
         "A16"
       ],
       "implementation_status": "NOT_IMPLEMENTED",
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D01",
         "D03"
@@ -23550,7 +23741,8 @@
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "pending_reason": "Approved set C design delivered; canonical activation/provider verification pending"
     },
     {
       "deferred_id": "DEFERRED-03",
@@ -23610,7 +23802,7 @@
         "A16"
       ],
       "implementation_status": "NOT_IMPLEMENTED",
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D01",
         "D03"
@@ -23625,7 +23817,8 @@
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "pending_reason": "Approved set C design delivered; canonical activation/provider verification pending"
     },
     {
       "deferred_id": "DEFERRED-04",
@@ -23685,7 +23878,7 @@
         "A16"
       ],
       "implementation_status": "NOT_IMPLEMENTED",
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D01",
         "D03"
@@ -23700,7 +23893,8 @@
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "pending_reason": "Approved set C design delivered; canonical activation/provider verification pending"
     },
     {
       "deferred_id": "DEFERRED-05",
@@ -23771,7 +23965,7 @@
         "P12"
       ],
       "implementation_status": "NOT_IMPLEMENTED",
-      "execution_status": "NEEDS_DECISION",
+      "execution_status": "PENDING",
       "unresolved_decisions": [
         "D08",
         "D10"
@@ -23786,7 +23980,8 @@
         "reason": "Real OAuth/Stripe protocol pending; exclude mock_google claims, fake signature and flat mock events."
       },
       "contract_version": "1.0.0-draft.2",
-      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be"
+      "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
+      "pending_reason": "Receiver component exists; real Stripe provider contract/sandbox gate pending"
     }
   ],
   "acceptance_cases": [
@@ -25557,8 +25752,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D01 remaining transport, D03",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P0",
       "parallel_group": "auth",
       "feature_integration_gate": "G-AUTH",
@@ -25655,8 +25850,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D03",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "auth",
       "feature_integration_gate": "G-AUTH",
@@ -25745,8 +25940,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D03",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "auth",
       "feature_integration_gate": "G-AUTH",
@@ -25830,8 +26025,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D09",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P0",
       "parallel_group": "accounts",
       "feature_integration_gate": "G-AUTH",
@@ -25935,8 +26130,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D03, D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "management",
       "feature_integration_gate": "G-MANAGEMENT",
@@ -26027,8 +26222,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: AUTH-01, MGMT-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "management",
       "feature_integration_gate": "G-MANAGEMENT",
@@ -26127,8 +26322,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "management",
       "feature_integration_gate": "G-MANAGEMENT",
@@ -26216,8 +26411,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "management",
       "feature_integration_gate": "G-MANAGEMENT",
@@ -26301,8 +26496,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: MGMT-04, CERT-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "management",
       "feature_integration_gate": "G-MANAGEMENT",
@@ -26389,8 +26584,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P0",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -26471,8 +26666,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -26590,8 +26785,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: AUTH-01, CATALOG-01, DB-02",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P0",
       "parallel_group": "enrollments",
       "feature_integration_gate": "G-LEARNING",
@@ -26695,8 +26890,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D10",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -26828,8 +27023,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D04, D05, D09",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -26910,8 +27105,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: FOUNDATION-01, AUTH-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -26993,8 +27188,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: COURSE-02",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -27092,8 +27287,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D04",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "courses",
       "feature_integration_gate": "G-COURSE",
@@ -27200,8 +27395,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: ENROLL-01, COURSE-02",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "learning",
       "feature_integration_gate": "G-LEARNING",
@@ -27313,8 +27508,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: LEARN-01, COMPLETION-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "learning",
       "feature_integration_gate": "G-LEARNING",
@@ -27430,8 +27625,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D06, D09, D10",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "assessments",
       "feature_integration_gate": "G-ASSESSMENT",
@@ -27531,8 +27726,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D06",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "assessments",
       "feature_integration_gate": "G-ASSESSMENT",
@@ -27637,8 +27832,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D06, D10",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "assessments",
       "feature_integration_gate": "G-ASSESSMENT",
@@ -27747,8 +27942,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D07",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "certificates",
       "feature_integration_gate": "G-CERTIFICATE",
@@ -27860,8 +28055,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D08, D10",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "payments",
       "feature_integration_gate": "G-PAYMENT",
@@ -27946,8 +28141,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: PAY-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "payments",
       "feature_integration_gate": "G-PAYMENT",
@@ -28051,8 +28246,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: COURSE-01, DB-04, AUTH-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "redeem",
       "feature_integration_gate": "G-REDEEM",
@@ -28174,8 +28369,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: REDEEM-01, ENROLL-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "redeem",
       "feature_integration_gate": "G-REDEEM",
@@ -28277,8 +28472,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: COURSE-02, DB-05",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "ai",
       "feature_integration_gate": "G-AI",
@@ -28375,8 +28570,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "ai",
       "feature_integration_gate": "G-AI",
@@ -28463,8 +28658,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D11",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "ai",
       "feature_integration_gate": "G-AI",
@@ -28609,8 +28804,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D12",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "ai",
       "feature_integration_gate": "G-AI",
@@ -28729,8 +28924,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: AI-03",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "ai",
       "feature_integration_gate": "G-AI",
@@ -28823,8 +29018,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D16",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "blog",
       "feature_integration_gate": "G-BLOG",
@@ -28922,8 +29117,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D05, D09",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "blog",
       "feature_integration_gate": "G-BLOG",
@@ -29016,8 +29211,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D11",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "blog",
       "feature_integration_gate": "G-BLOG",
@@ -29066,7 +29261,7 @@
       "operations": [],
       "acceptance_ids": [],
       "source_sections": [],
-      "status": "READY",
+      "status": "DONE",
       "status_reason": "ไม่มี dependency หรือ business/protocol decision ค้าง; planning blueprint พร้อมให้ review",
       "priority": "P0",
       "parallel_group": "foundation",
@@ -29149,7 +29344,7 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
+      "status": "DONE",
       "status_reason": "รอ dependencies: FOUNDATION-01",
       "priority": "P0",
       "parallel_group": "schema-owner-serial",
@@ -29240,7 +29435,7 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
+      "status": "DONE",
       "status_reason": "รอ dependencies: DB-01",
       "priority": "P0",
       "parallel_group": "schema-owner-serial",
@@ -29319,7 +29514,7 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
+      "status": "DONE",
       "status_reason": "รอ dependencies: DB-02",
       "priority": "P1",
       "parallel_group": "schema-owner-serial",
@@ -29397,7 +29592,7 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
+      "status": "DONE",
       "status_reason": "รอ dependencies: DB-02",
       "priority": "P1",
       "parallel_group": "schema-owner-serial",
@@ -29479,7 +29674,7 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
+      "status": "DONE",
       "status_reason": "รอ dependencies: DB-01",
       "priority": "P1",
       "parallel_group": "schema-owner-serial",
@@ -29597,8 +29792,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: DB-02",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "enrollments",
       "feature_integration_gate": "G-LEARNING",
@@ -29696,8 +29891,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D01, D03",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "auth",
       "feature_integration_gate": "G-AUTH",
@@ -29806,8 +30001,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D08, D10",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "payments",
       "feature_integration_gate": "G-PAYMENT",
@@ -29886,8 +30081,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: CATALOG-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P0",
       "parallel_group": "integration",
       "feature_integration_gate": null,
@@ -29974,8 +30169,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: AUTH-01, ACCOUNT-01, ENROLL-01, INTEGRATION-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P0",
       "parallel_group": "integration",
       "feature_integration_gate": null,
@@ -30047,8 +30242,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "BLOCKED",
-      "status_reason": "รอ dependencies: AI-04, AI-05, AUTH-02, AUTH-03, BLOG-03, CATALOG-02, CI-01, INTEGRATION-02, LEARN-02, MGMT-05, PAY-02, PROVIDER-STRIPE-01, REDEEM-02, REVIEW-02, VIDEO-01",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P2",
       "parallel_group": "integration",
       "feature_integration_gate": null,
@@ -30216,7 +30411,7 @@
       "operations": [],
       "acceptance_ids": [],
       "source_sections": [],
-      "status": "NEEDS_DECISION",
+      "status": "DONE",
       "status_reason": "ต้องปิด D13",
       "priority": "P1",
       "parallel_group": "foundation",
@@ -30414,8 +30609,8 @@
           "sha256": "bb349f08f6bac5dc1f4ea15539450ecf11b53533c0cc5d83b30075c039564680"
         }
       ],
-      "status": "NEEDS_DECISION",
-      "status_reason": "ต้องปิด D03",
+      "status": "PENDING",
+      "status_reason": "Pending remaining behavior/gates only; execute independently specified components from CONTINUATION_QUEUE.json.",
       "priority": "P1",
       "parallel_group": "schema-owner-serial",
       "feature_integration_gate": null,

@@ -4,10 +4,13 @@ import { EnrollmentsModule } from '../enrollments/enrollments.module';
 import { RedeemWriter } from './redeem-writer.service';
 import { RevokeCodeService } from './revoke-code.service';
 import { RevokeCodeController } from './revoke-code.controller';
+import { CodeCommandsController } from './code-commands.controller';
+import { CodeIssuanceService } from './code-issuance.service';
+import { RedeemCodeService } from './redeem-code.service';
 
 @Module({
   imports: [AuthModule, EnrollmentsModule],
-  controllers: [RevokeCodeController],
-  providers: [RedeemWriter, RevokeCodeService],
+  controllers: [RevokeCodeController, CodeCommandsController],
+  providers: [RedeemWriter, RevokeCodeService, CodeIssuanceService, RedeemCodeService],
 })
 export class RedeemModule {}

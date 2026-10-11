@@ -7,6 +7,7 @@ import { AppModule } from '../../src/app.module';
 import { configureApplication } from '../../src/bootstrap';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { AttemptReadService } from '../../src/features/assessments/attempt-read.service';
+import { ManagedAttemptReadService } from '../../src/features/assessments/managed-attempt-read.service';
 import { testConnections } from '../support/postgres';
 import { assertErrorContract, assertTaskContract } from '../support/contract-validator';
 
@@ -42,7 +43,7 @@ describe('ASSESS-02 single owned Attempt / actual HTTP and PostgreSQL historical
       snapshotQuestions: { create: [...definitions].reverse().map(q => ({ questionId: q.questionId, type: q.type, position: q.position, maxScore: q.maxScore,
         payloadSnapshot: { prompt: 'คำถามเดิม ' + q.questionId, prompt_doc: { type: 'doc', text: 'บทเดิม' },
           options: q.type.endsWith('choice') ? [{ id: 'a', text: 'A', correct: true, private: 'PRIVATE_OPTION' }, { id: 'b', text: 'B' }] : [],
-          correct_key: 'PRIVATE_KEY', provider: 'PRIVATE_PROVIDER' } })) } } }); attempts[name] = row.id;
+          correct_key: 'PRIVATE_KEY', provider: 'PRIVATE_PROVIDER', ...(q.questionId === 'essay' ? { rubric: 'historical rubric', response_mode: 'either' } : {}) } })) } } }); attempts[name] = row.id;
     for (const q of definitions) if (status !== 'in_progress' || q.questionId === 'single') {
       const scored = graded || (status === 'pending_review' && q.type.endsWith('choice'));
       await db.answer.create({ data: { attemptId: row.id, questionId: q.questionId, response: q.response,
@@ -190,5 +191,57 @@ describe('ASSESS-02 single owned Attempt / actual HTTP and PostgreSQL historical
       expect(blocked).toBe(true); release(); expect((await reading).body.question_results[2].comment).toBe('ความคิดเห็นเดิม'); await mutation;
       expect((await read().expect(200)).body.question_results[2].comment).toBe('ความคิดเห็นใหม่');
     } finally { release(); await Promise.allSettled([reading, mutation]); spy.mockRestore(); }
+  });
+  const managed = (id = attempts.graded, actor = 'instructor') => request(app.getHttpServer())
+    .get('/api/v1/instructor/attempts/' + encodeURIComponent(id)).set('x-melearn-app', 'web')
+    .set('Cookie', `melearn_web_session=${secrets[actor]}`);
+  it.each(['in_progress', 'pending_review', 'graded', 'submitted'])('MGMT-04 owner reads canonical %s historical attempt with learner and choice subtotals', async status => {
+    const response = await managed(attempts[status]).expect(200); assertTaskContract('MGMT-04', 'ManagedAttemptDto', response.body);
+    expect(response.body.status).toBe(status); expect(response.body.user_id).toBe(accounts.learner);
+    expect(response.body.learner_display_name).toBe((await db.account.findUniqueOrThrow({ where: { id: accounts.learner } })).displayName);
+    expect(response.body.course_id).toBe(courseId); expect(response.body.item_id).toBe(itemId);
+    expect(response.body.choice_max).toBe(5); expect(response.body.choice_earned).toBe(status === 'graded' || status === 'pending_review' ? 4.5 : 0);
+    expect(JSON.stringify(response.body)).not.toMatch(/PRIVATE_|correct_key|correctKey|gradedBy|passwordHash/);
+    expect(Object.keys(response.body.grades).sort()).toEqual(status === 'graded' ? ['essay', 'image', 'multiple', 'single'] : status === 'pending_review' ? ['multiple', 'single'] : []);
+  });
+  it('MGMT-04 preserves optional historical rubric/response mode and does not consult edited live questions', async () => {
+    const response = await managed().expect(200); assertTaskContract('MGMT-04', 'ManagedAttemptDto', response.body);
+    expect(response.body.questions.find((q: { id: string }) => q.id === 'essay')).toMatchObject({ rubric: 'historical rubric', response_mode: 'either' });
+    expect(response.body.max).toBe(10);
+  });
+  it('MGMT-04 rejects learner, Admin including combined Admin/Instructor and wrong session namespace', async () => {
+    await managed(attempts.graded, 'learner').expect(403); await managed(attempts.graded, 'admin').expect(403);
+    await db.userRole.create({ data: { accountId: accounts.admin, role: 'instructor' } });
+    try { await managed(attempts.graded, 'admin').expect(403); }
+    finally { await db.userRole.delete({ where: { accountId_role: { accountId: accounts.admin, role: 'instructor' } } }); }
+    await request(app.getHttpServer()).get('/api/v1/instructor/attempts/' + attempts.graded).set('x-melearn-app', 'admin')
+      .set('Cookie', `melearn_web_session=${secrets.instructor}`).expect(403);
+    await request(app.getHttpServer()).get('/api/v1/instructor/attempts/' + attempts.graded).set('x-melearn-app', 'web').expect(401);
+  });
+  it('MGMT-04 enrolled foreign Instructor has no authoring access; unknown attempt also hides existence', async () => {
+    await db.userRole.create({ data: { accountId: accounts.learner, role: 'instructor' } });
+    try { await managed(attempts.graded, 'learner').expect(404); await managed('missing').expect(404); }
+    finally { await db.userRole.delete({ where: { accountId_role: { accountId: accounts.learner, role: 'instructor' } } }); }
+  });
+  it('MGMT-04 rechecks fresh owner identity after guard and blocks revoked/disabled authority', async () => {
+    const service = app.get(ManagedAttemptReadService), original = service.read.bind(service);
+    const spy = jest.spyOn(service, 'read').mockImplementationOnce(async (reference, id) => {
+      await db.account.update({ where: { id: accounts.instructor }, data: { disabled: true } }); return original(reference, id);
+    });
+    try { const response = await managed().expect(401); assertErrorContract(response.body); }
+    finally { spy.mockRestore(); }
+  });
+  it('MGMT-04 malformed snapshots fail safely and reads never repair stored data', async () => {
+    const before = await academic(), log = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    try { const response = await managed(attempts.bad).expect(500); assertErrorContract(response.body);
+      expect(await academic()).toEqual(before); expect(JSON.stringify(response.body) + JSON.stringify(log.mock.calls)).not.toMatch(/PRIVATE_|snapshot|postgresql/); }
+    finally { log.mockRestore(); }
+  });
+  it('MGMT-04 parallel and reconnect reads preserve all academic and model state', async () => {
+    const before = await academic(), beforeCounts = await counts(); await db.$disconnect(); await db.$connect();
+    for (const response of await Promise.all(Array.from({ length: 4 }, () => managed()))) {
+      expect(response.status).toBe(200); assertTaskContract('MGMT-04', 'ManagedAttemptDto', response.body);
+    }
+    expect(await academic()).toEqual(before); expect(await counts()).toEqual(beforeCounts);
   });
 });

@@ -1,6 +1,6 @@
 # MGMT-04 — Learner directory and managed attempt views
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: management
+Status: **PENDING** · Priority: P2 · Module: management
 
 ต้องปิด D16; D02 constraints/profile semantics confirmed แล้ว
 
@@ -85,3 +85,5 @@ Feature gate: **G-MANAGEMENT** ใน [Execution Plan](../EXECUTION_PLAN.md); �
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+Continuation update 11 ต.ค.: 2/4 canonical operations component-verified; see [current checkpoint](../PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md). Outstanding feature gates/decisions are PENDING and do not block independent use cases.

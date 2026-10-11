@@ -1,6 +1,6 @@
 # BLOG-02 — Admin blog draft/editor/preview
 
-Status: **NEEDS_DECISION** · Priority: P2 · Module: blog
+Status: **PENDING** · Priority: P2 · Module: blog
 
 ต้องปิด D05, D09; D02 constraints/profile semantics confirmed แล้ว
 

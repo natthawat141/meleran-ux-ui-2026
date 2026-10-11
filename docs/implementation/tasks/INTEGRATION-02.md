@@ -1,6 +1,6 @@
 # INTEGRATION-02 — Username→Free Enroll vertical slice
 
-Status: **BLOCKED** · Priority: P0 · Module: integration
+Status: **PENDING** · Priority: P0 · Module: integration
 
 รอ dependencies: AUTH-01, ACCOUNT-01, ENROLL-01, INTEGRATION-01
 

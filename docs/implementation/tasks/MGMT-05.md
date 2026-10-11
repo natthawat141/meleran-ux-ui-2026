@@ -1,6 +1,6 @@
 # MGMT-05 — Admin/Instructor summaries
 
-Status: **BLOCKED** · Priority: P2 · Module: management
+Status: **PENDING** · Priority: P2 · Module: management
 
 รอ dependencies: MGMT-04, CERT-01
 

@@ -4,10 +4,14 @@ import { CurrentUser, CurrentPrincipal } from '../../shared/auth/current-user.de
 import { AuthoritativeAudience } from '../../shared/auth/session.guard';
 import { AuthPrincipal } from '../auth/public/index';
 import { SelfProfileService } from './self-profile.service';
+import { SelfProfileUpdateService } from './self-profile-update.service';
+import { SelfProfilePatchPipe } from './dto/self-profile-patch.pipe';
+import { SelfProfilePatch } from '../auth/public/index';
 
 @Controller('me')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService, private readonly selfProfile: SelfProfileService) {}
+  constructor(private readonly accountsService: AccountsService, private readonly selfProfile: SelfProfileService,
+    private readonly updates: SelfProfileUpdateService) {}
 
   @Get()
   @AuthoritativeAudience('web', 'admin')
@@ -16,7 +20,8 @@ export class AccountsController {
   }
 
   @Patch()
-  async updateProfile(@CurrentUser() user: any, @Body() patch: any) {
-    return this.accountsService.updateProfile(user.id, patch);
+  @AuthoritativeAudience('web', 'admin')
+  async updateProfile(@CurrentPrincipal() actor: AuthPrincipal, @Body(new SelfProfilePatchPipe()) patch: SelfProfilePatch) {
+    return this.updates.update(actor.session, patch);
   }
 }

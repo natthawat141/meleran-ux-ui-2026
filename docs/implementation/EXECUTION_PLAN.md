@@ -2,6 +2,13 @@
 
 Planning blueprint · 10 ตุลาคม 2026 · ไม่มีAPIimplementationในชุดงานนี้
 
+Continuation 11 ต.ค.: งานรอคำตอบ/remaining gates เป็น **PENDING** และข้ามเฉพาะ
+behavior ที่ยังไม่ชัด. ใช้ [CONTINUATION_QUEUE](CONTINUATION_QUEUE.json) เลือก
+operation อิสระใน Wave 1–17; planning dependencies ทั้ง task ไม่กั้น component
+ที่มี schema/authority/transaction พร้อม. Current HTTP components25/86;
+ดู [checkpoint](PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md). ชุด C provider
+ownership confirmed และ [concrete design](FIREBASE_PROVIDER_DESIGN.md) จัดทำแล้ว.
+
 เริ่ม execution แล้ว 11 ตุลาคม 2026 ตามคำสั่งทำ Wave 1–17; ตารางด้านล่างคง planning baseline สำหรับ traceability. ดู [สถานะและหลักฐานปัจจุบัน](EXECUTION_STATUS.md) / [machine-readable board](EXECUTION_STATUS.json) ก่อนเลือกใบงาน. Foundation, DB-01/02/05/03/04 และ CI-01 ผ่านแล้ว; ไม่ถือว่า business acceptance ผ่านจากการปิดสองงานนี้.
 
 ## 1. Inventory and readiness

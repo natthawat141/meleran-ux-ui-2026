@@ -1,6 +1,6 @@
 # REVIEW-01 — Admin review queue/detail
 
-Status: **BLOCKED** · Priority: P1 · Module: courses
+Status: **PENDING** · Priority: P1 · Module: courses
 
 รอ dependencies: COURSE-02
 

@@ -2,6 +2,27 @@
 
 อัปเดต 11 ต.ค. 2026. เป้าหมายยังครบ 50 tasks / 86 defined + 5 deferred operations / 113 acceptance cases.
 
+## Checkpoint ปัจจุบัน — เดินงานต่อโดยข้ามเฉพาะ PENDING
+
+- Implemented HTTP components **25/86** (เพิ่ม PATCH /me, owner Managed Attempt,
+  Admin issue codes และ public Redeem); **61 operations PENDING**. Backend APIs ครบ
+  ทุก operation ใน 5 packages: ACCOUNT-01, VIDEO-01, REDEEM-02, AI-01, AI-04;
+  full feature/browser/provider gates แยกจาก component implementation.
+- Targeted HTTP/PostgreSQL profile24, Attempt25 และ Redeem35 tests ผ่าน;
+  feature units44 ผ่าน. Full regression checkpoint: PG384 + foundation49 +
+  units44 = **477 tests**; ผล full run และ CI ของ SHA ใหม่บันทึกใน board เมื่อจบ.
+- Existing Frontend clients → real Nest → isolated PG: **141 checks** ผ่าน
+  (เพิ่ม profile5, managed Attempt5, code commands7). ไม่ใช้ mock fetcher;
+  session fixtures ยังไม่ใช่ authenticated browser/Firebase acceptance.
+- ชุด C ยืนยันเพิ่มแล้ว: [provider design](FIREBASE_PROVIDER_DESIGN.md) และ
+  [proposed 2-operation delta](contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json).
+  Canonical ยัง Draft.2, 86 defined + 5 deferred; ไม่ติดตั้ง SDK/เปลี่ยน live resources.
+- [CONTINUATION_QUEUE](CONTINUATION_QUEUE.json) ครบ 17 waves พร้อม operation-local
+  status, dependencies และ acceptance IDs. งานรอคำตอบเป็น PENDING; ไม่หยุดทั้งคิว.
+- Foundation/DB/CI DONE7, READY1, PENDING42; full acceptance ยัง **0/113**.
+  Whole-wave gate ไม่ใช้แทนจำนวน APIs ที่ implement แล้ว. ตาราง/ข้อความถัดไป
+  เป็นหลักฐาน checkpoints เดิม; current machine-readable board เป็นหลัก.
+
 ## ผลที่ตรวจแล้ว
 
 - DONE: FOUNDATION-01, DB-01, DB-02, DB-05, DB-03, DB-04 (7/50 tasks พร้อม CI-01).

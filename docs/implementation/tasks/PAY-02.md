@@ -1,6 +1,6 @@
 # PAY-02 — Admin payment view
 
-Status: **BLOCKED** · Priority: P1 · Module: payments
+Status: **PENDING** · Priority: P1 · Module: payments
 
 รอ dependencies: PAY-01
 
