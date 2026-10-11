@@ -4,7 +4,7 @@ Status: **PENDING** · Priority: P2 · Module: management
 
 ต้องปิด D16; D02 constraints/profile semantics confirmed แล้ว
 
-Component update 11 ต.ค.: GET /managed-quizzes/{id} implemented and verified separately; see [MANAGED_QUIZ_LOCATOR_COMPONENT](../MANAGED_QUIZ_LOCATOR_COMPONENT.md) for exact authority, public CourseItem ID mapping, locks and tests. Locator dependencies are FOUNDATION-01, DB-02 normalized identity, DB-03 current Quiz linkage and AUTH-BASE-01 fresh authoring authority. It does not depend on unresolved roster query/PII or grading policy. Whole task remains NEEDS_DECISION until all four operations and feature gate pass; no silent relaxation of planning dependencies for directories/managed Attempt.
+Component update 11 ต.ค.: GET /managed-quizzes/{id} and GET /instructor/attempts/{id} implemented and verified separately. Locator evidence is [MANAGED_QUIZ_LOCATOR_COMPONENT](../MANAGED_QUIZ_LOCATOR_COMPONENT.md); historical Attempt evidence is [current checkpoint](../PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md). Both depend on FOUNDATION-01, DB-02 normalized identity, DB-03 Quiz/snapshot linkage and AUTH-BASE-01 fresh authority. They do not depend on unresolved roster query/PII or best-score selection. The two roster operations and feature gate remain PENDING.
 
 ## Read set และ traceability
 

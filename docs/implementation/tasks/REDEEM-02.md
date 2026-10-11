@@ -10,8 +10,8 @@ Execution 11 ต.ค. 2026: internal caller-owned RedeemWriter consumes/grants
 atomically and competes with actual Admin revoke. See
 [REDEEM_TRANSACTION_COMPONENT](../REDEEM_TRANSACTION_COMPONENT.md) for locks,
 rollback/audit/source preservation and 21 shared PG tests. Public POST /me/redeem
-is not implemented; input/lifecycle/eligibility orchestration and full gates
-remain pending. Whole task BLOCKED, original acceptance IDs unchanged.
+is now implemented with input/lifecycle/eligibility orchestration and 9 additional
+HTTP/PG tests; full browser/provider gates remain PENDING. Original acceptance IDs unchanged.
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 

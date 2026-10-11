@@ -98,7 +98,10 @@
       "frontend_contract": "PASS_DRAFT_2",
       "schema_delta": false,
       "provider_design": "DELIVERED_PROPOSED_DELTA",
-      "browser_acceptance": false
+      "browser_acceptance": false,
+      "hosted_status": "PASS",
+      "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
     }
   },
   "environment": {
@@ -300,7 +303,9 @@
           ],
           "remaining": [
             "Full authenticated browser/provider feature gates"
-          ]
+          ],
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
@@ -480,7 +485,9 @@
           ],
           "remaining": [
             "Full authenticated browser/provider feature gates"
-          ]
+          ],
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
@@ -1146,7 +1153,9 @@
           ],
           "remaining": [
             "Full authenticated browser/provider feature gates"
-          ]
+          ],
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -1210,7 +1219,9 @@
           ],
           "remaining": [
             "Full authenticated browser/provider feature gates"
-          ]
+          ],
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569"
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -1991,6 +2002,33 @@
           "full_feature_gate": false,
           "verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321"
+        },
+        {
+          "id": "continuation_selfProfilePatch",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 5,
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
+          "full_acceptance": false,
+          "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md"
+        },
+        {
+          "id": "continuation_managedAttemptRead",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 5,
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
+          "full_acceptance": false,
+          "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md"
+        },
+        {
+          "id": "continuation_codeCommands",
+          "state": "COMPONENT_VERIFIED",
+          "checks": 7,
+          "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+          "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
+          "full_acceptance": false,
+          "evidence_document": "PROFILE_REDEEM_MANAGED_ATTEMPT_COMPONENT.md"
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -2201,16 +2239,18 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
-    "latest_component_ci": "PASS_APPROVED_LOCAL_AUTH_KERNEL",
+    "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
+    "latest_component_ci": "PASS_PROFILE_REDEEM_MANAGED_ATTEMPT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533791",
     "frontend_ci_evidence_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
-    "frontend_ci_evidence_note": "Exact Auth checkpoint: Nest433 tests +124 actual client checks; Frontend172 tests/contracts/tokens/boundaries/typecheck/build and Web/Admin container smoke. No complete Firebase/Login/reset/browser acceptance.",
-    "previous_verified_sha": "008c9e8cd62933e734330f5a1ae4d9531959d721",
-    "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38097574321",
-    "current_checkpoint_ci": "PENDING_NEW_SHA"
+    "frontend_ci_evidence_note": "Full Frontend CI evidence remains on 52852919d7acce6cb7c8c4dd4bc82e328cb1bc06; source unchanged in this checkpoint. Current unchanged clients tested against real Nest/PG in exact code CI; contract generation check passed locally.",
+    "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
+    "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
+    "current_checkpoint_ci": "PASS_EXACT_CODE_SHA",
+    "current_checkpoint_evidence": "Hosted Nest CI: 477 tests, build/smoke, blueprint/Auth delta/17-wave queue, 141 actual Frontend client checks. Full browser/provider acceptance remains pending.",
+    "frontend_source_changed": false
   },
   "remaining_decisions": [
     "D01",

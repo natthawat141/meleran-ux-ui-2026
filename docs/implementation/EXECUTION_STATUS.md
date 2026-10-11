@@ -10,7 +10,7 @@
   full feature/browser/provider gates แยกจาก component implementation.
 - Targeted HTTP/PostgreSQL profile24, Attempt25 และ Redeem35 tests ผ่าน;
   feature units44 ผ่าน. Full regression checkpoint: PG384 + foundation49 +
-  units44 = **477 tests**; ผล full run และ CI ของ SHA ใหม่บันทึกใน board เมื่อจบ.
+  units44 = **477 tests ผ่าน**; hosted [CI38105367569](https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569) ผ่านบน `e157b69` พร้อม build/smoke และ141 client checks.
 - Existing Frontend clients → real Nest → isolated PG: **141 checks** ผ่าน
   (เพิ่ม profile5, managed Attempt5, code commands7). ไม่ใช้ mock fetcher;
   session fixtures ยังไม่ใช่ authenticated browser/Firebase acceptance.

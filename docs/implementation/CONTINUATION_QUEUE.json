@@ -125,7 +125,7 @@
         "A15",
         "C12"
       ],
-      "remaining": "Unresolved behavior: D01, D02, D03; approved subsets are not reopened",
+      "remaining": "Unresolved behavior: D01, D03; approved subsets are not reopened",
       "read_set": [
         "tasks/AUTH-01.md",
         "contracts/AUTH-01.openapi.json",
@@ -267,7 +267,7 @@
         "A07",
         "A08"
       ],
-      "remaining": "Unresolved behavior: D02, D03, D16; approved subsets are not reopened",
+      "remaining": "Unresolved behavior: D03, D16; approved subsets are not reopened",
       "read_set": [
         "tasks/MGMT-01.md",
         "contracts/MGMT-01.openapi.json",
@@ -290,7 +290,7 @@
         "A07",
         "A08"
       ],
-      "remaining": "Unresolved behavior: D02, D03, D16; approved subsets are not reopened",
+      "remaining": "Unresolved behavior: D03, D16; approved subsets are not reopened",
       "read_set": [
         "tasks/MGMT-01.md",
         "contracts/MGMT-01.openapi.json",
@@ -2451,5 +2451,12 @@
       "implemented_operations": 0,
       "full_feature_acceptance": "PENDING"
     }
-  ]
+  ],
+  "checkpoint": {
+    "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
+    "tests": 477,
+    "frontend_client_checks": 141,
+    "full_acceptance": false
+  }
 }

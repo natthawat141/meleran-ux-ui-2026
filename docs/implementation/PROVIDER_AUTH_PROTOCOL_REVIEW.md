@@ -1,5 +1,10 @@
 # Firebase Auth — technical review packet
 
+Current concrete set-C design: [FIREBASE_PROVIDER_DESIGN](FIREBASE_PROVIDER_DESIGN.md)
+and [proposed OpenAPI delta](contracts/AUTH_FIREBASE_DELTA_DRAFT.openapi.json).
+This earlier packet supplies background; exact paths/schemas/deferred mapping and
+failure boundaries follow that design. Canonical remains Draft.2.
+
 11 ต.ค. 2026 · PROVIDER-AUTH-01 / AUTH-01–03 / DB-06. Approved ownership/linking direction; **proposals below are not additional canonical operations**. Baseline Draft.2 SHA `b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be`. Read Scope §2.1/§5.8 and this packet; no need to reread the full handbook.
 
 ## Confirmed boundaries

@@ -1045,7 +1045,6 @@
       "execution_status": "PENDING",
       "unresolved_decisions": [
         "D01",
-        "D02",
         "D03"
       ],
       "transaction_id": "TX-AUTH",
@@ -1762,7 +1761,6 @@
       "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D01",
-        "D02",
         "D03"
       ],
       "transaction_id": "TX-AUTH",
@@ -2511,7 +2509,6 @@
       },
       "execution_status": "PENDING",
       "unresolved_decisions": [
-        "D02",
         "D03",
         "D16"
       ],
@@ -2789,7 +2786,6 @@
       },
       "execution_status": "PENDING",
       "unresolved_decisions": [
-        "D02",
         "D03",
         "D16"
       ],
@@ -20411,7 +20407,6 @@
       },
       "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
-        "D02",
         "D03",
         "D16"
       ],

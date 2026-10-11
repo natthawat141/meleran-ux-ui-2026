@@ -10,7 +10,8 @@ Execution 11 ต.ค. 2026: canonical Admin revoke operation has actual HTTP/PG
 and unchanged frontend decoder integration; original actor/time replay and
 competing Redeem lock behavior verified. See
 [REDEEM_TRANSACTION_COMPONENT](../REDEEM_TRANSACTION_COMPONENT.md).
-Issue/list and full Auth/Course/G-REDEEM/G-AI remain pending; whole task BLOCKED.
+Issue is now implemented with 5 additional HTTP/PG tests; masked list and full
+Auth/Course/G-REDEEM/G-AI feature gates remain PENDING.
 
 อ่าน [Architecture](../ARCHITECTURE.md), ใบงานนี้ และ context subset เท่านั้นก่อนเริ่ม; เปิดต้นฉบับเฉพาะ section เมื่อพบ conflict.
 

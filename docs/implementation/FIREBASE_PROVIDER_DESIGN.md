@@ -142,6 +142,10 @@ Metadata-only ENV inspection 11 ต.ค.: Firebase public Web keys/project field
 server identity/project ผ่าน adapter preflight โดยไม่สร้าง key/IAM ใหม่. From ยัง
 ไม่พร้อมสำหรับ delivery gate. Public Web config ไม่ทดแทน server verification.
 
+Read-only `gcloud services list --enabled --project melearn-tutor` preflight:
+`identitytoolkit.googleapis.com` ENABLED. ผลนี้ไม่ยืนยัน Email/Google provider
+configuration หรือสิทธิ์ของ runtime principal. ไม่มี Cloud resource mutation.
+
 ## Deferred migration และจำนวน operation
 
 4 Google deferred (`GET /auth/google/start`, `GET /auth/google/callback`,
