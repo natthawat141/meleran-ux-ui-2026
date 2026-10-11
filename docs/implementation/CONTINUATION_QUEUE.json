@@ -20,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 40,
+    "implemented_operations": 48,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -556,7 +556,7 @@
       "operationId": "get_me_progress",
       "task_id": "LEARN-01",
       "wave": 11,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "ENROLL-01",
@@ -574,7 +574,7 @@
         "F03",
         "AI05"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/LEARN-01.md",
         "contracts/LEARN-01.openapi.json",
@@ -587,7 +587,7 @@
       "operationId": "post_learn_items_id_complete",
       "task_id": "LEARN-02",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "LEARN-01",
@@ -603,7 +603,7 @@
         "F03",
         "F05"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/LEARN-02.md",
         "contracts/LEARN-02.openapi.json",
@@ -931,7 +931,7 @@
       "operationId": "post_instructor_courses",
       "task_id": "COURSE-01",
       "wave": 9,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -942,7 +942,7 @@
         "C01",
         "C02"
       ],
-      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/COURSE-01.md",
         "contracts/COURSE-01.openapi.json",
@@ -955,7 +955,7 @@
       "operationId": "get_instructor_courses",
       "task_id": "COURSE-01",
       "wave": 9,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -966,7 +966,7 @@
         "C01",
         "C02"
       ],
-      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/COURSE-01.md",
         "contracts/COURSE-01.openapi.json",
@@ -979,7 +979,7 @@
       "operationId": "post_admin_courses",
       "task_id": "COURSE-01",
       "wave": 9,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -990,7 +990,7 @@
         "C01",
         "C02"
       ],
-      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/COURSE-01.md",
         "contracts/COURSE-01.openapi.json",
@@ -1003,7 +1003,7 @@
       "operationId": "get_admin_courses",
       "task_id": "COURSE-01",
       "wave": 9,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "AUTH-01",
@@ -1014,7 +1014,7 @@
         "C01",
         "C02"
       ],
-      "remaining": "Unresolved behavior: D10; approved subsets are not reopened",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/COURSE-01.md",
         "contracts/COURSE-01.openapi.json",
@@ -1027,7 +1027,7 @@
       "operationId": "get_courses_id_authoring",
       "task_id": "COURSE-02",
       "wave": 10,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-01",
@@ -1055,7 +1055,7 @@
         "AI09",
         "AI10"
       ],
-      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/COURSE-02.md",
         "contracts/COURSE-02.openapi.json",
@@ -1090,7 +1090,7 @@
       "operationId": "get_courses_id_authoring-preview",
       "task_id": "COURSE-02",
       "wave": 10,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-01",
@@ -1118,7 +1118,7 @@
         "AI09",
         "AI10"
       ],
-      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "remaining": "Full feature/browser acceptance gates",
       "read_set": [
         "tasks/COURSE-02.md",
         "contracts/COURSE-02.openapi.json",
@@ -2402,25 +2402,25 @@
     {
       "wave": 9,
       "defined_operations": 4,
-      "implemented_operations": 0,
+      "implemented_operations": 4,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 10,
       "defined_operations": 7,
-      "implemented_operations": 3,
+      "implemented_operations": 5,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 11,
       "defined_operations": 9,
-      "implemented_operations": 6,
+      "implemented_operations": 7,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 12,
       "defined_operations": 8,
-      "implemented_operations": 1,
+      "implemented_operations": 2,
       "full_feature_acceptance": "PENDING"
     },
     {

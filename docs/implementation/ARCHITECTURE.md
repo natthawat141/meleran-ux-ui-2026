@@ -2,6 +2,10 @@
 
 วันที่ 10 ตุลาคม 2026 · Planning only · Contract Draft ไม่ frozen ทั้งระบบ
 
+## Current execution override — 2026-10-11
+
+Latest user authorizes documented technical choices and continuing Wave1–17. Current verified feature-local boundaries: Enrollment owns CompletionCoordinator/ResumeWriter; Assessment exposes BestResultReader; Certificate exposes CompletionIssuer; Course owns metadata/directory/authoring. Atomic completion freezes first proof and certificate, not client scores. Auth Username HTTP now uses LocalAuthenticationService/SessionWriter, removing active prototype issuance/legacy password checking. Email remains explicit unavailable until Firebase branch. All protected runtime handlers require AuthoritativeAudience and fresh normalized roles; architecture-baseline has zero prototype exceptions. Older proposal/status paragraphs below are historical where superseded by current EXECUTION_STATUS and AUTONOMOUS_EXECUTION_DECISIONS. Canonical Draft.2 unchanged; original113 acceptance cases remain tracked.
+
 ## 1. Source precedence และ execution target
 
 Execution overlay 11 ต.ค.: ผู้ใช้อนุญาต agent เลือก technical details ที่ค้างพร้อมบันทึก ไม่ idle-wait; ดู AUTONOMOUS_EXECUTION_DECISIONS.md. Shared pagination utility มี scalar query validation/HMAC keyset เท่านั้น ไม่ query entities/authorize. Auth PrincipalService.requireSelfWrite ถือ Account UPDATE ก่อน resolve เพื่อไม่เกิด lock upgrade ใน simultaneous commands. AI wire metadata `_wire` version1 เป็น bounded private storage format; Sender ต้องเขียนตาม format, readers fail closed สำหรับ legacy missing metadata. Tombstone delete ไม่ทำลาย quota/dedupe

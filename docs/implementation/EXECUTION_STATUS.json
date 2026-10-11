@@ -16,22 +16,22 @@
   },
   "verified": {
     "foundation_tests": 53,
-    "database_tests": 430,
+    "database_tests": 486,
     "typecheck": "PASS",
     "nest_build": "PASS",
     "runtime_smoke": "PASS",
     "business_acceptance_cases": 0,
-    "boundary_gate": "PASS_WITH_TRACKED_PROTOTYPE_EXCEPTIONS",
+    "boundary_gate": "PASS_ZERO_PROTOTYPE_EXCEPTIONS",
     "catalog_detail_component_tests": 6,
     "prisma_physical_schema_parity": "PASS_NO_DDL_DIFF",
-    "feature_component_unit_tests": 50,
+    "feature_component_unit_tests": 53,
     "instructor_detail_component_tests": 6,
     "entitlement_writer_component_tests": 8,
     "submitted_score_component_tests": 8,
     "frontend_detail_client_checks": 6,
     "frontend_targeted_tests": 31,
     "frontend_typecheck": "PASS_WEB_ADMIN_PACKAGES",
-    "frontend_build": "PASS_WEB_ADMIN_LOCAL_PREVIEW",
+    "frontend_build": "PASS_WEB_ADMIN",
     "frontend_detail_browser_component": "PASS_PUBLISHED_EDIT_AND_500",
     "frontend_hosted_tests": 172,
     "stripe_receiver_unit_tests": 5,
@@ -53,7 +53,7 @@
     "ai_practice_answer_http_postgres_tests": 14,
     "ai_practice_link_postgres_tests": 6,
     "frontend_ai_practice_answer_client_checks": 8,
-    "frontend_client_checks_total": 162,
+    "frontend_client_checks_total": 177,
     "ai_usage_read_http_postgres_tests": 12,
     "frontend_ai_usage_client_checks": 7,
     "ai_rename_http_postgres_tests": 12,
@@ -74,9 +74,9 @@
     "course_creator_schema_postgres_tests": 7,
     "admin_user_detail_http_postgres_tests": 18,
     "frontend_admin_user_detail_transport_checks": 10,
-    "local_auth_kernel_postgres_tests": 18,
+    "local_auth_kernel_postgres_tests": 25,
     "local_password_unit_tests": 6,
-    "frontend_local_tests": 172,
+    "frontend_local_tests": 173,
     "frontend_contract_check": "PASS_DRAFT_2",
     "frontend_local_typecheck": "PASS_WEB_ADMIN_PACKAGES",
     "self_profile_patch_http_postgres_tests": 10,
@@ -87,16 +87,18 @@
     "current_checkpoint": {
       "local_status": "PASS",
       "foundation_tests": 53,
-      "database_tests": 430,
-      "feature_component_unit_tests": 50,
-      "total_tests": 533,
-      "frontend_client_checks": 162,
+      "database_tests": 486,
+      "feature_component_unit_tests": 53,
+      "total_tests": 592,
+      "full_regression_basis": "479 PG/36 suites passed; local-auth-kernel rerun25/25 including7 new HTTP tests; relevant HTTP foundation19 rerun after cutover",
+      "frontend_client_checks": 177,
+      "frontend_tests": 173,
       "typecheck": "PASS",
       "nest_build": "PASS",
       "runtime_smoke": "PASS",
       "blueprint_and_continuation": "PASS",
       "frontend_contract": "UNCHANGED_DRAFT_2",
-      "schema_delta": false,
+      "schema_delta": true,
       "browser_acceptance": false,
       "hosted_status": "PENDING_PUSH"
     },
@@ -111,13 +113,52 @@
       "canonical_changed": false,
       "schema_delta": false,
       "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
-      "hosted_status": "PENDING_CHECKPOINT",
+      "hosted_status": "PASS",
       "browser_acceptance": false
     },
     "frontend_continuation_list_resume_checks": 10,
     "frontend_ai_history_checks": 5,
     "frontend_admin_directory_checks": 6,
-    "total_local_tests": 533
+    "total_local_tests": 592,
+    "learning_authoring_continuation": {
+      "new_operations": 8,
+      "postgres_tests": 49,
+      "feature_units": 3,
+      "frontend_client_checks": 15,
+      "frontend_decoder_regression_tests": 1,
+      "schema_delta": true,
+      "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+      "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+      "local_targeted_status": "PASS",
+      "full_regression": "PASS_479_BASE_PLUS_7_LOGIN_HTTP",
+      "hosted_status": "PENDING_NEW_CHECKPOINT",
+      "browser_acceptance": false
+    },
+    "last_verified_checkpoint": {
+      "local_status": "PASS",
+      "foundation_tests": 53,
+      "database_tests": 430,
+      "feature_component_unit_tests": 50,
+      "total_tests": 533,
+      "frontend_client_checks": 162,
+      "typecheck": "PASS",
+      "nest_build": "PASS",
+      "runtime_smoke": "PASS",
+      "blueprint_and_continuation": "PASS",
+      "frontend_contract": "UNCHANGED_DRAFT_2",
+      "schema_delta": false,
+      "browser_acceptance": false,
+      "hosted_status": "PASS",
+      "verified_sha": "43f6cd52d681554d407931f9e03504a1318545bb",
+      "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38107556685"
+    },
+    "local_username_http": {
+      "state": "COMPONENT_VERIFIED",
+      "additional_postgres_tests": 7,
+      "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+      "operation_counted": false,
+      "remaining": "Firebase Email credential branch; AUTH-01 remains partial"
+    }
   },
   "environment": {
     "staging": false,
@@ -166,6 +207,11 @@
       {
         "name": "20261011045000_db01_course_creator",
         "sha256": "857c8152a11cdc4c5522efa903a53fdf80991ffeeaef44cfa5f4e127d9da0d8c"
+      },
+      {
+        "name": "20261011050000_course_authoring",
+        "sha256": "5204bffa343645c2d14d589829d51d54e9fae2487f430ef6a6fc75f96134ec8b",
+        "status": "APPLIED_ISOLATED_TEST_VERIFIED"
       }
     ],
     "stripe_webhook": {
@@ -214,6 +260,20 @@
           "full_acceptance": false,
           "verified_sha": "df236a23fe9a54abf194df1224bb4ae8739c0d8b",
           "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38092340554"
+        },
+        {
+          "id": "local_username_http_cutover",
+          "kind": "PARTIAL_HTTP_COMPONENT",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/local-auth-kernel.pg-spec.ts",
+          "postgres_tests": 25,
+          "http_operation_verified": false,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "remaining": [
+            "Firebase Email branch",
+            "Full provider/browser acceptance"
+          ],
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "NEEDS_DECISION",
@@ -793,9 +853,67 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 4,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
+      },
+      "components": [
+        {
+          "id": "continuation_post_instructor_courses",
+          "method": "POST",
+          "path": "/instructor/courses",
+          "operationId": "post_instructor_courses",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/course-directory.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
+        },
+        {
+          "id": "continuation_get_instructor_courses",
+          "method": "GET",
+          "path": "/instructor/courses",
+          "operationId": "get_instructor_courses",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/course-directory.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
+        },
+        {
+          "id": "continuation_post_admin_courses",
+          "method": "POST",
+          "path": "/admin/courses",
+          "operationId": "post_admin_courses",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/course-directory.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
+        },
+        {
+          "id": "continuation_get_admin_courses",
+          "method": "GET",
+          "path": "/admin/courses",
+          "operationId": "get_admin_courses",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/course-directory.pg-spec.ts",
+          "shared_suite_tests": 16,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
+        }
+      ]
     },
     {
       "id": "COURSE-02",
@@ -814,9 +932,39 @@
       "previous_planning_state": "NEEDS_DECISION",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
-      }
+        "implemented_operations": 2,
+        "state": "PARTIAL"
+      },
+      "components": [
+        {
+          "id": "continuation_get_courses_id_authoring",
+          "method": "GET",
+          "path": "/courses/{id}/authoring",
+          "operationId": "get_courses_id_authoring",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/authoring-read.pg-spec.ts",
+          "shared_suite_tests": 9,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
+        },
+        {
+          "id": "continuation_get_courses_id_authoring_preview",
+          "method": "GET",
+          "path": "/courses/{id}/authoring-preview",
+          "operationId": "get_courses_id_authoring-preview",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/authoring-read.pg-spec.ts",
+          "shared_suite_tests": 9,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
+        }
+      ]
     },
     {
       "id": "VIDEO-01",
@@ -974,13 +1122,27 @@
             "verified_sha": "7c0c4113dba86da354fd5813332850a968d6b343",
             "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38083900295"
           }
+        },
+        {
+          "id": "continuation_get_me_progress",
+          "method": "GET",
+          "path": "/me/progress",
+          "operationId": "get_me_progress",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/completion-command.pg-spec.ts",
+          "shared_suite_tests": 24,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
         }
       ],
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 2,
-        "state": "PARTIAL"
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -1030,13 +1192,27 @@
           "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
           "full_acceptance": false,
           "evidence": "Actual Nest HTTP + isolated PostgreSQL; schema/permission/owner scope, keyset pagination, persistence and negative cases. Actual unchanged Frontend clients checked separately; no provider/browser acceptance implied."
+        },
+        {
+          "id": "continuation_post_learn_items_id_complete",
+          "method": "POST",
+          "path": "/learn/items/{id}/complete",
+          "operationId": "post_learn_items_id_complete",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/completion-command.pg-spec.ts",
+          "shared_suite_tests": 24,
+          "tests_shared_across_operations": true,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "decision_document": "AUTONOMOUS_EXECUTION_DECISIONS.md",
+          "full_acceptance": false,
+          "evidence": "Actual HTTP/PostgreSQL, canonical wire schema, authorization/ownership, rollback, concurrency, persistence and unchanged historical records. Full browser/provider acceptance remains separate."
         }
       ],
       "previous_planning_state": "BLOCKED",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -1949,7 +2125,18 @@
         "defined_operations": 0,
         "implemented_operations": 0,
         "state": "PENDING"
-      }
+      },
+      "components": [
+        {
+          "id": "atomic_completion_coordinator",
+          "kind": "INTERNAL_TRANSACTION_COMPONENT",
+          "state": "COMPONENT_VERIFIED",
+          "test_suite": "backend/test/database/completion-command.pg-spec.ts",
+          "shared_suite_tests": 24,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "full_acceptance": false
+        }
+      ]
     },
     {
       "id": "PROVIDER-AUTH-01",
@@ -2303,6 +2490,20 @@
           "frontend_client_checks": 6,
           "protocol_document": "AUTONOMOUS_CONTINUATION_COMPONENT.md",
           "full_acceptance": false
+        },
+        {
+          "id": "learning_completion_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 6,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "full_acceptance": false
+        },
+        {
+          "id": "course_authoring_clients",
+          "state": "COMPONENT_VERIFIED",
+          "frontend_client_checks": 9,
+          "protocol_document": "LEARNING_AUTHORING_COMPONENT.md",
+          "full_acceptance": false
         }
       ],
       "previous_planning_state": "BLOCKED",
@@ -2513,18 +2714,19 @@
     "repository": "natthawat141/meleran-tutor",
     "branch": "backend/v1-foundation",
     "ci": "PASS",
-    "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
+    "verified_sha": "43f6cd52d681554d407931f9e03504a1318545bb",
     "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
     "latest_component_ci": "PASS_PROFILE_REDEEM_MANAGED_ATTEMPT",
     "frontend_ci": "PASS_VERIFY_AND_WEB_ADMIN_CONTAINERS",
     "frontend_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533791",
     "frontend_ci_evidence_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
-    "frontend_ci_evidence_note": "Full Frontend CI evidence remains on 52852919d7acce6cb7c8c4dd4bc82e328cb1bc06; source unchanged in this checkpoint. Current unchanged clients tested against real Nest/PG in exact code CI; contract generation check passed locally.",
+    "frontend_ci_evidence_note": "Previous hosted Frontend evidence retained; current preview decoder change verified locally and awaits exact-SHA CI.",
     "previous_verified_sha": "52852919d7acce6cb7c8c4dd4bc82e328cb1bc06",
     "previous_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38103533729",
     "current_checkpoint_ci": "PENDING_NEW_COMPONENTS",
     "current_checkpoint_evidence": "Hosted Nest CI: 477 tests, build/smoke, blueprint/Auth delta/17-wave queue, 141 actual Frontend client checks. Full browser/provider acceptance remains pending.",
-    "frontend_source_changed": false
+    "frontend_source_changed": true,
+    "last_ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38107556685"
   },
   "remaining_decisions": [
     "D01",

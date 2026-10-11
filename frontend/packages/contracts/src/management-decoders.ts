@@ -216,7 +216,7 @@ const fullItem =
         has_history: boolean,
         description: text,
         duration: text,
-        reading_minutes: revision,
+        reading_minutes: number,
         video_url: text,
         body: text,
         body_doc: jsonDoc,
@@ -235,9 +235,7 @@ const fullItem =
       ],
     )(v);
     const x = record(v);
-    if (x.type === 'video') text(x.video_url);
-    if (x.type === 'article') text(x.body);
-    if (x.type === 'quiz') {
+    if (x.quiz !== undefined) {
       const quiz = record(x.quiz);
       uniqueIds(quiz.questions);
     }
@@ -280,6 +278,19 @@ const fullCourse =
     uniqueIds(chapters);
     uniqueIds(chapters.flatMap((c) => c.items));
   };
+const coursePreview: Check = (v) => {
+  if (Object.keys(record(v)).some((key) => !['id', 'title', 'revision', 'chapters'].includes(key)))
+    fail();
+  object({
+    id: identifier,
+    title: text,
+    revision,
+    chapters: list(object({ id: identifier, title: text, items: list(fullItem(false)) })),
+  })(v);
+  const chapters = record(v).chapters as { id: string; items: { id: string }[] }[];
+  uniqueIds(chapters);
+  uniqueIds(chapters.flatMap((c) => c.items));
+};
 const courseSummary = object({
   ...courseFields,
   chapters: list(
@@ -455,7 +466,7 @@ export function decodeManagementResponse(path: string, method: string, payload: 
   if (/^(admin|instructor)\/courses$/.test(p))
     check = m === 'GET' ? page(courseSummary) : m === 'POST' ? fullCourse(true) : undefined;
   else if (/^courses\/[^/]+\/authoring$/.test(p) && m === 'GET') check = fullCourse(true);
-  else if (/^courses\/[^/]+\/authoring-preview$/.test(p) && m === 'GET') check = fullCourse(false);
+  else if (/^courses\/[^/]+\/authoring-preview$/.test(p) && m === 'GET') check = coursePreview;
   else if (/^courses\/[^/]+$/.test(p) && m === 'PATCH') check = fullCourse(true);
   else if (/^courses\/[^/]+\/publish$/.test(p) && m === 'POST') check = fullCourse(true);
   else if (/^courses\/[^/]+\/submit-review$/.test(p) && m === 'POST') check = review;

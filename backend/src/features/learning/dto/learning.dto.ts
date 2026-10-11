@@ -17,7 +17,7 @@ export interface LearningCourseDto {
 }
 export interface LearningItemContentDto {
   id: string; type: LearningItemType; title: string;
-  video_url?: string | null; body?: null; body_doc?: Prisma.JsonValue;
+  video_url?: string | null; body?: string|null; body_doc?: Prisma.JsonValue;
   quiz?: { question_count: number; max_score: number };
 }
 

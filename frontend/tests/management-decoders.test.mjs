@@ -166,3 +166,28 @@ test('quiz draft restoration preserves incomplete work and rejects stale, corrup
     0,
   );
 });
+
+test('canonical authoring preview accepts minimal draft content without management audit fields', () => {
+  const preview = {
+    id: 'course', title: 'Draft', revision: 1,
+    chapters: [{ id: 'chapter', title: '', items: [
+      { id: 'video', type: 'video', title: '', has_history: false },
+      { id: 'article', type: 'article', title: '', has_history: false, reading_minutes: 0.5 },
+      { id: 'quiz', type: 'quiz', title: '', has_history: false, quiz: {
+        pass_percent: 70, questions: [{ id: 'question', type: 'single_choice', prompt: 'Q', points: 1,
+          options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }] }],
+      } },
+    ] }],
+  };
+  assert.equal(decode('courses/course/authoring-preview', 'GET', preview), preview);
+  for (const mutate of [
+    (v) => { v.created_by = 'actor'; },
+    (v) => { v.chapters[0].items[2].quiz.questions[0].correct_option_ids = ['a']; },
+    (v) => { v.chapters[0].items.push(structuredClone(v.chapters[0].items[0])); },
+    (v) => { v.revision = 0; },
+  ]) {
+    const invalid = structuredClone(preview);
+    mutate(invalid);
+    assert.throws(() => decode('courses/course/authoring-preview', 'GET', invalid), TypeError);
+  }
+});

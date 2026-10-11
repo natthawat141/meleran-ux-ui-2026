@@ -5575,12 +5575,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/learning",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "READ",
       "contract_version": "1.0.0-draft.2",
@@ -5861,12 +5863,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/learning",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [],
       "transaction_id": "TX-COMPLETE",
       "contract_version": "1.0.0-draft.2",
@@ -9233,12 +9237,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D10"
       ],
@@ -9524,12 +9530,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D10"
       ],
@@ -9787,12 +9795,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D10"
       ],
@@ -10078,12 +10088,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D10"
       ],
@@ -10384,12 +10396,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D04",
         "D05",
@@ -10928,12 +10942,14 @@
       ],
       "acceptance_mapping_level": "work_package; not every HTTP call alone satisfies every mapped case",
       "implementation_status": {
-        "state": "NOT_IMPLEMENTED",
-        "handler_file": null,
-        "evidence": "static controller/service inspection; no tests rerun",
-        "known_gaps": []
+        "state": "COMPONENT_VERIFIED",
+        "handler_file": "worktrees/melearn-fullstack/backend/src/features/courses",
+        "evidence": "LEARNING_AUTHORING_COMPONENT.md",
+        "known_gaps": [
+          "Full feature acceptance pending"
+        ]
       },
-      "execution_status": "PENDING",
+      "execution_status": "COMPONENT_VERIFIED",
       "unresolved_decisions": [
         "D04",
         "D05",
@@ -26995,8 +27011,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 4,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -27141,8 +27157,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 4,
-        "implemented_operations": 0,
-        "state": "PENDING"
+        "implemented_operations": 2,
+        "state": "PARTIAL"
       }
     },
     {
@@ -27529,8 +27545,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 3,
-        "implemented_operations": 2,
-        "state": "PARTIAL"
+        "implemented_operations": 3,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {
@@ -27647,8 +27663,8 @@
       "contract_sha256": "b94be2175334ed8d612d713a47ac5cbcd0136ec19320faa5059991ab82e9b9be",
       "api_implementation": {
         "defined_operations": 2,
-        "implemented_operations": 1,
-        "state": "PARTIAL"
+        "implemented_operations": 2,
+        "state": "IMPLEMENTED_FEATURE_GATE_PENDING"
       }
     },
     {

@@ -79,13 +79,13 @@ export class LearningReadService {
     return this.prisma.$transaction(async tx => {
       await this.authorize(tx, reference, courseId);
       const item = await tx.courseItem.findFirst({ where: { id: itemId, courseId }, select: {
-        id: true, type: true, title: true, videoUrl: true, contentDoc: true,
+        id: true, type: true, title: true, videoUrl: true, contentDoc: true,body:true,
         quiz: { select: { questions: { select: { maxScore: true } } } },
       } });
       if (!item) throw ApiException.notFound('ไม่พบเนื้อหาในคอร์ส');
       const type = learningItemType(item.type), base = { id: item.id, type, title: item.title };
       if (type === 'video') return { ...base, video_url: item.videoUrl };
-      if (type === 'article') return { ...base, body: null, body_doc: item.contentDoc };
+      if (type === 'article') return { ...base, body: item.body, body_doc: item.contentDoc };
       if (!item.quiz) throw new Error('Missing stored quiz definition');
       const maximum = item.quiz.questions.reduce((sum, question) => sum.plus(question.maxScore), new ExactDecimal(0)).toNumber();
       if (!Number.isFinite(maximum) || maximum < 0) throw new Error('Invalid stored quiz maximum');

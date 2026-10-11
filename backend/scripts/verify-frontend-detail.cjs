@@ -823,6 +823,73 @@ async function main() {
     assert.equal(await db.appSession.count({where:{accountId:adminCreated.user.id}}),0);
     accountDirectoryChecks.push('created-identity-reconnect-and-no-auto-session');
 
+    phase = 'frontend-real-completion-certificate';
+    const completionChecks=[];
+    const completionCourse=await db.course.create({data:{slug:tag+'_completion',title:'คอร์สจบผ่าน API',category:'test',level:'test',
+      instructorId:accountId,status:'published',publishedAt:new Date(),chapters:{create:{title:'บท',position:0,
+        items:{create:[{title:'Video',type:'video',position:0},{title:'Article',type:'article',position:1}]}}}},
+      include:{chapters:{include:{items:{orderBy:{position:'asc'}}}}}});
+    const completionGrant=await continuationCatalog.enrollFree(completionCourse.id);
+    const completionVideo=completionCourse.chapters[0].items[0].id,completionArticle=completionCourse.chapters[0].items[1].id;
+    const completeApi=await learningApiFor('continuation-learner');
+    const completedVideo=await completeApi.complete(completionVideo);
+    assert.equal(completedVideo.progress.completed_items,1);assert.equal(completedVideo.progress.total_items,2);assert.equal(completedVideo.certificate_id,null);
+    completionChecks.push('actual-learning-client-first-item-does-not-finish-course');
+    const completedArticle=await completeApi.complete(completionArticle);
+    assert.equal(completedArticle.progress.completed_items,2);assert.ok(completedArticle.certificate_id);assert.equal(completedArticle.course_completed_at,completedArticle.progress.completed_at);
+    completionChecks.push('actual-learning-client-last-item-atomic-certificate');
+    assert.deepEqual(await completeApi.complete(completionArticle),completedArticle);
+    assert.equal(await db.certificate.count({where:{enrollmentId:completionGrant.id}}),1);
+    completionChecks.push('repeat-completion-preserves-first-time-and-certificate');
+    const completedCourseRead=await completeApi.course(completionCourse.id);
+    assert.equal(completedCourseRead.certificate_id,completedArticle.certificate_id);assert.equal(completedCourseRead.progress.completed_items,2);
+    const actualIssuedCertificate=await certificateApiFor('certificate-owner');
+    const actualCertificate=await actualIssuedCertificate.get(completedArticle.certificate_id);
+    assert.equal(actualCertificate.course_title,completionCourse.title);
+    completionChecks.push('actual-learning-and-certificate-read-decoders-see-issued-record');
+    globalThis[learningClientSlot].set('completion-owner',ownerUploadClient);
+    await assert.rejects((await learningApiFor('completion-owner')).complete(completionVideo),error=>error instanceof HttpClientError&&error.status===403);
+    completionChecks.push('owner-preview-cannot-create-progress');
+    await db.$disconnect();await db.$connect();
+    assert.deepEqual(await completeApi.complete(completionArticle),completedArticle);
+    completionChecks.push('completion-snapshot-and-certificate-survive-reconnect');
+
+    phase = 'frontend-course-create-directory-authoring';
+    const courseAuthoringChecks=[];
+    // Keep deliberately unknown legacy audits outside this valid Draft page.
+    // Their fail-closed behavior is checked by dedicated PostgreSQL tests.
+    await db.course.updateMany({where:{instructorId:accountId,status:'draft',createdBy:null},data:{status:'archived'}});
+    const createdCourse=await ownerResource('instructor/courses','POST',{title:tag+' owned authoring',category:'test',level:'test'});
+    assert.equal(createdCourse.created_by,accountId);assert.equal(createdCourse.instructor.id,accountId);assert.equal(createdCourse.revision,1);assert.equal(createdCourse.status,'draft');
+    courseAuthoringChecks.push('actual-Instructor-create-resource-canonical-authoring-decoder');
+    const adminCourse=await adminResource('admin/courses','POST',{title:tag+' Admin authoring',instructor_id:accountId,category:'test',level:'test'});
+    assert.equal(adminCourse.created_by,adminId);assert.equal(adminCourse.instructor.id,accountId);
+    courseAuthoringChecks.push('actual-Admin-create-resource-distinct-creator-and-Instructor');
+    const ownedCoursePage=await ownerResource('instructor/courses?status=draft&limit=1');
+    const ownedCourseNext=await ownerResource('instructor/courses?status=draft&limit=1&cursor='+encodeURIComponent(ownedCoursePage.next_cursor));
+    assert.notEqual(ownedCoursePage.items[0].id,ownedCourseNext.items[0].id);
+    courseAuthoringChecks.push('actual-owned-Course-list-keyset-and-management-decoder');
+    const adminCoursePage=await adminResource('admin/courses?status=draft&limit=50');
+    assert.deepEqual(new Set(adminCoursePage.items.map(c=>c.id)),new Set([createdCourse.id,adminCourse.id]));
+    courseAuthoringChecks.push('actual-Admin-directory-decoder-and-Draft-filter');
+    const authoringChapter=await db.courseChapter.create({data:{courseId:createdCourse.id,title:'บทที่บันทึกจริง',position:0,description:'คำอธิบายบท'}});
+    const authoringArticle=await db.courseItem.create({data:{courseId:createdCourse.id,chapterId:authoringChapter.id,title:'บทอ่านจริง',type:'article',position:0,
+      body:'เนื้อหาจริงจาก PostgreSQL',contentDoc:{type:'doc',content:[{type:'paragraph',text:'ย่อหน้า'}]}}});
+    const fullAuthoring=await ownerResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring');
+    assert.equal(fullAuthoring.chapters[0].items[0].body,'เนื้อหาจริงจาก PostgreSQL');
+    assert.equal(authoringForm(fullAuthoring).course.chapters[0].items[0].id,authoringArticle.id);
+    courseAuthoringChecks.push('actual-authoring-resource-and-shared-form-from-persisted-content');
+    const authoringPreview=await ownerResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring-preview');
+    assert.equal(authoringPreview.chapters[0].items[0].body,'เนื้อหาจริงจาก PostgreSQL');assert.equal(JSON.stringify(authoringPreview).includes('correct_option_ids'),false);
+    courseAuthoringChecks.push('actual-Preview-decoder-without-authoring-answer-keys');
+    assert.equal((await adminResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring')).id,createdCourse.id);
+    courseAuthoringChecks.push('actual-Admin-authoring-read-without-enrollment');
+    await assert.rejects(foreignResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring'),error=>error instanceof HttpClientError&&error.status===404);
+    courseAuthoringChecks.push('enrolled-foreign-Instructor-cannot-read-authoring');
+    await db.$disconnect();await db.$connect();
+    assert.equal((await ownerResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring')).chapters[0].items[0].body,'เนื้อหาจริงจาก PostgreSQL');
+    courseAuthoringChecks.push('created-course-audit-and-content-survive-reconnect');
+
     phase = 'frontend-current-session-logout';
     const logoutChecks = [];
     await assert.rejects((await authApiFor('certificate-guest')).logout(), error => error instanceof HttpClientError && error.status === 401);
@@ -958,6 +1025,8 @@ async function main() {
     result.continuationListsResume = {checks:continuationChecks.length,checkNames:continuationChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.aiHistory = {checks:aiHistoryChecks.length,checkNames:aiHistoryChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.adminAccountDirectory = {checks:accountDirectoryChecks.length,checkNames:accountDirectoryChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.completion = {checks:completionChecks.length,checkNames:completionChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.courseAuthoring = {checks:courseAuthoringChecks.length,checkNames:courseAuthoringChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {

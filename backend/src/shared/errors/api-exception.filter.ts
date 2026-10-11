@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import { ApiException } from './api-exception';
 import { VideoUploadUnavailableException } from './video-upload-unavailable.exception';
+import { ProviderUnavailableException } from './provider-unavailable.exception';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
@@ -27,6 +28,11 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof VideoUploadUnavailableException) {
       response.status(503).json({ error: { code: 'video_upload_not_available',
         message: 'ขออภัย ระบบนี้ยังไม่พร้อมใช้งาน', request_id: requestId } });
+      return;
+    }
+    if (exception instanceof ProviderUnavailableException) {
+      response.status(503).json({ error: { code: 'provider_unavailable',
+        message: 'ระบบเชื่อมต่อผู้ให้บริการยังไม่พร้อมใช้งาน', request_id: requestId } });
       return;
     }
 

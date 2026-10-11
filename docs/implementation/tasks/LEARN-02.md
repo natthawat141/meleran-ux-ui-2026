@@ -100,3 +100,7 @@ Feature gate: **G-LEARNING** ใน [Execution Plan](../EXECUTION_PLAN.md); ต�
 ## Renewed authorization continuation — 2026-10-11
 
 Latest user permits agent decisions with a written record. See [technical decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) and [current component evidence](../AUTONOMOUS_CONTINUATION_COMPONENT.md). The current EXECUTION_STATUS/CONTINUATION_QUEUE override old planning waits above. No idle user-decision blocker for the implemented subset; full feature acceptance is still tracked separately.
+
+## Learning/authoring continuation — 2026-10-11
+
+Latest user authorizes technical choices with a written record. See [current component evidence](../LEARNING_AUTHORING_COMPONENT.md) and [agent decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md). EXECUTION_STATUS and CONTINUATION_QUEUE supersede old decision waits for the verified subset. Full feature/acceptance gates remain pending; continue missing operations.

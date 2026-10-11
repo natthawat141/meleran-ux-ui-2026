@@ -46,3 +46,18 @@ Admin user list ค้น display_name/username/email เท่านั้น (
 ## Agent decisions: D06 / COMPLETION-01
 
 เปรียบเทียบผลที่ตรวจครบด้วยอัตรา earned/max (คำนวณ cross multiplication ด้วย Decimal ไม่ปัดเปอร์เซ็นต์) เมื่อคะแนนเต็มเปลี่ยนข้ามฉบับ; tieเลือก attempt numberที่น้อยกว่า/idตามลำดับเพื่อคงผลเดิม. ใช้เฉพาะ submitted + fully graded + ทุกคำตอบครบ; >70% เท่านั้น. ผลต่ำกว่า/รอตรวจภายหลังไม่ล้าง Progressที่เคยผ่าน. completion coordinatorล็อก Course SHARE → Enrollment UPDATE → Attempts SHARE; authoring/assessmentต้องใช้ลำดับเดียวกัน. snapshot version1เก็บ current item IDs/types/completed_at และ quiz attempt/result exact decimals ณ first completion. Certificateชื่อผู้เรียน/คอร์สและเวลาใช้ค่าจริง ณ transaction เดียว, unique Enrollment; รหัส opaque random, ไม่มี public issuance endpoint. ไม่สร้าง PDF/provider networkภายใน transaction. Historical completed Enrollmentรักษา snapshot/Certificateแม้เพิ่มหรือแก้เนื้อหา.
+
+## Agent decisions: D04 authoring storage and create protocol
+
+Lead append-only migration 20261011050000_course_authoring: nullable first publishedBy FK (immutable once known), Chapter.description, Item.body/description/duration/readingMinutes and nullable submitted Review JSON snapshot. ไม่มี backfill creator/publisher/เนื้อหาจาก mock; legacy NULL/revision0 ไม่ถูกแปลงเป็น authoring DTOที่โกหก. Fresh createใช้ revision1, actual actor/time, single normalized Instructor, Draft, ai_enabled=false, immutable UUID-derived slug; omitted metadata category/levelใช้ empty stringตาม Draft shape (ต้องครบพร้อมเรียนก่อน Publish), nullable fieldsnull/outcomes[]. Createไม่มี replay keyใน canonical จึงแต่ละคำสั่งที่สำเร็จสร้างคอร์สใหม่ ไม่ automatic retry. Signed management cursorsผูก actor/namespace/status; sortcreated_atDESC/idASC; management summariesไม่ส่ง answer keys/PII/Transcript content.
+
+Schema checksum 5204bffa343645c2d14d589829d51d54e9fae2487f430ef6a6fc75f96134ec8b; apply/test เฉพาะ melearn_test, ยังไม่มีหลักฐาน featureAPIหรือProductionmigrationจากการเพิ่มstorage.
+
+## Authoring/Preview read and storage conflict
+
+Authoringอ่านเฉลยเฉพาะ owner/Admin ผ่าน queryแยกที่ scopeด้วย course_id; Previewไม่ selectcorrectKey และไม่ใช้required creatorที่ไม่มีในPreviewshape. ไม่ส่งTranscript/คำตอบผู้เรียน/โปรไฟล์ส่วนตัว. Own Progress historical metadataใช้RepeatableReadและkeysetgranted_atDESC/idASC; ทุกaudienceอ่านเฉพาะตน รวม archived, ไม่ grant content.
+
+Money canonicalยังไม่มี max แต่ physical priceMinorเป็นInt; create rejectเกิน2147483647ด้วย422เพื่อไม่overflow. นี่คือagent-selected technical safeguardภายใต้สิทธิ์ล่าสุด มีcontract/storage gapที่ต้องแก้ด้วยtypeหรือcanonicaldeltaภายหลัง ไม่ใช่businessmaximumที่Scopeยืนยัน. reading_minutesต้องfinite/nonnegative.
+# Local Login HTTP cutover — D01/D03 implementation safety
+
+Agent-selected continuation under latest authorization: existing Username Login uses the tested LocalAuthenticationService/SessionWriter. Remove active prototype PBKDF2-1000/plain comparison and CSV-role issuance. Unsupported prototype hashes fail normally; no automatic credential conversion. Preserve canonical LoginRequest/Response, independent Web/Admin cookies, absolute12h lifetime, fresh normalized roles and hashed random server sessions. Cookie Secure is enabled in production; retain HttpOnly/SameSite Strict/path. Email identifiers return explicit503 provider_unavailable until Firebase credential branch is implemented; never verify Email locally or link by matching Email. This is a Username subset, not AUTH-01 completion or live Firebase evidence. No new route, dependency or migration.

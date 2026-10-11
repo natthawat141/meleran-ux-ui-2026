@@ -31,6 +31,7 @@ model Account {
   externalIdentities ExternalIdentity[]
   courses            Course[]
   coursesCreated     Course[] @relation("CourseCreator")
+  coursesPublished   Course[] @relation("CoursePublisher")
   enrollments        Enrollment[]
   reviewsSubmitted   CourseReview[] @relation("ReviewSubmitter")
   reviewsPerformed   CourseReview[] @relation("ReviewActor")
@@ -97,6 +98,8 @@ model Course {
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   publishedAt  DateTime?
+  publishedBy  String?
+  publisher    Account? @relation("CoursePublisher", fields: [publishedBy], references: [id], onDelete: Restrict, onUpdate: Cascade)
   description  String?
   outcomesJson String          @default("[]")
   instructorId String
@@ -112,6 +115,7 @@ model Course {
 
   @@index([status, publishedAt, id])
   @@index([createdBy])
+  @@index([publishedBy])
   @@map("courses")
 }
 
@@ -125,6 +129,7 @@ model CourseReview {
   reviewedAt        DateTime?
   result            String?
   reason            String?
+  submittedSnapshot Json? @db.JsonB
   course            Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
   submitter         Account  @relation("ReviewSubmitter", fields: [submittedBy], references: [id], onDelete: Restrict)
   reviewer          Account? @relation("ReviewActor", fields: [reviewedBy], references: [id], onDelete: Restrict)
@@ -137,6 +142,7 @@ model CourseChapter {
   id       String       @id @default(uuid())
   courseId String
   title    String
+  description String?
   position Int
   course   Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
   items    CourseItem[]
@@ -151,6 +157,10 @@ model CourseItem {
   chapterId String
   courseId  String
   title     String
+  description String?
+  body        String?
+  duration    String?
+  readingMinutes Float?
   type      String        @default("article")
   position  Int
   chapter   CourseChapter @relation(fields: [chapterId, courseId], references: [id, courseId], onDelete: Cascade)

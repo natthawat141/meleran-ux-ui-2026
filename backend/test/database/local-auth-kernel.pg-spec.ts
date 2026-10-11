@@ -32,6 +32,9 @@ describe('AUTH-BASE approved local credential/session kernel / actual PostgreSQL
       if (r.waiting) return; await new Promise(r=>setTimeout(r,10)); }
     throw Error('Expected observed PostgreSQL lock wait');
   };
+  const httpLogin = (name=names.learner,password=' password ',audience='web',header=audience) =>
+    request(app.getHttpServer()).post('/api/v1/auth/login').set('x-melearn-app',header)
+      .send({identifier:name,password,audience});
   beforeAll(async () => {
     const c=testConnections(); db=c.runtime; migrator=c.migrator; process.env.DATABASE_URL=c.runtimeUrl;
     const module = await Test.createTestingModule({imports:[AppModule]}).compile();
@@ -70,6 +73,46 @@ describe('AUTH-BASE approved local credential/session kernel / actual PostgreSQL
     const row=await db.appSession.findUniqueOrThrow({where:{tokenHash:tokenHash(issued.secret)}});
     expect(row.expiresAt).toEqual(issued.expiresAt);expect(row.audience).toBe('web');expect(row.revokedAt).toBeNull();
     await db.$disconnect();await db.$connect();expect((await principals.resolve(issued.secret,'web'))?.accountId).toBe(ids.learner);
+  });
+  it('HTTP Username login issues a canonical cookie and permits the actual protected self route', async () => {
+    const r=await httpLogin().expect(200);assertTaskContract('AUTH-01','LoginResponse',r.body);
+    expect(r.body.user).toMatchObject({id:ids.learner,roles:['learner'],learning_eligible:true});
+    const cookie=(r.headers['set-cookie'] as unknown as string[])[0];
+    expect(cookie).toMatch(/^melearn_web_session=[a-f0-9]{64};/);expect(cookie).toContain('HttpOnly');
+    expect(cookie).toContain('SameSite=Strict');expect(cookie).toContain('Path=/api/v1');
+    const me=await request(app.getHttpServer()).get('/api/v1/me').set('x-melearn-app','web').set('Cookie',cookie.split(';')[0]).expect(200);
+    expect(me.body.id).toBe(ids.learner);expect(JSON.stringify(r.body)).not.toMatch(/passwordHash|tokenHash|PRIVATE_/);
+  });
+  it('HTTP normalized grants reject forged legacy Admin roles without issuing a session', async () => {
+    const before=await counts();await httpLogin(names.learner,' password ','admin').expect(403);
+    expect(await counts()).toEqual(before);const r=await httpLogin(names.admin,' password ','admin').expect(200);
+    expect(r.body.user.roles).toEqual(['admin']);expect((r.headers['set-cookie'] as unknown as string[])[0]).toMatch(/^melearn_admin_session=/);
+  });
+  it('HTTP namespace mismatch and invalid body reject before credential/session changes', async () => {
+    const before=await counts();await httpLogin(names.learner,' password ','web','admin').expect(422);
+    await request(app.getHttpServer()).post('/api/v1/auth/login').set('x-melearn-app','web')
+      .send({identifier:names.learner,password:' password ',audience:'web',role:'admin'}).expect(422);
+    expect(await counts()).toEqual(before);
+  });
+  it('HTTP wrong password, unsupported prototype hash and unknown Username never issue a session', async () => {
+    const before=await db.appSession.count();await httpLogin(names.learner,'wrong').expect(401);await httpLogin('unknown_'+tag).expect(401);
+    await db.localCredential.update({where:{accountId:ids.learner},data:{passwordHash:'salt:prototype-key'}});
+    await httpLogin().expect(401);expect(await db.appSession.count()).toBe(before);
+  });
+  it('HTTP Email branch is explicitly unavailable without falling back to local credentials or writes', async () => {
+    await db.account.update({where:{id:ids.learner},data:{email:tag+'@example.test',normalizedEmail:(tag+'@example.test').toUpperCase()}});
+    const before=await counts();const r=await httpLogin(tag+'@example.test').expect(503);
+    expect(r.body.error.code).toBe('provider_unavailable');expect(r.headers['set-cookie']).toBeUndefined();expect(await counts()).toEqual(before);
+  });
+  it('HTTP disabled account rejection is fresh and atomic', async () => {
+    await db.account.update({where:{id:ids.learner},data:{disabled:true}});const before=await counts();
+    const r=await httpLogin().expect(403);expect(r.body.error.code).toBe('account_disabled');expect(await counts()).toEqual(before);
+  });
+  it('production HTTP session cookie is Secure without changing the canonical response or lifetime', async () => {
+    const previous=process.env.NODE_ENV;process.env.NODE_ENV='production';
+    try{const r=await httpLogin().expect(200);expect((r.headers['set-cookie'] as unknown as string[])[0]).toContain('; Secure');
+      assertTaskContract('AUTH-01','LoginResponse',r.body);
+    }finally{if(previous===undefined)delete process.env.NODE_ENV;else process.env.NODE_ENV=previous;}
   });
   it('preserves unverified account login without silently granting learning or verifying email', async () => {
     const before=await db.account.findUniqueOrThrow({where:{id:ids.unverified}});

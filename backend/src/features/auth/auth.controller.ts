@@ -38,6 +38,7 @@ export class AuthController {
     response.cookie(`melearn_${body.audience}_session`, issue.secret, {
       httpOnly: true,
       sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
       path: '/api/v1',
       expires: issue.expiresAt,
     });

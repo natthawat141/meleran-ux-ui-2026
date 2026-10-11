@@ -33,8 +33,8 @@ describe('DB-01 Course original creator distinct from current Instructor', () =>
     }
     if (migrator) await migrator.$disconnect();
   });
-  it('records exact reviewed checksum and rolls back all nine migration batches / 27 models', async () => {
-    expect(batches).toHaveLength(9);
+  it('records exact reviewed checksum and rolls back the entire migration chain / 27 models', async () => {
+    expect(batches).toHaveLength(10);
     await assertMigration(migrator, name);
     await assertMigrationRollback(migrationUrl, migrator, batches, 27);
   });
