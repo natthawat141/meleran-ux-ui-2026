@@ -30,15 +30,17 @@ export function configureApplication(app: INestApplication, origins: string[]): 
     request.headers['content-type']?.split(';')[0].trim().toLowerCase() === 'application/json';
   const transcriptRequest = (request: IncomingMessage) => request.method === 'PUT' &&
     /^\/api\/v1\/admin\/courses\/[^/]+\/videos\/[^/]+\/ai-transcript\/?$/i.test((request.url || '').split('?')[0]);
-  const blogWriteRequest = (request: IncomingMessage) =>
+  const largeWriteRequest = (request: IncomingMessage) =>
     (request.method === 'POST' && /^\/api\/v1\/admin\/blog\/?$/i.test((request.url || '').split('?')[0])) ||
-    (request.method === 'PATCH' && /^\/api\/v1\/admin\/blog\/[^/]+\/?$/i.test((request.url || '').split('?')[0]));
+    (request.method === 'PATCH' && /^\/api\/v1\/admin\/blog\/[^/]+\/?$/i.test((request.url || '').split('?')[0])) ||
+    (request.method === 'PATCH' && /^\/api\/v1\/courses\/[^/]+\/?$/i.test((request.url || '').split('?')[0])) ||
+    (request.method === 'POST' && /^\/api\/v1\/(?:instructor|admin)\/courses\/?$/i.test((request.url || '').split('?')[0]));
   (app as NestExpressApplication).useBodyParser('json', { limit: '100kb',
-    type: (request: IncomingMessage) => jsonRequest(request) && !transcriptRequest(request) && !blogWriteRequest(request) });
+    type: (request: IncomingMessage) => jsonRequest(request) && !transcriptRequest(request) && !largeWriteRequest(request) });
   (app as NestExpressApplication).useBodyParser('json', { limit: '3mb',
     type: (request: IncomingMessage) => jsonRequest(request) && transcriptRequest(request) });
   (app as NestExpressApplication).useBodyParser('json', { limit: '12mb',
-    type: (request: IncomingMessage) => jsonRequest(request) && blogWriteRequest(request) });
+    type: (request: IncomingMessage) => jsonRequest(request) && largeWriteRequest(request) });
   app.use((error: unknown, _request: Request, _response: Response, next: NextFunction) => {
     // Body-parser errors are not Nest HttpExceptions. Translate only its known
     // limit/encoding cases; never pass raw body/error.message into the response.

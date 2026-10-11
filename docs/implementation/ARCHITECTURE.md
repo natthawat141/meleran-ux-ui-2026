@@ -204,6 +204,8 @@ Decisionใหม่→DECISIONS.md + impactedtask; เปลี่ยนcanonic
 
 ## Reviewed physical batches — 2026-10-11
 
+Course aggregate/review writers stay Courses-local. Shared fresh principal → Course UPDATE serializes metadata/curriculum/state against content/completion/assessment Course SHARE. Questions/options retain scoped server IDs; submission stores versioned full-authoring and real management snapshots, preserving historical definitions/counts. Review queue/detail use snapshots and current stale status; canonical publish returns full AuthoringCourseDto. No cross-module private imports or schema delta. [Execution conventions](AUTHORING_REVIEW_COMPONENT.md).
+
 Lead is sole schema owner. DB-01/02/05/03/04 are applied only to isolated melearn_test. Applied SQL bytes are immutable and Git -text preserves checksums. New snapshot/history/date columns use PostgreSQL JSONB/timestamptz/date; assessment scores use numeric(65,30). Existing compatibility timestamps/roles/profile strings remain until their dependent cutover.
 
 DB-01 creator extension: ninth add-only batch stores immutable Course.createdBy FK separately from current Instructor. Unknown legacy creator remains NULL without guessed backfill; future audited creation uses fresh actor and existing createdAt in one Course INSERT. No HTTP create/replay policy is implied. See COURSE_CREATOR_AUDIT_SCHEMA.md. Blueprint requires exact migration directory/manifest parity and immutable checksums, not only checks for listed batches.

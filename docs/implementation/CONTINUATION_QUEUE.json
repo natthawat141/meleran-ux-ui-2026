@@ -20,7 +20,7 @@
     "defined_operations": 86,
     "deferred_operations": 5,
     "acceptance_cases": 113,
-    "implemented_operations": 64,
+    "implemented_operations": 71,
     "full_accepted_cases": 0
   },
   "pending_provider_design": "FIREBASE_PROVIDER_DESIGN.md",
@@ -395,7 +395,7 @@
       "operationId": "patch_courses_id",
       "task_id": "COURSE-02",
       "wave": 10,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-01",
@@ -423,7 +423,7 @@
         "AI09",
         "AI10"
       ],
-      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/COURSE-02.md",
         "contracts/COURSE-02.openapi.json",
@@ -1131,7 +1131,7 @@
       "operationId": "post_courses_id_submit-review",
       "task_id": "COURSE-02",
       "wave": 10,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-01",
@@ -1159,7 +1159,7 @@
         "AI09",
         "AI10"
       ],
-      "remaining": "Unresolved behavior: D04, D05, D09; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/COURSE-02.md",
         "contracts/COURSE-02.openapi.json",
@@ -1172,7 +1172,7 @@
       "operationId": "get_admin_course-reviews",
       "task_id": "REVIEW-01",
       "wave": 11,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-02"
@@ -1181,7 +1181,7 @@
         "C04",
         "C12"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/REVIEW-01.md",
         "contracts/REVIEW-01.openapi.json",
@@ -1194,7 +1194,7 @@
       "operationId": "get_admin_course-reviews_id",
       "task_id": "REVIEW-01",
       "wave": 11,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "COURSE-02"
@@ -1203,7 +1203,7 @@
         "C04",
         "C12"
       ],
-      "remaining": "Implementation/projection or remaining feature dependencies; review operation-local requirements before starting",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/REVIEW-01.md",
         "contracts/REVIEW-01.openapi.json",
@@ -1216,7 +1216,7 @@
       "operationId": "post_admin_course-reviews_id_approve",
       "task_id": "REVIEW-02",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "REVIEW-01"
@@ -1229,7 +1229,7 @@
         "C07",
         "C11"
       ],
-      "remaining": "Unresolved behavior: D04; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/REVIEW-02.md",
         "contracts/REVIEW-02.openapi.json",
@@ -1242,7 +1242,7 @@
       "operationId": "post_admin_course-reviews_id_return",
       "task_id": "REVIEW-02",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "REVIEW-01"
@@ -1255,7 +1255,7 @@
         "C07",
         "C11"
       ],
-      "remaining": "Unresolved behavior: D04; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/REVIEW-02.md",
         "contracts/REVIEW-02.openapi.json",
@@ -1268,7 +1268,7 @@
       "operationId": "post_courses_id_publish",
       "task_id": "REVIEW-02",
       "wave": 12,
-      "state": "PENDING",
+      "state": "IMPLEMENTED",
       "full_acceptance": false,
       "dependencies": [
         "REVIEW-01"
@@ -1281,7 +1281,7 @@
         "C07",
         "C11"
       ],
-      "remaining": "Unresolved behavior: D04; approved subsets are not reopened",
+      "remaining": "Full authenticated browser/original acceptance gates",
       "read_set": [
         "tasks/REVIEW-02.md",
         "contracts/REVIEW-02.openapi.json",
@@ -2408,19 +2408,19 @@
     {
       "wave": 10,
       "defined_operations": 7,
-      "implemented_operations": 5,
+      "implemented_operations": 7,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 11,
       "defined_operations": 9,
-      "implemented_operations": 7,
+      "implemented_operations": 9,
       "full_feature_acceptance": "PENDING"
     },
     {
       "wave": 12,
       "defined_operations": 8,
-      "implemented_operations": 2,
+      "implemented_operations": 5,
       "full_feature_acceptance": "PENDING"
     },
     {
@@ -2455,10 +2455,12 @@
     }
   ],
   "checkpoint": {
-    "verified_sha": "e157b6947d3bc1511bcd0dd0ccf2d2e5cbcb9938",
-    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38105367569",
-    "tests": 477,
-    "frontend_client_checks": 141,
-    "full_acceptance": false
+    "verified_sha": "89f46fdb4e2f8327476623b8712e3347fa9e765c",
+    "ci_run_url": "https://github.com/natthawat141/meleran-tutor/actions/runs/38111054853",
+    "tests": 645,
+    "frontend_client_checks": 198,
+    "full_acceptance": false,
+    "current_operations": 71,
+    "current_hosted_status": "PENDING_PUSH"
   }
 }

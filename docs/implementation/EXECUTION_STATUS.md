@@ -4,6 +4,8 @@
 
 ## Checkpoint ปัจจุบัน — เดินงานต่อโดยข้ามเฉพาะ PENDING
 
+**Current Authoring/Review continuation:** implemented **71/86**, เหลือ15; APIsครบใน26 packages. Course aggregate/save/submit และ Admin review/publish7 operations ผ่าน PG25/unit7/actual Frontend8 checks (รวม206). Frontend Review GET decoder registrationsผ่าน targeted regression/typecheck/build/contracts. Previous64 `89f46fd` hosted Backend645 tests/198 checksผ่านแล้ว; current677 regressionรอ hosted CI. [Evidence](AUTHORING_REVIEW_COMPONENT.md). ไม่มี schema/dependency delta/STG/deploy/full113 acceptance claim. ตัวเลข64/57/48/40/25ด้านล่างเป็นประวัติ.
+
 **Current Management continuation:** implemented **64/86**, เหลือ22; APIsครบใน23 packages. Management6 + Admin payment1 ผ่าน targeted PG28 และ actual Frontend12 checks (รวม198); ไม่มี schema/dependency delta. Blog checkpoint57 `d3d659d` ผ่าน exact-SHA hosted Backend617 tests/186 client checksแล้ว. Current full regression645 testsรอ hosted CI; [evidence](MANAGEMENT_HISTORY_COMPONENT.md). ตัวเลข57/48/40/25ด้านล่างเป็นประวัติ. ไม่มี STG/deploy/full113 acceptance claim.
 
 **Current Blog continuation:** implemented **57/86**, เหลือ29; APIsครบใน20 packages. Blog9 operationsผ่านPG21/units4/actual Frontend9 checks (รวม186);11-batch test migration/rollback/parityผ่าน. [Blog evidence](BLOG_COMPONENT.md). Checkpoint48 `ebcfd4d` ผ่าน hosted Backend592 testsและ Frontend173 tests/Web/Admin container buildsแล้ว; current Blog exact-SHA CIรอ push. ตัวเลข48/40/25ด้านล่างเป็นประวัติ. ยังไม่มี STG/deploy/full113 acceptance claim.

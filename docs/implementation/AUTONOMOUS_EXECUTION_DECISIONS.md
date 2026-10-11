@@ -9,6 +9,10 @@
 - HTTP paths/shapes ปัจจุบันคงเดิม; การเพิ่ม provider protocol ใช้ contract delta ที่ติดตามแยก
 - Technical/component evidence ไม่ใช่การตรวจรับ 113 cases ทั้งหมด
 
+## D04/D05/D09/D10 — authoring and review continuation
+
+เลือกรายละเอียดตาม [AUTHORING_REVIEW_COMPONENT.md](AUTHORING_REVIEW_COMPONENT.md): Course UPDATE transaction; stable retained IDs/atomic ordered curriculum; no deletion/type changes when academic or Admin Transcript history exists; version1 submitted authoring/management snapshots; current revision stale guard; pending editกลับ Draft; same-result command replay preserves first audit; Admin direct approval/publicationตาม Scope. Rich document uses active Tiptap/null shape and safe links matching Frontend; existing numeric/size limits recorded explicitly. Canonical paths/request shapes/statuses unchanged. These are documented agent choices under latest user instruction, not a claim of new human business approvals.
+
 ## Management history / D16 and PAY-02 execution choices
 
 MGMT-03/04: canonical roster has one Enrollment/course per row; current curriculum completion percentage rounds for display; historical certificates/Attempt snapshots remain immutable. Fresh scoped Instructor/Admin authority, RepeatableRead and existing signed keysets apply. Assessments exposes a trusted scoped ManagedAttemptReader, retaining existing single owner detail semantics.

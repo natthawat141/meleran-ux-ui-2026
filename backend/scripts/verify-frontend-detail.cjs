@@ -590,7 +590,7 @@ async function main() {
     locatorChecks.push('actual-admin-resource-authority');
     // Pure current frontend form mapping is a wire-ID interoperability check,
     // not evidence that the full authoring HTTP/editor feature is implemented.
-    const { authoringForm } = await import(pathToFileURL(path.join(frontend, 'packages/course-authoring/src/http-view.ts')).href);
+    const { authoringForm,authoringWrite } = await import(pathToFileURL(path.join(frontend, 'packages/course-authoring/src/http-view.ts')).href);
     const form = authoringForm({ id: ids.published, instructor: { id: accountId },
       chapters: [{ id: learningChapter.id, title: 'บทจริง', items: [{ id: quizItem.id, type: 'quiz', title: quizItem.title, has_history: true }] }] });
     assert.equal(form.quizzes[0].id, quizItem.id);
@@ -892,6 +892,41 @@ async function main() {
     assert.equal((await ownerResource('courses/'+encodeURIComponent(createdCourse.id)+'/authoring')).chapters[0].items[0].body,'เนื้อหาจริงจาก PostgreSQL');
     courseAuthoringChecks.push('created-course-audit-and-content-survive-reconnect');
 
+    phase = 'frontend-authoring-review-lifecycle';
+    const authoringReviewChecks=[],coursePath='courses/'+encodeURIComponent(createdCourse.id);
+    const existingForm=authoringForm(fullAuthoring);
+    existingForm.course.chapters.push({id:'draft-'+randomUUID(),title:'บทใหม่',items:[{id:'draft-'+randomUUID(),type:'article',title:'บทอ่านใหม่',articleBody:'เนื้อหาจาก Editor'}]});
+    const written=await ownerResource(coursePath,'PATCH',{expected_revision:fullAuthoring.revision,chapters:authoringWrite(existingForm.course,existingForm.quizzes,fullAuthoring)});
+    assert.equal(written.revision,2);assert.equal(written.chapters[0].items[0].id,authoringArticle.id);assert.equal(written.chapters[1].items[0].body,'เนื้อหาจาก Editor');
+    assert.equal(written.chapters[1].id.startsWith('draft-'),false);
+    authoringReviewChecks.push('actual-pure-Frontend-authoringWrite-and-resource-preserve-server-IDs');
+    const submittedReview=await ownerResource(coursePath+'/submit-review','POST',{expected_revision:2});
+    assert.equal(submittedReview.status,'pending');assert.equal(submittedReview.revision,2);
+    authoringReviewChecks.push('actual-owner-submit-client-canonical-review');
+    const reviewQueue=await adminResource('admin/course-reviews?status=pending&limit=50');
+    assert.ok(reviewQueue.items.some(review=>review.id===submittedReview.id));
+    const reviewDetail=await adminResource('admin/course-reviews/'+submittedReview.id);
+    assert.equal(reviewDetail.course.revision,2);assert.equal(reviewDetail.course.chapters[1].items[0].body,'เนื้อหาจาก Editor');
+    authoringReviewChecks.push('actual-Admin-review-queue-and-full-submitted-detail-decoders');
+    const returnedReview=await adminResource('admin/course-reviews/'+submittedReview.id+'/return','POST',{reason:'เพิ่มคำอธิบาย'});
+    assert.equal(returnedReview.status,'returned');assert.equal(returnedReview.reason,'เพิ่มคำอธิบาย');
+    authoringReviewChecks.push('actual-Admin-return-reason-client-and-Draft-transition');
+    const newReview=await ownerResource(coursePath+'/submit-review','POST',{expected_revision:2});assert.notEqual(newReview.id,submittedReview.id);
+    const approvedReview=await adminResource('admin/course-reviews/'+newReview.id+'/approve','POST',{expected_revision:2});assert.equal(approvedReview.status,'approved');
+    authoringReviewChecks.push('actual-resubmit-and-Admin-approve-current-revision');
+    const firstPublished=await ownerResource(coursePath+'/publish','POST',{});
+    assert.equal(firstPublished.status,'published');assert.equal(firstPublished.chapters[1].items[0].body,'เนื้อหาจาก Editor');
+    authoringReviewChecks.push('actual-owner-publication-full-authoring-response-decoder');
+    const publicationSave=await ownerResource(coursePath,'PATCH',{expected_revision:2,title:'แก้ Published ผ่าน API จริง'});
+    assert.equal(publicationSave.status,'published');assert.equal(publicationSave.published_at,firstPublished.published_at);
+    const publicWritten=await createCatalogApi(createHttpClient({baseUrl:globalThis[learningClientSlot].apiConfig.baseUrl,headers:{},credentials:'omit',timeoutMs:5000,fetcher:fetch})).getCourse(createdCourse.id);
+    assert.equal(publicWritten.title,'แก้ Published ผ่าน API จริง');
+    authoringReviewChecks.push('Published-save-visible-through-real-public-Catalog-client');
+    await assert.rejects(ownerResource(coursePath,'PATCH',{expected_revision:2,title:'stale'}),error=>error instanceof HttpClientError&&error.status===409);
+    await db.$disconnect();await db.$connect();assert.equal((await adminResource('admin/course-reviews/'+submittedReview.id)).course.title,createdCourse.title);
+    assert.equal((await ownerResource(coursePath+'/authoring')).title,'แก้ Published ผ่าน API จริง');
+    authoringReviewChecks.push('stale-revision-rejected-and-original-submitted-snapshot-survives-reconnect');
+
     phase = 'frontend-blog-lifecycle';
     const blogChecks=[],blogSlug='article-'+randomUUID();
     globalThis[learningClientSlot].set('blog-public',createHttpClient({baseUrl:globalThis[learningClientSlot].apiConfig.baseUrl,
@@ -1131,6 +1166,7 @@ async function main() {
     result.blog = {checks:blogChecks.length,checkNames:blogChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.managementHistory = {checks:historyChecks.length,checkNames:historyChecks,actualNestAndPostgres:true,browserAcceptance:false};
     result.adminPayment = {checks:adminPaymentChecks.length,checkNames:adminPaymentChecks,actualNestAndPostgres:true,browserAcceptance:false};
+    result.authoringReview = {checks:authoringReviewChecks.length,checkNames:authoringReviewChecks,actualNestAndPostgres:true,browserAcceptance:false};
     fs.writeFileSync(path.join(directory, 'frontend-detail-integration.json'), JSON.stringify(result, null, 2) + '\n');
     console.log(JSON.stringify(result, null, 2));
   } finally {
@@ -1156,6 +1192,7 @@ async function main() {
     if (accountId) await db.videoTranscript.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
     if (accountId) await db.question.deleteMany({ where: { quiz: { item: { chapter: { course: { instructorId: accountId } } } } } });
     if (accountId) await db.quiz.deleteMany({ where: { item: { chapter: { course: { instructorId: accountId } } } } });
+    if (accountId) await db.courseReview.deleteMany({where:{course:{instructorId:accountId}}});
     if (accountId) await db.course.deleteMany({ where: { instructorId: accountId } });
     await db.blogPost.deleteMany({where:{authorId:{in:ownedAccounts}}});
     await db.appSession.deleteMany({ where: { accountId: { in: ownedAccounts } } });

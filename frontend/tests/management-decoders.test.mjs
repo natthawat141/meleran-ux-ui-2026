@@ -191,3 +191,27 @@ test('canonical authoring preview accepts minimal draft content without manageme
     assert.throws(() => decode('courses/course/authoring-preview', 'GET', invalid), TypeError);
   }
 });
+
+test('review queue and detail decode canonical submitted course shapes and reject missing or corrupt revision/content', async () => {
+  const w = await context();
+  const courses = await w.read(w.owner, 'instructor/courses');
+  const summaryCourse = courses.items[0];
+  const full = await w.read(w.owner, 'courses/' + summaryCourse.id + '/authoring');
+  const review = { id: 'review', revision: full.revision, status: 'pending', submitted_by: full.instructor.id,
+    submitted_at: '2026-10-11T00:00:00.000Z', decided_by: null, decided_at: null, reason: null };
+  const page = { items: [{ ...review, course: summaryCourse }], next_cursor: null };
+  const detail = { ...review, course: full };
+  assert.equal(decode('admin/course-reviews?status=pending', 'GET', page), page);
+  assert.equal(decode('admin/course-reviews/review', 'GET', detail), detail);
+  for (const change of [
+    (v) => { delete v.course; },
+    (v) => { v.status = 'unknown'; },
+    (v) => { v.course.revision = 0; },
+    (v) => { v.course.chapters = 'invalid'; },
+  ]) {
+    const invalid = structuredClone(detail); change(invalid);
+    assert.throws(() => decode('admin/course-reviews/review', 'GET', invalid), TypeError);
+  }
+  const invalidPage = structuredClone(page); invalidPage.items[0].submitted_at = 'invalid';
+  assert.throws(() => decode('admin/course-reviews', 'GET', invalidPage), TypeError);
+});

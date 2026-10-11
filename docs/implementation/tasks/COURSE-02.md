@@ -114,3 +114,7 @@ Feature gate: **G-COURSE** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร
 ## Learning/authoring continuation — 2026-10-11
 
 Latest user authorizes technical choices with a written record. See [current component evidence](../LEARNING_AUTHORING_COMPONENT.md) and [agent decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md). EXECUTION_STATUS and CONTINUATION_QUEUE supersede old decision waits for the verified subset. Full feature/acceptance gates remain pending; continue missing operations.
+
+## Authoring review execution override — 2026-10-11
+
+Latest user permits documented agent choices. [Component evidence](../AUTHORING_REVIEW_COMPONENT.md) and [decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) override former D04/D05/D09/D10 waits for this implemented subset. All defined APIs in this package have component proof, shared PG25/unit7/actual Frontend8 checks. Whole browser/original feature acceptance pending; no provider/deploy claim.

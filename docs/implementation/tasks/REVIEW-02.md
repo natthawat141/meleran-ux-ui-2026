@@ -89,3 +89,7 @@ Feature gate: **G-COURSE** ใน [Execution Plan](../EXECUTION_PLAN.md); ตร
 - ห้ามแก้ schema/migrations ของคนอื่น; ห้าม runtime auto-seed/auto-migrate หรือใช้ live DB เป็น test
 - ห้ามติดตั้ง/upgrade libraries, deploy, cloud changes, live migrations หรือ legacy deletion ในงาน planning นี้
 - ถ้า contract/spec conflict ให้หยุดเฉพาะ behavior ที่เกี่ยวข้องและบันทึก decision; ไม่ fallback mock/เดา policy
+
+## Authoring review execution override — 2026-10-11
+
+Latest user permits documented agent choices. [Component evidence](../AUTHORING_REVIEW_COMPONENT.md) and [decisions](../AUTONOMOUS_EXECUTION_DECISIONS.md) override former D04/D05/D09/D10 waits for this implemented subset. All defined APIs in this package have component proof, shared PG25/unit7/actual Frontend8 checks. Whole browser/original feature acceptance pending; no provider/deploy claim.

@@ -472,6 +472,10 @@ export function decodeManagementResponse(path: string, method: string, payload: 
   else if (/^courses\/[^/]+\/submit-review$/.test(p) && m === 'POST') check = review;
   else if (/^admin\/course-reviews\/[^/]+\/(approve|return)$/.test(p) && m === 'POST')
     check = review;
+  else if (p === 'admin/course-reviews' && m === 'GET')
+    check = page(object({ ...reviewFields, course: courseSummary }));
+  else if (/^admin\/course-reviews\/[^/]+$/.test(p) && m === 'GET')
+    check = object({ ...reviewFields, course: fullCourse(true) });
   else if (p === 'admin/users' && m === 'GET') check = page(userSummary);
   else if (p === 'admin/instructors' && m === 'GET') check = page(instructor);
   else if (p === 'admin/users' && m === 'POST')
